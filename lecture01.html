@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Electrochemistry Bench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Serif:wght@500;600&display=swap">
+
+<style>
+:root{
+  --ground:#F1F3F2; --surface:#FFFFFF; --surface-2:#E9EDEB;
+  --ink:#14191B; --ink-2:#3E4A4D; --muted:#68767A; --line:#D6DDDA; --line-2:#C3CCC8;
+  --ox:#A85B33;            /* copper — oxidation / anode */
+  --ox-soft:#F3E4DA;
+  --red-:#15618E;          /* electrolyte blue — reduction / cathode */
+  --red-soft:#DDE9F2;
+  --go:#2C7355;            /* spontaneous */
+  --go-soft:#DCEBE3;
+  --stop:#8A5F0C;          /* driven / non-spontaneous */
+  --stop-soft:#F3E9D3;
+  --elec:#3E4A4D;
+  --shadow:0 1px 2px rgba(20,25,27,.05),0 8px 24px -12px rgba(20,25,27,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+    --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+    --ox:#D08551; --ox-soft:#33231A;
+    --red-:#5AA6D4; --red-soft:#152833;
+    --go:#5DBB8D; --go-soft:#152A21;
+    --stop:#D6A33F; --stop-soft:#2B2415;
+    --elec:#AEBBBE;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+  --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+  --ox:#D08551; --ox-soft:#33231A;
+  --red-:#5AA6D4; --red-soft:#152833;
+  --go:#5DBB8D; --go-soft:#152A21;
+  --stop:#D6A33F; --stop-soft:#2B2415;
+  --elec:#AEBBBE;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+  font-weight:400; line-height:1.6; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:32px 20px 72px}
+
+.masthead{display:flex;flex-wrap:wrap;align-items:flex-end;gap:20px 32px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+h1{font-family:"IBM Plex Serif",Georgia,serif;font-weight:600;font-size:clamp(28px,4.2vw,42px);line-height:1.12;margin:0;text-wrap:balance;letter-spacing:-.015em}
+.sub{margin:8px 0 0;color:var(--ink-2);font-size:15px;max-width:62ch}
+
+.tabs{display:flex;gap:2px;margin:24px 0 22px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{appearance:none;background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);
+  font-family:inherit;font-size:14.5px;font-weight:500;padding:11px 16px;cursor:pointer;white-space:nowrap;margin-bottom:-1px}
+.tab:hover{color:var(--ink-2)}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ox)}
+.tab:focus-visible{outline:2px solid var(--red-);outline-offset:-2px;border-radius:4px 4px 0 0}
+.panel[hidden]{display:none}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow)}
+.card-h{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.card-h h2{font-size:15px;font-weight:600;margin:0;letter-spacing:-.01em}
+.card-h .note{font-size:12.5px;color:var(--muted)}
+.card-b{padding:18px}
+
+.builder{display:grid;grid-template-columns:minmax(260px,1fr) minmax(300px,1.05fr) minmax(280px,1.1fr);gap:16px;align-items:start}
+@media(max-width:1000px){.builder{grid-template-columns:1fr 1fr}.builder>.col-3{grid-column:1/-1}}
+@media(max-width:700px){.builder{grid-template-columns:1fr}}
+
+label.fld,span.fld{display:block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+select,input[type=number],input[type=text]{
+  width:100%;font-family:inherit;font-size:14px;color:var(--ink);background:var(--surface-2);
+  border:1px solid var(--line-2);border-radius:7px;padding:9px 10px;
+}
+select:focus-visible,input:focus-visible{outline:2px solid var(--red-);outline-offset:1px}
+.stack{display:flex;flex-direction:column;gap:14px}
+
+.pill-row{display:flex;gap:6px;background:var(--surface-2);padding:4px;border-radius:8px}
+.pill{flex:1;appearance:none;border:0;background:none;font-family:inherit;font-size:13px;font-weight:500;
+  color:var(--muted);padding:8px 6px;border-radius:6px;cursor:pointer}
+.pill[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.pill:focus-visible{outline:2px solid var(--red-);outline-offset:1px}
+
+.role-tag{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  padding:2px 7px;border-radius:4px;font-weight:500;display:inline-block;margin-bottom:5px}
+.role-cat{background:var(--surface);color:var(--red-)}
+.role-an{background:var(--surface);color:var(--ox)}
+
+.readout{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px dotted var(--line)}
+.readout:last-child{border-bottom:0}
+.readout .k{font-size:13px;color:var(--muted)}
+.readout .v{font-family:"IBM Plex Mono",monospace;font-size:16px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--ink)}
+.verdict{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:8px;font-size:13.5px;line-height:1.5}
+.verdict.go{background:var(--go-soft);color:var(--go)}
+.verdict.stop{background:var(--stop-soft);color:var(--stop)}
+.verdict strong{font-weight:600}
+.eq{font-family:"IBM Plex Mono",monospace;font-size:13.5px;line-height:1.9;color:var(--ink)}
+.eq .co{color:var(--muted)}
+.half{padding:9px 11px;border-radius:7px;font-family:"IBM Plex Mono",monospace;font-size:12.5px;line-height:1.55}
+.half.cat{background:var(--red-soft);color:var(--red-)}
+.half.an{background:var(--ox-soft);color:var(--ox)}
+
+svg{display:block;max-width:100%}
+.scrollx{overflow-x:auto}
+
+.far{display:grid;grid-template-columns:minmax(280px,1fr) minmax(320px,1.4fr);gap:16px;align-items:start}
+@media(max-width:860px){.far{grid-template-columns:1fr}}
+.slider-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px}
+.slider-row .val{font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--ox);margin:2px 0 0}
+input[type=range]:focus-visible{outline:2px solid var(--red-);outline-offset:3px}
+.steps{display:flex;flex-direction:column;gap:0}
+.step{display:grid;grid-template-columns:26px 1fr auto;gap:12px;align-items:baseline;padding:11px 0;border-bottom:1px dotted var(--line)}
+.step:last-child{border-bottom:0}
+.step .n{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted);border:1px solid var(--line-2);border-radius:50%;width:22px;height:22px;display:grid;place-items:center;align-self:center}
+.step .d{font-size:13px;color:var(--ink-2)}
+.step .d em{font-style:normal;font-family:"IBM Plex Mono",monospace;color:var(--muted);font-size:12px}
+.step .r{font-family:"IBM Plex Mono",monospace;font-size:14.5px;font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap}
+.step.final .r{color:var(--ox);font-size:17px}
+.bars{display:flex;flex-direction:column;gap:7px}
+.bar{display:grid;grid-template-columns:44px 1fr 72px;gap:10px;align-items:center;font-size:12.5px}
+.bar .nm{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink-2)}
+.bar .tr{background:var(--surface-2);border-radius:3px;height:14px;overflow:hidden}
+.bar .fl{height:100%;background:var(--line-2);border-radius:3px;transition:width .35s ease}
+.bar.on .fl{background:var(--ox)}
+.bar .qt{font-family:"IBM Plex Mono",monospace;font-size:12.5px;text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+.bar.on .qt{color:var(--ink);font-weight:500}
+.ghost{appearance:none;background:var(--surface-2);border:1px solid var(--line-2);color:var(--ink-2);
+  font-family:inherit;font-size:12.5px;padding:8px 12px;border-radius:7px;cursor:pointer;text-align:left}
+.ghost:hover{border-color:var(--ox);color:var(--ox)}
+.ghost:focus-visible{outline:2px solid var(--red-);outline-offset:1px}
+.solid{appearance:none;background:var(--ox);border:1px solid var(--ox);color:#fff;
+  font-family:inherit;font-size:13.5px;font-weight:500;padding:10px 16px;border-radius:7px;cursor:pointer}
+.solid:hover{filter:brightness(1.08)}
+.solid:focus-visible{outline:2px solid var(--red-);outline-offset:2px}
+.solid:disabled{background:var(--line-2);border-color:var(--line-2);color:var(--muted);cursor:not-allowed;filter:none}
+
+/* ---------- concept check ---------- */
+.idgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:end}
+@media(max-width:640px){.idgrid{grid-template-columns:1fr}}
+input:read-only{background:var(--surface);color:var(--muted);cursor:not-allowed}
+.locked{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;background:var(--go-soft);color:var(--go);padding:2px 7px;border-radius:4px;margin-left:8px}
+.scorebar{display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;padding:14px 18px;border-top:1px solid var(--line)}
+.scorenum{font-family:"IBM Plex Mono",monospace;font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--ink);line-height:1}
+.scorenum small{font-size:14px;font-weight:400;color:var(--muted)}
+.vcode{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted)}
+.vcode b{color:var(--ink);font-weight:600;letter-spacing:.08em}
+.quiz{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:16px}
+.q .stem{font-size:14.5px;line-height:1.6;margin:0 0 12px}
+.q .stem code{font-family:"IBM Plex Mono",monospace;font-size:13px;background:var(--surface-2);padding:1px 5px;border-radius:4px}
+.opts{display:flex;flex-direction:column;gap:7px}
+.opt{appearance:none;text-align:left;font-family:inherit;font-size:13.5px;line-height:1.45;color:var(--ink);
+  background:var(--surface-2);border:1px solid transparent;border-radius:7px;padding:9px 12px;cursor:pointer;
+  display:flex;gap:9px}
+.opt .ltr{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);flex:0 0 auto;padding-top:1px}
+.opt:hover:not(:disabled){border-color:var(--line-2)}
+.opt:focus-visible{outline:2px solid var(--red-);outline-offset:1px}
+.opt.right{background:var(--go-soft);color:var(--go);border-color:var(--go);font-weight:500}
+.opt.right .ltr{color:var(--go)}
+.opt.wrong{background:var(--stop-soft);color:var(--stop);border-color:var(--stop)}
+.opt.wrong .ltr{color:var(--stop)}
+.opt:disabled{cursor:default}
+.why{margin:12px 0 0;font-size:13px;line-height:1.65;color:var(--ink-2);border-left:2px solid var(--line-2);padding-left:12px}
+.misc{display:block;margin-top:10px;padding:9px 12px;border-radius:7px;background:var(--stop-soft);color:var(--stop);font-size:12.5px;line-height:1.6}
+.misc a{color:inherit;font-weight:600;white-space:nowrap}
+.why[hidden]{display:none}
+.tally{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.hint{font-size:12.5px;color:var(--muted);line-height:1.6;margin:0}
+
+footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;line-height:1.8}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <div style="flex:1 1 380px">
+      <p class="eyebrow"><a href="index.html" style="color:inherit">CH40051 Electroanalytical Chemistry</a> · Lecture 1 · Thermodynamics</p>
+      <h1>Electrochemistry Bench</h1>
+      <p class="sub">Pick two half-reactions and a cell assembles itself. Change them and watch where the electrons go, why they go that way, and how much metal a given charge actually deposits.</p>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" aria-controls="p-cell" id="t-cell">Cell Builder</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-far" id="t-far">Faraday Bench</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-quiz" id="t-quiz">Concept Check</button>
+  </div>
+
+  <!-- ============ PANEL 1 ============ -->
+  <section class="panel" id="p-cell" role="tabpanel" aria-labelledby="t-cell">
+    <div class="builder">
+
+      <div class="col-1 stack">
+        <div class="card">
+          <div class="card-h"><h2>Pick two half-reactions</h2></div>
+          <div class="card-b stack">
+            <div>
+              <label class="fld" for="cA">Electrode A</label>
+              <select id="cA"></select>
+            </div>
+            <div>
+              <label class="fld" for="cB">Electrode B</label>
+              <select id="cB"></select>
+            </div>
+            <div>
+              <span class="fld">Cell mode</span>
+              <div class="pill-row" id="mode">
+                <button class="pill" data-mode="gal" aria-pressed="true">Galvanic (spontaneous)</button>
+                <button class="pill" data-mode="ele" aria-pressed="false">Electrolytic (driven)</button>
+              </div>
+            </div>
+            <p style="margin:0;font-size:12.5px;color:var(--muted);line-height:1.65" id="modeNote"></p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h2>How to read the table</h2></div>
+          <div class="card-b" style="font-size:13px;color:var(--ink-2);line-height:1.7">
+            The table lists <strong>reduction reactions only</strong>. To use one as an oxidation, reverse the arrow and flip the sign of <em>E</em>°.
+            A large <em>E</em>° marks a strong <strong>oxidizing agent</strong> (easily reduced); a small one, a strong <strong>reducing agent</strong>.
+          </div>
+        </div>
+      </div>
+
+      <div class="col-2">
+        <div class="card">
+          <div class="card-h"><h2>E diagram</h2><span class="note">electrons spontaneously flow from low <em>E</em> to high <em>E</em> — the reverse needs a power supply</span></div>
+          <div class="card-b scrollx"><svg id="ediag" viewBox="0 0 340 420" width="340" height="420" style="margin:0 auto" role="img" aria-label="Standard potential diagram for the two selected half-reactions"></svg></div>
+        </div>
+      </div>
+
+      <div class="col-3 stack">
+        <div class="card">
+          <div class="card-h"><h2>Readout</h2></div>
+          <div class="card-b">
+            <div class="readout"><span class="k">E<sub>cathode</sub> − E<sub>anode</sub></span><span class="v" id="rEcell">—</span></div>
+            <div class="readout"><span class="k">Electrons transferred, <em>n</em></span><span class="v" id="rN">—</span></div>
+            <div class="readout"><span class="k">ΔG° = −<em>nF</em> E°<sub>cell</sub></span><span class="v" id="rG">—</span></div>
+            <div style="margin-top:14px" class="verdict" id="rVerdict"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h2>Electrode reactions</h2></div>
+          <div class="card-b stack" style="gap:9px">
+            <div class="half cat" id="rCat"></div>
+            <div class="half an" id="rAn"></div>
+            <div style="border-top:1px solid var(--line);padding-top:11px">
+              <div class="eq" id="rOverall"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ PANEL 2 ============ -->
+  <section class="panel" id="p-far" role="tabpanel" aria-labelledby="t-far" hidden>
+    <div class="far">
+
+      <div class="stack">
+        <div class="card">
+          <div class="card-h"><h2>Power settings</h2></div>
+          <div class="card-b stack">
+            <div>
+              <div class="slider-row"><label class="fld" style="margin:0" for="fI">Current I</label><span class="val" id="fIv"></span></div>
+              <input type="range" id="fI" min="0.01" max="3" step="0.01" value="0.5">
+            </div>
+            <div>
+              <div class="slider-row"><label class="fld" style="margin:0" for="fT">Time t</label><span class="val" id="fTv"></span></div>
+              <input type="range" id="fT" min="1" max="300" step="1" value="101">
+            </div>
+            <div>
+              <div class="slider-row"><label class="fld" style="margin:0" for="fE">Current efficiency</label><span class="val" id="fEv"></span></div>
+              <input type="range" id="fE" min="40" max="100" step="1" value="100">
+            </div>
+            <div>
+              <label class="fld" for="fM">Metal to deposit</label>
+              <select id="fM"></select>
+            </div>
+            <div>
+              <label class="fld" for="fA">Electrode area (cm²)</label>
+              <input type="number" id="fA" value="4" min="0.1" step="0.1">
+            </div>
+            <button class="ghost" id="fPreset">Load EXAMPLE 17.2 — Ag, 0.500 A, 101 min</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>What current efficiency means</h2></div>
+          <div class="card-b" style="font-size:13px;color:var(--ink-2);line-height:1.7">
+            In a real cell some of the charge you pass leaks into <strong>side reactions</strong> such as hydrogen evolution. Drop the efficiency below 100 % to see why a measured mass falls short of the calculated one.
+          </div>
+        </div>
+      </div>
+
+      <div class="stack">
+        <div class="card">
+          <div class="card-h"><h2>Following the units</h2><span class="note">charge → moles of electrons → moles of substance → mass</span></div>
+          <div class="card-b"><div class="steps" id="fSteps"></div></div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>Same charge, different metals</h2><span class="note">the equivalent weight W<sub>eq</sub> = M/n sets the mass</span></div>
+          <div class="card-b"><div class="bars" id="fBars"></div></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ PANEL 3 ============ -->
+  <section class="panel" id="p-quiz" role="tabpanel" aria-labelledby="t-quiz" hidden>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h">
+        <h2>Concept check</h2>
+        <span class="note">Answer once per question — the reasoning appears immediately</span>
+        <span class="tally" style="margin-left:auto" id="tally"></span>
+      </div>
+      <div class="card-b">
+        <div class="idgrid">
+          <div>
+            <label class="fld" for="sId">Student ID</label>
+            <input type="text" id="sId" inputmode="numeric" placeholder="e.g. 20261234">
+          </div>
+        </div>
+        <p class="hint" id="idHint" style="margin-top:12px"><strong>One attempt.</strong> Enter your student ID before you begin — it locks once you answer the first question. Each answer is final, and the correct answer with its explanation appears as soon as you choose.</p>
+      </div>
+      <div class="scorebar" id="scorebar" hidden>
+        <div>
+          <div class="scorenum" id="scoreNum">—</div>
+          <div class="vcode" style="margin-top:4px" id="whoLine">—</div>
+        </div>
+        <div style="flex:1 1 300px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="solid" id="sendBtn" type="button" hidden>Submit to the course</button>
+            <button class="ghost" id="dlBtn" type="button">Download my result</button>
+          </div>
+          <p class="hint" id="dlHint" style="margin-top:8px">Download the file and hand it in as your instructor directs.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="quiz" id="quiz"></div>
+  </section>
+
+  <footer>
+    Standard potentials are quoted at 25 °C and unit activity · F = 96 485 C mol⁻¹ · Li-ion electrode potentials are approximate<br>
+    CH40051 Electroanalytical Chemistry · Fall 2026 — companion to Lecture 1
+  </footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------------- data : ox + n e- -> red ---------------- */
+var C = [
+ {g:"Metal / metal ion", id:"Li",  E:-3.04, n:1, ox:[[1,"Li⁺"]],  red:[[1,"Li(s)"]]},
+ {g:"Metal / metal ion", id:"K",   E:-2.93, n:1, ox:[[1,"K⁺"]],   red:[[1,"K(s)"]]},
+ {g:"Metal / metal ion", id:"Ca",  E:-2.87, n:2, ox:[[1,"Ca²⁺"]], red:[[1,"Ca(s)"]]},
+ {g:"Metal / metal ion", id:"Na",  E:-2.71, n:1, ox:[[1,"Na⁺"]],  red:[[1,"Na(s)"]]},
+ {g:"Metal / metal ion", id:"Mg",  E:-2.37, n:2, ox:[[1,"Mg²⁺"]], red:[[1,"Mg(s)"]]},
+ {g:"Metal / metal ion", id:"Al",  E:-1.66, n:3, ox:[[1,"Al³⁺"]], red:[[1,"Al(s)"]]},
+ {g:"Metal / metal ion", id:"Zn",  E:-0.76, n:2, ox:[[1,"Zn²⁺"]], red:[[1,"Zn(s)"]]},
+ {g:"Metal / metal ion", id:"Fe",  E:-0.44, n:2, ox:[[1,"Fe²⁺"]], red:[[1,"Fe(s)"]]},
+ {g:"Metal / metal ion", id:"Ni",  E:-0.25, n:2, ox:[[1,"Ni²⁺"]], red:[[1,"Ni(s)"]]},
+ {g:"Metal / metal ion", id:"Sn",  E:-0.14, n:2, ox:[[1,"Sn²⁺"]], red:[[1,"Sn(s)"]]},
+ {g:"Metal / metal ion", id:"Pb",  E:-0.13, n:2, ox:[[1,"Pb²⁺"]], red:[[1,"Pb(s)"]]},
+ {g:"Metal / metal ion", id:"Cu",  E: 0.34, n:2, ox:[[1,"Cu²⁺"]], red:[[1,"Cu(s)"]]},
+ {g:"Metal / metal ion", id:"Ag",  E: 0.80, n:1, ox:[[1,"Ag⁺"]],  red:[[1,"Ag(s)"]]},
+ {g:"Metal / metal ion", id:"Au",  E: 1.50, n:3, ox:[[1,"Au³⁺"]], red:[[1,"Au(s)"]]},
+
+ {g:"Gases, ions and redox couples", id:"SHE",  E: 0.00, n:2, ox:[[2,"H⁺"]], red:[[1,"H₂(g)"]]},
+ {g:"Gases, ions and redox couples", id:"AgCl", E: 0.22, n:1, ox:[[1,"AgCl(s)"]], red:[[1,"Ag(s)"],[1,"Cl⁻"]]},
+ {g:"Gases, ions and redox couples", id:"O2b",  E: 0.40, n:4, ox:[[1,"O₂(g)"],[2,"H₂O"]], red:[[4,"OH⁻"]]},
+ {g:"Gases, ions and redox couples", id:"I2",   E: 0.54, n:2, ox:[[1,"I₂(s)"]], red:[[2,"I⁻"]]},
+ {g:"Gases, ions and redox couples", id:"Fe23", E: 0.77, n:1, ox:[[1,"Fe³⁺"]], red:[[1,"Fe²⁺"]]},
+ {g:"Gases, ions and redox couples", id:"Br2",  E: 1.09, n:2, ox:[[1,"Br₂(l)"]], red:[[2,"Br⁻"]]},
+ {g:"Gases, ions and redox couples", id:"O2a",  E: 1.23, n:4, ox:[[1,"O₂(g)"],[4,"H⁺"]], red:[[2,"H₂O"]]},
+ {g:"Gases, ions and redox couples", id:"Cl2",  E: 1.36, n:2, ox:[[1,"Cl₂(g)"]], red:[[2,"Cl⁻"]]},
+ {g:"Gases, ions and redox couples", id:"MnO4", E: 1.51, n:5, ox:[[1,"MnO₄⁻"],[8,"H⁺"]], red:[[1,"Mn²⁺"],[4,"H₂O"]]},
+ {g:"Gases, ions and redox couples", id:"Ce",   E: 1.72, n:1, ox:[[1,"Ce⁴⁺"]], red:[[1,"Ce³⁺"]]},
+ {g:"Gases, ions and redox couples", id:"H2O2", E: 1.78, n:2, ox:[[1,"H₂O₂"],[2,"H⁺"]], red:[[2,"H₂O"]]},
+ {g:"Gases, ions and redox couples", id:"F2",   E: 2.87, n:2, ox:[[1,"F₂(g)"]], red:[[2,"F⁻"]]},
+
+ {g:"Li-ion electrodes (approximate)", id:"LCO", E: 0.80, n:1, esym:"x", ox:[[1,"Li₁₋ₓCoO₂"],[1,"Li⁺","x"]], red:[[1,"LiCoO₂"]]},
+ {g:"Li-ion electrodes (approximate)", id:"LiC", E:-3.04, n:1, ox:[[1,"Li⁺"],[6,"C"]], red:[[1,"LiC₆"]]}
+];
+
+var F = 96485.33;
+var LBL = {SHE:"H⁺/H₂", AgCl:"AgCl/Ag", O2b:"O₂/OH⁻", O2a:"O₂/H₂O",
+           Fe23:"Fe³⁺/Fe²⁺", MnO4:"MnO₄⁻/Mn²⁺", H2O2:"H₂O₂", Ce:"Ce⁴⁺/Ce³⁺",
+           LCO:"LiCoO₂", LiC:"LiC₆", I2:"I₂/I⁻", Br2:"Br₂/Br⁻", Cl2:"Cl₂/Cl⁻", F2:"F₂/F⁻"};
+
+/* ---------------- helpers ---------------- */
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+/* p[2] (and c.esym) hold a symbolic coefficient such as "x", printed tight
+   against the species: 1 → "x", 2 → "2x". Plain numbers keep the trailing space. */
+function co(k,s){return s ? (k===1?"":k)+s : (k===1?"":k+" ");}
+function sp(list,m){
+  return list.map(function(p){return co(p[0]*m,p[2])+p[1];}).join(" + ");
+}
+function half(c,m){
+  var e=c.n*m;
+  return sp(c.ox,m)+" + "+co(e,c.esym)+"e⁻  →  "+sp(c.red,m);
+}
+function halfRev(c,m){
+  var e=c.n*m;
+  return sp(c.red,m)+"  →  "+sp(c.ox,m)+" + "+co(e,c.esym)+"e⁻";
+}
+function gcd(a,b){while(b){var t=b;b=a%b;a=t;}return a;}
+function lcm(a,b){return a*b/gcd(a,b);}
+function fmt(x,d){var s=x.toFixed(d);return /^-0(\.0*)?$/.test(s)?s.slice(1):s;}
+function byId(id){for(var i=0;i<C.length;i++) if(C[i].id===id) return C[i]; return C[0];}
+
+function overall(cat,mc,an,ma){
+  var L={},R={},order=[],sym={};
+  function add(map,list,m){
+    list.forEach(function(p){
+      var k=p[1],s=p[2]||"";
+      if(!(k in map)) map[k]=0;
+      if(order.indexOf(k)<0) order.push(k);
+      /* a species that arrives symbolic from one side and numeric from the
+         other has no common symbol — print it as a plain number */
+      sym[k] = (k in sym) ? (sym[k]===s?s:"") : s;
+      map[k]+=p[0]*m;
+    });
+  }
+  add(L,cat.ox,mc); add(L,an.red,ma);
+  add(R,cat.red,mc); add(R,an.ox,ma);
+  order.forEach(function(k){
+    var c=Math.min(L[k]||0,R[k]||0);
+    if(c>0){L[k]-=c;R[k]-=c;}
+  });
+  function str(map){
+    var out=order.filter(function(k){return (map[k]||0)>0;})
+      .map(function(k){
+        var v=map[k],s=sym[k];
+        if(s) return '<span class="co">'+(v===1?"":v)+s+'</span>'+esc(k);
+        return (v===1?"":'<span class="co">'+v+'</span> ')+esc(k);
+      });
+    return out.length?out.join(" + "):"—";
+  }
+  return str(L)+"  →  "+str(R);
+}
+
+/* ---------------- tabs ---------------- */
+var tabs=[].slice.call(document.querySelectorAll(".tab"));
+tabs.forEach(function(t){
+  t.addEventListener("click",function(){
+    tabs.forEach(function(o){
+      var on=(o===t);
+      o.setAttribute("aria-selected",on?"true":"false");
+      document.getElementById(o.getAttribute("aria-controls")).hidden=!on;
+    });
+  });
+});
+
+/* ---------------- panel 1 ---------------- */
+var selA=document.getElementById("cA"), selB=document.getElementById("cB");
+function fill(sel,val){
+  var groups={},order=[],html="";
+  C.forEach(function(c){ if(!groups[c.g]){groups[c.g]=[];order.push(c.g);} groups[c.g].push(c); });
+  order.forEach(function(g){
+    html+='<optgroup label="'+esc(g)+'">';
+    groups[g].forEach(function(c){
+      html+='<option value="'+c.id+'"'+(c.id===val?" selected":"")+'>'+esc(half(c,1)+"   ("+fmt(c.E,2)+" V)")+'</option>';
+    });
+    html+="</optgroup>";
+  });
+  sel.innerHTML=html;
+}
+fill(selA,"Zn"); fill(selB,"Cu");
+
+var mode="gal";
+var pills=[].slice.call(document.querySelectorAll("#mode .pill"));
+pills.forEach(function(p){
+  p.addEventListener("click",function(){
+    mode=p.getAttribute("data-mode");
+    pills.forEach(function(o){o.setAttribute("aria-pressed",o===p?"true":"false");});
+    draw();
+  });
+});
+selA.addEventListener("change",draw);
+selB.addEventListener("change",draw);
+
+function draw(){
+  var a=byId(selA.value), b=byId(selB.value);
+  var hi=(a.E>=b.E)?a:b, lo=(a.E>=b.E)?b:a;
+  var cat,an;
+  if(mode==="gal"){cat=hi;an=lo;} else {cat=lo;an=hi;}
+
+  var same=(a.id===b.id);
+  var n=lcm(cat.n,an.n), mc=n/cat.n, ma=n/an.n;
+  var Ecell=cat.E-an.E;
+  var dG=-n*F*Ecell/1000;
+
+  document.getElementById("rEcell").textContent=same?"0.00 V":fmt(Ecell,2)+" V";
+  document.getElementById("rN").textContent=same?"—":n;
+  document.getElementById("rG").textContent=same?"—":fmt(dG,1)+" kJ/mol";
+
+  var v=document.getElementById("rVerdict");
+  if(same){
+    v.className="verdict stop";
+    v.innerHTML="<span>Two identical half-reactions give zero potential difference. Pick a <strong>different</strong> pair.</span>";
+  }else if(mode==="gal"){
+    v.className="verdict go";
+    v.innerHTML="<span><strong>Galvanic cell · spontaneous discharge.</strong> E°<sub>cell</sub> &gt; 0 and ΔG° &lt; 0, so the cell does electrical work on its own.</span>";
+  }else{
+    v.className="verdict stop";
+    v.innerHTML="<span><strong>Electrolytic cell · externally driven.</strong> E°<sub>cell</sub> &lt; 0 and ΔG° &gt; 0, so you must apply at least "+fmt(Math.abs(Ecell),2)+" V to make the reaction go.</span>";
+  }
+  document.getElementById("modeNote").innerHTML = (mode==="gal")
+    ? "The <strong>higher</strong> E° is assigned reduction (cathode); the lower one, oxidation (anode)."
+    : "The roles are deliberately reversed. An external supply has to push the electrons uphill.";
+
+  document.getElementById("rCat").innerHTML =
+    '<span class="role-tag role-cat">cathode · reduction</span><br>'+esc(half(cat,mc))+"   ( E° = "+fmt(cat.E,2)+" V )";
+  document.getElementById("rAn").innerHTML =
+    '<span class="role-tag role-an">anode · oxidation</span><br>'+esc(halfRev(an,ma))+"   ( table value E° = "+fmt(an.E,2)+" V )";
+  document.getElementById("rOverall").innerHTML = same ? "—" : overall(cat,mc,an,ma);
+
+  ediagram(cat,an,Ecell,same);
+}
+
+function ediagram(cat,an,Ecell,same){
+  var H=420,padT=34,padB=44,axX=196;
+  var EMIN=-3.35,EMAX=3.15;
+  /* electrochemistry convention: negative E at the top, positive E at the bottom */
+  function y(E){return padT+(E-EMIN)/(EMAX-EMIN)*(H-padT-padB);}
+  var mono='font-family="IBM Plex Mono,monospace"';
+  var s='<defs>'
+   +'<marker id="ar" markerWidth="7" markerHeight="7" refX="5.6" refY="3" orient="auto">'
+   +'<path d="M0,0.4 L6,3 L0,5.6 z" fill="var(--elec)"/></marker>'
+   +'<marker id="arC" markerWidth="7" markerHeight="7" refX="5.6" refY="3" orient="auto">'
+   +'<path d="M0,0.4 L6,3 L0,5.6 z" fill="var(--muted)"/></marker></defs>';
+
+  s+='<line x1="'+axX+'" y1="'+(padT-16)+'" x2="'+axX+'" y2="'+(H-padB+16)+'" stroke="var(--line-2)" stroke-width="1.4"/>';
+  s+='<text x="'+(axX+8)+'" y="'+(padT-20)+'" fill="var(--muted)" '+mono+' font-size="10.5">−   E vs SHE / V</text>';
+  s+='<text x="'+(axX+8)+'" y="'+(H-padB+28)+'" fill="var(--muted)" '+mono+' font-size="10.5">+</text>';
+  for(var t=-3;t<=3;t++){
+    var yy=y(t);
+    s+='<line x1="'+(axX-4)+'" y1="'+yy+'" x2="'+(axX+4)+'" y2="'+yy+'" stroke="var(--line-2)" stroke-width="1"/>';
+    s+='<text x="'+(axX+9)+'" y="'+(yy+3.5)+'" fill="var(--muted)" '+mono+' font-size="9.5">'+(t>0?"+":"")+t.toFixed(1)+'</text>';
+  }
+  s+='<line x1="34" y1="'+y(0)+'" x2="'+(axX-6)+'" y2="'+y(0)+'" stroke="var(--line)" stroke-width="1" stroke-dasharray="2 4"/>';
+
+  if(!same){
+    var yc=y(cat.E), ya=y(an.E);
+    var tight=Math.abs(ya-yc)<46;
+    function lvl(c,yy,col,role,up){
+      var nm=LBL[c.id]||c.id;
+      var yName = up ? yy-22 : yy-9;
+      var yRole = up ? yy-9  : yy+15;
+      if(!up && tight){ yName = yy+15; yRole = yy+28; }
+      s+='<line x1="34" y1="'+yy+'" x2="'+(axX-6)+'" y2="'+yy+'" stroke="'+col+'" stroke-width="2.6"/>';
+      s+='<text x="34" y="'+yName+'" fill="'+col+'" '+mono+' font-size="11" font-weight="500">'+esc(nm)+'   '+fmt(c.E,2)+' V</text>';
+      s+='<text x="34" y="'+yRole+'" fill="'+col+'" '+mono+' font-size="9.5" letter-spacing="0.08em">'+role+'</text>';
+    }
+    if(yc<=ya){ lvl(cat,yc,"var(--red-)","CATHODE · REDUCTION",true); lvl(an,ya,"var(--ox)","ANODE · OXIDATION",false); }
+    else      { lvl(an,ya,"var(--ox)","ANODE · OXIDATION",true);   lvl(cat,yc,"var(--red-)","CATHODE · REDUCTION",false); }
+
+    var bx=axX-26, ymid=(ya+yc)/2;
+    s+='<line x1="'+bx+'" y1="'+ya+'" x2="'+bx+'" y2="'+yc+'" stroke="var(--muted)" stroke-width="1" marker-end="url(#arC)"/>';
+    s+='<text x="'+(bx-7)+'" y="'+(ymid+3)+'" text-anchor="end" fill="var(--ink-2)" '+mono+' font-size="11" font-weight="500">E°cell '+fmt(Ecell,2)+' V</text>';
+
+    var rail=20;
+    s+='<path d="M '+rail+' '+ya+' L '+rail+' '+yc+'" stroke="var(--elec)" stroke-width="1.6" fill="none" marker-end="url(#ar)" stroke-dasharray="5 4">'
+      +'<animate attributeName="stroke-dashoffset" from="18" to="0" dur="1.1s" repeatCount="indefinite"/></path>';
+    s+='<text x="'+(rail-7)+'" y="'+(ymid-3)+'" text-anchor="middle" fill="var(--elec)" '+mono+' font-size="10" transform="rotate(-90 '+(rail-7)+' '+(ymid-3)+')">e⁻</text>';
+  }else{
+    s+='<text x="34" y="'+y(0)+'" fill="var(--muted)" font-family="IBM Plex Sans,sans-serif" font-size="12">Pick two different couples</text>';
+  }
+  document.getElementById("ediag").innerHTML=s;
+}
+draw();
+
+/* ---------------- panel 2 ---------------- */
+var METALS=[
+ {id:"Ag",M:107.87,n:1,rho:10.49,rxn:"Ag⁺ + e⁻ → Ag(s)"},
+ {id:"Cu",M:63.55, n:2,rho:8.96, rxn:"Cu²⁺ + 2e⁻ → Cu(s)"},
+ {id:"Zn",M:65.38, n:2,rho:7.14, rxn:"Zn²⁺ + 2e⁻ → Zn(s)"},
+ {id:"Ni",M:58.69, n:2,rho:8.91, rxn:"Ni²⁺ + 2e⁻ → Ni(s)"},
+ {id:"Al",M:26.98, n:3,rho:2.70, rxn:"Al³⁺ + 3e⁻ → Al(s)"},
+ {id:"Au",M:196.97,n:3,rho:19.32,rxn:"Au³⁺ + 3e⁻ → Au(s)"},
+ {id:"Li",M:6.94,  n:1,rho:0.534,rxn:"Li⁺ + e⁻ → Li(s)"}
+];
+var fM=document.getElementById("fM");
+fM.innerHTML=METALS.map(function(m){
+  return '<option value="'+m.id+'"'+(m.id==="Ag"?" selected":"")+'>'+esc(m.id+"   —   "+m.rxn)+'</option>';
+}).join("");
+
+var fI=document.getElementById("fI"),fT=document.getElementById("fT"),
+    fE=document.getElementById("fE"),fA=document.getElementById("fA");
+[fI,fT,fE,fA,fM].forEach(function(el){el.addEventListener("input",far);});
+document.getElementById("fPreset").addEventListener("click",function(){
+  fI.value=0.5; fT.value=101; fE.value=100; fM.value="Ag"; far();
+});
+
+function far(){
+  var I=+fI.value, tmin=+fT.value, eff=+fE.value/100, area=Math.max(0.1,+fA.value||1);
+  var m=null;
+  for(var i=0;i<METALS.length;i++) if(METALS[i].id===fM.value) m=METALS[i];
+  var tsec=tmin*60, Q=I*tsec*eff, mole=Q/F, molM=mole/m.n, mass=molM*m.M;
+  var thick=mass/m.rho/area*1e4;
+
+  document.getElementById("fIv").textContent=I.toFixed(2)+" A";
+  document.getElementById("fTv").textContent=tmin+" min";
+  document.getElementById("fEv").textContent=(eff*100).toFixed(0)+" %";
+
+  var rows=[
+    ["Q = I · t"+(eff<1?" · η":""),"current × time = charge passed",
+     I.toFixed(2)+" A × "+tsec.toLocaleString()+" s"+(eff<1?" × "+eff.toFixed(2):""), Q.toFixed(0)+" C", false],
+    ["N(e⁻) = Q / F","divide the charge by the Faraday constant",
+     Q.toFixed(0)+" ÷ 96 485", mole.toExponential(3)+" mol", false],
+    ["N(M) = N(e⁻) / n",m.n+" electron"+(m.n>1?"s":"")+" per atom of "+m.id,
+     "n = "+m.n+"   ·   "+m.rxn, molM.toExponential(3)+" mol", false],
+    ["W = N(M) · M","moles × atomic mass",
+     "W_eq = M/n = "+(m.M/m.n).toFixed(2)+" g/mol", mass.toFixed(3)+" g", true],
+    ["d = W / (ρ · A)","thickness of the deposited layer",
+     "ρ = "+m.rho+" g/cm³   ·   A = "+area+" cm²", thick.toFixed(1)+" µm", false]
+  ];
+  document.getElementById("fSteps").innerHTML=rows.map(function(r,i){
+    return '<div class="step'+(r[4]?" final":"")+'"><span class="n">'+(i+1)+'</span>'
+      +'<span class="d"><strong style="font-family:IBM Plex Mono,monospace;font-weight:500;color:var(--ink)">'+esc(r[0])+'</strong><br>'
+      +esc(r[1])+'<br><em>'+esc(r[2])+'</em></span>'
+      +'<span class="r">'+esc(r[3])+'</span></div>';
+  }).join("");
+
+  var masses=METALS.map(function(x){return {nm:x.id,w:(Q/F/x.n)*x.M,on:x.id===m.id};});
+  var max=Math.max.apply(null,masses.map(function(x){return x.w;}))||1;
+  document.getElementById("fBars").innerHTML=masses.map(function(x){
+    return '<div class="bar'+(x.on?" on":"")+'"><span class="nm">'+x.nm+'</span>'
+      +'<span class="tr"><span class="fl" style="width:'+(x.w/max*100).toFixed(1)+'%"></span></span>'
+      +'<span class="qt">'+x.w.toFixed(3)+' g</span></div>';
+  }).join("");
+}
+far();
+
+/* ---------------- panel 3 : concept check ---------------- */
+var QZ=[
+ {q:"In a galvanic cell the <b>anode</b> is the (−) terminal, but in an electrolytic cell the anode is (+). What accounts for the difference?",
+  o:["The definition of “anode” changes with the type of cell",
+     "The anode is always where <b>oxidation</b> happens; the polarity label answers a separate question",
+     "The direction of the current is reversed in an electrolytic cell",
+     "The external supply reverses the sign of the ions"],
+  a:1,
+  w:"Anode and cathode are defined by the <b>reaction</b> — oxidation at the anode, reduction at the cathode. (+) and (−) are a separate label. In a galvanic cell the reaction itself pushes electrons out of the anode, so it is negative; in an electrolytic cell the supply pulls electrons out of the anode, so it is positive. Do not mix the two systems."},
+
+ {q:"The table lists <code>Cu²⁺ + 2e⁻ → Cu(s), E° = +0.34 V</code>. What is E° for the oxidation of Cu(s)?",
+  o:["−0.34 V",
+     "+0.34 V — E° is a property of the substance and does not change",
+     "+0.17 V — divide by the number of electrons",
+     "−0.68 V — multiply by the number of electrons"],
+  a:0,
+  w:"Reversing the direction flips the sign. But <b>multiplying the equation by a coefficient does not change E°</b> — it is energy per unit charge (J/C), an intensive property. Only ΔG°, an extensive quantity, scales with n."},
+
+ {q:"A classmate balances the electrons in a cell by doubling a half-reaction and writes <code>2Fe³⁺ + 2e⁻ → 2Fe²⁺, E° = 2 × 0.77 = +1.54 V</code>. Which belief produced that line?",
+  o:["Unit-agnostic formula — a quantity was used without converting its units",
+     "Scaling an intensive quantity — E° was treated as though it grows with the amount of reaction",
+     "Inverted electron ratio — the electron count was multiplied where it should divide",
+     "Double sign flip — a reversed half-reaction was also subtracted"],
+  a:1,
+  w:"E° is energy per unit charge (J C⁻¹). It is <b>intensive</b>: it does not care how you chose to write the equation. ΔG° = −nFE° is extensive and does double, because n doubles while E° stays put. The other three options are real misconceptions with real names — you will meet each of them this term, and the midterm expects you to be able to tell them apart."},
+
+ {q:"You pass the same 1 000 C through a solution of Ag⁺ and through a solution of Al³⁺. How do the deposited masses compare?",
+  o:["Far more Ag — its atomic mass is larger and it needs only one electron",
+     "The same, because the number of moles is the same",
+     "More Al, because it accepts three electrons",
+     "The same, whenever the current is the same"],
+  a:0,
+  w:"What sets the mass is the equivalent weight W<sub>eq</sub> = M/n. For Ag it is 107.9/1 = 107.9; for Al, 27.0/3 = 9.0 — a factor of about 12. Check it on the Faraday Bench."},
+
+ {q:"Inside the electrolyte, which electrode do <b>anions</b> move toward?",
+  o:["The cathode — negative ions are attracted to the negative terminal",
+     "They do not move; only electrons do",
+     "The anode — to balance the positive charge produced by oxidation",
+     "At random, regardless of the electrode"],
+  a:2,
+  w:"An <b>an</b>ion goes to the <b>an</b>ode, as the name suggests. The reason is electroneutrality: oxidation at the anode releases cations into solution, and anions migrate in to balance them. Electron flow in the external circuit and ion flow inside the cell together close one circuit."},
+
+ {q:"A cell is found to have ΔG° = +212 kJ/mol with n = 2. Which statement is correct?",
+  o:["E°cell ≈ +1.10 V and it discharges spontaneously",
+     "ΔG° is positive, so the reaction is impossible under any conditions",
+     "n = 2, so the voltage doubles",
+     "E°cell ≈ −1.10 V, and an external supply is needed to drive the reaction"],
+  a:3,
+  w:"E° = −ΔG°/(nF) = −212 000/(2 × 96 485) ≈ −1.10 V. That means non-spontaneous <b>under standard conditions</b>, not impossible — apply a voltage, or shift the concentrations (Nernst equation, next lecture)."}
+];
+
+/* one concept tag per question — the instructor dashboard groups by these */
+var TAGS=[
+  "Electrode definitions & polarity",
+  "Sign convention & intensivity of E°",
+  "Computing E°cell",
+  "Faraday's law & equivalent weight",
+  "Ion transport & electroneutrality",
+  "ΔG–E relationship & spontaneity"
+];
+
+var LETTERS="ABCD";
+var STORE="echem-l1-check-v1";
+var picks=new Array(QZ.length).fill(-1);
+var sId=document.getElementById("sId");
+var elTally=document.getElementById("tally"), elBar=document.getElementById("scorebar");
+var elScore=document.getElementById("scoreNum"), elWho=document.getElementById("whoLine");
+var elIdHint=document.getElementById("idHint");
+var dlBtn=document.getElementById("dlBtn"), dlHint=document.getElementById("dlHint");
+var startedAt=null, finishedAt=null;
+
+function save(){
+  try{
+    localStorage.setItem(STORE,JSON.stringify({
+      i:sId.value, p:picks, s:startedAt, t:finishedAt
+    }));
+  }catch(e){/* private window, blocked storage — the page still works */}
+}
+function load(){
+  try{
+    var raw=localStorage.getItem(STORE);
+    if(!raw) return;
+    var d=JSON.parse(raw);
+    if(d && typeof d==="object"){
+      sId.value=d.i||"";
+      if(Array.isArray(d.p)&&d.p.length===QZ.length) picks=d.p.slice();
+      startedAt=d.s||null;
+      finishedAt=d.t||null;
+    }
+  }catch(e){/* corrupt or unreadable — start clean */}
+}
+function started(){ return picks.some(function(p){return p>=0;}); }
+
+/* FNV-1a: tamper-evidence for the receipt, not a security guarantee */
+function code(str){
+  var h=0x811c9dc5;
+  for(var i=0;i<str.length;i++){
+    h^=str.charCodeAt(i);
+    h=(h+((h<<1)+(h<<4)+(h<<7)+(h<<8)+(h<<24)))>>>0;
+  }
+  return ("0000000"+h.toString(16).toUpperCase()).slice(-8);
+}
+function scoreOf(){
+  var s=0;
+  for(var i=0;i<QZ.length;i++) if(picks[i]===QZ[i].a) s++;
+  return s;
+}
+function answered(){
+  return picks.filter(function(p){return p>=0;}).length;
+}
+/* One header row + one data row, so the instructor can concatenate every
+   student's file into a single table without editing anything. */
+function receipt(){
+  var s=scoreOf(), pct=Math.round(s/QZ.length*100);
+  var id=(sId.value||"").trim();
+  var stamp=finishedAt||new Date().toISOString();
+  var seed=id+"|"+stamp+"|"+picks.join("");
+  var vc=code(seed);
+
+  var head=["lecture","student_id","completed_utc","score","total","percent","verification"];
+  var row=["L1", id, stamp, s, QZ.length, pct, vc];
+  for(var i=0;i<QZ.length;i++){ head.push("a"+(i+1)); row.push(picks[i]>=0?LETTERS[picks[i]]:"-"); }
+  for(var j=0;j<QZ.length;j++){ head.push("ok"+(j+1)); row.push(picks[j]===QZ[j].a?1:0); }
+
+  function cell(v){
+    v=String(v);
+    return /[",\n]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v;
+  }
+  return {
+    csv: head.join(",")+"\n"+row.map(cell).join(",")+"\n",
+    vcode:vc, score:s, pct:pct, id:id
+  };
+}
+
+function render(){
+  var done=answered(), all=(done===QZ.length);
+  elTally.textContent = done+" / "+QZ.length+" answered";
+  elBar.hidden = !all;
+
+  /* identity locks as soon as the attempt begins, so the record cannot drift */
+  var lock=started();
+  sId.readOnly=lock;
+  if(all){
+    elIdHint.innerHTML="<strong>Attempt complete.</strong> Your answers are final. "
+      + "Every question below now shows the correct answer and why it is correct — read them before you close this page.";
+  }else if(lock){
+    elIdHint.innerHTML="<strong>Attempt in progress.</strong><span class=\"locked\">ID locked</span><br>"
+      + "Each answer is final. The correct answer and its explanation appear as soon as you choose.";
+  }else{
+    elIdHint.innerHTML="<strong>One attempt.</strong> Enter your student ID before you begin — "
+      + "it locks once you answer the first question. Each answer is final, and the correct answer with its "
+      + "explanation appears as soon as you choose.";
+  }
+
+  if(all){
+    if(!finishedAt){ finishedAt=new Date().toISOString(); save(); }
+    var r=receipt();
+    elScore.innerHTML = r.score+" <small>/ "+QZ.length+"  ·  "+r.pct+" %</small>";
+    elWho.innerHTML = "Student ID <b>"+esc(r.id||"—")+"</b> &nbsp;·&nbsp; Verification <b>"+r.vcode+"</b>";
+  }
+  for(var i=0;i<QZ.length;i++){
+    var box=document.querySelector('.opts[data-q="'+i+'"]');
+    var kids=[].slice.call(box.children);
+    var why=box.parentNode.querySelector(".why");
+    if(picks[i]<0){
+      kids.forEach(function(o){o.disabled=false;o.className="opt";});
+      why.hidden=true;
+    }else{
+      (function(qi){
+        kids.forEach(function(o,j){
+          o.disabled=true;
+          o.className="opt"+(j===QZ[qi].a?" right":(j===picks[qi]?" wrong":""));
+        });
+      })(i);
+      var _note=(picks[i]!==QZ[i].a)
+        ? '<span class="misc">You chose <b>'+LETTERS[picks[i]]+'</b>. '
+          + 'The correct answer is <b>'+LETTERS[QZ[i].a]+'</b>.</span>'
+        : "";
+      why.innerHTML=_note+QZ[i].w; why.hidden=false;
+    }
+  }
+}
+
+document.getElementById("quiz").innerHTML=QZ.map(function(item,i){
+  return '<div class="card q"><div class="card-b">'
+    +'<p class="stem"><b style="font-family:IBM Plex Mono,monospace;color:var(--muted);font-size:12px">Q'+(i+1)+'</b>  '+item.q+'</p>'
+    +'<div class="opts" data-q="'+i+'">'+item.o.map(function(o,j){
+        return '<button class="opt" data-i="'+j+'"><span class="ltr">'+LETTERS[j]+'</span><span>'+o+'</span></button>';
+      }).join("")+'</div>'
+    +'<p class="why" hidden></p></div></div>';
+}).join("");
+
+[].slice.call(document.querySelectorAll(".opts")).forEach(function(box){
+  box.addEventListener("click",function(ev){
+    var b=ev.target.closest(".opt");
+    if(!b||b.disabled) return;
+    var qi=+box.getAttribute("data-q");
+    if(picks[qi]>=0) return;
+    if(!(sId.value||"").trim()){
+      elIdHint.innerHTML="<strong style=\"color:var(--stop)\">Enter your student ID first.</strong> "
+        + "It is written into the result file you submit, so it has to be set before the attempt starts.";
+      sId.focus();
+      return;
+    }
+    if(!startedAt) startedAt=new Date().toISOString();
+    picks[qi]=+b.getAttribute("data-i");
+    save(); render();
+  });
+});
+
+sId.addEventListener("input",save);
+
+/* plain-browser download: build a Blob and click a temporary link */
+function saveCsv(filename, text){
+  var blob=new Blob([text],{type:"text/csv;charset=utf-8"});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement("a");
+  a.href=url; a.download=filename; a.style.display="none";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(function(){URL.revokeObjectURL(url);},1000);
+}
+
+dlBtn.addEventListener("click",function(){
+  var id=(sId.value||"").trim();
+  if(!id){
+    dlHint.textContent="Enter your student ID first — it goes into the file.";
+    return;
+  }
+  var r=receipt();
+  try{
+    saveCsv("CH40051-L1-check_"+id.replace(/[^A-Za-z0-9_-]/g,"")+".csv", r.csv);
+    dlHint.textContent="Saved to your downloads folder. Hand it in as your instructor directs.";
+  }catch(e){
+    dlHint.textContent="Your browser blocked the download. Take a screenshot of this panel and submit that instead.";
+  }
+});
+
+
+/* ---- submit straight to the course sheet ----------------------------------
+   Paste the Apps Script /exec URL between the quotes to switch this on.
+   Left empty, the button stays hidden and only the download exists.        */
+var SUBMIT_URL = "https://script.google.com/macros/s/AKfycbxPm7WrbttFu6-gnTi__IcUPt-816GthK0eI8TPuwOZyYlcRW3RAWJlmsr791moxBc5GA/exec";
+
+var sendBtn=document.getElementById("sendBtn");
+if(SUBMIT_URL){
+  sendBtn.hidden=false;
+  dlHint.textContent="Press Submit to send your result to the course. The download is a backup.";
+}
+
+sendBtn.addEventListener("click",function(){
+  var id=(sId.value||"").trim();
+  if(!id){ dlHint.textContent="Enter your student ID first."; return; }
+  var r=receipt();
+  var payload={
+    lecture:"L1", student_id:id, completed_utc:finishedAt||new Date().toISOString(),
+    score:r.score, total:QZ.length, percent:r.pct, verification:r.vcode,
+    answers:picks.map(function(p){ return p>=0?LETTERS[p]:"-"; }),
+    ok:picks.map(function(p,i){ return p===QZ[i].a?1:0; })
+  };
+  sendBtn.disabled=true;
+  dlHint.textContent="Sending…";
+
+  /* text/plain keeps this a simple request, so the browser sends it without
+     a preflight the Apps Script endpoint cannot answer */
+  fetch(SUBMIT_URL,{
+    method:"POST",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify(payload)
+  })
+  .then(function(res){ return res.json(); })
+  .then(function(j){
+    if(j && j.ok){
+      sendBtn.textContent="Submitted \u2713";
+      dlHint.textContent="Recorded for student ID "+id+". You can close this page.";
+    }else{
+      throw new Error((j && j.error) || "rejected");
+    }
+  })
+  .catch(function(){
+    /* the response could not be read - resend blind so the record still
+       lands, then tell the student to keep the file as proof */
+    fetch(SUBMIT_URL,{method:"POST",mode:"no-cors",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(payload)}).catch(function(){});
+    sendBtn.disabled=false;
+    sendBtn.textContent="Submit to the course";
+    dlHint.textContent="Sent, but the confirmation did not come back. "
+      + "Download the file as well and keep it — it is your proof of submission.";
+  });
+});
+
+load();
+render();
+
+})();
+</script>
+</body>
+</html>
