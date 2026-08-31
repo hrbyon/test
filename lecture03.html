@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Reference Bench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+:root{
+  --ground:#F1F3F2; --surface:#FFFFFF; --surface-2:#E9EDEB;
+  --ink:#14191B; --ink-2:#3E4A4D; --muted:#68767A; --line:#D6DDDA; --line-2:#C3CCC8;
+  --ox:#A85B33; --ox-soft:#F3E4DA;
+  --red-:#15618E; --red-soft:#DDE9F2;
+  --go:#2C7355; --go-soft:#DCEBE3;
+  --stop:#8A5F0C; --stop-soft:#F3E9D3;
+  --elec:#3E4A4D;
+  --shadow:0 1px 2px rgba(20,25,27,.05),0 8px 24px -12px rgba(20,25,27,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+    --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+    --ox:#D08551; --ox-soft:#33231A;
+    --red-:#5AA6D4; --red-soft:#152833;
+    --go:#5DBB8D; --go-soft:#152A21;
+    --stop:#D6A33F; --stop-soft:#2B2415;
+    --elec:#AEBBBE;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+  --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+  --ox:#D08551; --ox-soft:#33231A;
+  --red-:#5AA6D4; --red-soft:#152833;
+  --go:#5DBB8D; --go-soft:#152A21;
+  --stop:#D6A33F; --stop-soft:#2B2415;
+  --elec:#AEBBBE;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:32px 20px 72px}
+.masthead{display:flex;flex-wrap:wrap;align-items:flex-end;gap:20px 32px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.eyebrow a{color:inherit}
+h1{font-family:"IBM Plex Serif",Georgia,serif;font-weight:600;font-size:clamp(28px,4.2vw,42px);line-height:1.12;margin:0;text-wrap:balance;letter-spacing:-.015em}
+.sub{margin:8px 0 0;color:var(--ink-2);font-size:15px;max-width:62ch}
+.tabs{display:flex;gap:2px;margin:24px 0 22px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{appearance:none;background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);
+  font-family:inherit;font-size:14.5px;font-weight:500;padding:11px 16px;cursor:pointer;white-space:nowrap;margin-bottom:-1px}
+.tab:hover{color:var(--ink-2)}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ox)}
+.tab:focus-visible{outline:2px solid var(--red-);outline-offset:-2px;border-radius:4px 4px 0 0}
+.panel[hidden]{display:none}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow)}
+.card-h{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.card-h h2{font-size:15px;font-weight:600;margin:0;letter-spacing:-.01em}
+.card-h .note{font-size:12.5px;color:var(--muted)}
+.card-b{padding:18px}
+.stack{display:flex;flex-direction:column;gap:16px}
+.two{display:grid;grid-template-columns:minmax(280px,1fr) minmax(320px,1.3fr);gap:16px;align-items:start}
+@media(max-width:900px){.two{grid-template-columns:1fr}}
+label.fld,span.fld{display:block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+select,input[type=text],input[type=number]{width:100%;font-family:inherit;font-size:14px;color:var(--ink);
+  background:var(--surface-2);border:1px solid var(--line-2);border-radius:7px;padding:9px 10px}
+input:read-only{background:var(--surface);color:var(--muted);cursor:not-allowed}
+select:focus-visible,input:focus-visible{outline:2px solid var(--red-);outline-offset:1px}
+input[type=range]{width:100%;accent-color:var(--ox)}
+input[type=range]:focus-visible{outline:2px solid var(--red-);outline-offset:3px}
+.slider-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;gap:10px}
+.slider-row .val{font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+.solid{appearance:none;background:var(--ox);border:1px solid var(--ox);color:#fff;font-family:inherit;
+  font-size:13.5px;font-weight:500;padding:10px 16px;border-radius:7px;cursor:pointer}
+.solid:hover{filter:brightness(1.08)}
+.solid:disabled{background:var(--line-2);border-color:var(--line-2);color:var(--muted);cursor:not-allowed}
+.ghost{appearance:none;background:var(--surface-2);border:1px solid var(--line-2);color:var(--ink-2);
+  font-family:inherit;font-size:12.5px;padding:8px 12px;border-radius:7px;cursor:pointer;text-align:left}
+.ghost:hover{border-color:var(--ox);color:var(--ox)}
+.pill-row{display:flex;gap:6px;background:var(--surface-2);padding:4px;border-radius:8px}
+.pill{flex:1;appearance:none;border:0;background:none;font-family:inherit;font-size:13px;font-weight:500;
+  color:var(--muted);padding:8px 6px;border-radius:6px;cursor:pointer}
+.pill[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+/* converter output */
+.conv{display:flex;flex-direction:column}
+.crow{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:baseline;padding:10px 0;border-bottom:1px dotted var(--line)}
+.crow:last-child{border-bottom:0}
+.crow.self{background:var(--ox-soft);margin:0 -10px;padding:10px;border-radius:6px;border-bottom:0}
+.crow .nm{font-size:13.5px;color:var(--ink)}
+.crow .nm small{display:block;font-size:11.5px;color:var(--muted);font-family:"IBM Plex Mono",monospace}
+.crow .vv{font-family:"IBM Plex Mono",monospace;font-size:16px;font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap}
+.crow.aq .vv{color:var(--ink)}
+.crow.non .vv{color:var(--stop)}
+.big{font-family:"IBM Plex Mono",monospace;font-size:30px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.1}
+.plots{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-top:16px;align-items:start}
+/* controls and both graphs on one screen; everything explanatory sits below */
+.top3{display:grid;grid-template-columns:minmax(250px,.8fr) minmax(310px,1.1fr) minmax(310px,1.1fr);gap:16px;align-items:start}
+@media(max-width:1010px){.top3{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){.top3{grid-template-columns:1fr}}
+.statrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:14px 18px}
+.stat .k{display:block;font-size:11.5px;color:var(--muted);margin-bottom:3px}
+.stat .v{font-family:"IBM Plex Mono",monospace;font-size:19px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--ink)}
+.stat .v.warn{color:var(--stop)}
+.sidebyside{display:grid;grid-template-columns:minmax(240px,0.9fr) minmax(280px,1.1fr);gap:14px;align-items:start}
+@media(max-width:760px){.sidebyside{grid-template-columns:1fr}}
+/* the figure on the left, the numbers and the roles stacked to the right of it */
+.split{display:grid;grid-template-columns:minmax(330px,1.05fr) minmax(300px,1fr);gap:16px;align-items:start}
+@media(max-width:900px){.split{grid-template-columns:1fr}}
+.readout{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:9px 0;border-bottom:1px dotted var(--line)}
+.readout:last-child{border-bottom:0}
+.readout .k{font-size:13px;color:var(--muted)}
+.readout .v{font-family:"IBM Plex Mono",monospace;font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--ink)}
+.readout .v.warn{color:var(--stop)}
+.eqline{font-family:"IBM Plex Mono",monospace;font-size:13px;line-height:1.9;color:var(--ink-2);
+  background:var(--surface-2);border-radius:7px;padding:11px 13px}
+.eqline b{color:var(--ox);font-weight:600}
+.verdict{padding:12px 14px;border-radius:8px;font-size:13.5px;line-height:1.55}
+.verdict.go{background:var(--go-soft);color:var(--go)}
+.verdict.stop{background:var(--stop-soft);color:var(--stop)}
+.verdict.flat{background:var(--surface-2);color:var(--ink-2)}
+svg{display:block;max-width:100%}
+.scrollx{overflow-x:auto}
+.roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.role{border:1px solid var(--line);border-radius:9px;padding:14px 15px;background:var(--surface);cursor:pointer}
+.role[aria-pressed="true"]{border-color:var(--ox);background:var(--ox-soft)}
+.role h3{margin:0 0 6px;font-size:14px;font-weight:600}
+.role p{margin:0;font-size:12.5px;color:var(--ink-2);line-height:1.6}
+.role .tagn{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+/* quiz */
+.idgrid{display:grid;grid-template-columns:1fr;gap:14px;max-width:340px}
+.scorebar{display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;padding:14px 18px;border-top:1px solid var(--line)}
+.scorenum{font-family:"IBM Plex Mono",monospace;font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+.scorenum small{font-size:14px;font-weight:400;color:var(--muted)}
+.vcode{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted)}
+.vcode b{color:var(--ink);font-weight:600;letter-spacing:.08em}
+.quiz{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:16px}
+.q .stem{font-size:14.5px;line-height:1.6;margin:0 0 12px}
+.q .stem code{font-family:"IBM Plex Mono",monospace;font-size:13px;background:var(--surface-2);padding:1px 5px;border-radius:4px}
+.opts{display:flex;flex-direction:column;gap:7px}
+.opt{appearance:none;text-align:left;font-family:inherit;font-size:13.5px;line-height:1.45;color:var(--ink);
+  background:var(--surface-2);border:1px solid transparent;border-radius:7px;padding:9px 12px;cursor:pointer;display:flex;gap:9px}
+.opt .ltr{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);flex:0 0 auto;padding-top:1px}
+.opt:hover:not(:disabled){border-color:var(--line-2)}
+.opt.right{background:var(--go-soft);color:var(--go);border-color:var(--go);font-weight:500}
+.opt.right .ltr{color:var(--go)}
+.opt.wrong{background:var(--stop-soft);color:var(--stop);border-color:var(--stop)}
+.opt.wrong .ltr{color:var(--stop)}
+.opt:disabled{cursor:default}
+.why{margin:12px 0 0;font-size:13px;line-height:1.65;color:var(--ink-2);border-left:2px solid var(--line-2);padding-left:12px}
+.misc{display:block;margin-top:10px;padding:9px 12px;border-radius:7px;background:var(--stop-soft);color:var(--stop);font-size:12.5px;line-height:1.6}
+.misc a{color:inherit;font-weight:600;white-space:nowrap}
+.why[hidden]{display:none}
+.tally{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.hint{font-size:12.5px;color:var(--muted);line-height:1.65;margin:10px 0 0}
+.locked{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;background:var(--go-soft);color:var(--go);padding:2px 7px;border-radius:4px;margin-left:8px}
+footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;line-height:1.8}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <div style="flex:1 1 380px">
+      <p class="eyebrow"><a href="index.html">CH40051 Electroanalytical Chemistry</a> · Lecture 3 · Electrochemical cells</p>
+      <h1>Reference Bench</h1>
+      <p class="sub">A potential means nothing until you say what it is measured against. Convert between reference electrodes without losing a sign, and see why a working measurement needs three electrodes rather than two.</p>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" aria-controls="p-conv" id="t-conv">Reference Converter</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-cell" id="t-cell">Three/Two-Electrode Cell</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-quiz" id="t-quiz">Concept Check</button>
+  </div>
+
+  <!-- ============== CONVERTER ============== -->
+  <section class="panel" id="p-conv" role="tabpanel" aria-labelledby="t-conv">
+    <div class="two">
+
+      <div class="stack">
+        <div class="card">
+          <div class="card-h"><h2>Your measurement</h2></div>
+          <div class="card-b stack">
+            <div>
+              <label class="fld" for="pot">Potential you measured</label>
+              <input type="number" id="pot" value="-0.220" step="0.001">
+            </div>
+            <div>
+              <label class="fld" for="src">measured versus</label>
+              <select id="src"></select>
+            </div>
+            <button class="ghost" id="egA" type="button">Worked example A — −0.220 V vs SHE</button>
+            <button class="ghost" id="egB" type="button">Worked example B — +0.230 V vs SHE</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h2>The rule, once</h2></div>
+          <div class="card-b stack" style="gap:11px">
+            <div class="eqline" id="rule"></div>
+            <p class="hint" style="margin:0">Every reference sits at a known potential on the SHE scale. Convert by going <em>through</em> SHE: add where you came from, subtract where you are going. The sign error everyone makes is doing it backwards.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="stack">
+        <div class="card">
+          <div class="card-h"><h2>The same potential, against every reference</h2><span class="note" id="srcEcho"></span></div>
+          <div class="card-b"><div class="conv" id="convOut"></div></div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>On one scale</h2><span class="note">where the references sit, and where your value lands</span></div>
+          <div class="card-b scrollx"><svg id="scale" viewBox="0 0 700 210" width="700" height="210" role="img" aria-label="Potential scale showing reference electrodes and the converted value"></svg></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============== CELL ============== -->
+  <section class="panel" id="p-cell" role="tabpanel" aria-labelledby="t-cell" hidden>
+
+    <div class="top3">
+      <div class="card">
+        <div class="card-h"><h2>Cell configuration</h2></div>
+        <div class="card-b stack">
+          <div>
+            <span class="fld">How many electrodes</span>
+            <div class="pill-row" id="mode">
+              <button class="pill" data-mode="three" aria-pressed="true">Three</button>
+              <button class="pill" data-mode="two" aria-pressed="false">Two</button>
+            </div>
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">Current drawn</span><span class="val" id="curV"></span></div>
+            <input type="range" id="cur" min="0" max="50" step="1" value="12">
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">RE tip → WE surface</span><span class="val" id="distV"></span></div>
+            <input type="range" id="dist" min="-1.3" max="1.3" step="0.02" value="0">
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">CE area ÷ WE area</span><span class="val" id="areaV"></span></div>
+            <input type="range" id="area" min="0.2" max="20" step="0.2" value="5">
+          </div>
+          <p style="margin:0;font-size:12px;color:var(--muted);line-height:1.6">
+            WE is a 1.5 mm disk, the electrolyte is 0.05 S cm⁻¹, and the CE sits 30 mm away.
+          </p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2>Potential across the cell</h2><span class="note">where you put the RE is what you read</span></div>
+        <div class="card-b scrollx"><svg id="profsvg" viewBox="0 0 400 300" width="400" height="300" style="margin:0 auto" role="img" aria-label="Potential profile from the working electrode to the counter electrode"></svg></div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2>Ohmic error against current</h2><span class="note">a straight line through the origin</span></div>
+        <div class="card-b scrollx"><svg id="errsvg" viewBox="0 0 400 300" width="400" height="300" style="margin:0 auto" role="img" aria-label="Ohmic error against current for two and three electrode cells"></svg></div>
+      </div>
+    </div>
+
+    <div class="split" style="margin-top:16px">
+
+      <div class="card">
+        <div class="card-h"><h2>The cell, and the circuit it is</h2><span class="note" id="comboNote"></span></div>
+        <div class="card-b scrollx"><svg id="combosvg" viewBox="0 0 520 380" width="520" height="380" style="margin:0 auto" role="img" aria-label="The electrochemical cell drawn above its equivalent circuit"></svg></div>
+        <div class="card-b stack" style="border-top:1px solid var(--line);gap:10px;font-size:13px;color:var(--ink-2);line-height:1.7">
+          <p style="margin:0">The electrodes keep the same positions in both halves, so the resistor between WE and RE <em>is</em> the slice of solution between them. Its width follows R<sub>u</sub>/R<sub>total</sub>, not the distance — a resistor symbol stands for resistance, and R<sub>u</sub> saturates while distance does not.</p>
+          <p style="margin:0"><strong>Two electrodes.</strong> One electrode is both the reference and the current carrier, so the meter sees the WE interface, the whole solution resistance, and the CE interface in series — and the CE interface moves as it works. Nothing in the reading belongs to the WE alone. It is still the right circuit when no current flows: a pH meter, a potentiometric titration, an open-circuit measurement.</p>
+          <p style="margin:0"><strong>Three electrodes.</strong> The two jobs are split. Current flows only in the WE–CE loop; the RE hangs on a voltmeter input drawing essentially nothing, so its interface is never disturbed. What survives is R<sub>u</sub> — the one term the third electrode cannot remove, only shrink.</p>
+        </div>
+      </div>
+
+      <div class="stack">
+        <div class="card">
+          <div class="card-h"><h2>What you are actually measuring</h2></div>
+          <div class="card-b stack" style="gap:14px">
+            <div class="statrow">
+              <div class="stat"><span class="k">E(WE) — the true value</span><span class="v" id="oWE">—</span></div>
+              <div class="stat"><span class="k">measured at this RE</span><span class="v" id="oMeas">—</span></div>
+              <div class="stat"><span class="k">ohmic error, <em>iR</em><sub>u</sub></span><span class="v" id="oErr">—</span></div>
+              <div class="stat"><span class="k">uncompensated <em>R</em><sub>u</sub></span><span class="v" id="oRu">—</span></div>
+              <div class="stat"><span class="k">E(CE)</span><span class="v" id="oCE">—</span></div>
+            </div>
+            <div class="eqline" id="cellEq"></div>
+            <div class="verdict" id="cellVerdict"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h2>What each electrode is for</h2><span class="note">click one to pick it out of the drawing</span></div>
+          <div class="card-b stack" style="gap:14px">
+            <div class="roles">
+              <div class="role" id="rWE"><span class="tagn">WE</span><h3>Working</h3>
+                <p>The electrode you care about. The reaction under study happens here, and it is deliberately the <strong>limiting</strong> one.</p></div>
+              <div class="role" id="rRE"><span class="tagn">RE</span><h3>Reference</h3>
+                <p>Holds a fixed, known potential. Almost no current passes through it, so its equilibrium — and therefore its potential — is never disturbed.</p></div>
+              <div class="role" id="rCE"><span class="tagn">CE</span><h3>Counter</h3>
+                <p>Completes the circuit and carries the whole current. Its reaction must never run out, so it is made large.</p></div>
+            </div>
+            <div class="verdict flat" id="areaNote"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============== QUIZ ============== -->
+  <section class="panel" id="p-quiz" role="tabpanel" aria-labelledby="t-quiz" hidden>
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h">
+        <h2>Concept check</h2>
+        <span class="note">Answer once per question — the reasoning appears immediately</span>
+        <span class="tally" style="margin-left:auto" id="tally"></span>
+      </div>
+      <div class="card-b">
+        <div class="idgrid">
+          <div>
+            <label class="fld" for="sId">Student ID</label>
+            <input type="text" id="sId" inputmode="numeric" placeholder="e.g. 20261234">
+          </div>
+        </div>
+        <p class="hint" id="idHint"></p>
+      </div>
+      <div class="scorebar" id="scorebar" hidden>
+        <div>
+          <div class="scorenum" id="scoreNum">—</div>
+          <div class="vcode" style="margin-top:4px" id="whoLine">—</div>
+        </div>
+        <div style="flex:1 1 300px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="solid" id="sendBtn" type="button" hidden>Submit to the course</button>
+            <button class="ghost" id="dlBtn" type="button">Download my result</button>
+          </div>
+          <p class="hint" id="dlHint" style="margin-top:8px">Download the file and hand it in as your instructor directs.</p>
+        </div>
+      </div>
+    </div>
+    <div class="quiz" id="quiz"></div>
+  </section>
+
+  <footer>
+    Reference potentials are quoted at 25 °C and differ by a millivolt or two between sources · non-aqueous values are solvent-dependent and approximate<br>
+    CH40051 Electroanalytical Chemistry · Fall 2026 — companion to Lecture 3
+  </footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function sgn(x,d){ var s=x.toFixed(d); if(/^-0(\.0*)?$/.test(s)) s=s.slice(1); return (x>0?"+":"")+s; }
+
+/* every reference on the SHE scale, in volts */
+var REFS=[
+ {id:"SHE",   nm:"SHE",              sub:"standard hydrogen electrode",        E:0.000, aq:true},
+ {id:"NHE",   nm:"NHE",              sub:"normal hydrogen, 1 M acid",          E:0.000, aq:true},
+ {id:"AgCl3", nm:"Ag/AgCl",          sub:"3 M KCl",                            E:0.210, aq:true},
+ {id:"AgClS", nm:"Ag/AgCl",          sub:"saturated KCl",                      E:0.197, aq:true},
+ {id:"SCE01", nm:"SCE",              sub:"0.1 M KCl",                          E:0.336, aq:true},
+ {id:"SCE1",  nm:"SCE",              sub:"1 M KCl",                            E:0.283, aq:true},
+ {id:"SCES",  nm:"SCE",              sub:"saturated KCl",                      E:0.241, aq:true},
+ {id:"HgO",   nm:"Hg/HgO",           sub:"1 M NaOH — for alkaline media",      E:0.140, aq:true},
+ {id:"AgAg",  nm:"Ag/Ag⁺",           sub:"0.01 M AgNO₃ in MeCN — approximate", E:0.542, aq:false},
+ {id:"Fc",    nm:"Fc/Fc⁺",           sub:"ferrocene in MeCN — approximate",    E:0.400, aq:false}
+];
+function ref(id){ for(var i=0;i<REFS.length;i++) if(REFS[i].id===id) return REFS[i]; return REFS[0]; }
+function full(r){ return r.nm+" ("+r.sub.split(" — ")[0]+")"; }
+
+/* ---------------- tabs ---------------- */
+var tabs=[].slice.call(document.querySelectorAll(".tab"));
+tabs.forEach(function(t){
+  t.addEventListener("click",function(){
+    tabs.forEach(function(o){
+      var on=(o===t);
+      o.setAttribute("aria-selected",on?"true":"false");
+      document.getElementById(o.getAttribute("aria-controls")).hidden=!on;
+    });
+  });
+});
+
+/* ================= CONVERTER ================= */
+var pot=document.getElementById("pot"), src=document.getElementById("src");
+src.innerHTML=REFS.map(function(r){
+  return '<option value="'+r.id+'"'+(r.id==="SHE"?" selected":"")+'>'+esc(r.nm+" — "+r.sub)+'</option>';
+}).join("");
+[pot,src].forEach(function(el){ el.addEventListener("input",convert); });
+document.getElementById("egA").addEventListener("click",function(){ pot.value="-0.220"; src.value="SHE"; convert(); });
+document.getElementById("egB").addEventListener("click",function(){ pot.value="0.230";  src.value="SHE"; convert(); });
+
+function convert(){
+  var v=parseFloat(pot.value);
+  var s=ref(src.value);
+  var ok=isFinite(v);
+  var vsSHE=ok?v+s.E:NaN;
+
+  document.getElementById("srcEcho").textContent = ok ? sgn(v,3)+" V vs "+full(s) : "enter a number";
+
+  document.getElementById("rule").innerHTML= ok
+    ? "E(vs target) = E(vs source) + E(source vs SHE) − E(target vs SHE)<br>"
+      + "on the SHE scale your value is <b>"+sgn(vsSHE,3)+" V</b>"
+    : "E(vs target) = E(vs source) + E(source vs SHE) − E(target vs SHE)";
+
+  document.getElementById("convOut").innerHTML=REFS.map(function(r){
+    var self=(r.id===s.id);
+    var val=ok?(vsSHE-r.E):NaN;
+    return '<div class="crow'+(self?" self":"")+" "+(r.aq?"aq":"non")+'">'
+      + '<span class="nm">'+esc(r.nm)+(self?'  <b style="color:var(--ox)">← your reference</b>':'')
+      + '<small>'+esc(r.sub)+'   ·   '+sgn(r.E,3)+' V vs SHE</small></span>'
+      + '<span class="vv">'+(ok?sgn(val,3)+" V":"—")+'</span></div>';
+  }).join("");
+
+  drawScale(ok?vsSHE:null, s);
+}
+
+function drawScale(vsSHE, s){
+  var W=700,H=210,L=30,R=30,axY=118;
+  var lo=-0.6, hi=0.9;
+  if(vsSHE!==null){ lo=Math.min(lo,vsSHE-0.15); hi=Math.max(hi,vsSHE+0.15); }
+  function X(v){ return L+(v-lo)/(hi-lo)*(W-L-R); }
+  var mono='font-family="IBM Plex Mono,monospace"';
+  var out='<line x1="'+L+'" y1="'+axY+'" x2="'+(W-R)+'" y2="'+axY+'" stroke="var(--line-2)" stroke-width="1.4"/>';
+  for(var t=Math.ceil(lo*10)/10;t<=hi;t+=0.2){
+    var tv=Math.round(t*10)/10;
+    out+='<line x1="'+X(tv)+'" y1="'+axY+'" x2="'+X(tv)+'" y2="'+(axY+5)+'" stroke="var(--line-2)"/>';
+    out+='<text x="'+X(tv)+'" y="'+(axY+18)+'" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="9.5">'+sgn(tv,1)+'</text>';
+  }
+  out+='<text x="'+(W-R)+'" y="'+(axY+34)+'" text-anchor="end" fill="var(--muted)" '+mono+' font-size="10">V vs SHE</text>';
+
+  /* stagger the reference labels so they do not collide */
+  var lanes=[0,1,2,0,1,2,0,1,2,0];
+  REFS.forEach(function(r,i){
+    if(!r.aq && r.id!=="Fc" && r.id!=="AgAg") return;
+    var x=X(r.E), lane=lanes[i%lanes.length];
+    var y=axY-14-lane*30;
+    var col=r.aq?"var(--red-)":"var(--stop)";
+    out+='<line x1="'+x+'" y1="'+axY+'" x2="'+x+'" y2="'+y+'" stroke="'+col+'" stroke-width="1" stroke-dasharray="2 3"/>';
+    out+='<circle cx="'+x+'" cy="'+axY+'" r="3.2" fill="'+col+'"/>';
+    out+='<text x="'+x+'" y="'+(y-3)+'" text-anchor="middle" fill="'+col+'" '+mono+' font-size="9.5">'+esc(r.nm)+'</text>';
+  });
+
+  if(vsSHE!==null){
+    var xv=X(vsSHE);
+    out+='<line x1="'+xv+'" y1="'+(axY+40)+'" x2="'+xv+'" y2="'+(axY+8)+'" stroke="var(--ox)" stroke-width="2"/>';
+    out+='<circle cx="'+xv+'" cy="'+axY+'" r="5.5" fill="var(--ox)"/>';
+    out+='<text x="'+xv+'" y="'+(axY+55)+'" text-anchor="middle" fill="var(--ox)" '+mono+' font-size="11" font-weight="500">'+sgn(vsSHE,3)+' V vs SHE</text>';
+  }
+  document.getElementById("scale").innerHTML=out;
+}
+
+/* ================= THREE / TWO-ELECTRODE CELL =================
+   Uncompensated resistance for a disk electrode set in an insulating plane
+   (Newman):   R_u(d) = R_inf * (2/pi) * arctan(2d/r0),  R_inf = 1/(4 k r0)
+   For d << r0 this collapses to d/(kA), the parallel-plate answer, and it
+   saturates at R_inf.  Both limits matter here: moving the reference closer
+   can never reach zero error, and past a few radii moving it further away
+   barely changes anything.
+   The working electrode is taken as cathodic throughout, so the measured
+   potential sits below the true one and iR has to be added back. */
+var CELL={r0:0.15, kap:0.05, L:3.0, EWE:-0.40, etaCE:0.35};   /* cm, S/cm, cm, V, V */
+var RINF=1/(4*CELL.kap*CELL.r0);
+
+function ruAt(x){ return RINF*(2/Math.PI)*Math.atan(2*x/CELL.r0); }   /* x in cm */
+function rceOf(ratio){ return CELL.r0*Math.sqrt(ratio); }
+function rinfCE(ratio){ return 1/(4*CELL.kap*rceOf(ratio)); }
+/* solution drop from the WE surface out to x, counting both spreading fields */
+function dropAt(x,iA,ratio){
+  var rc=rceOf(ratio), Rc=rinfCE(ratio);
+  var back=Rc*(2/Math.PI)*Math.atan(2*Math.max(0,CELL.L-x)/rc);
+  return iA*(ruAt(x)+Rc-back);
+}
+function rTotal(ratio){ return ruAt(CELL.L)+rinfCE(ratio); }
+
+var mode="three";
+var pills=[].slice.call(document.querySelectorAll("#mode .pill"));
+pills.forEach(function(p){
+  p.addEventListener("click",function(){
+    mode=p.getAttribute("data-mode");
+    pills.forEach(function(o){ o.setAttribute("aria-pressed", o===p?"true":"false"); });
+    cell();
+  });
+});
+var cur=document.getElementById("cur"), area=document.getElementById("area"),
+    dist=document.getElementById("dist");
+[cur,area,dist].forEach(function(el){ el.addEventListener("input",cell); });
+
+var focus=null;
+["rWE","rRE","rCE"].forEach(function(id){
+  var el=document.getElementById(id);
+  el.addEventListener("click",function(){
+    focus=(focus===id)?null:id;
+    ["rWE","rRE","rCE"].forEach(function(o){
+      document.getElementById(o).setAttribute("aria-pressed", o===focus?"true":"false");
+    });
+    cell();
+  });
+});
+
+function mmShow(mm){ return mm<1 ? mm.toFixed(2)+" mm" : mm.toFixed(1)+" mm"; }
+
+function cell(){
+  var iMA=+cur.value, ratio=+area.value;
+  var dmm=Math.pow(10,+dist.value), d=dmm/10;      /* mm -> cm */
+  var iA=iMA/1000;
+  var Ru=ruAt(d), Rtot=rTotal(ratio);
+  var Reff=(mode==="three")?Ru:Rtot;
+  var err=iA*Reff;
+  var meas=CELL.EWE-iA*Ru;                          /* what an RE at d reads */
+  var eCE=CELL.EWE-dropAt(CELL.L,iA,ratio)-CELL.etaCE;
+
+  dist.disabled=(mode!=="three");
+  document.getElementById("curV").textContent=iMA+" mA";
+  document.getElementById("areaV").textContent=ratio.toFixed(1)+" ×";
+  document.getElementById("distV").textContent=(mode==="three")?mmShow(dmm):"—";
+
+  document.getElementById("oWE").textContent=CELL.EWE.toFixed(3)+" V";
+  document.getElementById("oMeas").textContent=(mode==="three"?meas:eCE).toFixed(3)+" V";
+  var oe=document.getElementById("oErr");
+  oe.textContent=(err*1000).toFixed(0)+" mV";
+  oe.className="v"+(err>0.02?" warn":"");
+  document.getElementById("oRu").textContent=Reff.toFixed(1)+" Ω";
+  document.getElementById("oCE").textContent=eCE.toFixed(3)+" V";
+
+  var v=document.getElementById("cellVerdict"), eq=document.getElementById("cellEq");
+  if(mode==="three"){
+    v.className="verdict go";
+    v.innerHTML="<span><b>Three electrodes.</b> The RE carries no current, so its own potential never moves and the CE's behaviour stays out of the reading. What is left is the solution between the WE and the RE tip — "
+      +Ru.toFixed(1)+" Ω of it here, worth <b>"+(err*1000).toFixed(0)+" mV</b> at "+iMA+" mA. The third electrode shrinks that term; it does not delete it.</span>";
+    eq.innerHTML="E<sub>true</sub> = E<sub>measured</sub> + iR<sub>u</sub><br>"
+      +"= "+meas.toFixed(3)+" + ("+iMA+" mA)("+Ru.toFixed(1)+" Ω)<br>"
+      +"= <b>"+CELL.EWE.toFixed(3)+" V</b>";
+  }else{
+    v.className="verdict stop";
+    v.innerHTML="<span><b>Two electrodes.</b> The counter electrode has to be the reference as well, so the reading carries the whole solution resistance ("
+      +Rtot.toFixed(1)+" Ω, <b>"+(err*1000).toFixed(0)+" mV</b> at "+iMA+" mA) <em>and</em> the "
+      +(CELL.etaCE*1000).toFixed(0)+" mV the CE has polarised. Neither term can be separated out.</span>";
+    eq.innerHTML="reading = E(WE) − iR<sub>total</sub> − η(CE)<br>"
+      +"= "+CELL.EWE.toFixed(3)+" − "+(err).toFixed(3)+" − "+CELL.etaCE.toFixed(3)+"<br>"
+      +"= <b>"+eCE.toFixed(3)+" V</b>, and none of it is E(WE)";
+  }
+
+  var an=document.getElementById("areaNote");
+  if(ratio<1){
+    an.className="verdict stop";
+    an.innerHTML="The CE is <b>smaller</b> than the WE. Its current density is "+(1/ratio).toFixed(1)+" × higher, so it polarises first and may run out of reactant — the counter reaction becomes the bottleneck instead of the one you are studying.";
+  }else if(ratio<3){
+    an.className="verdict flat";
+    an.innerHTML="Comparable areas. Workable, but the CE is doing nearly as much work per unit area as the WE. Give it more room if you plan to draw current for long.";
+  }else{
+    an.className="verdict go";
+    an.innerHTML="The CE has "+ratio.toFixed(1)+" × the area, so its current density is "+(1/ratio*100).toFixed(0)+" % of the WE's. The counter reaction stays comfortably unlimited, which is exactly its job.";
+  }
+
+  drawCombo(ratio,dmm,Ru,Rtot);
+  drawProfile(iA,ratio,d,meas,eCE);
+  drawErr(iMA,Ru,Rtot);
+}
+
+/* ---- the cell and its equivalent circuit, one above the other ----
+   The electrodes keep the same x in both halves, so the resistor drawn
+   between WE and RE is visibly the slice of solution between them.  Its
+   width tracks R_u/R_total rather than the distance, because a resistor
+   symbol stands for resistance — and R_u saturates while distance does not. */
+function drawCombo(ratio,dmm,Ru,Rtot){
+  var mono='font-family="IBM Plex Mono,monospace"';
+  var WEX=80, CEX=440, SPAN=CEX-WEX, RENODE=260;
+  var reX=WEX+Math.min(SPAN-14,(dmm/(CELL.L*10))*SPAN);
+  var three=(mode==="three");
+
+  var dimWE = focus && focus!=="rWE", dimRE = focus && focus!=="rRE", dimCE = focus && focus!=="rCE";
+  var cWE = dimWE?"var(--line-2)":"var(--ox)";
+  var cRE = dimRE?"var(--line-2)":"var(--go)";
+  var cCE = dimCE?"var(--line-2)":"var(--red-)";
+  var cE  = "var(--elec)";
+
+  var s='<defs><marker id="cbar" markerWidth="7" markerHeight="7" refX="5.6" refY="3" orient="auto">'
+       +'<path d="M0,0.4 L6,3 L0,5.6 z" fill="'+cE+'"/></marker></defs>';
+
+  /* ============ upper half: the physical cell ============ */
+  s+='<text x="30" y="18" fill="var(--muted)" '+mono+' font-size="9.5" letter-spacing="0.1em">THE CELL</text>';
+  s+='<rect x="30" y="62" width="460" height="108" rx="6" fill="var(--red-soft)" stroke="var(--line-2)"/>';
+  s+='<text x="260" y="186" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="9">electrolyte</text>';
+
+  function post(x,tag,col,h,w){
+    var o='<rect x="'+(x-w/2)+'" y="'+(62-22)+'" width="'+w+'" height="'+h+'" fill="'+col+'" rx="2"/>';
+    o+='<text x="'+x+'" y="34" text-anchor="middle" fill="'+col+'" '+mono+' font-size="10.5" font-weight="500">'+tag+'</text>';
+    return o;
+  }
+  s+=post(WEX,"WE",cWE,105,13);
+  var ceW=Math.max(9,Math.min(46,13*Math.sqrt(ratio)));
+  s+=post(CEX,"CE",cCE,105,ceW);
+  if(three){
+    s+=post(reX,"RE",cRE,78,9);
+    s+='<line x1="'+(WEX+8)+'" y1="150" x2="'+(reX-6)+'" y2="150" stroke="'+cRE+'" stroke-width="1" stroke-dasharray="2 3"/>';
+    s+='<text x="'+((WEX+reX)/2)+'" y="145" text-anchor="middle" fill="'+cRE+'" '+mono+' font-size="8.5">'+mmShow(dmm)+'</text>';
+  }
+  /* the whole current goes WE to CE, in the cell and in the circuit alike */
+  s+='<path d="M '+WEX+' 40 L '+WEX+' 26 L '+CEX+' 26" fill="none" stroke="'+cE+'" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#cbar)">'
+    +'<animate attributeName="stroke-dashoffset" from="18" to="0" dur="1.1s" repeatCount="indefinite"/></path>';
+  s+='<text x="'+((WEX+CEX)/2)+'" y="20" text-anchor="middle" fill="'+cE+'" '+mono+' font-size="9">all the current</text>';
+
+  /* ============ the link between the two halves ============ */
+  s+='<line x1="'+WEX+'" y1="172" x2="'+WEX+'" y2="252" stroke="'+cWE+'" stroke-width="1" stroke-dasharray="2 4" opacity="0.75"/>';
+  s+='<line x1="'+CEX+'" y1="172" x2="'+CEX+'" y2="252" stroke="'+cCE+'" stroke-width="1" stroke-dasharray="2 4" opacity="0.75"/>';
+  if(three) s+='<line x1="'+reX+'" y1="152" x2="'+RENODE+'" y2="252" stroke="'+cRE+'" stroke-width="1" stroke-dasharray="2 4" opacity="0.75"/>';
+  s+='<text x="30" y="212" fill="var(--muted)" '+mono+' font-size="9.5" letter-spacing="0.1em">THE SAME CELL AS A CIRCUIT</text>';
+
+  /* ============ lower half: the equivalent circuit ============ */
+  var Y=280;
+  function bar(x,tag,col,w){
+    return '<rect x="'+(x-(w||5))+'" y="'+(Y-20)+'" width="'+((w||5)*2)+'" height="40" fill="'+col+'" rx="2"/>';
+  }
+  function resistor(cx,w,label,col){
+    var o='<rect x="'+(cx-w/2)+'" y="'+(Y-11)+'" width="'+w+'" height="22" rx="3" fill="var(--surface-2)" stroke="'+col+'" stroke-width="1.4"/>';
+    o+='<text x="'+cx+'" y="'+(Y+4)+'" text-anchor="middle" fill="'+col+'" '+mono+' font-size="9">'+label+'</text>';
+    return o;
+  }
+  function meter(cx,cy,txt,col){
+    return '<circle cx="'+cx+'" cy="'+cy+'" r="14" fill="var(--surface)" stroke="'+col+'" stroke-width="1.5"/>'
+      +'<text x="'+cx+'" y="'+(cy+4)+'" text-anchor="middle" fill="'+col+'" '+mono+' font-size="10" font-weight="600">'+txt+'</text>';
+  }
+  /* the solution path itself */
+  s+='<line x1="'+WEX+'" y1="'+Y+'" x2="'+CEX+'" y2="'+Y+'" stroke="'+cE+'" stroke-width="1.5"/>';
+  s+=bar(WEX,"WE",cWE);
+  s+=bar(CEX,"CE",cCE,Math.max(4,Math.min(16,5*Math.sqrt(ratio))));
+  s+='<text x="'+WEX+'" y="'+(Y+34)+'" text-anchor="middle" fill="'+cWE+'" '+mono+' font-size="9.5">WE</text>';
+  s+='<text x="'+CEX+'" y="'+(Y+34)+'" text-anchor="middle" fill="'+cCE+'" '+mono+' font-size="9.5">CE</text>';
+
+  /* current loop, identical in both configurations */
+  s+='<path d="M '+WEX+' '+(Y-20)+' L '+WEX+' 238 L '+(RENODE-16)+' 238" fill="none" stroke="'+cE+'" stroke-width="1.5"/>';
+  s+='<path d="M '+(RENODE+16)+' 238 L '+CEX+' 238 L '+CEX+' '+(Y-20)+'" fill="none" stroke="'+cE+'" stroke-width="1.5"/>';
+  s+=meter(RENODE,238,"A",cE);
+
+  if(three){
+    var frac=Ru/Rtot;
+    var wu=Math.max(38,Math.min(132,150*frac));
+    var wr=Math.max(38,Math.min(132,150*(1-frac)));
+    s+=resistor((WEX+RENODE)/2,wu,"Ru "+Ru.toFixed(1)+" Ω",cRE);
+    s+=resistor((RENODE+CEX)/2,wr,"the rest",cE);
+    s+='<circle cx="'+RENODE+'" cy="'+Y+'" r="3.5" fill="'+cRE+'"/>';
+    s+='<text x="'+RENODE+'" y="'+(Y-16)+'" text-anchor="middle" fill="'+cRE+'" '+mono+' font-size="9.5">RE</text>';
+    /* the voltmeter sits across WE and RE and takes no current */
+    s+='<path d="M '+WEX+' '+(Y+20)+' L '+WEX+' 336 L '+(((WEX+RENODE)/2)-14)+' 336" fill="none" stroke="'+cRE+'" stroke-width="1.3"/>';
+    s+='<path d="M '+(((WEX+RENODE)/2)+14)+' 336 L '+RENODE+' 336 L '+RENODE+' '+(Y+4)+'" fill="none" stroke="'+cRE+'" stroke-width="1.3"/>';
+    s+=meter((WEX+RENODE)/2,336,"V",cRE);
+    s+='<text x="'+(RENODE+8)+'" y="'+(Y+26)+'" fill="'+cRE+'" '+mono+' font-size="8.5">i ≈ 0</text>';
+    s+='<text x="'+((WEX+RENODE)/2)+'" y="362" text-anchor="middle" fill="'+cRE+'" '+mono+' font-size="9">only R'+"ᵤ"+' is inside the reading</text>';
+  }else{
+    s+=resistor((WEX+CEX)/2,150,"R total "+Rtot.toFixed(1)+" Ω",cE);
+    s+='<path d="M '+WEX+' '+(Y+20)+' L '+WEX+' 336 L '+(((WEX+CEX)/2)-14)+' 336" fill="none" stroke="'+cE+'" stroke-width="1.3"/>';
+    s+='<path d="M '+(((WEX+CEX)/2)+14)+' 336 L '+CEX+' 336 L '+CEX+' '+(Y+20)+'" fill="none" stroke="'+cE+'" stroke-width="1.3"/>';
+    s+=meter((WEX+CEX)/2,336,"V",cE);
+    s+='<text x="'+((WEX+CEX)/2)+'" y="362" text-anchor="middle" fill="'+cE+'" '+mono+' font-size="9">the meter sees WE, the whole R, and CE at once</text>';
+  }
+
+  document.getElementById("comboNote").textContent =
+    three ? "RE senses, CE works" : "one electrode doing two jobs";
+  document.getElementById("combosvg").innerHTML=s;
+}
+
+/* ---- potential from the WE surface across to the CE ---- */
+function drawProfile(iA,ratio,d,meas,eCE){
+  var W=400,H=300,L=54,R=18,T=20,B=52;
+  var mono='font-family="IBM Plex Mono,monospace"';
+  var xmaxmm=CELL.L*10;
+  var lo=Math.min(eCE,CELL.EWE)-0.05, hi=Math.max(eCE,CELL.EWE)+0.05;
+  function X(mm){ return L+(mm/xmaxmm)*(W-L-R); }
+  function Y(v){ return T+(hi-v)/(hi-lo)*(H-T-B); }
+  var s="";
+  s+='<line x1="'+L+'" y1="'+T+'" x2="'+L+'" y2="'+(H-B)+'" stroke="var(--line-2)" stroke-width="1.2"/>';
+  s+='<line x1="'+L+'" y1="'+(H-B)+'" x2="'+(W-R)+'" y2="'+(H-B)+'" stroke="var(--line-2)" stroke-width="1.2"/>';
+  [0,10,20,30].forEach(function(t){
+    s+='<line x1="'+X(t)+'" y1="'+(H-B)+'" x2="'+X(t)+'" y2="'+(H-B+4)+'" stroke="var(--line-2)"/>';
+    s+='<text x="'+X(t)+'" y="'+(H-B+16)+'" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="9.5">'+t+'</text>';
+  });
+  s+='<text x="'+((L+W-R)/2)+'" y="'+(H-8)+'" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="10">distance from WE / mm</text>';
+  var i;
+  for(i=0;i<=4;i++){
+    var vv=lo+(hi-lo)*i/4;
+    s+='<line x1="'+(L-4)+'" y1="'+Y(vv)+'" x2="'+L+'" y2="'+Y(vv)+'" stroke="var(--line-2)"/>';
+    s+='<text x="'+(L-7)+'" y="'+(Y(vv)+3.5)+'" text-anchor="end" fill="var(--muted)" '+mono+' font-size="9">'+vv.toFixed(2)+'</text>';
+  }
+  s+='<text transform="rotate(-90 14 '+((T+H-B)/2)+')" x="14" y="'+((T+H-B)/2)+'" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="10">potential / V</text>';
+
+  /* E(WE): the value you are trying to measure */
+  s+='<line x1="'+L+'" y1="'+Y(CELL.EWE)+'" x2="'+(W-R)+'" y2="'+Y(CELL.EWE)+'" stroke="var(--ox)" stroke-width="1.4" stroke-dasharray="4 3"/>';
+  s+='<text x="'+(W-R)+'" y="'+(Y(CELL.EWE)-6)+'" text-anchor="end" fill="var(--ox)" '+mono+' font-size="9.5">E(WE) = '+CELL.EWE.toFixed(2)+' V</text>';
+  /* E(CE): also the whole two-electrode reading */
+  s+='<line x1="'+L+'" y1="'+Y(eCE)+'" x2="'+(W-R)+'" y2="'+Y(eCE)+'" stroke="var(--red-)" stroke-width="1.4" stroke-dasharray="4 3"/>';
+  s+='<text x="'+(W-R)+'" y="'+(Y(eCE)+13)+'" text-anchor="end" fill="var(--red-)" '+mono+' font-size="9.5">E(CE) = '+eCE.toFixed(2)+' V</text>';
+
+  /* what a reference probe would read at each position */
+  var pts=[];
+  for(i=0;i<=200;i++){
+    var mm=xmaxmm*i/200;
+    pts.push(X(mm).toFixed(1)+","+Y(CELL.EWE-dropAt(mm/10,iA,ratio)).toFixed(1));
+  }
+  s+='<polyline points="'+pts.join(" ")+'" fill="none" stroke="var(--go)" stroke-width="2.2"/>';
+  /* label below the curve: it falls away from E(WE), so the space under it is clear
+     even at zero current, where the curve lies on the E(WE) line itself */
+  s+='<text x="'+X(xmaxmm*0.5)+'" y="'+(Y(CELL.EWE-dropAt(xmaxmm*0.5/10,iA,ratio))+15)+'" text-anchor="middle" fill="var(--go)" '+mono+' font-size="9.5">measured, RE here</text>';
+
+  if(mode==="three"){
+    var px=X(d*10), py=Y(meas);
+    s+='<line x1="'+px+'" y1="'+Y(CELL.EWE)+'" x2="'+px+'" y2="'+py+'" stroke="var(--stop)" stroke-width="3"/>';
+    s+='<circle cx="'+px+'" cy="'+py+'" r="4.5" fill="var(--go)"/>';
+    var lab=((CELL.EWE-meas)*1000).toFixed(0)+" mV";
+    var flip=px>W-R-70;
+    s+='<text x="'+(flip?px-8:px+8)+'" y="'+((Y(CELL.EWE)+py)/2+3)+'" text-anchor="'+(flip?"end":"start")+'" fill="var(--stop)" '+mono+' font-size="10" font-weight="500">'+lab+'</text>';
+  }
+  document.getElementById("profsvg").innerHTML=s;
+}
+
+/* ---- the error is linear in current; only the slope differs ---- */
+function drawErr(iMA,Ru,Rtot){
+  var W=400,H=300,L=54,R=18,T=20,B=52;
+  var mono='font-family="IBM Plex Mono,monospace"';
+  var imax=50, emax=Math.max(60,imax/1000*Rtot*1000*1.08);
+  function X(i){ return L+(i/imax)*(W-L-R); }
+  function Y(e){ return T+(emax-e)/emax*(H-T-B); }
+  var s="";
+  s+='<line x1="'+L+'" y1="'+T+'" x2="'+L+'" y2="'+(H-B)+'" stroke="var(--line-2)" stroke-width="1.2"/>';
+  s+='<line x1="'+L+'" y1="'+(H-B)+'" x2="'+(W-R)+'" y2="'+(H-B)+'" stroke="var(--line-2)" stroke-width="1.2"/>';
+  [0,10,20,30,40,50].forEach(function(t){
+    s+='<line x1="'+X(t)+'" y1="'+(H-B)+'" x2="'+X(t)+'" y2="'+(H-B+4)+'" stroke="var(--line-2)"/>';
+    s+='<text x="'+X(t)+'" y="'+(H-B+16)+'" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="9.5">'+t+'</text>';
+  });
+  s+='<text x="'+((L+W-R)/2)+'" y="'+(H-8)+'" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="10">current / mA</text>';
+  var i;
+  for(i=0;i<=4;i++){
+    var ee=emax*i/4;
+    s+='<line x1="'+(L-4)+'" y1="'+Y(ee)+'" x2="'+L+'" y2="'+Y(ee)+'" stroke="var(--line-2)"/>';
+    s+='<text x="'+(L-7)+'" y="'+(Y(ee)+3.5)+'" text-anchor="end" fill="var(--muted)" '+mono+' font-size="9">'+ee.toFixed(0)+'</text>';
+  }
+  s+='<text transform="rotate(-90 14 '+((T+H-B)/2)+')" x="14" y="'+((T+H-B)/2)+'" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="10">ohmic error / mV</text>';
+
+  function line(Rv,col,solid,name){
+    var e=imax/1000*Rv*1000;
+    var o='<line x1="'+X(0)+'" y1="'+Y(0)+'" x2="'+X(imax)+'" y2="'+Y(Math.min(e,emax))+'" stroke="'+col+'" stroke-width="'+(solid?2.4:1.6)+'"'+(solid?"":' stroke-dasharray="4 4"')+'/>';
+    var ly=Y(Math.min(e,emax));
+    o+='<text x="'+(W-R-3)+'" y="'+(ly+(solid?-6:13))+'" text-anchor="end" fill="'+col+'" '+mono+' font-size="9.5">'+name+'</text>';
+    return o;
+  }
+  s+=line(Rtot,"var(--red-)",mode!=="three","two electrodes");
+  s+=line(Ru,"var(--go)",mode==="three","three electrodes");
+
+  var Rv=(mode==="three")?Ru:Rtot;
+  var ec=iMA/1000*Rv*1000;
+  var px=X(iMA), py=Y(Math.min(ec,emax));
+  s+='<line x1="'+L+'" y1="'+py+'" x2="'+px+'" y2="'+py+'" stroke="var(--stop)" stroke-width="1" stroke-dasharray="2 3"/>';
+  s+='<line x1="'+px+'" y1="'+(H-B)+'" x2="'+px+'" y2="'+py+'" stroke="var(--stop)" stroke-width="1" stroke-dasharray="2 3"/>';
+  s+='<circle cx="'+px+'" cy="'+py+'" r="5" fill="var(--stop)"/>';
+  var flip=px>W-R-70;
+  s+='<text x="'+(flip?px-9:px+9)+'" y="'+(py-9)+'" text-anchor="'+(flip?"end":"start")+'" fill="var(--stop)" '+mono+' font-size="10.5" font-weight="500">'+ec.toFixed(0)+' mV</text>';
+  document.getElementById("errsvg").innerHTML=s;
+}
+
+/* ================= CONCEPT CHECK ================= */
+var QZ=[
+ {q:"A student measures −0.30 V vs Ag/AgCl (sat. KCl, which sits at +0.197 V vs SHE) and reports “−0.497 V vs SHE”. Which belief produced that number?",
+  o:["Dropping n from a per-decade slope",
+     "Reference-frame arithmetic run backwards — the reference potential was subtracted where it must be added",
+     "Scaling an intensive quantity — the potential was multiplied by the number of electrons",
+     "Activity blindness — the chloride activity was left out"],
+  a:1,
+  w:"To move onto the SHE scale from a scale whose zero sits at +0.197 V vs SHE you <b>add</b>: −0.30 + 0.197 = <b>−0.103 V</b>. Subtracting moves you the wrong way, so the error is twice the offset — here 0.394 V, which is larger than many of the differences you will be trying to measure. Option D is a real misconception about this same electrode, and it is what makes an SCE read differently in 0.1 M and in saturated KCl — see question 4."},
+
+ {q:"Why does a three-electrode cell measure the working electrode better than a two-electrode cell?",
+  o:["Three electrodes pass more current, so the signal is larger",
+     "The reference electrode amplifies the measured potential",
+     "The reference carries almost no current, so its potential stays fixed while the counter electrode absorbs the current",
+     "It removes the need for a supporting electrolyte"],
+  a:2,
+  w:"In a two-electrode cell one electrode must both provide a stable reference <b>and</b> carry the current — and it cannot do both. As it passes current it polarises, and the ohmic drop through the solution adds to the reading. Splitting the two jobs lets the RE stay at equilibrium while the CE does the work."},
+
+ {q:"Why must the counter electrode normally have a <b>larger</b> area than the working electrode?",
+  o:["To lower the solution resistance",
+     "Because it must be the same material as the working electrode",
+     "To keep the reference electrode clean",
+     "So its current density stays low and its reaction never becomes the limiting one"],
+  a:3,
+  w:"WE and CE pass <b>equal charge</b> — that is forced by the circuit. If the CE is small, its current density is high, so it polarises, may exhaust its reactant, and starts to limit the experiment. The whole point is that the interesting limitation lives at the WE."},
+
+ {q:"An SCE gives +0.336 V vs SHE in 0.1 M KCl but +0.241 V in saturated KCl. Why does the value depend on the KCl?",
+  o:["The electrode's potential is set by the chloride activity, through the Nernst equation",
+     "The KCl concentration changes the temperature of the cell",
+     "Saturated KCl leaks mercury and shifts the potential",
+     "It is an experimental artefact with no thermodynamic basis"],
+  a:0,
+  w:"For Hg₂Cl₂ + 2e⁻ → 2Hg + 2Cl⁻ the only variable species is Cl⁻, so E depends on chloride activity. More chloride pushes the reduction potential down. This is also why the KCl concentration must always be quoted with the reference — “vs SCE” alone is incomplete."},
+
+ {q:"In non-aqueous work you are urged to report potentials against the <b>ferrocene</b> Fc/Fc⁺ couple. Why?",
+  o:["Ferrocene has exactly 0.000 V in every solvent",
+     "It is the only species that does not react with the analyte",
+     "It is an internal standard measured in the same solution, so it sidesteps the unknown junction potential of an external reference",
+     "It makes the measured currents larger and easier to read"],
+  a:2,
+  w:"Non-aqueous reference electrodes are poorly reproducible and carry an unknown liquid-junction potential. Ferrocene is dissolved in the <b>same</b> solution, so it references your measurement internally. Note it is not solvent-independent — its potential still shifts between solvents, which is why the lecture insists you also state the solvent and electrolyte."},
+
+ {q:"What does a voltmeter actually do when you 'read the potential of the working electrode'?",
+  o:["It measures the absolute potential of the working electrode",
+     "It passes a tiny current and reports the potential difference between two connectors",
+     "It measures the current and converts it with Ohm's law",
+     "It measures the potential of the solution directly"],
+  a:1,
+  w:"A single electrode's absolute potential is not measurable. The meter reports a <b>difference</b>, and it must pass a small current (nA or less) to do so. That current is deliberately tiny so it disturbs neither the RE's equilibrium nor the reaction at the WE."}
+];
+
+var LETTERS="ABCD", STORE="ch40051-l3-check-v1";
+var picks=new Array(QZ.length).fill(-1);
+var sId=document.getElementById("sId"), elTally=document.getElementById("tally"),
+    elBar=document.getElementById("scorebar"), elScore=document.getElementById("scoreNum"),
+    elWho=document.getElementById("whoLine"), elIdHint=document.getElementById("idHint"),
+    dlBtn=document.getElementById("dlBtn"), dlHint=document.getElementById("dlHint");
+var startedAt=null, finishedAt=null;
+
+function save(){
+  try{ localStorage.setItem(STORE,JSON.stringify({i:sId.value,p:picks,s:startedAt,t:finishedAt})); }catch(e){}
+}
+function load(){
+  try{
+    var d=JSON.parse(localStorage.getItem(STORE)||"null");
+    if(d){ sId.value=d.i||""; if(Array.isArray(d.p)&&d.p.length===QZ.length) picks=d.p.slice();
+           startedAt=d.s||null; finishedAt=d.t||null; }
+  }catch(e){}
+}
+function started(){ return picks.some(function(p){return p>=0;}); }
+function code(str){
+  var h=0x811c9dc5;
+  for(var i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=(h+((h<<1)+(h<<4)+(h<<7)+(h<<8)+(h<<24)))>>>0; }
+  return ("0000000"+h.toString(16).toUpperCase()).slice(-8);
+}
+function scoreOf(){ var s=0; for(var i=0;i<QZ.length;i++) if(picks[i]===QZ[i].a) s++; return s; }
+function answered(){ return picks.filter(function(p){return p>=0;}).length; }
+
+function receipt(){
+  var s=scoreOf(), pct=Math.round(s/QZ.length*100), id=(sId.value||"").trim();
+  var stamp=finishedAt||new Date().toISOString();
+  var vc=code(id+"|"+stamp+"|"+picks.join(""));
+  var head=["lecture","student_id","completed_utc","score","total","percent","verification"];
+  var row=["L3",id,stamp,s,QZ.length,pct,vc];
+  for(var i=0;i<QZ.length;i++){ head.push("a"+(i+1)); row.push(picks[i]>=0?LETTERS[picks[i]]:"-"); }
+  for(var j=0;j<QZ.length;j++){ head.push("ok"+(j+1)); row.push(picks[j]===QZ[j].a?1:0); }
+  function cell(v){ v=String(v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
+  return {csv:head.join(",")+"\n"+row.map(cell).join(",")+"\n", vcode:vc, score:s, pct:pct, id:id};
+}
+
+function render(){
+  var done=answered(), all=(done===QZ.length);
+  elTally.textContent=done+" / "+QZ.length+" answered";
+  elBar.hidden=!all;
+  sId.readOnly=started();
+  elIdHint.innerHTML = all
+    ? "<strong>Attempt complete.</strong> Your answers are final. Every question now shows the correct answer and why — read them before you close this page."
+    : started() ? "<strong>Attempt in progress.</strong><span class=\"locked\">ID locked</span><br>Each answer is final."
+                : "<strong>One attempt.</strong> Enter your student ID before you begin — it locks once you answer the first question.";
+  if(all){
+    if(!finishedAt){ finishedAt=new Date().toISOString(); save(); }
+    var r=receipt();
+    elScore.innerHTML=r.score+' <small>/ '+QZ.length+'  ·  '+r.pct+' %</small>';
+    elWho.innerHTML="Student ID <b>"+esc(r.id||"—")+"</b> &nbsp;·&nbsp; Verification <b>"+r.vcode+"</b>";
+  }
+  for(var i=0;i<QZ.length;i++){
+    var box=document.querySelector('.opts[data-q="'+i+'"]');
+    var kids=[].slice.call(box.children), why=box.parentNode.querySelector(".why");
+    if(picks[i]<0){ kids.forEach(function(o){o.disabled=false;o.className="opt";}); why.hidden=true; }
+    else{
+      (function(qi){ kids.forEach(function(o,j){
+        o.disabled=true;
+        o.className="opt"+(j===QZ[qi].a?" right":(j===picks[qi]?" wrong":""));
+      }); })(i);
+      var _note=(picks[i]!==QZ[i].a)
+        ? '<span class="misc">You chose <b>'+LETTERS[picks[i]]+'</b>. '
+          + 'The correct answer is <b>'+LETTERS[QZ[i].a]+'</b>.</span>'
+        : "";
+      why.innerHTML=_note+QZ[i].w; why.hidden=false;
+    }
+  }
+}
+
+document.getElementById("quiz").innerHTML=QZ.map(function(item,i){
+  return '<div class="card q"><div class="card-b">'
+    +'<p class="stem"><b style="font-family:IBM Plex Mono,monospace;color:var(--muted);font-size:12px">Q'+(i+1)+'</b>  '+item.q+'</p>'
+    +'<div class="opts" data-q="'+i+'">'+item.o.map(function(o,j){
+        return '<button class="opt" data-i="'+j+'"><span class="ltr">'+LETTERS[j]+'</span><span>'+o+'</span></button>';
+      }).join("")+'</div><p class="why" hidden></p></div></div>';
+}).join("");
+
+[].slice.call(document.querySelectorAll(".opts")).forEach(function(box){
+  box.addEventListener("click",function(ev){
+    var b=ev.target.closest(".opt");
+    if(!b||b.disabled) return;
+    var qi=+box.getAttribute("data-q");
+    if(picks[qi]>=0) return;
+    if(!(sId.value||"").trim()){
+      elIdHint.innerHTML="<strong style=\"color:var(--stop)\">Enter your student ID first.</strong> It is written into the result file you submit.";
+      sId.focus(); return;
+    }
+    if(!startedAt) startedAt=new Date().toISOString();
+    picks[qi]=+b.getAttribute("data-i");
+    save(); render();
+  });
+});
+sId.addEventListener("input",save);
+
+dlBtn.addEventListener("click",function(){
+  var id=(sId.value||"").trim();
+  if(!id){ dlHint.textContent="Enter your student ID first — it goes into the file."; return; }
+  var r=receipt();
+  try{
+    var blob=new Blob([r.csv],{type:"text/csv;charset=utf-8"});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement("a");
+    a.href=url; a.download="CH40051-L3-check_"+id.replace(/[^A-Za-z0-9_-]/g,"")+".csv";
+    a.style.display="none";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(url);},1000);
+    dlHint.textContent="Saved. Hand it in as your instructor directs.";
+  }catch(e){
+    dlHint.textContent="Your browser blocked the download. Screenshot this panel and submit that instead.";
+  }
+});
+
+convert();
+cell();
+
+/* ---- submit straight to the course sheet ----------------------------------
+   Paste the Apps Script /exec URL between the quotes to switch this on.
+   Left empty, the button stays hidden and only the download exists.        */
+var SUBMIT_URL = "https://script.google.com/macros/s/AKfycbxPm7WrbttFu6-gnTi__IcUPt-816GthK0eI8TPuwOZyYlcRW3RAWJlmsr791moxBc5GA/exec";
+
+var sendBtn=document.getElementById("sendBtn");
+if(SUBMIT_URL){
+  sendBtn.hidden=false;
+  dlHint.textContent="Press Submit to send your result to the course. The download is a backup.";
+}
+
+sendBtn.addEventListener("click",function(){
+  var id=(sId.value||"").trim();
+  if(!id){ dlHint.textContent="Enter your student ID first."; return; }
+  var r=receipt();
+  var payload={
+    lecture:"L3", student_id:id, completed_utc:finishedAt||new Date().toISOString(),
+    score:r.score, total:QZ.length, percent:r.pct, verification:r.vcode,
+    answers:picks.map(function(p){ return p>=0?LETTERS[p]:"-"; }),
+    ok:picks.map(function(p,i){ return p===QZ[i].a?1:0; })
+  };
+  sendBtn.disabled=true;
+  dlHint.textContent="Sending...";
+
+  /* text/plain keeps this a simple request, so the browser sends it without
+     a preflight the Apps Script endpoint cannot answer */
+  fetch(SUBMIT_URL,{
+    method:"POST",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify(payload)
+  })
+  .then(function(res){ return res.json(); })
+  .then(function(j){
+    if(j && j.ok){
+      sendBtn.textContent="Submitted ✓";
+      dlHint.textContent="Recorded for student ID "+id+". You can close this page.";
+    }else{
+      throw new Error((j && j.error) || "rejected");
+    }
+  })
+  .catch(function(){
+    /* the response could not be read - resend blind so the record still lands,
+       then tell the student to keep the file as proof */
+    fetch(SUBMIT_URL,{method:"POST",mode:"no-cors",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(payload)}).catch(function(){});
+    sendBtn.disabled=false;
+    sendBtn.textContent="Submit to the course";
+    dlHint.textContent="Sent, but the confirmation did not come back. "
+      + "Download the file as well and keep it - it is your proof of submission.";
+  });
+});
+
+load();
+render();
+
+})();
+</script>
+</body>
+</html>
