@@ -217,7 +217,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
         </div>
         <div class="card">
           <div class="card-h"><h2>On one scale</h2><span class="note">where the references sit, and where your value lands</span></div>
-          <div class="card-b scrollx"><svg id="scale" viewBox="0 0 700 210" width="700" height="210" role="img" aria-label="Potential scale showing reference electrodes and the converted value"></svg></div>
+          <div class="card-b scrollx"><svg id="scale" viewBox="0 0 700 260" width="700" height="260" role="img" aria-label="Potential scale showing reference electrodes and the converted value"></svg></div>
         </div>
       </div>
 
@@ -288,10 +288,13 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
               <div class="stat"><span class="k">measured at this RE</span><span class="v" id="oMeas">—</span></div>
               <div class="stat"><span class="k">ohmic error, <em>iR</em><sub>u</sub></span><span class="v" id="oErr">—</span></div>
               <div class="stat"><span class="k">uncompensated <em>R</em><sub>u</sub></span><span class="v" id="oRu">—</span></div>
+              <div class="stat"><span class="k">CE current density</span><span class="v" id="oJ">—</span></div>
+              <div class="stat"><span class="k">CE overpotential, η(CE)</span><span class="v" id="oEtaCE">—</span></div>
               <div class="stat"><span class="k">E(CE)</span><span class="v" id="oCE">—</span></div>
             </div>
             <div class="eqline" id="cellEq"></div>
             <div class="verdict" id="cellVerdict"></div>
+            <p class="hint" style="margin:0"><strong>How η(CE) is modelled here.</strong> It is not a fixed number. The counter electrode is an interface like any other, so its overpotential is taken from Butler–Volmer at its <em>own</em> current density, <em>j</em><sub>CE</sub> = <em>i</em>/<em>A</em><sub>CE</sub>: η = (<em>b</em>/2.303)·asinh(<em>j</em><sub>CE</sub>/2<em>j</em><sub>0</sub>), with a Tafel slope <em>b</em> = 120 mV/decade and an exchange current density <em>j</em><sub>0</sub> = 4×10⁻⁵ A cm⁻². Those two numbers are stand-ins for a real counter reaction, not measured values — but the <em>behaviour</em> is right: η(CE) is zero at zero current, climbs roughly 120 mV per decade of current, and falls as you enlarge the CE. Push the current up or shrink the CE and watch it move.</p>
           </div>
         </div>
 
@@ -367,12 +370,12 @@ var REFS=[
  {id:"NHE",   nm:"NHE",              sub:"normal hydrogen, 1 M acid",          E:0.000, aq:true},
  {id:"AgCl3", nm:"Ag/AgCl",          sub:"3 M KCl",                            E:0.210, aq:true},
  {id:"AgClS", nm:"Ag/AgCl",          sub:"saturated KCl",                      E:0.197, aq:true},
- {id:"SCE01", nm:"SCE",              sub:"0.1 M KCl",                          E:0.336, aq:true},
- {id:"SCE1",  nm:"SCE",              sub:"1 M KCl",                            E:0.283, aq:true},
- {id:"SCES",  nm:"SCE",              sub:"saturated KCl",                      E:0.241, aq:true},
+ {id:"SCE01", nm:"Calomel",          sub:"Hg/Hg₂Cl₂, 0.1 M KCl",              E:0.336, aq:true, tag:"Calomel 0.1M"},
+ {id:"SCE1",  nm:"Calomel",          sub:"Hg/Hg₂Cl₂, 1 M KCl (NCE)",          E:0.283, aq:true, tag:"Calomel 1M"},
+ {id:"SCES",  nm:"SCE",              sub:"Hg/Hg₂Cl₂, saturated KCl",           E:0.241, aq:true, tag:"SCE"},
  {id:"HgO",   nm:"Hg/HgO",           sub:"1 M NaOH — for alkaline media",      E:0.140, aq:true},
  {id:"AgAg",  nm:"Ag/Ag⁺",           sub:"0.01 M AgNO₃ in MeCN — approximate", E:0.542, aq:false},
- {id:"Fc",    nm:"Fc/Fc⁺",           sub:"ferrocene in MeCN — approximate",    E:0.400, aq:false}
+ {id:"Fc",    nm:"Fc/Fc⁺",           sub:"ferrocene in MeCN — approximate",    E:0.640, aq:false}
 ];
 function ref(id){ for(var i=0;i<REFS.length;i++) if(REFS[i].id===id) return REFS[i]; return REFS[0]; }
 function full(r){ return r.nm+" ("+r.sub.split(" — ")[0]+")"; }
@@ -424,7 +427,7 @@ function convert(){
 }
 
 function drawScale(vsSHE, s){
-  var W=700,H=210,L=30,R=30,axY=118;
+  var W=700,H=260,L=30,R=30,axY=168;
   var lo=-0.6, hi=0.9;
   if(vsSHE!==null){ lo=Math.min(lo,vsSHE-0.15); hi=Math.max(hi,vsSHE+0.15); }
   function X(v){ return L+(v-lo)/(hi-lo)*(W-L-R); }
@@ -437,16 +440,34 @@ function drawScale(vsSHE, s){
   }
   out+='<text x="'+(W-R)+'" y="'+(axY+34)+'" text-anchor="end" fill="var(--muted)" '+mono+' font-size="10">V vs SHE</text>';
 
-  /* stagger the reference labels so they do not collide */
-  var lanes=[0,1,2,0,1,2,0,1,2,0];
-  REFS.forEach(function(r,i){
-    if(!r.aq && r.id!=="Fc" && r.id!=="AgAg") return;
-    var x=X(r.E), lane=lanes[i%lanes.length];
-    var y=axY-14-lane*30;
-    var col=r.aq?"var(--red-)":"var(--stop)";
-    out+='<line x1="'+x+'" y1="'+axY+'" x2="'+x+'" y2="'+y+'" stroke="'+col+'" stroke-width="1" stroke-dasharray="2 3"/>';
-    out+='<circle cx="'+x+'" cy="'+axY+'" r="3.2" fill="'+col+'"/>';
-    out+='<text x="'+x+'" y="'+(y-3)+'" text-anchor="middle" fill="'+col+'" '+mono+' font-size="9.5">'+esc(r.nm)+'</text>';
+  /* Stack the reference labels in lanes, assigned left to right so that no two
+     that overlap horizontally ever share a lane.  A fixed lane pattern used to
+     collide once the names grew past three letters. */
+  var shown=REFS.filter(function(r){ return r.aq || r.id==="Fc" || r.id==="AgAg"; })
+                .map(function(r){ var nm=r.tag||r.nm; return {r:r,nm:nm,x:X(r.E),w:nm.length*5.7+12}; })
+                .sort(function(a,b){ return a.x-b.x; });
+  var occupied=[];
+  shown.forEach(function(it){
+    var lane=0;
+    while(true){
+      if(!occupied[lane]) occupied[lane]=[];
+      var clash=occupied[lane].some(function(sp){ return it.x-it.w/2 < sp[1] && it.x+it.w/2 > sp[0]; });
+      if(!clash){ occupied[lane].push([it.x-it.w/2,it.x+it.w/2]); it.lane=lane; return; }
+      lane++;
+    }
+  });
+  var gap=Math.min(30,(axY-26)/occupied.length);
+  /* leaders first, then every label, so no line is drawn across a name */
+  shown.forEach(function(it){
+    var col=it.r.aq?"var(--red-)":"var(--stop)";
+    out+='<line x1="'+it.x+'" y1="'+axY+'" x2="'+it.x+'" y2="'+(axY-14-it.lane*gap)+'" stroke="'+col+'" stroke-width="1" stroke-dasharray="2 3"/>';
+    out+='<circle cx="'+it.x+'" cy="'+axY+'" r="3.2" fill="'+col+'"/>';
+  });
+  shown.forEach(function(it){
+    var col=it.r.aq?"var(--red-)":"var(--stop)", ly=axY-17-it.lane*gap;
+    /* a card-coloured plate so a leader from a lower lane cannot run through a name */
+    out+='<rect x="'+(it.x-(it.w-8)/2)+'" y="'+(ly-9.5)+'" width="'+(it.w-8)+'" height="13" fill="var(--surface)"/>';
+    out+='<text x="'+it.x+'" y="'+ly+'" text-anchor="middle" fill="'+col+'" '+mono+' font-size="9.5">'+esc(it.nm)+'</text>';
   });
 
   if(vsSHE!==null){
@@ -467,7 +488,21 @@ function drawScale(vsSHE, s){
    barely changes anything.
    The working electrode is taken as cathodic throughout, so the measured
    potential sits below the true one and iR has to be added back. */
-var CELL={r0:0.15, kap:0.05, L:3.0, EWE:-0.40, etaCE:0.35};   /* cm, S/cm, cm, V, V */
+var CELL={r0:0.15, kap:0.05, L:3.0, EWE:-0.40,
+          j0CE:4e-5, bCE:0.120};   /* cm, S/cm, cm, V; A/cm², V/decade */
+var AWE=Math.PI*CELL.r0*CELL.r0;                    /* WE disk area, cm² */
+
+/* The counter electrode is not a fixed 350 mV battery: it is an interface, so
+   its overpotential follows its own current density through Butler-Volmer,
+       j = 2 j0 sinh(eta / (b/ln10)),
+   inverted here.  It goes to zero at zero current, rises ~b per decade once
+   past j0, and falls when the CE is made larger.  j0 and b are stand-ins for
+   a real counter reaction, chosen so the default settings land near 350 mV. */
+function asinh(x){ return Math.log(x+Math.sqrt(x*x+1)); }
+function jCEof(iA,ratio){ return Math.abs(iA)/(AWE*ratio); }        /* A/cm² */
+function etaCEof(iA,ratio){
+  return (CELL.bCE/Math.LN10)*asinh(jCEof(iA,ratio)/(2*CELL.j0CE));
+}
 var RINF=1/(4*CELL.kap*CELL.r0);
 
 function ruAt(x){ return RINF*(2/Math.PI)*Math.atan(2*x/CELL.r0); }   /* x in cm */
@@ -516,7 +551,8 @@ function cell(){
   var Reff=(mode==="three")?Ru:Rtot;
   var err=iA*Reff;
   var meas=CELL.EWE-iA*Ru;                          /* what an RE at d reads */
-  var eCE=CELL.EWE-dropAt(CELL.L,iA,ratio)-CELL.etaCE;
+  var jCE=jCEof(iA,ratio), etaCE=etaCEof(iA,ratio);
+  var eCE=CELL.EWE-dropAt(CELL.L,iA,ratio)-etaCE;
 
   dist.disabled=(mode!=="three");
   document.getElementById("curV").textContent=iMA+" mA";
@@ -530,6 +566,8 @@ function cell(){
   oe.className="v"+(err>0.02?" warn":"");
   document.getElementById("oRu").textContent=Reff.toFixed(1)+" Ω";
   document.getElementById("oCE").textContent=eCE.toFixed(3)+" V";
+  document.getElementById("oJ").textContent=(jCE*1000).toFixed(1)+" mA/cm²";
+  document.getElementById("oEtaCE").textContent=(etaCE*1000).toFixed(0)+" mV";
 
   var v=document.getElementById("cellVerdict"), eq=document.getElementById("cellEq");
   if(mode==="three"){
@@ -543,22 +581,22 @@ function cell(){
     v.className="verdict stop";
     v.innerHTML="<span><b>Two electrodes.</b> The counter electrode has to be the reference as well, so the reading carries the whole solution resistance ("
       +Rtot.toFixed(1)+" Ω, <b>"+(err*1000).toFixed(0)+" mV</b> at "+iMA+" mA) <em>and</em> the "
-      +(CELL.etaCE*1000).toFixed(0)+" mV the CE has polarised. Neither term can be separated out.</span>";
+      +(etaCE*1000).toFixed(0)+" mV the CE has polarised at "+(jCE*1000).toFixed(1)+" mA/cm². Neither term can be separated out, and both move when you change the current.</span>";
     eq.innerHTML="reading = E(WE) − iR<sub>total</sub> − η(CE)<br>"
-      +"= "+CELL.EWE.toFixed(3)+" − "+(err).toFixed(3)+" − "+CELL.etaCE.toFixed(3)+"<br>"
+      +"= "+CELL.EWE.toFixed(3)+" − "+(err).toFixed(3)+" − "+etaCE.toFixed(3)+"<br>"
       +"= <b>"+eCE.toFixed(3)+" V</b>, and none of it is E(WE)";
   }
 
   var an=document.getElementById("areaNote");
   if(ratio<1){
     an.className="verdict stop";
-    an.innerHTML="The CE is <b>smaller</b> than the WE. Its current density is "+(1/ratio).toFixed(1)+" × higher, so it polarises first and may run out of reactant — the counter reaction becomes the bottleneck instead of the one you are studying.";
+    an.innerHTML="The CE is <b>smaller</b> than the WE. Its current density is "+(1/ratio).toFixed(1)+" × higher, so it polarises first and may run out of reactant — the counter reaction becomes the bottleneck instead of the one you are studying. η(CE) here is <b>"+(etaCE*1000).toFixed(0)+" mV</b>.";
   }else if(ratio<3){
     an.className="verdict flat";
-    an.innerHTML="Comparable areas. Workable, but the CE is doing nearly as much work per unit area as the WE. Give it more room if you plan to draw current for long.";
+    an.innerHTML="Comparable areas. Workable, but the CE is doing nearly as much work per unit area as the WE — η(CE) is <b>"+(etaCE*1000).toFixed(0)+" mV</b> at this current. Give it more room if you plan to draw current for long.";
   }else{
     an.className="verdict go";
-    an.innerHTML="The CE has "+ratio.toFixed(1)+" × the area, so its current density is "+(1/ratio*100).toFixed(0)+" % of the WE's. The counter reaction stays comfortably unlimited, which is exactly its job.";
+    an.innerHTML="The CE has "+ratio.toFixed(1)+" × the area, so its current density is "+(1/ratio*100).toFixed(0)+" % of the WE's and η(CE) drops to <b>"+(etaCE*1000).toFixed(0)+" mV</b>. The counter reaction stays comfortably unlimited, which is exactly its job.";
   }
 
   drawCombo(ratio,dmm,Ru,Rtot);
@@ -673,7 +711,9 @@ function drawProfile(iA,ratio,d,meas,eCE){
   var W=400,H=300,L=54,R=18,T=20,B=52;
   var mono='font-family="IBM Plex Mono,monospace"';
   var xmaxmm=CELL.L*10;
-  var lo=Math.min(eCE,CELL.EWE)-0.05, hi=Math.max(eCE,CELL.EWE)+0.05;
+  /* pad proportionally so the lower line never lands on the x-axis labels */
+  var pad=Math.max(0.05,Math.abs(CELL.EWE-eCE)*0.12);
+  var lo=Math.min(eCE,CELL.EWE)-pad, hi=Math.max(eCE,CELL.EWE)+pad*0.4;
   function X(mm){ return L+(mm/xmaxmm)*(W-L-R); }
   function Y(v){ return T+(hi-v)/(hi-lo)*(H-T-B); }
   var s="";
@@ -710,13 +750,24 @@ function drawProfile(iA,ratio,d,meas,eCE){
      even at zero current, where the curve lies on the E(WE) line itself */
   s+='<text x="'+X(xmaxmm*0.5)+'" y="'+(Y(CELL.EWE-dropAt(xmaxmm*0.5/10,iA,ratio))+15)+'" text-anchor="middle" fill="var(--go)" '+mono+' font-size="9.5">measured, RE here</text>';
 
+  /* the gap between the end of the solution profile and E(CE) is the CE's own
+     overpotential — the term the two-electrode reading cannot separate out */
+  var vEnd=CELL.EWE-dropAt(CELL.L,iA,ratio), etaC=etaCEof(iA,ratio);
+  if(etaC>0.005){
+    var ex=X(xmaxmm)-10;
+    s+='<line x1="'+ex+'" y1="'+Y(vEnd)+'" x2="'+ex+'" y2="'+Y(eCE)+'" stroke="var(--stop)" stroke-width="2"/>';
+    s+='<text x="'+(ex-6)+'" y="'+((Y(vEnd)+Y(eCE))/2+3)+'" text-anchor="end" fill="var(--stop)" '+mono+' font-size="9.5">η(CE) = '+(etaC*1000).toFixed(0)+' mV</text>';
+  }
+
   if(mode==="three"){
     var px=X(d*10), py=Y(meas);
     s+='<line x1="'+px+'" y1="'+Y(CELL.EWE)+'" x2="'+px+'" y2="'+py+'" stroke="var(--stop)" stroke-width="3"/>';
     s+='<circle cx="'+px+'" cy="'+py+'" r="4.5" fill="var(--go)"/>';
-    var lab=((CELL.EWE-meas)*1000).toFixed(0)+" mV";
-    var flip=px>W-R-70;
-    s+='<text x="'+(flip?px-8:px+8)+'" y="'+((Y(CELL.EWE)+py)/2+3)+'" text-anchor="'+(flip?"end":"start")+'" fill="var(--stop)" '+mono+' font-size="10" font-weight="500">'+lab+'</text>';
+    if(Math.abs(CELL.EWE-meas)>=0.002){
+      var lab=((CELL.EWE-meas)*1000).toFixed(0)+" mV";
+      var flip=px>W-R-70;
+      s+='<text x="'+(flip?px-8:px+8)+'" y="'+((Y(CELL.EWE)+py)/2+3)+'" text-anchor="'+(flip?"end":"start")+'" fill="var(--stop)" '+mono+' font-size="10" font-weight="500">'+lab+'</text>';
+    }
   }
   document.getElementById("profsvg").innerHTML=s;
 }
@@ -773,7 +824,7 @@ var QZ=[
      "Scaling an intensive quantity — the potential was multiplied by the number of electrons",
      "Activity blindness — the chloride activity was left out"],
   a:1,
-  w:"To move onto the SHE scale from a scale whose zero sits at +0.197 V vs SHE you <b>add</b>: −0.30 + 0.197 = <b>−0.103 V</b>. Subtracting moves you the wrong way, so the error is twice the offset — here 0.394 V, which is larger than many of the differences you will be trying to measure. Option D is a real misconception about this same electrode, and it is what makes an SCE read differently in 0.1 M and in saturated KCl — see question 4."},
+  w:"To move onto the SHE scale from a scale whose zero sits at +0.197 V vs SHE you <b>add</b>: −0.30 + 0.197 = <b>−0.103 V</b>. Subtracting moves you the wrong way, so the error is twice the offset — here 0.394 V, which is larger than many of the differences you will be trying to measure. Option D is a real misconception about this same electrode, and it is what makes a calomel electrode read differently in 0.1 M and in saturated KCl — see question 4."},
 
  {q:"Why does a three-electrode cell measure the working electrode better than a two-electrode cell?",
   o:["Three electrodes pass more current, so the signal is larger",
@@ -791,13 +842,13 @@ var QZ=[
   a:3,
   w:"WE and CE pass <b>equal charge</b> — that is forced by the circuit. If the CE is small, its current density is high, so it polarises, may exhaust its reactant, and starts to limit the experiment. The whole point is that the interesting limitation lives at the WE."},
 
- {q:"An SCE gives +0.336 V vs SHE in 0.1 M KCl but +0.241 V in saturated KCl. Why does the value depend on the KCl?",
+ {q:"A calomel electrode (Hg/Hg₂Cl₂) gives +0.336 V vs SHE in 0.1 M KCl but +0.241 V in saturated KCl — only the saturated one is properly called an <b>SCE</b>. Why does the value depend on the KCl?",
   o:["The electrode's potential is set by the chloride activity, through the Nernst equation",
      "The KCl concentration changes the temperature of the cell",
      "Saturated KCl leaks mercury and shifts the potential",
      "It is an experimental artefact with no thermodynamic basis"],
   a:0,
-  w:"For Hg₂Cl₂ + 2e⁻ → 2Hg + 2Cl⁻ the only variable species is Cl⁻, so E depends on chloride activity. More chloride pushes the reduction potential down. This is also why the KCl concentration must always be quoted with the reference — “vs SCE” alone is incomplete."},
+  w:"For Hg₂Cl₂ + 2e⁻ → 2Hg + 2Cl⁻ the only variable species is Cl⁻, so E depends on chloride activity. More chloride pushes the reduction potential down. This is also why the KCl concentration must always be quoted with the reference. Note the naming too: the <b>S</b> in SCE already means <em>saturated</em>, so “SCE in 0.1 M KCl” is a contradiction — the 0.1 M and 1 M versions are simply calomel electrodes (the 1 M one is sometimes called the NCE)."},
 
  {q:"In non-aqueous work you are urged to report potentials against the <b>ferrocene</b> Fc/Fc⁺ couple. Why?",
   o:["Ferrocene has exactly 0.000 V in every solvent",

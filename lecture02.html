@@ -172,7 +172,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
             </div>
             <div>
               <div class="slider-row"><span class="fld" style="margin:0">Applied potential</span><span class="val" id="valE"></span></div>
-              <input type="range" id="fE" min="-1.5" max="2.0" step="0.01" value="0">
+              <input type="range" id="fE" min="-3.6" max="2.4" step="0.01" value="0">
             </div>
             <button class="ghost" id="toEq" type="button">Set to equilibrium (η = 0)</button>
             <button class="solid" id="stepBtn" type="button">Step the potential &amp; watch the current</button>
@@ -242,6 +242,14 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
               <input type="range" id="temp" min="0" max="80" step="1" value="25">
             </div>
             <button class="ghost" id="resetN" type="button">Back to standard state</button>
+            <p class="hint" style="margin:0">The sliders are labelled as concentrations, but the quantity the equation actually wants is the <strong>activity</strong>. See the note below.</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>Activities, not concentrations</h2><span class="note">what the log term really contains</span></div>
+          <div class="card-b" style="font-size:13px;color:var(--ink-2);line-height:1.7">
+            The Nernst equation is written in terms of <strong>activities</strong>: <em>E</em> = <em>E</em>° + (2.303<em>RT</em>/<em>nF</em>) log(<em>a</em><sub>O</sub>/<em>a</em><sub>R</sub>), where <em>a</em> = γ·<em>c</em>/<em>c</em>° and γ is the activity coefficient. On this page, <strong>activities are approximated by concentrations</strong> — that is, γ ≈ 1 — purely for simplicity.
+            That approximation is decent in dilute solution and gets worse as the solution becomes concentrated or the ions more highly charged, where γ can fall well below 1 and shift <em>E</em> by tens of millivolts. So read every number here as an idealised value, not a prediction for a real 1 M solution.
           </div>
         </div>
         <div class="card">
@@ -278,7 +286,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
             <div class="readout"><span class="k">E° (standard)</span><span class="v" id="nE0">—</span></div>
             <div class="readout"><span class="k">Shift from E°</span><span class="v" id="nShift">—</span></div>
             <div class="readout"><span class="k">Slope, 2.303RT/nF</span><span class="v" id="nSlope">—</span></div>
-            <div class="readout"><span class="k">log([O]/[R])</span><span class="v" id="nLog">—</span></div>
+            <div class="readout"><span class="k">log(a<sub>O</sub>/a<sub>R</sub>) ≈ log([O]/[R])</span><span class="v" id="nLog">—</span></div>
           </div>
         </div>
         <div class="card">
@@ -499,7 +507,7 @@ function fmt(x,d){var s=x.toFixed(d);return /^-0(\.0*)?$/.test(s)?s.slice(1):s;}
 var COUPLES=[
  {id:"Fe",  E0:0.77,  n:1, O:"Fe³⁺",  Rd:"Fe²⁺",   solidR:false},
  {id:"Ce",  E0:1.72,  n:1, O:"Ce⁴⁺",  Rd:"Ce³⁺",   solidR:false},
- {id:"Fc",  E0:0.40,  n:1, O:"Fc⁺",   Rd:"Fc",     solidR:false},
+ {id:"Fc",  E0:0.64,  n:1, O:"Fc⁺",   Rd:"Fc",     solidR:false},
  {id:"Ag",  E0:0.80,  n:1, O:"Ag⁺",   Rd:"Ag(s)",  solidR:true},
  {id:"Cu",  E0:0.34,  n:2, O:"Cu²⁺",  Rd:"Cu(s)",  solidR:true},
  {id:"Zn",  E0:-0.76, n:2, O:"Zn²⁺",  Rd:"Zn(s)",  solidR:true},
@@ -562,7 +570,8 @@ function nernst(){
   document.getElementById("nLog").textContent=(ratio>=0?"+":"")+fmt(ratio,2);
 
   document.getElementById("nEq").innerHTML=
-    "E = E° + (2.303RT/nF) · log([O]/[R])<br>"
+    "E = E° + (2.303RT/nF) · log(a<sub>O</sub>/a<sub>R</sub>)<br>"
+   +"<span style=\"color:var(--muted)\">with γ ≈ 1, a<sub>O</sub>/a<sub>R</sub> ≈ ["+esc(c.O)+"] / "+(c.solidR?"1 (pure solid)":"["+esc(c.Rd)+"]")+"</span><br>"
    +"E = "+fmt(c.E0,2)+" + ("+fmt(slope*1000,1)+" mV) × ("+fmt(ratio,2)+")<br>"
    +"E = <b>"+fmt(E,3)+" V</b>";
 
@@ -1073,37 +1082,48 @@ function fermi(){
 }
 
 function fplot(c,Eapp,Eeq){
-  var W=380,H=380,Tp=26,B=34;
-  /* vertical axis is electron energy in eV vs vacuum; more positive potential = lower energy */
-  var emin=-7.0, emax=-2.0;
-  function Y(e){ return Tp+(emax-e)/(emax-emin)*(H-Tp-B); }
-  var eF=-(VAC+Eapp), eRedox=-(VAC+Eeq);
+  var W=380,H=380,Tp=66,B=34;
   var mono='font-family="IBM Plex Mono,monospace"';
+  var eF=-(VAC+Eapp), eRedox=-(VAC+Eeq);
+
+  /* The window follows the two levels, so a couple as far out as Li(s)/Li+
+     still lands inside the frame instead of running off the top. */
+  var lo=Math.min(eF,eRedox), hi=Math.max(eF,eRedox);
+  var span=Math.max(5,Math.ceil(((hi-lo)+2.6)*2)/2);
+  var emax=Math.ceil(((lo+hi)/2+span/2)*2)/2;
+  if(emax>-0.5) emax=-0.5;
+  var emin=emax-span;
+  function Y(e){ return Tp+(emax-e)/(emax-emin)*(H-Tp-B); }
+
   var s='<defs><marker id="fa" markerWidth="7" markerHeight="7" refX="5.6" refY="3" orient="auto">'
        +'<path d="M0,0.4 L6,3 L0,5.6 z" fill="var(--elec)"/></marker></defs>';
 
-  /* vacuum level */
-  s+='<line x1="20" y1="'+Y(-2.2)+'" x2="'+(W-20)+'" y2="'+Y(-2.2)+'" stroke="var(--line-2)" stroke-width="1" stroke-dasharray="4 4"/>';
-  s+='<text x="20" y="'+(Y(-2.2)-6)+'" fill="var(--muted)" '+mono+' font-size="9.5">vacuum level (0 eV, off scale)</text>';
+  /* vacuum level sits at 0 eV, always above the top of this window, so it is
+     drawn in the margin rather than on the scale */
+  s+='<line x1="20" y1="54" x2="'+(W-20)+'" y2="54" stroke="var(--line-2)" stroke-width="1" stroke-dasharray="4 4"/>';
+  s+='<text x="20" y="48" fill="var(--muted)" '+mono+' font-size="9.5">vacuum level, 0 eV — above the top of this scale</text>';
 
   /* electrode block */
   s+='<rect x="26" y="'+Tp+'" width="130" height="'+(H-Tp-B)+'" fill="var(--surface-2)" rx="4"/>';
   s+='<text x="91" y="'+(H-B+16)+'" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="10">electrode</text>';
   /* filled states up to E_F */
-  s+='<rect x="26" y="'+Y(eF)+'" width="130" height="'+Math.max(0,(H-B)-Y(eF))+'" fill="var(--red-soft)" rx="0"/>';
-  s+='<line x1="26" y1="'+Y(eF)+'" x2="156" y2="'+Y(eF)+'" stroke="var(--red-)" stroke-width="2.6"/>';
-  s+='<text x="30" y="'+(Y(eF)-7)+'" fill="var(--red-)" '+mono+' font-size="11" font-weight="500">E_F  '+fmt(eF,2)+' eV</text>';
+  var yEF=Y(eF);
+  s+='<rect x="26" y="'+yEF+'" width="130" height="'+Math.max(0,(H-B)-yEF)+'" fill="var(--red-soft)" rx="0"/>';
+  s+='<line x1="26" y1="'+yEF+'" x2="156" y2="'+yEF+'" stroke="var(--red-)" stroke-width="2.6"/>';
+  s+='<text x="30" y="'+Math.max(Tp+13,yEF-7)+'" fill="var(--red-)" '+mono+' font-size="11" font-weight="500">'
+    +'E<tspan font-size="8" dy="2.5">F</tspan><tspan dy="-2.5">  '+fmt(eF,2)+' eV</tspan></text>';
 
   /* solution side */
+  var yRx=Y(eRedox);
   s+='<text x="286" y="'+(H-B+16)+'" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="10">solution</text>';
-  s+='<line x1="220" y1="'+Y(eRedox)+'" x2="352" y2="'+Y(eRedox)+'" stroke="var(--ox)" stroke-width="2.6"/>';
-  s+='<text x="220" y="'+(Y(eRedox)-7)+'" fill="var(--ox)" '+mono+' font-size="11" font-weight="500">'+esc(c.O)+'/'+esc(c.Rd)+'  '+fmt(eRedox,2)+' eV</text>';
-  s+='<text x="220" y="'+(Y(eRedox)+15)+'" fill="var(--ox)" '+mono+' font-size="9.5">E° = '+fmt(c.E0,2)+' V vs SHE</text>';
+  s+='<line x1="220" y1="'+yRx+'" x2="352" y2="'+yRx+'" stroke="var(--ox)" stroke-width="2.6"/>';
+  s+='<text x="220" y="'+Math.max(Tp+13,yRx-7)+'" fill="var(--ox)" '+mono+' font-size="11" font-weight="500">'+esc(c.O)+'/'+esc(c.Rd)+'  '+fmt(eRedox,2)+' eV</text>';
+  s+='<text x="220" y="'+Math.min(H-B-4,yRx+15)+'" fill="var(--ox)" '+mono+' font-size="9.5">E° = '+fmt(c.E0,2)+' V vs SHE</text>';
 
   /* transfer arrow */
   var eta=Eapp-Eeq;
   if(Math.abs(eta)>=0.02){
-    var y1=Y(eF), y2=Y(eRedox);
+    var y1=yEF, y2=yRx;
     var dir = eta<0 ? 1 : -1;   /* cathodic: electrode -> solution */
     var xa = dir>0 ? 162 : 214, xb = dir>0 ? 214 : 162;
     s+='<path d="M '+xa+' '+(dir>0?y1:y2)+' C 188 '+(dir>0?y1:y2)+', 188 '+(dir>0?y2:y1)+', '+xb+' '+(dir>0?y2:y1)+'" '
@@ -1113,15 +1133,14 @@ function fplot(c,Eapp,Eeq){
   }
 
   /* twin axes: energy on the left, potential on the right */
-  for(var e=-7;e<=-2;e++){
+  for(var e=Math.ceil(emin);e<=Math.floor(emax);e++){
     s+='<text x="18" y="'+(Y(e)+3.5)+'" text-anchor="end" fill="var(--muted)" '+mono+' font-size="8.5">'+e+'</text>';
-    var pot=-(e)-VAC;
-    s+='<text x="'+(W-14)+'" y="'+(Y(e)+3.5)+'" text-anchor="start" fill="var(--muted)" '+mono+' font-size="8.5">'+fmt(pot,1)+'</text>';
+    s+='<text x="'+(W-6)+'" y="'+(Y(e)+3.5)+'" text-anchor="end" fill="var(--muted)" '+mono+' font-size="8.5">'+fmt(-e-VAC,2)+'</text>';
   }
-  s+='<text x="8" y="'+(Tp-10)+'" fill="var(--muted)" '+mono+' font-size="9">eV</text>';
-  s+='<text x="'+(W-30)+'" y="'+(Tp-10)+'" fill="var(--muted)" '+mono+' font-size="9">V vs SHE</text>';
-  s+='<text x="8" y="'+(Tp-22)+'" fill="var(--muted)" '+mono+' font-size="8.5">↑ electron energy</text>';
-  s+='<text x="'+(W-30)+'" y="'+(Tp-22)+'" fill="var(--muted)" '+mono+' font-size="8.5">↓ potential</text>';
+  s+='<text x="8" y="16" fill="var(--muted)" '+mono+' font-size="8.5">↑ electron energy</text>';
+  s+='<text x="8" y="30" fill="var(--muted)" '+mono+' font-size="9">eV</text>';
+  s+='<text x="'+(W-6)+'" y="16" text-anchor="end" fill="var(--muted)" '+mono+' font-size="8.5">↓ potential</text>';
+  s+='<text x="'+(W-6)+'" y="30" text-anchor="end" fill="var(--muted)" '+mono+' font-size="9">V vs SHE</text>';
   document.getElementById("fplot").innerHTML=s;
 }
 
