@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Potential Explorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+:root{
+  --ground:#F1F3F2; --surface:#FFFFFF; --surface-2:#E9EDEB;
+  --ink:#14191B; --ink-2:#3E4A4D; --muted:#68767A; --line:#D6DDDA; --line-2:#C3CCC8;
+  --ox:#A85B33; --ox-soft:#F3E4DA;
+  --red-:#15618E; --red-soft:#DDE9F2;
+  --go:#2C7355; --go-soft:#DCEBE3;
+  --stop:#8A5F0C; --stop-soft:#F3E9D3;
+  --elec:#3E4A4D;
+  --shadow:0 1px 2px rgba(20,25,27,.05),0 8px 24px -12px rgba(20,25,27,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+    --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+    --ox:#D08551; --ox-soft:#33231A;
+    --red-:#5AA6D4; --red-soft:#152833;
+    --go:#5DBB8D; --go-soft:#152A21;
+    --stop:#D6A33F; --stop-soft:#2B2415;
+    --elec:#AEBBBE;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+  --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+  --ox:#D08551; --ox-soft:#33231A;
+  --red-:#5AA6D4; --red-soft:#152833;
+  --go:#5DBB8D; --go-soft:#152A21;
+  --stop:#D6A33F; --stop-soft:#2B2415;
+  --elec:#AEBBBE;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:32px 20px 72px}
+.masthead{display:flex;flex-wrap:wrap;align-items:flex-end;gap:20px 32px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.eyebrow a{color:inherit}
+h1{font-family:"IBM Plex Serif",Georgia,serif;font-weight:600;font-size:clamp(28px,4.2vw,42px);line-height:1.12;margin:0;text-wrap:balance;letter-spacing:-.015em}
+.sub{margin:8px 0 0;color:var(--ink-2);font-size:15px;max-width:62ch}
+.tabs{display:flex;gap:2px;margin:24px 0 22px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{appearance:none;background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);
+  font-family:inherit;font-size:14.5px;font-weight:500;padding:11px 16px;cursor:pointer;white-space:nowrap;margin-bottom:-1px}
+.tab:hover{color:var(--ink-2)}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ox)}
+.tab:focus-visible{outline:2px solid var(--red-);outline-offset:-2px;border-radius:4px 4px 0 0}
+.panel[hidden]{display:none}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow)}
+.card-h{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.card-h h2{font-size:15px;font-weight:600;margin:0;letter-spacing:-.01em}
+.card-h .note{font-size:12.5px;color:var(--muted)}
+.card-b{padding:18px}
+.stack{display:flex;flex-direction:column;gap:16px}
+.grid3{display:grid;grid-template-columns:minmax(250px,1fr) minmax(300px,1.25fr) minmax(250px,1fr);gap:16px;align-items:start}
+@media(max-width:1040px){.grid3{grid-template-columns:1fr 1fr}.grid3>.c3{grid-column:1/-1}}
+@media(max-width:720px){.grid3{grid-template-columns:1fr}}
+label.fld,span.fld{display:block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+select,input[type=text]{width:100%;font-family:inherit;font-size:14px;color:var(--ink);background:var(--surface-2);
+  border:1px solid var(--line-2);border-radius:7px;padding:9px 10px}
+input:read-only{background:var(--surface);color:var(--muted);cursor:not-allowed}
+select:focus-visible,input:focus-visible{outline:2px solid var(--red-);outline-offset:1px}
+input[type=range]{width:100%;accent-color:var(--ox);margin:2px 0 0}
+input[type=range]:focus-visible{outline:2px solid var(--red-);outline-offset:3px}
+input[type=range]:disabled{opacity:.4}
+.slider-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;gap:10px}
+.slider-row .val{font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+.readout{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px dotted var(--line)}
+.readout:last-child{border-bottom:0}
+.readout .k{font-size:13px;color:var(--muted)}
+.readout .v{font-family:"IBM Plex Mono",monospace;font-size:16px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--ink)}
+.big{font-family:"IBM Plex Mono",monospace;font-size:30px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.1}
+.verdict{padding:12px 14px;border-radius:8px;font-size:13.5px;line-height:1.55}
+.verdict.go{background:var(--go-soft);color:var(--go)}
+.verdict.stop{background:var(--stop-soft);color:var(--stop)}
+.verdict.flat{background:var(--surface-2);color:var(--ink-2)}
+.verdict b{font-weight:600}
+.eqline{font-family:"IBM Plex Mono",monospace;font-size:13px;line-height:1.9;color:var(--ink-2);
+  background:var(--surface-2);border-radius:7px;padding:11px 13px}
+.eqline b{color:var(--ox);font-weight:600}
+svg{display:block;max-width:100%}
+.scrollx{overflow-x:auto}
+.wf{display:flex;flex-direction:column;gap:5px}
+.wfrow{display:grid;grid-template-columns:34px 1fr 54px;gap:9px;align-items:center;font-size:12.5px}
+.wfrow .nm{font-family:"IBM Plex Mono",monospace;color:var(--ink-2)}
+.wfrow .tr{background:var(--surface-2);border-radius:3px;height:12px;overflow:hidden}
+.wfrow .fl{height:100%;background:var(--line-2);border-radius:3px}
+.wfrow.on .fl{background:var(--red-)}
+.wfrow .q{font-family:"IBM Plex Mono",monospace;font-size:12px;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+.wfrow.on .q{color:var(--ink);font-weight:500}
+.solid{appearance:none;background:var(--ox);border:1px solid var(--ox);color:#fff;font-family:inherit;
+  font-size:13.5px;font-weight:500;padding:10px 16px;border-radius:7px;cursor:pointer}
+.solid:hover{filter:brightness(1.08)}
+.solid:disabled{background:var(--line-2);border-color:var(--line-2);color:var(--muted);cursor:not-allowed}
+.ghost{appearance:none;background:var(--surface-2);border:1px solid var(--line-2);color:var(--ink-2);
+  font-family:inherit;font-size:12.5px;padding:8px 12px;border-radius:7px;cursor:pointer}
+.ghost:hover{border-color:var(--ox);color:var(--ox)}
+/* concept check */
+.idgrid{display:grid;grid-template-columns:1fr;gap:14px;align-items:end;max-width:340px}
+.scorebar{display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;padding:14px 18px;border-top:1px solid var(--line)}
+.scorenum{font-family:"IBM Plex Mono",monospace;font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+.scorenum small{font-size:14px;font-weight:400;color:var(--muted)}
+.vcode{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted)}
+.vcode b{color:var(--ink);font-weight:600;letter-spacing:.08em}
+.quiz{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:16px}
+.q .stem{font-size:14.5px;line-height:1.6;margin:0 0 12px}
+.q .stem code{font-family:"IBM Plex Mono",monospace;font-size:13px;background:var(--surface-2);padding:1px 5px;border-radius:4px}
+.opts{display:flex;flex-direction:column;gap:7px}
+.opt{appearance:none;text-align:left;font-family:inherit;font-size:13.5px;line-height:1.45;color:var(--ink);
+  background:var(--surface-2);border:1px solid transparent;border-radius:7px;padding:9px 12px;cursor:pointer;display:flex;gap:9px}
+.opt .ltr{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);flex:0 0 auto;padding-top:1px}
+.opt:hover:not(:disabled){border-color:var(--line-2)}
+.opt.right{background:var(--go-soft);color:var(--go);border-color:var(--go);font-weight:500}
+.opt.right .ltr{color:var(--go)}
+.opt.wrong{background:var(--stop-soft);color:var(--stop);border-color:var(--stop)}
+.opt.wrong .ltr{color:var(--stop)}
+.opt:disabled{cursor:default}
+.why{margin:12px 0 0;font-size:13px;line-height:1.65;color:var(--ink-2);border-left:2px solid var(--line-2);padding-left:12px}
+.misc{display:block;margin-top:10px;padding:9px 12px;border-radius:7px;background:var(--stop-soft);color:var(--stop);font-size:12.5px;line-height:1.6}
+.misc a{color:inherit;font-weight:600;white-space:nowrap}
+.why[hidden]{display:none}
+.tally{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.hint{font-size:12.5px;color:var(--muted);line-height:1.65;margin:10px 0 0}
+.locked{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;background:var(--go-soft);color:var(--go);padding:2px 7px;border-radius:4px;margin-left:8px}
+footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;line-height:1.8}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <div style="flex:1 1 380px">
+      <p class="eyebrow"><a href="index.html">CH40051 Electroanalytical Chemistry</a> · Lecture 2 · Potentials</p>
+      <h1>Potential Explorer</h1>
+      <p class="sub">Lecture 1 held everything at standard state. Start from the electron's point of view — what "applying a potential" actually does to an electrode — then leave standard state behind and watch E move: in one couple, in a cell with no driving chemistry at all, and in the cell that started the whole subject.</p>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" aria-controls="p-fermi" id="t-fermi">Fermi Level &amp; Sweep</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-nernst" id="t-nernst">Nernst Explorer</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-conc" id="t-conc">Concentration Cell</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-dan" id="t-dan">Daniell Cell · E vs discharge</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-quiz" id="t-quiz">Concept Check</button>
+  </div>
+
+  <!-- ================= FERMI ================= -->
+  <section class="panel" id="p-fermi" role="tabpanel" aria-labelledby="t-fermi">
+    <div class="grid3">
+
+      <div class="stack">
+        <div class="card">
+          <div class="card-h"><h2>The experiment</h2></div>
+          <div class="card-b stack">
+            <div>
+              <label class="fld" for="fc">Couple in solution</label>
+              <select id="fc"></select>
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">Applied potential</span><span class="val" id="valE"></span></div>
+              <input type="range" id="fE" min="-1.5" max="2.0" step="0.01" value="0">
+            </div>
+            <button class="ghost" id="toEq" type="button">Set to equilibrium (η = 0)</button>
+            <button class="solid" id="stepBtn" type="button">Step the potential &amp; watch the current</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>Work functions</h2><span class="note">vacuum reference</span></div>
+          <div class="card-b">
+            <div class="wf" id="wfList"></div>
+            <p class="hint">These are <strong>surface</strong> properties measured against vacuum, and they are not the same thing as an electrode potential. An electrode potential is the Fermi level referred to a redox couple in solution — usually H⁺/H₂. Changing a surface coating changes W without moving the bulk E<sub>F</sub>.</p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <div class="card-h"><h2>Electron energy</h2><span class="note">raise E<sub>F</sub> and electrons fall into solution</span></div>
+          <div class="card-b scrollx"><svg id="fplot" viewBox="0 0 380 380" width="380" height="380" style="margin:0 auto" role="img" aria-label="Energy level diagram of the electrode Fermi level against the solution redox level"></svg></div>
+        </div>
+      </div>
+
+      <div class="c3 stack">
+        <div class="card">
+          <div class="card-h"><h2>What is happening</h2></div>
+          <div class="card-b stack" style="gap:12px">
+            <div class="verdict" id="fVerdict"></div>
+            <div class="readout"><span class="k">Equilibrium potential</span><span class="v" id="fEeq">—</span></div>
+            <div class="readout"><span class="k">Applied potential</span><span class="v" id="fEapp">—</span></div>
+            <div class="readout"><span class="k">Overpotential η</span><span class="v" id="fEta">—</span></div>
+            <div class="readout"><span class="k">E<sub>F</sub> vs vacuum</span><span class="v" id="fEf">—</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>Current after a potential step</h2><span class="note">two currents, not one</span></div>
+          <div class="card-b scrollx">
+            <svg id="iplot" viewBox="0 0 340 170" width="340" height="170" role="img" aria-label="Current against time after a potential step"></svg>
+            <p class="hint" id="iNote">Press the step button to charge the double layer.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= NERNST ================= -->
+  <section class="panel" id="p-nernst" role="tabpanel" aria-labelledby="t-nernst" hidden>
+    <div class="grid3">
+
+      <div class="stack">
+        <div class="card">
+          <div class="card-h"><h2>The couple</h2></div>
+          <div class="card-b stack">
+            <div>
+              <label class="fld" for="nc">Redox couple</label>
+              <select id="nc"></select>
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0" id="labO">[O]</span><span class="val" id="valO"></span></div>
+              <input type="range" id="cO" min="-6" max="1" step="0.05" value="0">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0" id="labR">[R]</span><span class="val" id="valR"></span></div>
+              <input type="range" id="cR" min="-6" max="1" step="0.05" value="0">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">Temperature</span><span class="val" id="valT"></span></div>
+              <input type="range" id="temp" min="0" max="80" step="1" value="25">
+            </div>
+            <button class="ghost" id="resetN" type="button">Back to standard state</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>Why a solid drops out</h2></div>
+          <div class="card-b" style="font-size:13px;color:var(--ink-2);line-height:1.7">
+            A pure solid or a pure liquid has <strong>activity 1</strong> by definition — there is no "concentration of solid zinc" to change. So for a plating couple only the dissolved species appears in the log term, and the slider for the solid is switched off.
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>What the temperature slider does not do</h2></div>
+          <div class="card-b" style="font-size:13px;color:var(--ink-2);line-height:1.7">
+            Moving T here changes <strong>only the slope</strong>, 2.303<em>RT</em>/<em>nF</em>. Every tab on this page holds E° fixed while you do it, which is not true of a real couple: E° carries its own temperature dependence, <strong>dE°/dT = ΔS°/nF</strong>, because the entropy of the reaction is not zero. Treat the temperature slider as showing you the log term's sensitivity, not a real thermal scan.
+          </div>
+        </div>
+      </div>
+
+      <div class="stack">
+        <div class="card">
+          <div class="card-h"><h2>E against the concentration ratio</h2><span class="note">a straight line on a log axis</span></div>
+          <div class="card-b scrollx"><svg id="nplot" viewBox="0 0 380 320" width="380" height="320" style="margin:0 auto" role="img" aria-label="Plot of electrode potential against the logarithm of the concentration ratio"></svg></div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>The same data, linear axis</h2><span class="note">[O]/[R] itself, not its logarithm</span></div>
+          <div class="card-b scrollx"><svg id="nplot2" viewBox="0 0 380 268" width="380" height="268" style="margin:0 auto" role="img" aria-label="Plot of electrode potential against the concentration ratio on a linear axis"></svg></div>
+        </div>
+      </div>
+
+      <div class="c3 stack">
+        <div class="card">
+          <div class="card-h"><h2>Equilibrium potential</h2></div>
+          <div class="card-b">
+            <div class="big" id="nE">—</div>
+            <div style="font-size:12.5px;color:var(--muted);margin:4px 0 14px">V vs SHE</div>
+            <div class="readout"><span class="k">E° (standard)</span><span class="v" id="nE0">—</span></div>
+            <div class="readout"><span class="k">Shift from E°</span><span class="v" id="nShift">—</span></div>
+            <div class="readout"><span class="k">Slope, 2.303RT/nF</span><span class="v" id="nSlope">—</span></div>
+            <div class="readout"><span class="k">log([O]/[R])</span><span class="v" id="nLog">—</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>The equation, filled in</h2></div>
+          <div class="card-b stack" style="gap:11px">
+            <div class="eqline" id="nEq"></div>
+            <div class="verdict flat" id="nNote"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= CONCENTRATION CELL ================= -->
+  <section class="panel" id="p-conc" role="tabpanel" aria-labelledby="t-conc" hidden>
+    <div class="grid3">
+
+      <div class="stack">
+        <div class="card">
+          <div class="card-h"><h2>Two half-cells, one couple</h2></div>
+          <div class="card-b stack">
+            <div>
+              <label class="fld" for="zc">Electrode — the same on both sides</label>
+              <select id="zc"></select>
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0" id="labzL">Left half-cell</span><span class="val" id="valzL"></span></div>
+              <input type="range" id="zL" min="-6" max="1" step="0.01" value="-3">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0" id="labzR">Right half-cell</span><span class="val" id="valzR"></span></div>
+              <input type="range" id="zR" min="-6" max="1" step="0.01" value="0">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">Temperature</span><span class="val" id="valzT"></span></div>
+              <input type="range" id="zT" min="0" max="80" step="1" value="25">
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="solid" id="runZ" type="button">Let it discharge</button>
+              <button class="ghost" id="resetZ" type="button">Reset</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>Why this cell works at all</h2></div>
+          <div class="card-b" style="font-size:13px;color:var(--ink-2);line-height:1.7">
+            Both electrodes are the <strong>same metal in the same salt</strong>, so the two E° values are identical and <strong>E°<sub>cell</sub> = 0 exactly</strong>. Every millivolt on the voltmeter comes from the log term and nothing else — this is the cleanest possible demonstration that the Nernst term is real. The driving force is not chemistry but <strong>mixing</strong>: the cell runs until the two concentrations meet, then stops dead.
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <div class="card-h"><h2>Where each electrode sits</h2><span class="note">one E°, two values of E</span></div>
+          <div class="card-b scrollx"><svg id="zplot" viewBox="0 0 340 400" width="340" height="400" style="margin:0 auto" role="img" aria-label="Potential of the two electrodes of a concentration cell"></svg></div>
+        </div>
+      </div>
+
+      <div class="c3 stack">
+        <div class="card">
+          <div class="card-h"><h2>Cell potential</h2></div>
+          <div class="card-b">
+            <div class="big" id="zE">—</div>
+            <div style="font-size:12.5px;color:var(--muted);margin:4px 0 14px">mV — the log term, alone</div>
+            <div class="readout"><span class="k">E°<sub>cell</sub></span><span class="v" id="zE0">0.000 V</span></div>
+            <div class="readout"><span class="k">Anode · oxidation</span><span class="v" id="zAnode">—</span></div>
+            <div class="readout"><span class="k">log(c<sub>high</sub> / c<sub>low</sub>)</span><span class="v" id="zRatio">—</span></div>
+            <div class="readout"><span class="k">Slope, 2.303RT/nF</span><span class="v" id="zSlope">—</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>The equation, filled in</h2></div>
+          <div class="card-b stack" style="gap:11px">
+            <div class="eqline" id="zEq"></div>
+            <div class="verdict flat" id="zNote"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= DANIELL CELL ================= -->
+  <section class="panel" id="p-dan" role="tabpanel" aria-labelledby="t-dan" hidden>
+    <div class="grid3">
+
+      <div class="stack">
+        <div class="card">
+          <div class="card-h"><h2>Discharge the cell</h2></div>
+          <div class="card-b stack">
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">ξ — fraction of Cu²⁺ used up</span><span class="val" id="valdxi"></span></div>
+              <input type="range" id="dxi" min="0" max="0.999" step="0.001" value="0">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">Starting [Zn²⁺]</span><span class="val" id="valdZn"></span></div>
+              <input type="range" id="dZn" min="-3" max="0.3" step="0.05" value="0">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">Starting [Cu²⁺]</span><span class="val" id="valdCu"></span></div>
+              <input type="range" id="dCu" min="-3" max="0.3" step="0.05" value="0">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">Temperature</span><span class="val" id="valdT"></span></div>
+              <input type="range" id="dT" min="0" max="80" step="1" value="25">
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="solid" id="runD" type="button">Run it down</button>
+              <button class="ghost" id="resetD" type="button">Fresh cell</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>One knob moves both beakers</h2></div>
+          <div class="card-b" style="font-size:13px;color:var(--ink-2);line-height:1.7">
+            <code>Zn(s) + Cu²⁺ → Zn²⁺ + Cu(s)</code><br><br>
+            Every electron that crosses the wire dissolves zinc on one side and plates copper on the other, so ξ raises [Zn²⁺] and lowers [Cu²⁺] <strong>at the same time</strong>. That is the only difference from the first tab, and it is what turns a static reading into a discharge curve. Both metals are pure solids, so only the two dissolved ions appear in Q.
+            <br><br>
+            Each half-cell holds <strong>1.00 L</strong>.
+          </div>
+        </div>
+      </div>
+
+      <div class="stack">
+        <div class="card">
+          <div class="card-h"><h2>The cell itself</h2><span class="note">the blue drains as Cu²⁺ plates out</span></div>
+          <div class="card-b scrollx"><svg id="dcell" viewBox="0 0 380 300" width="380" height="300" style="margin:0 auto" role="img" aria-label="Schematic of a Daniell cell discharging"></svg></div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>Cell voltage as it discharges</h2><span class="note">the flattest curve on this page</span></div>
+          <div class="card-b scrollx"><svg id="dplot" viewBox="0 0 380 330" width="380" height="330" style="margin:0 auto" role="img" aria-label="Daniell cell voltage against the extent of discharge"></svg></div>
+        </div>
+      </div>
+
+      <div class="c3 stack">
+        <div class="card">
+          <div class="card-h"><h2>Cell potential</h2></div>
+          <div class="card-b">
+            <div class="big" id="dE">—</div>
+            <div style="font-size:12.5px;color:var(--muted);margin:4px 0 14px">V — on open circuit</div>
+            <div class="readout"><span class="k">E°<sub>cell</sub></span><span class="v" id="dE0">—</span></div>
+            <div class="readout"><span class="k">[Zn²⁺] / [Cu²⁺] now</span><span class="v" id="dConc">—</span></div>
+            <div class="readout"><span class="k">Q</span><span class="v" id="dQ">—</span></div>
+            <div class="readout"><span class="k">log Q</span><span class="v" id="dLogQ">—</span></div>
+            <div class="readout"><span class="k">Slope, 2.303RT/nF</span><span class="v" id="dSlope">—</span></div>
+            <div class="readout"><span class="k">Charge delivered</span><span class="v" id="dCharge">—</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>The equation, filled in</h2></div>
+          <div class="card-b stack" style="gap:11px">
+            <div class="eqline" id="dEq"></div>
+            <div class="verdict flat" id="dNote"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>Why it never reaches equilibrium</h2></div>
+          <div class="card-b stack" style="gap:11px">
+            <div class="eqline" id="dK"></div>
+            <p style="margin:0;font-size:12.5px;color:var(--muted);line-height:1.6">Raising T shrinks this log K, but only because the slope grew — E° is held fixed here. A real K also moves with the reaction's own ΔH°, which this page does not model.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= QUIZ ================= -->
+  <section class="panel" id="p-quiz" role="tabpanel" aria-labelledby="t-quiz" hidden>
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h">
+        <h2>Concept check</h2>
+        <span class="note">Answer once per question — the reasoning appears immediately</span>
+        <span class="tally" style="margin-left:auto" id="tally"></span>
+      </div>
+      <div class="card-b">
+        <div class="idgrid">
+          <div>
+            <label class="fld" for="sId">Student ID</label>
+            <input type="text" id="sId" inputmode="numeric" placeholder="e.g. 20261234">
+          </div>
+        </div>
+        <p class="hint" id="idHint"></p>
+      </div>
+      <div class="scorebar" id="scorebar" hidden>
+        <div>
+          <div class="scorenum" id="scoreNum">—</div>
+          <div class="vcode" style="margin-top:4px" id="whoLine">—</div>
+        </div>
+        <div style="flex:1 1 300px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="solid" id="sendBtn" type="button" hidden>Submit to the course</button>
+            <button class="ghost" id="dlBtn" type="button">Download my result</button>
+          </div>
+          <p class="hint" id="dlHint" style="margin-top:8px">Download the file and hand it in as your instructor directs.</p>
+        </div>
+      </div>
+    </div>
+    <div class="quiz" id="quiz"></div>
+  </section>
+
+  <footer>
+    R = 8.314 J K⁻¹ mol⁻¹ · F = 96 485 C mol⁻¹ · the SHE sits about 4.44 eV below the vacuum level<br>
+    CH40051 Electroanalytical Chemistry · Fall 2026 — companion to Lecture 2
+  </footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+var R=8.314, F=96485.33, LN10=Math.LN10, VAC=4.44;   /* SHE ≈ −4.44 eV vs vacuum */
+
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function fmt(x,d){var s=x.toFixed(d);return /^-0(\.0*)?$/.test(s)?s.slice(1):s;}
+
+/* O + n e- -> R.  solidR: the reduced form is a pure solid, activity 1 */
+var COUPLES=[
+ {id:"Fe",  E0:0.77,  n:1, O:"Fe³⁺",  Rd:"Fe²⁺",   solidR:false},
+ {id:"Ce",  E0:1.72,  n:1, O:"Ce⁴⁺",  Rd:"Ce³⁺",   solidR:false},
+ {id:"Fc",  E0:0.40,  n:1, O:"Fc⁺",   Rd:"Fc",     solidR:false},
+ {id:"Ag",  E0:0.80,  n:1, O:"Ag⁺",   Rd:"Ag(s)",  solidR:true},
+ {id:"Cu",  E0:0.34,  n:2, O:"Cu²⁺",  Rd:"Cu(s)",  solidR:true},
+ {id:"Zn",  E0:-0.76, n:2, O:"Zn²⁺",  Rd:"Zn(s)",  solidR:true},
+ {id:"Li",  E0:-3.04, n:1, O:"Li⁺",   Rd:"Li(s)",  solidR:true}
+];
+function byId(id){for(var i=0;i<COUPLES.length;i++) if(COUPLES[i].id===id) return COUPLES[i]; return COUPLES[0];}
+function label(c){ return c.O+" + "+(c.n===1?"":c.n)+"e⁻ → "+c.Rd+"   (E° = "+fmt(c.E0,2)+" V)"; }
+
+/* work functions in eV, from the lecture's metal list */
+var WF=[{m:"Na",w:2.4},{m:"Ca",w:2.9},{m:"Zn",w:4.3},{m:"Fe",w:4.5},{m:"Cu",w:4.7},{m:"Pt",w:5.6}];
+
+/* ---------------- tabs ---------------- */
+var tabs=[].slice.call(document.querySelectorAll(".tab"));
+tabs.forEach(function(t){
+  t.addEventListener("click",function(){
+    tabs.forEach(function(o){
+      var on=(o===t);
+      o.setAttribute("aria-selected",on?"true":"false");
+      document.getElementById(o.getAttribute("aria-controls")).hidden=!on;
+    });
+  });
+});
+
+/* =============== NERNST =============== */
+var nc=document.getElementById("nc"), cO=document.getElementById("cO"),
+    cR=document.getElementById("cR"), temp=document.getElementById("temp");
+nc.innerHTML=COUPLES.map(function(c){
+  return '<option value="'+c.id+'"'+(c.id==="Fe"?" selected":"")+'>'+esc(label(c))+'</option>';
+}).join("");
+[nc,cO,cR,temp].forEach(function(el){ el.addEventListener("input",nernst); });
+document.getElementById("resetN").addEventListener("click",function(){
+  cO.value=0; cR.value=0; temp.value=25; nernst();
+});
+
+function conc(v){
+  var x=Math.pow(10,v);
+  return x>=0.01 ? x.toFixed(x>=1?2:3)+" M" : x.toExponential(1)+" M";
+}
+
+function nernst(){
+  var c=byId(nc.value), T=+temp.value+273.15;
+  var lo=+cO.value, lr=c.solidR?0:+cR.value;
+  var slope=2.302585*R*T/(c.n*F);           /* V per decade */
+  var ratio=lo-lr;                          /* log10([O]/[R]) */
+  var E=c.E0+slope*ratio;
+
+  cR.disabled=c.solidR;
+  document.getElementById("labO").textContent="["+c.O+"]";
+  document.getElementById("labR").innerHTML=c.solidR
+    ? "["+esc(c.Rd)+"] — pure solid, a = 1"
+    : "["+esc(c.Rd)+"]";
+  document.getElementById("valO").textContent=conc(lo);
+  document.getElementById("valR").textContent=c.solidR?"a = 1":conc(lr);
+  document.getElementById("valT").textContent=temp.value+" °C";
+
+  document.getElementById("nE").textContent=fmt(E,3);
+  document.getElementById("nE0").textContent=fmt(c.E0,2)+" V";
+  document.getElementById("nShift").textContent=(E-c.E0>=0?"+":"")+fmt((E-c.E0)*1000,0)+" mV";
+  document.getElementById("nSlope").textContent=fmt(slope*1000,1)+" mV/decade";
+  document.getElementById("nLog").textContent=(ratio>=0?"+":"")+fmt(ratio,2);
+
+  document.getElementById("nEq").innerHTML=
+    "E = E° + (2.303RT/nF) · log([O]/[R])<br>"
+   +"E = "+fmt(c.E0,2)+" + ("+fmt(slope*1000,1)+" mV) × ("+fmt(ratio,2)+")<br>"
+   +"E = <b>"+fmt(E,3)+" V</b>";
+
+  var note=document.getElementById("nNote");
+  if(Math.abs(ratio)<0.01){
+    note.className="verdict flat";
+    note.innerHTML="At equal activities the log term vanishes and <b>E = E°</b>. That is all “standard state” means here.";
+  }else if(ratio>0){
+    note.className="verdict go";
+    note.innerHTML="More oxidised species than reduced, so the couple is <b>easier to reduce</b> and E sits <b>above</b> E°. Ten-fold more "+esc(c.O)+" buys you "+fmt(slope*1000,1)+" mV.";
+  }else{
+    note.className="verdict stop";
+    note.innerHTML="More reduced species than oxidised, so the couple is <b>harder to reduce</b> and E sits <b>below</b> E°. Each ten-fold excess costs "+fmt(slope*1000,1)+" mV.";
+  }
+  nplot(c,slope,ratio,E);
+  nplot2(c,slope,ratio,E);
+}
+
+/* The same Nernst line with the logarithm undone on the x axis: equal steps in
+   [O]/[R] stop buying equal steps in E, which is the whole point of the log. */
+function nplot2(c,slope,ratio,E){
+  var W=380,H=268,L=52,Rr=16,Tp=16,B=44;
+  var RMAX=10;                                   /* one decade either side of 1 */
+  var ymin=c.E0-2.0*slope, ymax=c.E0+1.25*slope;
+  function X(r){ return L+(r/RMAX)*(W-L-Rr); }
+  function Y(v){ return Tp+(ymax-v)/(ymax-ymin)*(H-Tp-B); }
+  var mono='font-family="IBM Plex Mono,monospace"';
+  var s="";
+  /* frame */
+  s+='<line x1="'+L+'" y1="'+Tp+'" x2="'+L+'" y2="'+(H-B)+'" stroke="var(--line-2)" stroke-width="1.2"/>';
+  s+='<line x1="'+L+'" y1="'+(H-B)+'" x2="'+(W-Rr)+'" y2="'+(H-B)+'" stroke="var(--line-2)" stroke-width="1.2"/>';
+  for(var t=0;t<=RMAX;t+=2){
+    s+='<line x1="'+X(t)+'" y1="'+(H-B)+'" x2="'+X(t)+'" y2="'+(H-B+4)+'" stroke="var(--line-2)"/>';
+    s+='<text x="'+X(t)+'" y="'+(H-B+16)+'" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="9.5">'+t+'</text>';
+  }
+  s+='<text x="'+((L+W-Rr)/2)+'" y="'+(H-8)+'" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="10">[O] / [R]</text>';
+  var i,v;
+  for(i=0;i<=4;i++){
+    v=ymin+(ymax-ymin)*i/4;
+    s+='<line x1="'+(L-4)+'" y1="'+Y(v)+'" x2="'+L+'" y2="'+Y(v)+'" stroke="var(--line-2)"/>';
+    s+='<text x="'+(L-7)+'" y="'+(Y(v)+3.5)+'" text-anchor="end" fill="var(--muted)" '+mono+' font-size="9">'+fmt(v,2)+'</text>';
+  }
+  s+='<text transform="rotate(-90 13 '+((Tp+H-B)/2)+')" x="13" y="'+((Tp+H-B)/2)+'" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="10">E / V vs SHE</text>';
+  /* the standard state sits at a ratio of exactly 1 */
+  s+='<line x1="'+L+'" y1="'+Y(c.E0)+'" x2="'+(W-Rr)+'" y2="'+Y(c.E0)+'" stroke="var(--line)" stroke-width="1" stroke-dasharray="3 4"/>';
+  s+='<line x1="'+X(1)+'" y1="'+Tp+'" x2="'+X(1)+'" y2="'+(H-B)+'" stroke="var(--line)" stroke-width="1" stroke-dasharray="3 4"/>';
+  /* below the E° line and right of ratio 1 is the one corner the curve never enters */
+  s+='<text x="'+(X(1)+6)+'" y="'+(Y(c.E0)+14)+'" fill="var(--muted)" '+mono+' font-size="9">ratio = 1 → E = E°</text>';
+  /* the curve */
+  var pts=[];
+  for(i=1;i<=300;i++){
+    var r=RMAX*i/300;
+    v=c.E0+slope*Math.log(r)/LN10;
+    if(v<ymin) continue;
+    pts.push(X(r).toFixed(1)+","+Y(v).toFixed(1));
+  }
+  s+='<polyline points="'+pts.join(" ")+'" fill="none" stroke="var(--ox)" stroke-width="2.2"/>';
+  /* where the sliders are — the ratio can easily run off a linear axis */
+  var rr=Math.pow(10,ratio);
+  if(rr<=RMAX && E>=ymin){
+    var px=X(rr), py=Y(E);
+    s+='<circle cx="'+px+'" cy="'+py+'" r="5" fill="var(--red-)"/>';
+    var flip=px>W-Rr-70;
+    s+='<text x="'+(flip?px-9:px+9)+'" y="'+(py+16)+'" text-anchor="'+(flip?"end":"start")+'" fill="var(--red-)" '+mono+' font-size="10.5" font-weight="500">'+(rr<0.01?rr.toExponential(1):fmt(rr,2))+'</text>';
+  }else{
+    var off=rr>RMAX;
+    var rtxt=(rr>=0.01&&rr<1000)?fmt(rr,2):rr.toExponential(1);
+    s+='<text x="'+(off?W-Rr-4:L+6)+'" y="'+(off?Tp+14:H-B-8)+'" text-anchor="'+(off?"end":"start")+'" fill="var(--red-)" '+mono+' font-size="9.5">ratio = '+rtxt+' — '+(off?"past the right edge":"below the floor")+'</text>';
+  }
+  document.getElementById("nplot2").innerHTML=s;
+}
+
+function nplot(c,slope,ratio,E){
+  var W=380,H=320,L=52,Rr=14,Tp=18,B=44;
+  var xmin=-6,xmax=6;
+  var span=Math.max(0.35, slope*6.6);
+  var ymin=c.E0-span, ymax=c.E0+span;
+  function X(v){ return L+(v-xmin)/(xmax-xmin)*(W-L-Rr); }
+  function Y(v){ return Tp+(ymax-v)/(ymax-ymin)*(H-Tp-B); }
+  var mono='font-family="IBM Plex Mono,monospace"';
+  var s="";
+  /* frame */
+  s+='<line x1="'+L+'" y1="'+Tp+'" x2="'+L+'" y2="'+(H-B)+'" stroke="var(--line-2)" stroke-width="1.2"/>';
+  s+='<line x1="'+L+'" y1="'+Y(c.E0)+'" x2="'+(W-Rr)+'" y2="'+Y(c.E0)+'" stroke="var(--line)" stroke-width="1" stroke-dasharray="3 4"/>';
+  s+='<text x="'+(W-Rr)+'" y="'+(Y(c.E0)-6)+'" text-anchor="end" fill="var(--muted)" '+mono+' font-size="9.5">E° = '+fmt(c.E0,2)+' V</text>';
+  /* x ticks */
+  for(var t=-6;t<=6;t+=3){
+    s+='<line x1="'+X(t)+'" y1="'+(H-B)+'" x2="'+X(t)+'" y2="'+(H-B+4)+'" stroke="var(--line-2)"/>';
+    s+='<text x="'+X(t)+'" y="'+(H-B+17)+'" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="9.5">'+(t>0?"+":"")+t+'</text>';
+  }
+  s+='<text x="'+((L+W-Rr)/2)+'" y="'+(H-8)+'" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="10">log([O] / [R])</text>';
+  /* y ticks */
+  [ymin,c.E0-span/2,c.E0,c.E0+span/2,ymax].forEach(function(v){
+    s+='<line x1="'+(L-4)+'" y1="'+Y(v)+'" x2="'+L+'" y2="'+Y(v)+'" stroke="var(--line-2)"/>';
+    s+='<text x="'+(L-7)+'" y="'+(Y(v)+3.5)+'" text-anchor="end" fill="var(--muted)" '+mono+' font-size="9">'+fmt(v,2)+'</text>';
+  });
+  s+='<text transform="rotate(-90 13 '+((Tp+H-B)/2)+')" x="13" y="'+((Tp+H-B)/2)+'" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="10">E / V vs SHE</text>';
+  /* the Nernst line */
+  var y1=c.E0+slope*xmin, y2=c.E0+slope*xmax;
+  s+='<line x1="'+X(xmin)+'" y1="'+Y(y1)+'" x2="'+X(xmax)+'" y2="'+Y(y2)+'" stroke="var(--ox)" stroke-width="2.2"/>';
+  /* one decade marked out on the line */
+  var dx0=-4.5, dy0=c.E0+slope*dx0, dy1=c.E0+slope*(dx0+1);
+  s+='<line x1="'+X(dx0)+'" y1="'+Y(dy0)+'" x2="'+X(dx0+1)+'" y2="'+Y(dy0)+'" stroke="var(--muted)" stroke-width="1" stroke-dasharray="2 3"/>';
+  s+='<line x1="'+X(dx0+1)+'" y1="'+Y(dy0)+'" x2="'+X(dx0+1)+'" y2="'+Y(dy1)+'" stroke="var(--muted)" stroke-width="1" stroke-dasharray="2 3"/>';
+  s+='<text x="'+(X(dx0+1)+5)+'" y="'+((Y(dy0)+Y(dy1))/2+3)+'" fill="var(--ink-2)" '+mono+' font-size="9.5">'+fmt(slope*1000,0)+' mV</text>';
+  /* current state */
+  var px=X(Math.max(xmin,Math.min(xmax,ratio))), py=Y(Math.max(ymin,Math.min(ymax,E)));
+  s+='<line x1="'+L+'" y1="'+py+'" x2="'+px+'" y2="'+py+'" stroke="var(--red-)" stroke-width="1" stroke-dasharray="2 3"/>';
+  s+='<line x1="'+px+'" y1="'+(H-B)+'" x2="'+px+'" y2="'+py+'" stroke="var(--red-)" stroke-width="1" stroke-dasharray="2 3"/>';
+  s+='<circle cx="'+px+'" cy="'+py+'" r="5" fill="var(--red-)"/>';
+  s+='<text x="'+(px+9)+'" y="'+(py-8)+'" fill="var(--red-)" '+mono+' font-size="10.5" font-weight="500">'+fmt(E,3)+' V</text>';
+  document.getElementById("nplot").innerHTML=s;
+}
+
+/* =============== DANIELL CELL ===============
+   Zn(s) + Cu2+ -> Zn2+ + Cu(s).  One extent-of-reaction variable drives both
+   concentrations, so the Nernst equation becomes a discharge curve. */
+var DAN={cat:0.34, an:-0.76, n:2, vol:1.0};      /* volts, and litres per half-cell */
+var DE0=DAN.cat-DAN.an;                          /* 1.10 V */
+var dxi=document.getElementById("dxi"), dZn=document.getElementById("dZn"),
+    dCu=document.getElementById("dCu"), dT=document.getElementById("dT"),
+    runDBtn=document.getElementById("runD");
+[dxi,dZn,dCu,dT].forEach(function(el){ el.addEventListener("input",function(){ stopD(); daniell(); }); });
+document.getElementById("resetD").addEventListener("click",function(){
+  stopD(); dxi.value=0; daniell();
+});
+runDBtn.addEventListener("click",function(){ if(dAnim) stopD(); else runD(); });
+
+var dAnim=null;
+function stopD(){ if(dAnim){ cancelAnimationFrame(dAnim); dAnim=null; runDBtn.textContent="Run it down"; } }
+function runD(){
+  runDBtn.textContent="Stop";
+  var xi=+dxi.value;
+  if(xi>=0.998) xi=0;                            /* pressing it on a dead cell restarts */
+  var tick=function(){
+    xi+=(0.999-xi)*0.035+0.0015;
+    if(xi>=0.999){ dxi.value=0.999; daniell(); stopD(); return; }
+    dxi.value=xi; daniell();
+    dAnim=requestAnimationFrame(tick);
+  };
+  dAnim=requestAnimationFrame(tick);
+}
+
+function cShow(x){ return x>=0.01 ? x.toFixed(x>=1?2:3)+" M" : x.toExponential(1)+" M"; }
+
+/* concentrations after a fraction xi of the starting Cu2+ has plated out */
+function dState(xi,a,b){ return {zn:a+b*xi, cu:b*(1-xi)}; }
+function dEcell(xi,a,b,slope){
+  var c=dState(xi,a,b);
+  return DE0-slope*Math.log(c.zn/c.cu)/LN10;
+}
+
+function daniell(){
+  var xi=+dxi.value, T=+dT.value+273.15;
+  var a=Math.pow(10,+dZn.value), b=Math.pow(10,+dCu.value);
+  var slope=2.302585*R*T/(DAN.n*F);
+  var c=dState(xi,a,b);
+  var Q=c.zn/c.cu, lg=Math.log(Q)/LN10;
+  var E=DE0-slope*lg;
+  var logK=DE0/slope;                            /* E = 0 exactly when log Q = log K */
+  var charge=DAN.n*b*xi*DAN.vol*F/3600;          /* A.h */
+
+  document.getElementById("valdxi").textContent=(xi*100).toFixed(1)+" %";
+  document.getElementById("valdZn").textContent=cShow(a);
+  document.getElementById("valdCu").textContent=cShow(b);
+  document.getElementById("valdT").textContent=dT.value+" °C";
+
+  document.getElementById("dE").textContent=fmt(E,3);
+  document.getElementById("dE0").textContent=fmt(DE0,2)+" V";
+  document.getElementById("dConc").textContent=cShow(c.zn)+" / "+cShow(c.cu);
+  document.getElementById("dQ").textContent=(Q>=0.01&&Q<1e4)?fmt(Q,2):Q.toExponential(1);
+  document.getElementById("dLogQ").textContent=(lg>=0?"+":"")+fmt(lg,2);
+  document.getElementById("dSlope").textContent=fmt(slope*1000,1)+" mV/decade";
+  document.getElementById("dCharge").textContent=fmt(charge,1)+" A·h";
+
+  document.getElementById("dEq").innerHTML=
+     "E = E°<sub>cell</sub> − (2.303RT/nF) · log( [Zn²⁺] / [Cu²⁺] )<br>"
+    +"E = "+fmt(DE0,2)+" − ("+fmt(slope*1000,1)+" mV) × ("+fmt(lg,2)+")<br>"
+    +"E = <b>"+fmt(E,3)+" V</b>";
+
+  /* how much copper would still have to leave for the cell to actually stop */
+  var cuEq=c.zn/Math.pow(10,logK);               /* mol/L at equilibrium */
+  var ionsEq=cuEq*6.02214e23*DAN.vol;
+  document.getElementById("dK").innerHTML=
+     "E = 0 needs log Q = E°/slope = <b>"+fmt(logK,1)+"</b>, so K = 10<sup>"+fmt(logK,1)+"</sup><br>"
+    +"that means [Cu²⁺] = "+cuEq.toExponential(1)+" M — about <b>"+ionsEq.toExponential(0)
+    +"</b> ions in the litre<br>"
+    +"ΔG° = −nFE° = <b>"+fmt(-DAN.n*F*DE0/1000,1)+" kJ/mol</b>";
+
+  var note=document.getElementById("dNote");
+  var left=logK-lg;                              /* decades still to go */
+  if(xi<0.5){
+    note.className="verdict go";
+    note.innerHTML="Most of the copper is still in solution and the voltage has moved <b>"+fmt(Math.abs(E-dEcell(0,a,b,slope))*1000,0)+" mV</b> from where it started. A cell is useful because the log term is this slow.";
+  }else if(xi<0.99){
+    note.className="verdict go";
+    note.innerHTML="Deep into the discharge and still only <b>"+fmt(Math.abs(E-dEcell(0,a,b,slope))*1000,0)+" mV</b> down. Each further ten-fold drop in [Cu²⁺] costs just "+fmt(slope*1000,1)+" mV.";
+  }else{
+    note.className="verdict stop";
+    note.innerHTML="[Cu²⁺] is nearly gone, yet E is still <b>"+fmt(E,2)+" V</b>. The cell will stop because it <b>runs out of copper</b>, not because it reaches equilibrium — that is still <b>"+fmt(left,0)+" decades</b> away.";
+  }
+  dcellUpdate(xi,c,E);
+  dplot(xi,a,b,slope,E);
+}
+
+/* The schematic is built once and then only its attributes are touched.  It is
+   redrawn on every frame of "Run it down", and re-writing innerHTML would
+   restart the electron animation each time, freezing it. */
+var dcellRefs=null;
+function dcellBuild(){
+  var mono='font-family="IBM Plex Mono,monospace"';
+  var ZX=80, CX=300, ETOP=62, EBOT=210;          /* electrode centres and extent */
+  var s='<defs>'
+   +'<marker id="dcar" markerWidth="7" markerHeight="7" refX="5.6" refY="3" orient="auto">'
+   +'<path d="M0,0.4 L6,3 L0,5.6 z" fill="var(--elec)"/></marker></defs>';
+
+  /* wire, with the meter sitting in the middle of it */
+  s+='<path d="M '+ZX+' '+ETOP+' L '+ZX+' 42 L 156 42" fill="none" stroke="var(--elec)" stroke-width="1.6"/>';
+  s+='<path d="M 224 42 L '+CX+' 42 L '+CX+' '+ETOP+'" fill="none" stroke="var(--elec)" stroke-width="1.6"/>';
+  s+='<rect x="156" y="28" width="68" height="28" rx="6" fill="var(--surface-2)" stroke="var(--line-2)"/>';
+  s+='<text id="dcV" x="190" y="46" text-anchor="middle" fill="var(--ink)" '+mono+' font-size="12" font-weight="600">—</text>';
+
+  /* electrons leave the zinc and travel to the copper, clear of the meter */
+  s+='<path d="M '+ZX+' 52 L 150 52" fill="none" stroke="var(--elec)" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#dcar)">'
+    +'<animate attributeName="stroke-dashoffset" from="18" to="0" dur="1.1s" repeatCount="indefinite"/></path>';
+  s+='<path d="M 230 52 L '+(CX-4)+' 52" fill="none" stroke="var(--elec)" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#dcar)">'
+    +'<animate attributeName="stroke-dashoffset" from="18" to="0" dur="1.1s" repeatCount="indefinite"/></path>';
+  s+='<text x="115" y="38" text-anchor="middle" fill="var(--elec)" '+mono+' font-size="10">e⁻</text>';
+  s+='<text x="265" y="38" text-anchor="middle" fill="var(--elec)" '+mono+' font-size="10">e⁻</text>';
+
+  /* solutions first, so the beaker outline and electrodes sit on top */
+  s+='<rect x="36" y="124" width="108" height="122" fill="var(--line-2)" opacity="0.18"/>';
+  s+='<rect id="dcSol" x="236" y="124" width="108" height="122" fill="var(--red-)" fill-opacity="0.5"/>';
+
+  /* salt bridge */
+  s+='<path d="M 118 152 L 118 120 Q 118 104 134 104 L 246 104 Q 262 104 262 120 L 262 152" '
+    +'fill="none" stroke="var(--line-2)" stroke-width="7" stroke-linecap="round"/>';
+  s+='<path d="M 118 152 L 118 120 Q 118 104 134 104 L 246 104 Q 262 104 262 120 L 262 152" '
+    +'fill="none" stroke="var(--surface)" stroke-width="4" stroke-linecap="round"/>';
+  s+='<text x="190" y="128" text-anchor="middle" fill="var(--ox)" '+mono+' font-size="9.5">← SO₄²⁻</text>';
+  s+='<text x="190" y="142" text-anchor="middle" fill="var(--red-)" '+mono+' font-size="9.5">K⁺ →</text>';
+  s+='<text x="190" y="96" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="9">salt bridge</text>';
+
+  /* beakers */
+  s+='<path d="M 34 104 L 34 248 L 146 248 L 146 104" fill="none" stroke="var(--line-2)" stroke-width="1.6"/>';
+  s+='<path d="M 234 104 L 234 248 L 346 248 L 346 104" fill="none" stroke="var(--line-2)" stroke-width="1.6"/>';
+
+  /* electrodes — zinc thins as it dissolves, copper thickens as it plates */
+  s+='<rect id="dcZn" x="'+(ZX-7)+'" y="'+ETOP+'" width="14" height="'+(EBOT-ETOP)+'" fill="var(--ox)"/>';
+  s+='<rect id="dcCu" x="'+(CX-7)+'" y="'+ETOP+'" width="14" height="'+(EBOT-ETOP)+'" fill="var(--red-)"/>';
+
+  s+='<text x="'+ZX+'" y="'+(EBOT+18)+'" text-anchor="middle" fill="var(--ox)" '+mono+' font-size="11" font-weight="500">Zn(s)</text>';
+  s+='<text x="'+CX+'" y="'+(EBOT+18)+'" text-anchor="middle" fill="var(--red-)" '+mono+' font-size="11" font-weight="500">Cu(s)</text>';
+  s+='<text x="'+ZX+'" y="'+(EBOT+31)+'" text-anchor="middle" fill="var(--ox)" '+mono+' font-size="8.5" letter-spacing="0.08em">ANODE · OXIDATION</text>';
+  s+='<text x="'+CX+'" y="'+(EBOT+31)+'" text-anchor="middle" fill="var(--red-)" '+mono+' font-size="8.5" letter-spacing="0.08em">CATHODE · REDUCTION</text>';
+  s+='<text id="dcLc" x="90" y="272" text-anchor="middle" fill="var(--ink-2)" '+mono+' font-size="10">—</text>';
+  s+='<text id="dcRc" x="290" y="272" text-anchor="middle" fill="var(--ink-2)" '+mono+' font-size="10">—</text>';
+  s+='<text x="90" y="286" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="8.5">colourless</text>';
+  s+='<text id="dcRn" x="290" y="286" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="8.5">blue</text>';
+
+  var el=document.getElementById("dcell");
+  el.innerHTML=s;
+  dcellRefs={
+    sol:document.getElementById("dcSol"), zn:document.getElementById("dcZn"),
+    cu:document.getElementById("dcCu"), v:document.getElementById("dcV"),
+    lc:document.getElementById("dcLc"), rc:document.getElementById("dcRc"),
+    rn:document.getElementById("dcRn"), ZX:ZX, CX:CX
+  };
+}
+
+function dcellUpdate(xi,c,E){
+  if(!dcellRefs) dcellBuild();
+  var r=dcellRefs;
+  /* the classic lecture demo: Cu2+ blue fades in step with its concentration */
+  r.sol.setAttribute("fill-opacity",(0.5*(1-xi)+0.02).toFixed(3));
+  var wZn=14-8*xi, wCu=14+8*xi;
+  r.zn.setAttribute("width",wZn.toFixed(1));
+  r.zn.setAttribute("x",(r.ZX-wZn/2).toFixed(1));
+  r.cu.setAttribute("width",wCu.toFixed(1));
+  r.cu.setAttribute("x",(r.CX-wCu/2).toFixed(1));
+  r.v.textContent=fmt(E,3)+" V";
+  r.lc.textContent=cShow(c.zn);
+  r.rc.textContent=cShow(c.cu);
+  r.rn.textContent=xi>0.97?"almost gone":"blue";
+}
+
+function dplot(xi,a,b,slope,E){
+  var W=380,H=330,L=54,Rr=16,Tp=18,B=52;
+  var XMAX=0.999;
+  var lo=1e9,hi=-1e9,i,u,v;
+  for(i=0;i<=300;i++){ u=XMAX*i/300; v=dEcell(u,a,b,slope); if(v<lo)lo=v; if(v>hi)hi=v; }
+  var pad=Math.max(0.008,(hi-lo)*0.12), ymin=lo-pad, ymax=hi+pad;
+  function X(t){ return L+(t/XMAX)*(W-L-Rr); }
+  function Y(t){ return Tp+(ymax-t)/(ymax-ymin)*(H-Tp-B); }
+  var mono='font-family="IBM Plex Mono,monospace"';
+  var s="";
+  var qmax=DAN.n*b*DAN.vol*F/3600;               /* A.h at full conversion */
+  /* frame */
+  s+='<line x1="'+L+'" y1="'+Tp+'" x2="'+L+'" y2="'+(H-B)+'" stroke="var(--line-2)" stroke-width="1.2"/>';
+  s+='<line x1="'+L+'" y1="'+(H-B)+'" x2="'+(W-Rr)+'" y2="'+(H-B)+'" stroke="var(--line-2)" stroke-width="1.2"/>';
+  [0,0.25,0.5,0.75,1].forEach(function(t){
+    var tt=Math.min(t,XMAX);
+    s+='<line x1="'+X(tt)+'" y1="'+(H-B)+'" x2="'+X(tt)+'" y2="'+(H-B+4)+'" stroke="var(--line-2)"/>';
+    s+='<text x="'+X(tt)+'" y="'+(H-B+16)+'" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="9.5">'+t.toFixed(2)+'</text>';
+    s+='<text x="'+X(tt)+'" y="'+(H-B+29)+'" text-anchor="middle" fill="var(--line-2)" '+mono+' font-size="8.5">'+(qmax*t).toFixed(0)+'</text>';
+  });
+  s+='<text x="'+(L-7)+'" y="'+(H-B+29)+'" text-anchor="end" fill="var(--line-2)" '+mono+' font-size="8.5">A·h</text>';
+  s+='<text x="'+((L+W-Rr)/2)+'" y="'+(H-8)+'" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="10">ξ — fraction of the Cu²⁺ used up</text>';
+  for(i=0;i<=4;i++){
+    v=ymin+(ymax-ymin)*i/4;
+    s+='<line x1="'+(L-4)+'" y1="'+Y(v)+'" x2="'+L+'" y2="'+Y(v)+'" stroke="var(--line-2)"/>';
+    s+='<text x="'+(L-7)+'" y="'+(Y(v)+3.5)+'" text-anchor="end" fill="var(--muted)" '+mono+' font-size="9">'+fmt(v,3)+'</text>';
+  }
+  s+='<text transform="rotate(-90 13 '+((Tp+H-B)/2)+')" x="13" y="'+((Tp+H-B)/2)+'" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="10">E / V</text>';
+  /* E°cell, for scale: the log term only ever nudges the cell off this line */
+  if(DE0>=ymin&&DE0<=ymax){
+    s+='<line x1="'+L+'" y1="'+Y(DE0)+'" x2="'+(W-Rr)+'" y2="'+Y(DE0)+'" stroke="var(--line)" stroke-width="1" stroke-dasharray="3 4"/>';
+    s+='<text x="'+(W-Rr)+'" y="'+(Y(DE0)-5)+'" text-anchor="end" fill="var(--muted)" '+mono+' font-size="9">E°cell = '+fmt(DE0,2)+' V</text>';
+  }
+  var pts=[];
+  for(i=0;i<=300;i++){ u=XMAX*i/300; pts.push(X(u).toFixed(1)+","+Y(dEcell(u,a,b,slope)).toFixed(1)); }
+  s+='<polyline points="'+pts.join(" ")+'" fill="none" stroke="var(--ox)" stroke-width="2.2"/>';
+  var px=X(Math.min(xi,XMAX)), py=Y(Math.max(ymin,Math.min(ymax,E)));
+  s+='<line x1="'+L+'" y1="'+py+'" x2="'+px+'" y2="'+py+'" stroke="var(--red-)" stroke-width="1" stroke-dasharray="2 3"/>';
+  s+='<line x1="'+px+'" y1="'+(H-B)+'" x2="'+px+'" y2="'+py+'" stroke="var(--red-)" stroke-width="1" stroke-dasharray="2 3"/>';
+  s+='<circle cx="'+px+'" cy="'+py+'" r="5" fill="var(--red-)"/>';
+  /* this curve falls, so the clear space is above it — the mirror of the LCO plot */
+  var flip=px>W-Rr-62;
+  s+='<text x="'+(flip?px-9:px+9)+'" y="'+(py-9)+'" text-anchor="'+(flip?"end":"start")+'" fill="var(--red-)" '+mono+' font-size="10.5" font-weight="500">'+fmt(E,3)+' V</text>';
+  document.getElementById("dplot").innerHTML=s;
+}
+
+/* =============== CONCENTRATION CELL ===============
+   Same couple on both sides, so E°cell = 0 and the whole voltage is the log term. */
+var ZC=COUPLES.filter(function(c){return c.solidR;});
+var zc=document.getElementById("zc"), zL=document.getElementById("zL"),
+    zR=document.getElementById("zR"), zT=document.getElementById("zT"),
+    runBtn=document.getElementById("runZ");
+zc.innerHTML=ZC.map(function(c){
+  return '<option value="'+c.id+'"'+(c.id==="Cu"?" selected":"")+'>'
+    +esc(c.Rd+" | "+c.O+"    (n = "+c.n+",  E° = "+fmt(c.E0,2)+" V)")+'</option>';
+}).join("");
+[zc,zL,zR,zT].forEach(function(el){ el.addEventListener("input",function(){ stopZ(); zcell(); }); });
+document.getElementById("resetZ").addEventListener("click",function(){
+  stopZ(); zL.value=-3; zR.value=0; zT.value=25; zcell();
+});
+runBtn.addEventListener("click",function(){ if(zAnim) stopZ(); else runZ(); });
+
+/* discharge = the two half-cells trading ions until they meet in the middle */
+var zAnim=null;
+function stopZ(){ if(zAnim){ cancelAnimationFrame(zAnim); zAnim=null; runBtn.textContent="Let it discharge"; } }
+function runZ(){
+  runBtn.textContent="Stop";
+  /* the state is kept in these floats, not in the sliders: the sliders quantise to
+     their step, and reading them back each frame would both stall and drift the total */
+  var a=Math.pow(10,+zL.value), b=Math.pow(10,+zR.value);
+  var m=(a+b)/2, lm=Math.log(m)/LN10;   /* ions are conserved, so this is where it lands */
+  var tick=function(){
+    a+=(m-a)*0.045; b+=(m-b)*0.045;
+    var nA=Math.log(a)/LN10, nB=Math.log(b)/LN10;
+    if(Math.abs(nA-nB)<0.02){ zL.value=zR.value=lm; zcell(); stopZ(); return; }
+    zL.value=nA; zR.value=nB;
+    zcell();
+    zAnim=requestAnimationFrame(tick);
+  };
+  zAnim=requestAnimationFrame(tick);
+}
+
+function zcell(){
+  var c=byId(zc.value), T=+zT.value+273.15;
+  var lL=+zL.value, lR=+zR.value;
+  var slope=2.302585*R*T/(c.n*F);
+  var d=lR-lL;                                  /* log(c_right / c_left) */
+  var EL=c.E0+slope*lL, ER=c.E0+slope*lR;
+  var Ecell=slope*Math.abs(d);
+  var flat=Math.abs(d)<0.005;
+
+  document.getElementById("labzL").innerHTML="Left — ["+esc(c.O)+"]";
+  document.getElementById("labzR").innerHTML="Right — ["+esc(c.O)+"]";
+  document.getElementById("valzL").textContent=conc(lL);
+  document.getElementById("valzR").textContent=conc(lR);
+  document.getElementById("valzT").textContent=zT.value+" °C";
+
+  document.getElementById("zE").textContent=fmt(Ecell*1000,1);
+  document.getElementById("zAnode").textContent=flat?"—":(d>0?"left · dilute":"right · dilute");
+  document.getElementById("zRatio").textContent=fmt(Math.abs(d),2);
+  document.getElementById("zSlope").textContent=fmt(slope*1000,1)+" mV/decade";
+
+  document.getElementById("zEq").innerHTML=
+     "E<sub>cell</sub> = E°<sub>cell</sub> + (2.303RT/nF) · log(c<sub>high</sub>/c<sub>low</sub>)<br>"
+    +"E<sub>cell</sub> = 0 + ("+fmt(slope*1000,1)+" mV) × ("+fmt(Math.abs(d),2)+")<br>"
+    +"E<sub>cell</sub> = <b>"+fmt(Ecell*1000,1)+" mV</b>";
+
+  var note=document.getElementById("zNote");
+  if(flat){
+    note.className="verdict flat";
+    note.innerHTML="Both sides sit at the same concentration, so <b>E = 0</b> — and it is zero because the log term is zero, not because there is no chemistry left. This is where the cell ends up on its own.";
+  }else{
+    note.className="verdict go";
+    note.innerHTML="The <b>dilute</b> side is the anode: metal dissolves there and raises its own concentration, while the concentrated side plates out and falls. Both moves close the gap, so <b>E decays as it discharges</b> — press <b>Let it discharge</b> and watch it die at 0 mV.";
+  }
+  zplot(c,lL,lR,EL,ER,Ecell,flat);
+}
+
+function zplot(c,lL,lR,EL,ER,Ecell,flat){
+  var H=400,padT=34,padB=44,axX=196,x0=32;
+  var span=Math.max(0.03,Math.abs(EL-c.E0),Math.abs(ER-c.E0))*1.5;
+  var EMIN=c.E0-span, EMAX=c.E0+span;
+  /* electrochemistry convention, as in Lecture 1: negative up, positive down */
+  function y(E){return padT+(E-EMIN)/(EMAX-EMIN)*(H-padT-padB);}
+  var mono='font-family="IBM Plex Mono,monospace"';
+  var s='<defs>'
+   +'<marker id="zar" markerWidth="7" markerHeight="7" refX="5.6" refY="3" orient="auto">'
+   +'<path d="M0,0.4 L6,3 L0,5.6 z" fill="var(--elec)"/></marker>'
+   +'<marker id="zarC" markerWidth="7" markerHeight="7" refX="5.6" refY="3" orient="auto">'
+   +'<path d="M0,0.4 L6,3 L0,5.6 z" fill="var(--muted)"/></marker></defs>';
+
+  s+='<line x1="'+axX+'" y1="'+(padT-16)+'" x2="'+axX+'" y2="'+(H-padB+16)+'" stroke="var(--line-2)" stroke-width="1.4"/>';
+  s+='<text x="'+(axX+8)+'" y="'+(padT-20)+'" fill="var(--muted)" '+mono+' font-size="10.5">−   E vs SHE / V</text>';
+  s+='<text x="'+(axX+8)+'" y="'+(H-padB+28)+'" fill="var(--muted)" '+mono+' font-size="10.5">+</text>';
+  for(var i=0;i<=4;i++){
+    var tv=EMIN+(EMAX-EMIN)*i/4, yy=y(tv);
+    s+='<line x1="'+(axX-4)+'" y1="'+yy+'" x2="'+(axX+4)+'" y2="'+yy+'" stroke="var(--line-2)" stroke-width="1"/>';
+    s+='<text x="'+(axX+9)+'" y="'+(yy+3.5)+'" fill="var(--muted)" '+mono+' font-size="9.5">'+fmt(tv,3)+'</text>';
+  }
+  /* where both electrodes would sit at standard state */
+  var yL=y(EL), yR=y(ER), y0=y(c.E0);
+  s+='<line x1="'+x0+'" y1="'+y0+'" x2="'+(axX-6)+'" y2="'+y0+'" stroke="var(--line)" stroke-width="1" stroke-dasharray="2 4"/>';
+  /* a half-cell at 1 M sits exactly on E°, so shorten the tag when it would collide */
+  var near=Math.min(Math.abs(y0-yL),Math.abs(y0-yR))<14;
+  s+='<text x="'+(axX-8)+'" y="'+(y0+12)+'" text-anchor="end" fill="var(--muted)" '+mono+' font-size="9.5">'
+    +(near?"E°":"E° = "+fmt(c.E0,2)+" V — shared")+'</text>';
+  if(flat){
+    s+='<line x1="'+x0+'" y1="'+yL+'" x2="'+(axX-6)+'" y2="'+yL+'" stroke="var(--muted)" stroke-width="2.6"/>';
+    s+='<text x="'+x0+'" y="'+(yL-9)+'" fill="var(--muted)" '+mono+' font-size="11" font-weight="500">both electrodes   '+esc(conc(lL))+'   '+fmt(EL,3)+' V</text>';
+    s+='<text x="'+x0+'" y="'+(yL+15)+'" fill="var(--muted)" '+mono+' font-size="9.5" letter-spacing="0.08em">E = 0 · NOTHING FLOWS</text>';
+    document.getElementById("zplot").innerHTML=s;
+    return;
+  }
+
+  var leftAn=EL<ER;                       /* the lower E is the anode */
+  var colL=leftAn?"var(--ox)":"var(--red-)", colR=leftAn?"var(--red-)":"var(--ox)";
+  var roleL=leftAn?"LEFT · ANODE · DILUTE":"LEFT · CATHODE · CONCENTRATED";
+  var roleR=leftAn?"RIGHT · CATHODE · CONCENTRATED":"RIGHT · ANODE · DILUTE";
+  var tight=Math.abs(yL-yR)<48;
+  function lvl(txt,role,yy,col,up){
+    var yName=up?yy-22:yy-9, yRole=up?yy-9:yy+15;
+    if(!up&&tight){ yName=yy+15; yRole=yy+28; }
+    s+='<line x1="'+x0+'" y1="'+yy+'" x2="'+(axX-6)+'" y2="'+yy+'" stroke="'+col+'" stroke-width="2.6"/>';
+    s+='<text x="'+x0+'" y="'+yName+'" fill="'+col+'" '+mono+' font-size="11" font-weight="500">'+txt+'</text>';
+    s+='<text x="'+x0+'" y="'+yRole+'" fill="'+col+'" '+mono+' font-size="9.5" letter-spacing="0.08em">'+role+'</text>';
+  }
+  var txtL=esc(conc(lL))+"   "+fmt(EL,3)+" V", txtR=esc(conc(lR))+"   "+fmt(ER,3)+" V";
+  if(yL<=yR){ lvl(txtL,roleL,yL,colL,true); lvl(txtR,roleR,yR,colR,false); }
+  else      { lvl(txtR,roleR,yR,colR,true); lvl(txtL,roleL,yL,colL,false); }
+
+  var bx=axX-26, ymid=(yL+yR)/2;
+  var yAn=leftAn?yL:yR, yCa=leftAn?yR:yL;
+  s+='<line x1="'+bx+'" y1="'+yAn+'" x2="'+bx+'" y2="'+yCa+'" stroke="var(--muted)" stroke-width="1" marker-end="url(#zarC)"/>';
+  s+='<text x="'+(bx-7)+'" y="'+(ymid+3)+'" text-anchor="end" fill="var(--ink-2)" '+mono+' font-size="11" font-weight="500">'+fmt(Ecell*1000,1)+' mV</text>';
+
+  var rail=20;
+  s+='<path d="M '+rail+' '+yAn+' L '+rail+' '+yCa+'" stroke="var(--elec)" stroke-width="1.6" fill="none" marker-end="url(#zar)" stroke-dasharray="5 4">'
+    +'<animate attributeName="stroke-dashoffset" from="18" to="0" dur="1.1s" repeatCount="indefinite"/></path>';
+  s+='<text x="'+(rail-7)+'" y="'+(ymid-3)+'" text-anchor="middle" fill="var(--elec)" '+mono+' font-size="10" transform="rotate(-90 '+(rail-7)+' '+(ymid-3)+')">e⁻</text>';
+  document.getElementById("zplot").innerHTML=s;
+}
+
+daniell(); zcell();
+
+/* =============== FERMI =============== */
+var fc=document.getElementById("fc"), fE=document.getElementById("fE");
+fc.innerHTML=COUPLES.map(function(c){
+  return '<option value="'+c.id+'"'+(c.id==="Fe"?" selected":"")+'>'+esc(label(c))+'</option>';
+}).join("");
+[fc,fE].forEach(function(el){ el.addEventListener("input",fermi); });
+document.getElementById("toEq").addEventListener("click",function(){
+  fE.value=byId(fc.value).E0.toFixed(2); fermi();
+});
+
+function fermi(){
+  var c=byId(fc.value), Eapp=+fE.value, Eeq=c.E0, eta=Eapp-Eeq;
+  document.getElementById("valE").textContent=fmt(Eapp,2)+" V";
+  document.getElementById("fEeq").textContent=fmt(Eeq,2)+" V";
+  document.getElementById("fEapp").textContent=fmt(Eapp,2)+" V";
+  document.getElementById("fEta").textContent=(eta>=0?"+":"")+fmt(eta,2)+" V";
+  document.getElementById("fEf").textContent=fmt(-(VAC+Eapp),2)+" eV";
+
+  var v=document.getElementById("fVerdict");
+  if(Math.abs(eta)<0.02){
+    v.className="verdict flat";
+    v.innerHTML="<span><b>At equilibrium.</b> E<sub>F</sub> sits level with the couple. Oxidation and reduction run at the same rate, so no net current flows — this is the open-circuit condition.</span>";
+  }else if(eta<0){
+    v.className="verdict go";
+    v.innerHTML="<span><b>Cathodic — reduction.</b> A more negative potential raises E<sub>F</sub> above the couple's level, so electrons in the electrode are now higher in energy than the empty state in solution and fall into it. "+esc(c.O)+" is reduced.</span>";
+  }else{
+    v.className="verdict stop";
+    v.innerHTML="<span><b>Anodic — oxidation.</b> A more positive potential lowers E<sub>F</sub> below the couple's level, so electrons on "+esc(c.Rd)+" are higher in energy than the empty states in the metal and transfer into the electrode.</span>";
+  }
+
+  document.getElementById("wfList").innerHTML=WF.map(function(x){
+    return '<div class="wfrow"><span class="nm">'+x.m+'</span>'
+      +'<span class="tr"><span class="fl" style="width:'+(x.w/6*100).toFixed(0)+'%"></span></span>'
+      +'<span class="q">'+x.w.toFixed(1)+' eV</span></div>';
+  }).join("");
+
+  fplot(c,Eapp,Eeq);
+}
+
+function fplot(c,Eapp,Eeq){
+  var W=380,H=380,Tp=26,B=34;
+  /* vertical axis is electron energy in eV vs vacuum; more positive potential = lower energy */
+  var emin=-7.0, emax=-2.0;
+  function Y(e){ return Tp+(emax-e)/(emax-emin)*(H-Tp-B); }
+  var eF=-(VAC+Eapp), eRedox=-(VAC+Eeq);
+  var mono='font-family="IBM Plex Mono,monospace"';
+  var s='<defs><marker id="fa" markerWidth="7" markerHeight="7" refX="5.6" refY="3" orient="auto">'
+       +'<path d="M0,0.4 L6,3 L0,5.6 z" fill="var(--elec)"/></marker></defs>';
+
+  /* vacuum level */
+  s+='<line x1="20" y1="'+Y(-2.2)+'" x2="'+(W-20)+'" y2="'+Y(-2.2)+'" stroke="var(--line-2)" stroke-width="1" stroke-dasharray="4 4"/>';
+  s+='<text x="20" y="'+(Y(-2.2)-6)+'" fill="var(--muted)" '+mono+' font-size="9.5">vacuum level (0 eV, off scale)</text>';
+
+  /* electrode block */
+  s+='<rect x="26" y="'+Tp+'" width="130" height="'+(H-Tp-B)+'" fill="var(--surface-2)" rx="4"/>';
+  s+='<text x="91" y="'+(H-B+16)+'" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="10">electrode</text>';
+  /* filled states up to E_F */
+  s+='<rect x="26" y="'+Y(eF)+'" width="130" height="'+Math.max(0,(H-B)-Y(eF))+'" fill="var(--red-soft)" rx="0"/>';
+  s+='<line x1="26" y1="'+Y(eF)+'" x2="156" y2="'+Y(eF)+'" stroke="var(--red-)" stroke-width="2.6"/>';
+  s+='<text x="30" y="'+(Y(eF)-7)+'" fill="var(--red-)" '+mono+' font-size="11" font-weight="500">E_F  '+fmt(eF,2)+' eV</text>';
+
+  /* solution side */
+  s+='<text x="286" y="'+(H-B+16)+'" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="10">solution</text>';
+  s+='<line x1="220" y1="'+Y(eRedox)+'" x2="352" y2="'+Y(eRedox)+'" stroke="var(--ox)" stroke-width="2.6"/>';
+  s+='<text x="220" y="'+(Y(eRedox)-7)+'" fill="var(--ox)" '+mono+' font-size="11" font-weight="500">'+esc(c.O)+'/'+esc(c.Rd)+'  '+fmt(eRedox,2)+' eV</text>';
+  s+='<text x="220" y="'+(Y(eRedox)+15)+'" fill="var(--ox)" '+mono+' font-size="9.5">E° = '+fmt(c.E0,2)+' V vs SHE</text>';
+
+  /* transfer arrow */
+  var eta=Eapp-Eeq;
+  if(Math.abs(eta)>=0.02){
+    var y1=Y(eF), y2=Y(eRedox);
+    var dir = eta<0 ? 1 : -1;   /* cathodic: electrode -> solution */
+    var xa = dir>0 ? 162 : 214, xb = dir>0 ? 214 : 162;
+    s+='<path d="M '+xa+' '+(dir>0?y1:y2)+' C 188 '+(dir>0?y1:y2)+', 188 '+(dir>0?y2:y1)+', '+xb+' '+(dir>0?y2:y1)+'" '
+      +'fill="none" stroke="var(--elec)" stroke-width="1.8" marker-end="url(#fa)" stroke-dasharray="5 4">'
+      +'<animate attributeName="stroke-dashoffset" from="18" to="0" dur="1.1s" repeatCount="indefinite"/></path>';
+    s+='<text x="188" y="'+((y1+y2)/2-6)+'" text-anchor="middle" fill="var(--elec)" '+mono+' font-size="10">e⁻</text>';
+  }
+
+  /* twin axes: energy on the left, potential on the right */
+  for(var e=-7;e<=-2;e++){
+    s+='<text x="18" y="'+(Y(e)+3.5)+'" text-anchor="end" fill="var(--muted)" '+mono+' font-size="8.5">'+e+'</text>';
+    var pot=-(e)-VAC;
+    s+='<text x="'+(W-14)+'" y="'+(Y(e)+3.5)+'" text-anchor="start" fill="var(--muted)" '+mono+' font-size="8.5">'+fmt(pot,1)+'</text>';
+  }
+  s+='<text x="8" y="'+(Tp-10)+'" fill="var(--muted)" '+mono+' font-size="9">eV</text>';
+  s+='<text x="'+(W-30)+'" y="'+(Tp-10)+'" fill="var(--muted)" '+mono+' font-size="9">V vs SHE</text>';
+  s+='<text x="8" y="'+(Tp-22)+'" fill="var(--muted)" '+mono+' font-size="8.5">↑ electron energy</text>';
+  s+='<text x="'+(W-30)+'" y="'+(Tp-22)+'" fill="var(--muted)" '+mono+' font-size="8.5">↓ potential</text>';
+  document.getElementById("fplot").innerHTML=s;
+}
+
+/* ---- current after a potential step: charging decays, faradaic stays ---- */
+var stepAnim=null;
+document.getElementById("stepBtn").addEventListener("click",function(){
+  var c=byId(fc.value), eta=(+fE.value)-c.E0;
+  drawCurrent(eta,true);
+});
+function drawCurrent(eta,animate){
+  var W=340,H=170,L=40,Rr=12,Tp=14,B=30;
+  var tau=0.18;                                   /* RC time constant, arbitrary units */
+  var iF=Math.min(1,Math.abs(eta)/0.6)*0.55;      /* steady faradaic level */
+  var iC=0.95;                                    /* charging spike */
+  function X(t){ return L+t*(W-L-Rr); }
+  function Y(i){ return (H-B)-i*(H-Tp-B); }
+  var mono='font-family="IBM Plex Mono,monospace"';
+  function frame(prog){
+    var s="";
+    s+='<line x1="'+L+'" y1="'+(H-B)+'" x2="'+(W-Rr)+'" y2="'+(H-B)+'" stroke="var(--line-2)"/>';
+    s+='<line x1="'+L+'" y1="'+Tp+'" x2="'+L+'" y2="'+(H-B)+'" stroke="var(--line-2)"/>';
+    s+='<text x="'+((L+W)/2)+'" y="'+(H-8)+'" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="9.5">time after the step</text>';
+    s+='<text transform="rotate(-90 12 '+((Tp+H-B)/2)+')" x="12" y="'+((Tp+H-B)/2)+'" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="9.5">|current|</text>';
+    if(iF>0.002){
+      s+='<line x1="'+L+'" y1="'+Y(iF)+'" x2="'+(W-Rr)+'" y2="'+Y(iF)+'" stroke="var(--ox)" stroke-width="1" stroke-dasharray="3 4"/>';
+      s+='<text x="'+(W-Rr)+'" y="'+(Y(iF)-5)+'" text-anchor="end" fill="var(--ox)" '+mono+' font-size="9.5">faradaic</text>';
+    }
+    var d="", N=90;
+    for(var k=0;k<=N;k++){
+      var t=k/N;
+      if(t>prog) break;
+      var i=iF+iC*Math.exp(-t/tau);
+      d+=(k===0?"M ":"L ")+X(t).toFixed(1)+" "+Y(Math.min(1,i)).toFixed(1)+" ";
+    }
+    s+='<path d="'+d+'" fill="none" stroke="var(--red-)" stroke-width="2"/>';
+    document.getElementById("iplot").innerHTML=s;
+  }
+  if(stepAnim){ cancelAnimationFrame(stepAnim); stepAnim=null; }
+  var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if(!animate||reduce){ frame(1); }
+  else{
+    var t0=performance.now();
+    (function loop(now){
+      var p=Math.min(1,(now-t0)/900);
+      frame(p);
+      if(p<1) stepAnim=requestAnimationFrame(loop); else stepAnim=null;
+    })(t0);
+  }
+  document.getElementById("iNote").innerHTML = iF>0.002
+    ? "The spike is <b>non-faradaic</b> — charge rearranging in the electric double layer, no reaction. It dies away with RC. What is left is the <b>faradaic</b> current, the reaction itself."
+    : "At η = 0 there is no faradaic current, yet a spike still appears: charging the double layer costs current even when nothing reacts. That is why a fast potential sweep looks like it has a baseline.";
+}
+
+/* =============== CONCEPT CHECK =============== */
+var QZ=[
+ {q:"A student writes: “For any redox couple, E shifts by 59 mV for every ten-fold change in [O]/[R] at 25 °C.” Which belief is this?",
+  o:["Dropping n from a per-decade slope — the 59 mV figure is quoted without dividing by the number of electrons",
+     "Scaling an intensive quantity — a per-charge quantity was multiplied by a coefficient",
+     "Activity blindness — a pure solid was given a concentration term",
+     "Reference-frame arithmetic run backwards — a potential was quoted against the wrong zero"],
+  a:0,
+  w:"The Nernst slope is 2.303<i>RT</i>/<i>nF</i>, that is <b>59 mV per decade divided by n</b>. For a two-electron couple it is 30 mV, for three it is 20 mV. The number 59 belongs to n = 1 only. Option C is a real misconception and it is exactly what the next question tests."},
+
+ {q:"For <code>Zn²⁺ + 2e⁻ → Zn(s)</code>, why does no term for the zinc metal appear in the Nernst equation?",
+  o:["Because solids do not conduct",
+     "Because zinc is the anode and anodes are excluded",
+     "Because its concentration is too large to measure",
+     "Because a pure solid has an activity of 1, so its log term is zero"],
+  a:3,
+  w:"Activity, not concentration, enters the Nernst equation, and a pure solid or pure liquid is defined to have a = 1. log(1) = 0, so it drops out. Only the dissolved Zn²⁺ can shift the potential."},
+
+ {q:"You make the electrode potential <b>more negative</b>. What happens to the Fermi level of the electrode?",
+  o:["It moves up — electrons in the metal become higher in energy",
+     "It moves down — electrons become more tightly bound",
+     "It does not move; only the solution changes",
+     "It moves up or down depending on the metal's work function"],
+  a:0,
+  w:"Potential and electron energy run in <b>opposite directions</b>, because the electron's charge is negative: E(energy) = −eE(potential). A more negative potential raises E<sub>F</sub>, and once it is above the empty level in solution the electrons fall into it — that is reduction."},
+
+ {q:"A metal's work function is 4.7 eV. What does that tell you about its electrode potential in solution?",
+  o:["It is +4.7 V vs SHE",
+     "It is −4.7 V vs SHE",
+     "Very little on its own — W is a surface property referenced to vacuum, while electrode potential is referenced to a redox couple",
+     "It equals the work function minus 4.44 V"],
+  a:2,
+  w:"The lecture flags this explicitly. W is measured to <b>vacuum</b> and depends on the surface — adsorbates or a coating change W without moving the bulk E<sub>F</sub>. An electrode potential is E<sub>F</sub> referred to a redox couple in solution, conventionally H⁺/H₂. They are related ideas on different reference scales, not the same number."},
+
+ {q:"Why is an open-circuit voltage measured through a very <b>large</b> resistance?",
+  o:["To protect the voltmeter from high current",
+     "So that almost no current flows, leaving the equilibrium undisturbed",
+     "To increase the measured voltage",
+     "Because electrolytes have low resistance"],
+  a:1,
+  w:"OCV is meant to read the <b>equilibrium</b> potential difference. Any appreciable current would drive the reaction and shift the very equilibrium you are trying to measure. A large series resistance keeps the current negligible, so the reading approximates V<sub>eq</sub> = E₁ − E₂."},
+
+ {q:"Immediately after a potential step you see a current spike that decays, on top of a steady current. What are these two?",
+  o:["Both are faradaic; the spike is the faster reaction",
+     "The spike is faradaic; the steady part is double-layer charging",
+     "The spike is non-faradaic double-layer charging; the steady part is faradaic",
+     "The spike is instrument noise and should be ignored"],
+  a:2,
+  w:"Changing the potential rearranges ions in the <b>electric double layer</b>. That is charge moving without any electron crossing the interface — a non-faradaic charging current that decays with the cell's RC constant. The steady current that remains is the faradaic one, the reaction itself. Separating them is the whole game in voltammetry."}
+];
+
+var LETTERS="ABCD", STORE="ch40051-l2-check-v1";
+var picks=new Array(QZ.length).fill(-1);
+var sId=document.getElementById("sId"), elTally=document.getElementById("tally"),
+    elBar=document.getElementById("scorebar"), elScore=document.getElementById("scoreNum"),
+    elWho=document.getElementById("whoLine"), elIdHint=document.getElementById("idHint"),
+    dlBtn=document.getElementById("dlBtn"), dlHint=document.getElementById("dlHint");
+var startedAt=null, finishedAt=null;
+
+function save(){
+  try{ localStorage.setItem(STORE,JSON.stringify({i:sId.value,p:picks,s:startedAt,t:finishedAt})); }catch(e){}
+}
+function load(){
+  try{
+    var d=JSON.parse(localStorage.getItem(STORE)||"null");
+    if(d){ sId.value=d.i||""; if(Array.isArray(d.p)&&d.p.length===QZ.length) picks=d.p.slice();
+           startedAt=d.s||null; finishedAt=d.t||null; }
+  }catch(e){}
+}
+function started(){ return picks.some(function(p){return p>=0;}); }
+function code(str){
+  var h=0x811c9dc5;
+  for(var i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=(h+((h<<1)+(h<<4)+(h<<7)+(h<<8)+(h<<24)))>>>0; }
+  return ("0000000"+h.toString(16).toUpperCase()).slice(-8);
+}
+function scoreOf(){ var s=0; for(var i=0;i<QZ.length;i++) if(picks[i]===QZ[i].a) s++; return s; }
+function answered(){ return picks.filter(function(p){return p>=0;}).length; }
+
+function receipt(){
+  var s=scoreOf(), pct=Math.round(s/QZ.length*100), id=(sId.value||"").trim();
+  var stamp=finishedAt||new Date().toISOString();
+  var vc=code(id+"|"+stamp+"|"+picks.join(""));
+  var head=["lecture","student_id","completed_utc","score","total","percent","verification"];
+  var row=["L2",id,stamp,s,QZ.length,pct,vc];
+  for(var i=0;i<QZ.length;i++){ head.push("a"+(i+1)); row.push(picks[i]>=0?LETTERS[picks[i]]:"-"); }
+  for(var j=0;j<QZ.length;j++){ head.push("ok"+(j+1)); row.push(picks[j]===QZ[j].a?1:0); }
+  function cell(v){ v=String(v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
+  return {csv:head.join(",")+"\n"+row.map(cell).join(",")+"\n", vcode:vc, score:s, pct:pct, id:id};
+}
+
+function render(){
+  var done=answered(), all=(done===QZ.length);
+  elTally.textContent=done+" / "+QZ.length+" answered";
+  elBar.hidden=!all;
+  var lock=started();
+  sId.readOnly=lock;
+  elIdHint.innerHTML = all
+    ? "<strong>Attempt complete.</strong> Your answers are final. Every question now shows the correct answer and why — read them before you close this page."
+    : lock ? "<strong>Attempt in progress.</strong><span class=\"locked\">ID locked</span><br>Each answer is final."
+           : "<strong>One attempt.</strong> Enter your student ID before you begin — it locks once you answer the first question.";
+  if(all){
+    if(!finishedAt){ finishedAt=new Date().toISOString(); save(); }
+    var r=receipt();
+    elScore.innerHTML=r.score+' <small>/ '+QZ.length+'  ·  '+r.pct+' %</small>';
+    elWho.innerHTML="Student ID <b>"+esc(r.id||"—")+"</b> &nbsp;·&nbsp; Verification <b>"+r.vcode+"</b>";
+  }
+  for(var i=0;i<QZ.length;i++){
+    var box=document.querySelector('.opts[data-q="'+i+'"]');
+    var kids=[].slice.call(box.children), why=box.parentNode.querySelector(".why");
+    if(picks[i]<0){ kids.forEach(function(o){o.disabled=false;o.className="opt";}); why.hidden=true; }
+    else{
+      (function(qi){ kids.forEach(function(o,j){
+        o.disabled=true;
+        o.className="opt"+(j===QZ[qi].a?" right":(j===picks[qi]?" wrong":""));
+      }); })(i);
+      var _note=(picks[i]!==QZ[i].a)
+        ? '<span class="misc">You chose <b>'+LETTERS[picks[i]]+'</b>. '
+          + 'The correct answer is <b>'+LETTERS[QZ[i].a]+'</b>.</span>'
+        : "";
+      why.innerHTML=_note+QZ[i].w; why.hidden=false;
+    }
+  }
+}
+
+document.getElementById("quiz").innerHTML=QZ.map(function(item,i){
+  return '<div class="card q"><div class="card-b">'
+    +'<p class="stem"><b style="font-family:IBM Plex Mono,monospace;color:var(--muted);font-size:12px">Q'+(i+1)+'</b>  '+item.q+'</p>'
+    +'<div class="opts" data-q="'+i+'">'+item.o.map(function(o,j){
+        return '<button class="opt" data-i="'+j+'"><span class="ltr">'+LETTERS[j]+'</span><span>'+o+'</span></button>';
+      }).join("")+'</div><p class="why" hidden></p></div></div>';
+}).join("");
+
+[].slice.call(document.querySelectorAll(".opts")).forEach(function(box){
+  box.addEventListener("click",function(ev){
+    var b=ev.target.closest(".opt");
+    if(!b||b.disabled) return;
+    var qi=+box.getAttribute("data-q");
+    if(picks[qi]>=0) return;
+    if(!(sId.value||"").trim()){
+      elIdHint.innerHTML="<strong style=\"color:var(--stop)\">Enter your student ID first.</strong> It is written into the result file you submit.";
+      sId.focus(); return;
+    }
+    if(!startedAt) startedAt=new Date().toISOString();
+    picks[qi]=+b.getAttribute("data-i");
+    save(); render();
+  });
+});
+sId.addEventListener("input",save);
+
+dlBtn.addEventListener("click",function(){
+  var id=(sId.value||"").trim();
+  if(!id){ dlHint.textContent="Enter your student ID first — it goes into the file."; return; }
+  var r=receipt();
+  try{
+    var blob=new Blob([r.csv],{type:"text/csv;charset=utf-8"});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement("a");
+    a.href=url; a.download="CH40051-L2-check_"+id.replace(/[^A-Za-z0-9_-]/g,"")+".csv";
+    a.style.display="none";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(url);},1000);
+    dlHint.textContent="Saved. Hand it in as your instructor directs.";
+  }catch(e){
+    dlHint.textContent="Your browser blocked the download. Screenshot this panel and submit that instead.";
+  }
+});
+
+/* ---- boot ---- */
+nernst();
+fermi();
+drawCurrent(0,false);
+
+/* ---- submit straight to the course sheet ----------------------------------
+   Paste the Apps Script /exec URL between the quotes to switch this on.
+   Left empty, the button stays hidden and only the download exists.        */
+var SUBMIT_URL = "https://script.google.com/macros/s/AKfycbxPm7WrbttFu6-gnTi__IcUPt-816GthK0eI8TPuwOZyYlcRW3RAWJlmsr791moxBc5GA/exec";
+
+var sendBtn=document.getElementById("sendBtn");
+if(SUBMIT_URL){
+  sendBtn.hidden=false;
+  dlHint.textContent="Press Submit to send your result to the course. The download is a backup.";
+}
+
+sendBtn.addEventListener("click",function(){
+  var id=(sId.value||"").trim();
+  if(!id){ dlHint.textContent="Enter your student ID first."; return; }
+  var r=receipt();
+  var payload={
+    lecture:"L2", student_id:id, completed_utc:finishedAt||new Date().toISOString(),
+    score:r.score, total:QZ.length, percent:r.pct, verification:r.vcode,
+    answers:picks.map(function(p){ return p>=0?LETTERS[p]:"-"; }),
+    ok:picks.map(function(p,i){ return p===QZ[i].a?1:0; })
+  };
+  sendBtn.disabled=true;
+  dlHint.textContent="Sending...";
+
+  /* text/plain keeps this a simple request, so the browser sends it without
+     a preflight the Apps Script endpoint cannot answer */
+  fetch(SUBMIT_URL,{
+    method:"POST",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify(payload)
+  })
+  .then(function(res){ return res.json(); })
+  .then(function(j){
+    if(j && j.ok){
+      sendBtn.textContent="Submitted ✓";
+      dlHint.textContent="Recorded for student ID "+id+". You can close this page.";
+    }else{
+      throw new Error((j && j.error) || "rejected");
+    }
+  })
+  .catch(function(){
+    /* the response could not be read - resend blind so the record still lands,
+       then tell the student to keep the file as proof */
+    fetch(SUBMIT_URL,{method:"POST",mode:"no-cors",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(payload)}).catch(function(){});
+    sendBtn.disabled=false;
+    sendBtn.textContent="Submit to the course";
+    dlHint.textContent="Sent, but the confirmation did not come back. "
+      + "Download the file as well and keep it - it is your proof of submission.";
+  });
+});
+
+load();
+render();
+
+})();
+</script>
+</body>
+</html>
