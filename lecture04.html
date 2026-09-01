@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Double Layer Bench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+:root{
+  --ground:#F1F3F2; --surface:#FFFFFF; --surface-2:#E9EDEB;
+  --ink:#14191B; --ink-2:#3E4A4D; --muted:#68767A; --line:#D6DDDA; --line-2:#C3CCC8;
+  --ox:#A85B33; --ox-soft:#F3E4DA;
+  --red-:#15618E; --red-soft:#DDE9F2;
+  --go:#2C7355; --go-soft:#DCEBE3;
+  --stop:#8A5F0C; --stop-soft:#F3E9D3;
+  --elec:#3E4A4D;
+  --shadow:0 1px 2px rgba(20,25,27,.05),0 8px 24px -12px rgba(20,25,27,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+    --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+    --ox:#D08551; --ox-soft:#33231A;
+    --red-:#5AA6D4; --red-soft:#152833;
+    --go:#5DBB8D; --go-soft:#152A21;
+    --stop:#D6A33F; --stop-soft:#2B2415;
+    --elec:#AEBBBE;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+  --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+  --ox:#D08551; --ox-soft:#33231A;
+  --red-:#5AA6D4; --red-soft:#152833;
+  --go:#5DBB8D; --go-soft:#152A21;
+  --stop:#D6A33F; --stop-soft:#2B2415;
+  --elec:#AEBBBE;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:32px 20px 72px}
+.masthead{display:flex;flex-wrap:wrap;align-items:flex-end;gap:20px 32px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.eyebrow a{color:inherit}
+h1{font-family:"IBM Plex Serif",Georgia,serif;font-weight:600;font-size:clamp(28px,4.2vw,42px);line-height:1.12;margin:0;text-wrap:balance;letter-spacing:-.015em}
+.sub{margin:8px 0 0;color:var(--ink-2);font-size:15px;max-width:62ch}
+.tabs{display:flex;gap:2px;margin:24px 0 22px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{appearance:none;background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);
+  font-family:inherit;font-size:14.5px;font-weight:500;padding:11px 16px;cursor:pointer;white-space:nowrap;margin-bottom:-1px}
+.tab:hover{color:var(--ink-2)}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ox)}
+.tab:focus-visible{outline:2px solid var(--red-);outline-offset:-2px;border-radius:4px 4px 0 0}
+.panel[hidden]{display:none}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow)}
+.card-h{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.card-h h2{font-size:15px;font-weight:600;margin:0;letter-spacing:-.01em}
+.card-h .note{font-size:12.5px;color:var(--muted)}
+.card-b{padding:18px}
+.stack{display:flex;flex-direction:column;gap:16px}
+.two{display:grid;grid-template-columns:minmax(270px,1fr) minmax(330px,1.45fr);gap:16px;align-items:start}
+@media(max-width:900px){.two{grid-template-columns:1fr}}
+label.fld,span.fld{display:block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+select,input[type=number]{width:100%;font-family:inherit;font-size:14px;color:var(--ink);
+  background:var(--surface-2);border:1px solid var(--line-2);border-radius:7px;padding:9px 10px}
+input[type=text]{width:100%;font-family:inherit;font-size:14px;color:var(--ink);
+  background:var(--surface-2);border:1px solid var(--line-2);border-radius:7px;padding:9px 10px}
+input:read-only{background:var(--surface);color:var(--muted);cursor:not-allowed}
+select:focus-visible,input:focus-visible{outline:2px solid var(--red-);outline-offset:1px}
+input[type=range]{width:100%;accent-color:var(--ox)}
+input[type=range]:focus-visible{outline:2px solid var(--red-);outline-offset:3px}
+.slider-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;gap:10px}
+.slider-row .val{font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+.models{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.mbtn{appearance:none;text-align:left;background:var(--surface-2);border:1px solid transparent;border-radius:8px;
+  padding:10px 12px;cursor:pointer;font-family:inherit;color:var(--ink)}
+.mbtn[aria-pressed="true"]{border-color:var(--ox);background:var(--ox-soft)}
+.mbtn:focus-visible{outline:2px solid var(--red-);outline-offset:1px}
+.mbtn b{display:block;font-size:13.5px;font-weight:600}
+.mbtn span{display:block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--muted);margin-top:2px}
+.readout{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px dotted var(--line)}
+.readout:last-child{border-bottom:0}
+.readout .k{font-size:13px;color:var(--muted)}
+.readout .v{font-family:"IBM Plex Mono",monospace;font-size:16px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--ink)}
+.verdict{padding:12px 14px;border-radius:8px;font-size:13.5px;line-height:1.55}
+.verdict.go{background:var(--go-soft);color:var(--go)}
+.verdict.stop{background:var(--stop-soft);color:var(--stop)}
+.verdict.flat{background:var(--surface-2);color:var(--ink-2)}
+.eqline{font-family:"IBM Plex Mono",monospace;font-size:13px;line-height:1.9;color:var(--ink-2);
+  background:var(--surface-2);border-radius:7px;padding:11px 13px}
+.eqline b{color:var(--ox);font-weight:600}
+svg{display:block;max-width:100%}
+.scrollx{overflow-x:auto}
+.solid{appearance:none;background:var(--ox);border:1px solid var(--ox);color:#fff;font-family:inherit;
+  font-size:13.5px;font-weight:500;padding:10px 16px;border-radius:7px;cursor:pointer}
+.solid:hover{filter:brightness(1.08)}
+.ghost{appearance:none;background:var(--surface-2);border:1px solid var(--line-2);color:var(--ink-2);
+  font-family:inherit;font-size:12.5px;padding:8px 12px;border-radius:7px;cursor:pointer;text-align:left}
+.ghost:hover{border-color:var(--ox);color:var(--ox)}
+.idgrid{display:grid;grid-template-columns:1fr;gap:14px;max-width:340px}
+.scorebar{display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;padding:14px 18px;border-top:1px solid var(--line)}
+.scorenum{font-family:"IBM Plex Mono",monospace;font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+.scorenum small{font-size:14px;font-weight:400;color:var(--muted)}
+.vcode{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted)}
+.vcode b{color:var(--ink);font-weight:600;letter-spacing:.08em}
+.quiz{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:16px}
+.q .stem{font-size:14.5px;line-height:1.6;margin:0 0 12px}
+.q .stem code{font-family:"IBM Plex Mono",monospace;font-size:13px;background:var(--surface-2);padding:1px 5px;border-radius:4px}
+.opts{display:flex;flex-direction:column;gap:7px}
+.opt{appearance:none;text-align:left;font-family:inherit;font-size:13.5px;line-height:1.45;color:var(--ink);
+  background:var(--surface-2);border:1px solid transparent;border-radius:7px;padding:9px 12px;cursor:pointer;display:flex;gap:9px}
+.opt .ltr{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);flex:0 0 auto;padding-top:1px}
+.opt:hover:not(:disabled){border-color:var(--line-2)}
+.opt.right{background:var(--go-soft);color:var(--go);border-color:var(--go);font-weight:500}
+.opt.right .ltr{color:var(--go)}
+.opt.wrong{background:var(--stop-soft);color:var(--stop);border-color:var(--stop)}
+.opt.wrong .ltr{color:var(--stop)}
+.opt:disabled{cursor:default}
+.why{margin:12px 0 0;font-size:13px;line-height:1.65;color:var(--ink-2);border-left:2px solid var(--line-2);padding-left:12px}
+.misc{display:block;margin-top:10px;padding:9px 12px;border-radius:7px;background:var(--stop-soft);color:var(--stop);font-size:12.5px;line-height:1.6}
+.misc a{color:inherit;font-weight:600;white-space:nowrap}
+.why[hidden]{display:none}
+.tally{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.hint{font-size:12.5px;color:var(--muted);line-height:1.65;margin:10px 0 0}
+.locked{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;background:var(--go-soft);color:var(--go);padding:2px 7px;border-radius:4px;margin-left:8px}
+footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;line-height:1.8}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <div style="flex:1 1 380px">
+      <p class="eyebrow"><a href="index.html">CH40051 Electroanalytical Chemistry</a> · Lecture 4 · Ion distribution</p>
+      <h1>Double Layer Bench</h1>
+      <p class="sub">Four models of the same interface, built one correction at a time. Watch where the potential actually drops, then see what that structure does to a cyclic voltammogram when no reaction happens at all.</p>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" aria-controls="p-dl" id="t-dl">Double Layer Models</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-cv" id="t-cv">Capacitor CV</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-quiz" id="t-quiz">Concept Check</button>
+  </div>
+
+  <!-- ============== DOUBLE LAYER ============== -->
+  <section class="panel" id="p-dl" role="tabpanel" aria-labelledby="t-dl">
+    <div class="two">
+
+      <div class="stack">
+        <div class="card">
+          <div class="card-h"><h2>The model</h2><span class="note">each one fixes the previous one</span></div>
+          <div class="card-b stack">
+            <div class="models" id="models">
+              <button class="mbtn" data-m="H"  aria-pressed="true"><b>Helmholtz</b><span>1853</span></button>
+              <button class="mbtn" data-m="GC" aria-pressed="false"><b>Gouy–Chapman</b><span>1910–13</span></button>
+              <button class="mbtn" data-m="S"  aria-pressed="false"><b>Stern</b><span>1924</span></button>
+              <button class="mbtn" data-m="G"  aria-pressed="false"><b>Grahame</b><span>1947</span></button>
+              <button class="mbtn" data-m="B"  aria-pressed="false" style="grid-column:1/-1"><b>Ion size</b><span>Bikerman · crowding</span></button>
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">Electrolyte concentration</span><span class="val" id="cV"></span></div>
+              <input type="range" id="conc" min="-4" max="0.3" step="0.05" value="-1">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">Surface potential φ₀</span><span class="val" id="pV"></span></div>
+              <input type="range" id="phi" min="-0.4" max="0.4" step="0.01" value="0.20">
+            </div>
+            <div id="anionWrap" hidden>
+              <label class="fld" for="anion">Specifically adsorbed anion</label>
+              <select id="anion"></select>
+            </div>
+            <div id="ionWrap" hidden>
+              <div class="slider-row"><span class="fld" style="margin:0">Effective ion size</span><span class="val" id="iV"></span></div>
+              <input type="range" id="ionsize" min="0.3" max="1.0" step="0.01" value="0.60">
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h2>Numbers</h2></div>
+          <div class="card-b">
+            <div class="readout"><span class="k">Debye length, κ⁻¹</span><span class="v" id="rDeb">—</span></div>
+            <div class="readout"><span class="k">OHP distance</span><span class="v" id="rOHP">—</span></div>
+            <div class="readout"><span class="k">Drop across compact layer</span><span class="v" id="rComp">—</span></div>
+            <div class="readout"><span class="k">Drop across diffuse layer</span><span class="v" id="rDiff">—</span></div>
+            <div class="readout"><span class="k">Compact, <em>C</em><sub>H</sub></span><span class="v" id="rCH">—</span></div>
+            <div class="readout"><span class="k">Diffuse, <em>C</em><sub>d</sub></span><span class="v" id="rCD">—</span></div>
+            <div class="readout"><span class="k">In series — what you measure</span><span class="v" id="rCT">—</span></div>
+            <div class="readout"><span class="k">Packing fraction, ν</span><span class="v" id="rNu">—</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stack">
+        <div class="card">
+          <div class="card-h"><h2>Potential against distance</h2><span class="note" id="dlNote"></span></div>
+          <div class="card-b scrollx"><svg id="dlplot" viewBox="0 0 520 340" width="520" height="340" style="margin:0 auto" role="img" aria-label="Potential profile from the electrode surface into the solution"></svg></div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>Differential capacitance</h2><span class="note">the curve an experiment actually gives you</span></div>
+          <div class="card-b scrollx"><svg id="cdplot" viewBox="0 0 520 300" width="520" height="300" style="margin:0 auto" role="img" aria-label="Differential capacitance against potential for the selected double layer model"></svg></div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>What this model says</h2></div>
+          <div class="card-b stack" style="gap:12px">
+            <div class="verdict" id="mDesc"></div>
+            <div class="verdict stop" id="mFail"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============== CAPACITOR CV ============== -->
+  <section class="panel" id="p-cv" role="tabpanel" aria-labelledby="t-cv" hidden>
+    <div class="two">
+
+      <div class="stack">
+        <div class="card">
+          <div class="card-h"><h2>Sweep settings</h2></div>
+          <div class="card-b stack">
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">Scan rate ν</span><span class="val" id="nuV"></span></div>
+              <input type="range" id="nu" min="-2" max="0.7" step="0.02" value="-1">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">Capacitance C</span><span class="val" id="capV"></span></div>
+              <input type="range" id="cap" min="1" max="100" step="1" value="20">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">Series resistance R</span><span class="val" id="resV"></span></div>
+              <input type="range" id="res" min="0" max="60" step="1" value="5">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">Electrode mass m</span><span class="val" id="massV"></span></div>
+              <input type="range" id="mass" min="1" max="20" step="1" value="5">
+            </div>
+            <button class="ghost" id="ideal" type="button">Make it ideal — R = 0</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>Reading the capacitance</h2></div>
+          <div class="card-b stack" style="gap:11px">
+            <div class="eqline" id="cvEq"></div>
+            <div class="readout"><span class="k">Plateau current, Cν</span><span class="v" id="rI">—</span></div>
+            <div class="readout"><span class="k">Specific capacitance</span><span class="v" id="rCs">—</span></div>
+            <div class="readout"><span class="k">Time constant RC</span><span class="v" id="rRC">—</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stack">
+        <div class="card">
+          <div class="card-h"><h2>The voltammogram</h2><span class="note">no reaction anywhere — this is all charging</span></div>
+          <div class="card-b scrollx"><svg id="cvplot" viewBox="0 0 520 320" width="520" height="320" style="margin:0 auto" role="img" aria-label="Cyclic voltammogram of a capacitor"></svg></div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>Shape check</h2></div>
+          <div class="card-b"><div class="verdict" id="cvVerdict"></div></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============== QUIZ ============== -->
+  <section class="panel" id="p-quiz" role="tabpanel" aria-labelledby="t-quiz" hidden>
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h">
+        <h2>Concept check</h2>
+        <span class="note">Answer once per question — the reasoning appears immediately</span>
+        <span class="tally" style="margin-left:auto" id="tally"></span>
+      </div>
+      <div class="card-b">
+        <div class="idgrid">
+          <div>
+            <label class="fld" for="sId">Student ID</label>
+            <input type="text" id="sId" inputmode="numeric" placeholder="e.g. 20261234">
+          </div>
+        </div>
+        <p class="hint" id="idHint"></p>
+      </div>
+      <div class="scorebar" id="scorebar" hidden>
+        <div>
+          <div class="scorenum" id="scoreNum">—</div>
+          <div class="vcode" style="margin-top:4px" id="whoLine">—</div>
+        </div>
+        <div style="flex:1 1 300px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="solid" id="sendBtn" type="button" hidden>Submit to the course</button>
+            <button class="ghost" id="dlBtn" type="button">Download my result</button>
+          </div>
+          <p class="hint" id="dlHint" style="margin-top:8px">Download the file and hand it in as your instructor directs.</p>
+        </div>
+      </div>
+    </div>
+    <div class="quiz" id="quiz"></div>
+  </section>
+
+  <footer>
+    Debye lengths are for a 1:1 aqueous electrolyte at 25 °C · compact-layer thicknesses are typical values, not measurements<br>
+    CH40051 Electroanalytical Chemistry · Fall 2026 — companion to Lecture 4
+  </footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+/* ================= DOUBLE LAYER =================
+   Everything below is in SI internally and displayed in nm and uF/cm2.
+
+   The diffuse layer is solved without linearising.  For a symmetric z:z
+   electrolyte the exact Gouy-Chapman charge is
+
+       sigma(phi_d) = (2 eps VT / lam) sinh(phi_d / 2VT),     VT = RT/F
+
+   and the Bikerman lattice-gas correction, which stops ions from packing
+   more densely than their own size allows, replaces it with
+
+       sigma(phi_d) = (eps VT / lam) sqrt( (2/nu) ln[1 + 2 nu sinh^2(u)] )
+
+   with u = phi_d/2VT and nu = 2c/c_max the bulk volume fraction of ions.
+   As nu -> 0 the logarithm goes to 2 nu sinh^2 u and the second expression
+   collapses onto the first, which is the check to run after any edit here.
+
+   The compact layer gets its own permittivity.  Water next to a charged
+   metal is dielectrically saturated, so er falls from 78.5 in the bulk to
+   something near 10; using the bulk value would put C_H near 150 uF/cm2
+   instead of the ~20 that mercury actually shows. */
+var e0=8.854e-12, er=78.5, erC=10, Rg=8.314, T=298.15, Fc=96485.33;
+var VT=Rg*T/Fc;                              /* 25.7 mV */
+var D_IHP=0.20e-9, D_OHP=0.45e-9;            /* m */
+var EPS=er*e0, EPSC=erC*e0;
+var CH=EPSC/D_OHP;                           /* compact-layer capacitance, F/m2 */
+var NA=6.02214076e23;
+
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function fmt(x,d){var s=x.toFixed(d);return /^-0(\.0*)?$/.test(s)?s.slice(1):s;}
+function uF(Cf){ return Cf*100; }            /* F/m2 -> uF/cm2 */
+
+/* Debye length in m for a 1:1 electrolyte of concentration c (mol/L) */
+function debyeM(c){ return Math.sqrt(EPS*Rg*T/(2*Fc*Fc*c*1000)); }
+function debye(c){ return debyeM(c)*1e9; }   /* nm, for display */
+
+/* bulk volume fraction of ions for a lattice of spacing aNm */
+function nuOf(c,aNm){
+  var cmax=1/(NA*Math.pow(aNm*1e-9,3))/1000;  /* mol/L */
+  return Math.min(0.98, 2*c/cmax);
+}
+
+function sgn(x){ return x<0?-1:1; }
+function sigGC(pd,lam){
+  return sgn(pd)*(2*EPS*VT/lam)*Math.sinh(Math.abs(pd)/(2*VT));
+}
+function sigMPB(pd,lam,nu){
+  var u=Math.abs(pd)/(2*VT), S=2*nu*Math.sinh(u)*Math.sinh(u);
+  return sgn(pd)*(EPS*VT/lam)*Math.sqrt(2*Math.log(1+S)/nu);
+}
+function sigOf(pd,lam,nu,mpb){ return mpb?sigMPB(pd,lam,nu):sigGC(pd,lam); }
+
+/* differential capacitance of the diffuse layer alone */
+function cdGC(pd,lam){ return (EPS/lam)*Math.cosh(pd/(2*VT)); }
+function cdMPB(pd,lam,nu){
+  var u=Math.abs(pd)/(2*VT), S=2*nu*Math.sinh(u)*Math.sinh(u);
+  if(S<1e-12) return EPS/lam;
+  return (EPS/lam)*Math.sinh(2*u)/((1+S)*Math.sqrt(2*Math.log(1+S)/nu));
+}
+function cdOf(pd,lam,nu,mpb){ return mpb?cdMPB(pd,lam,nu):cdGC(pd,lam); }
+
+/* Split phi0 between the compact and diffuse layers by matching the charge:
+   sigma_diffuse(phi_d) = C_H (phi0 - phi_d).  Bisection, because sinh makes
+   this transcendental — this is exactly the step the old linear formula
+   skipped, and the step that matters once |phi0| passes RT/F. */
+function solvePd(p0,lam,nu,mpb){
+  if(Math.abs(p0)<1e-9) return 0;
+  var s=sgn(p0), a0=Math.abs(p0), lo=0, hi=a0, mid, i;
+  for(i=0;i<70;i++){
+    mid=(lo+hi)/2;
+    if(sigOf(mid,lam,nu,mpb)-CH*(a0-mid) > 0) hi=mid; else lo=mid;
+  }
+  return s*(lo+hi)/2;
+}
+
+/* total differential capacitance, compact and diffuse in series */
+function cTotal(model,p0,lam,nu){
+  if(model==="H")  return CH;
+  /* Gouy-Chapman and Bikerman are both bare diffuse-layer models, with no
+     compact layer in series.  That is deliberate: Bikerman is the ion-size fix
+     to Gouy-Chapman, and putting C_H in front of it hides the very feature it
+     adds.  With a Stern layer the diffuse drop saturates near 60 mV however far
+     phi0 is pushed, so the crowding humps are never reached. */
+  if(model==="GC") return cdGC(p0,lam);
+  if(model==="B")  return cdMPB(p0,lam,nu);
+  var pd=solvePd(p0,lam,nu,false);
+  return 1/(1/CH+1/cdGC(pd,lam));
+}
+function bare(m){ return m==="GC"||m==="B"; }   /* no compact layer */
+
+/* specific adsorption on mercury, weakest first, from the lecture */
+var ANIONS=[
+ {id:"F",    nm:"F⁻",    s:0.00},
+ {id:"PF6",  nm:"PF₆⁻",  s:0.12},
+ {id:"BF4",  nm:"BF₄⁻",  s:0.22},
+ {id:"ClO4", nm:"ClO₄⁻", s:0.35},
+ {id:"Cl",   nm:"Cl⁻",   s:0.52},
+ {id:"Br",   nm:"Br⁻",   s:0.72},
+ {id:"I",    nm:"I⁻",    s:0.95}
+];
+var anion=document.getElementById("anion");
+anion.innerHTML=ANIONS.map(function(a){
+  return '<option value="'+a.id+'"'+(a.id==="Cl"?" selected":"")+'>'+esc(a.nm)+
+         '  —  '+(a.s===0?"no specific adsorption":a.s<0.4?"weak":a.s<0.8?"moderate":"strong")+'</option>';
+}).join("");
+
+var model="H";
+var mbtns=[].slice.call(document.querySelectorAll("#models .mbtn"));
+mbtns.forEach(function(b){
+  b.addEventListener("click",function(){
+    model=b.getAttribute("data-m");
+    mbtns.forEach(function(o){ o.setAttribute("aria-pressed", o===b?"true":"false"); });
+    dl();
+  });
+});
+var conc=document.getElementById("conc"), phi=document.getElementById("phi"),
+    ions=document.getElementById("ionsize");
+[conc,phi,anion,ions].forEach(function(el){ el.addEventListener("input",dl); });
+
+var MODEL_TEXT={
+ H:{d:"<b>Helmholtz.</b> Ions are pinned in a single rigid layer at the outer Helmholtz plane, one solvation shell from the metal. The entire potential drop is linear across that gap, and beyond the OHP the solution is field-free. The interface is simply a parallel-plate capacitor.",
+    f:"What it misses: thermal motion. Real ions are jostled by Brownian motion and cannot be held in a rigid sheet, so the layer is not that sharp — and the model predicts a capacitance that depends on neither concentration nor potential, which the flat line on the capacitance plot makes obvious and which experiment contradicts."},
+ GC:{d:"<b>Gouy–Chapman.</b> Let the ions move. Balancing electrostatic attraction against thermal motion spreads the counter-charge into a diffuse cloud, and the potential decays with a length set by the Debye screening length — so dilute solutions screen over far greater distances. The capacitance is now a V with its minimum at the potential of zero charge, and the V deepens as the solution is diluted.",
+    f:"What it misses: ions have a size. Nothing stops them reaching the surface, so the cosh in its capacitance runs away — look at the plot leaving the top of the frame within a couple of hundred millivolts."},
+ S:{d:"<b>Stern.</b> Combine the two. Ions cannot come closer than the OHP, so the first stretch is a linear Helmholtz drop; beyond the OHP the remainder decays as a Gouy–Chapman diffuse layer. The two behave as capacitors in series, so whichever is smaller dominates — the diffuse layer near the pzc, the compact layer far from it.",
+    f:"What it still misses: every ion is treated as a charged sphere held back by its solvation shell. Some ions shed that shell and touch the metal, and this model has no place for them."},
+ G:{d:"<b>Grahame.</b> Some ions lose their solvation shell and adsorb directly on the metal, at the inner Helmholtz plane. This is chemical, not merely electrostatic: it depends on the ion's identity rather than only on its charge, and it can even reverse the local field.",
+    f:"On mercury the tendency runs F⁻ &lt; PF₆⁻ &lt; BF₄⁻ &lt; ClO₄⁻ &lt; Cl⁻ &lt; Br⁻ &lt; I⁻. Fluoride and PF₆⁻ stay solvated, which is exactly why they are chosen as non-adsorbing supporting electrolytes. The capacitance curve here is Stern's, shifted along the potential axis by the adsorbed charge; the hump a real mercury electrode shows needs an adsorption isotherm this page does not carry."},
+ B:{d:"<b>Ion size — Bikerman.</b> This is the fix to Gouy–Chapman, so like Gouy–Chapman it is drawn with no compact layer — put one in front and the diffuse drop saturates near 60 mV, hiding the very thing this model adds. Give the ions a volume and they can no longer pile up without limit: once the layer against the electrode is full, more potential only pushes the crowded region outwards. The capacitance stops rising and turns over, so the runaway V becomes a <b>camel</b> — two humps astride the pzc — and then a single <b>bell</b>.",
+    f:"The humps move inwards as the packing fraction ν = 2c/c<sub>max</sub> grows — near ±150 mV at ν = 0.01, ±50 mV at ν = 0.26 — and merge into the bell once ν passes about ⅓. Raise the concentration or the ion size and watch it happen. It is still a mean-field model: it counts volume but not the correlations between individual ions, which is where molecular simulation has to take over."}
+};
+
+function dl(){
+  var c=Math.pow(10,+conc.value), p0=+phi.value;
+  var lamM=debyeM(c), lam=lamM*1e9;
+  var aNm=+ions.value, nu=nuOf(c,aNm);
+  var a=ANIONS.filter(function(x){return x.id===anion.value;})[0];
+  var mpb=(model==="B");
+
+  document.getElementById("anionWrap").hidden=(model!=="G");
+  document.getElementById("ionWrap").hidden=(model!=="B");
+  document.getElementById("cV").textContent = c>=0.01 ? fmt(c,2)+" M" : c.toExponential(1)+" M";
+  document.getElementById("pV").textContent = fmt(p0,2)+" V";
+  document.getElementById("iV").textContent = fmt(aNm,2)+" nm";
+
+  var pOHP;                                  /* potential left at the OHP */
+  if(model==="H")   pOHP=0;
+  else if(bare(model)) pOHP=p0;              /* no compact layer at all */
+  else              pOHP=solvePd(p0,lamM,nu,false);
+
+  var Cd=cTotal(model,p0,lamM,nu);
+  var cDiff=(model==="H")?Infinity:cdOf(pOHP,lamM,nu,mpb);
+
+  document.getElementById("rDeb").textContent = model==="H" ? "—" : fmt(lam,2)+" nm";
+  document.getElementById("rOHP").textContent = bare(model) ? "— (no compact layer)" : (D_OHP*1e9).toFixed(2)+" nm";
+  document.getElementById("rComp").textContent = fmt(Math.abs(p0-pOHP)*1000,0)+" mV";
+  document.getElementById("rDiff").textContent = fmt(Math.abs(pOHP)*1000,0)+" mV";
+  document.getElementById("rCH").textContent = bare(model) ? "— (none)" : fmt(uF(CH),1)+" µF/cm²";
+  document.getElementById("rCD").textContent = model==="H" ? "— (none)" : fmt(uF(cDiff),1)+" µF/cm²";
+  document.getElementById("rCT").textContent = fmt(uF(Cd),1)+" µF/cm²";
+  document.getElementById("rNu").textContent = mpb ? fmt(nu,3) : "—";
+
+  document.getElementById("mDesc").className="verdict flat";
+  document.getElementById("mDesc").innerHTML=MODEL_TEXT[model].d;
+  document.getElementById("mFail").innerHTML=MODEL_TEXT[model].f;
+
+  document.getElementById("dlNote").textContent =
+    model==="H" ? "all of it across one gap" :
+    model==="GC"? "all of it in a diffuse cloud" :
+    model==="S" ? "compact, then diffuse" :
+    model==="G" ? "compact, diffuse, plus adsorbed ions" : "crowding caps the diffuse layer";
+
+  plotDL(c,p0,lamM,pOHP,a,nu,mpb);
+  plotCD(c,p0,lamM,nu,a);
+}
+
+/* the diffuse profile, integrated rather than assumed:  eps dphi/dx = -sigma(phi) */
+function diffuseProfile(pd,lamM,nu,mpb,xStartM,xEndM,n){
+  var out=[], dx=(xEndM-xStartM)/n, p=pd, i;
+  for(i=0;i<=n;i++){
+    out.push(p);
+    p -= (sigOf(p,lamM,nu,mpb)/EPS)*dx;
+    if(!isFinite(p)) p=0;
+    if(pd>0&&p<0) p=0;
+    if(pd<0&&p>0) p=0;
+  }
+  return out;
+}
+
+function plotDL(c,p0,lamM,pOHP,a,nu,mpb){
+  var W=520,H=340,L=58,Rr=18,Tp=22,B=48;
+  var lam=lamM*1e9;
+  var xmax=Math.max(3, Math.min(12, lam*3.2));   /* nm shown */
+  function X(x){ return L+x/xmax*(W-L-Rr); }
+  var pmax=0.42;
+  function Y(p){ return Tp+(pmax-p)/(2*pmax)*(H-Tp-B); }
+  var mono='font-family="IBM Plex Mono,monospace"';
+  var s="";
+
+  s+='<rect x="'+(L-26)+'" y="'+Tp+'" width="26" height="'+(H-Tp-B)+'" fill="var(--surface-2)"/>';
+  s+='<text x="'+(L-13)+'" y="'+(H-B+14)+'" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="9">M</text>';
+
+  s+='<line x1="'+L+'" y1="'+Y(0)+'" x2="'+(W-Rr)+'" y2="'+Y(0)+'" stroke="var(--line-2)" stroke-width="1.2"/>';
+  s+='<line x1="'+L+'" y1="'+Tp+'" x2="'+L+'" y2="'+(H-B)+'" stroke="var(--line-2)" stroke-width="1.2"/>';
+  for(var t=0;t<=xmax;t+=(xmax>6?2:1)){
+    s+='<line x1="'+X(t)+'" y1="'+Y(0)+'" x2="'+X(t)+'" y2="'+(Y(0)+4)+'" stroke="var(--line-2)"/>';
+    s+='<text x="'+X(t)+'" y="'+(Y(0)+16)+'" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="9">'+t+'</text>';
+  }
+  s+='<text x="'+((L+W-Rr)/2)+'" y="'+(H-14)+'" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="10">distance from the electrode / nm</text>';
+  s+='<text transform="rotate(-90 16 '+((Tp+H-B)/2)+')" x="16" y="'+((Tp+H-B)/2)+'" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="10">potential φ / V</text>';
+  [-0.4,-0.2,0,0.2,0.4].forEach(function(v){
+    s+='<text x="'+(L-6)+'" y="'+(Y(v)+3.5)+'" text-anchor="end" fill="var(--muted)" '+mono+' font-size="9">'+fmt(v,1)+'</text>';
+  });
+
+  function plane(x,label,col){
+    if(x>xmax) return "";
+    return '<line x1="'+X(x)+'" y1="'+Tp+'" x2="'+X(x)+'" y2="'+(H-B)+'" stroke="'+col+'" stroke-width="1" stroke-dasharray="3 3"/>'
+         + '<text x="'+X(x)+'" y="'+(Tp-6)+'" text-anchor="middle" fill="'+col+'" '+mono+' font-size="9.5">'+label+'</text>';
+  }
+  var dIHP=D_IHP*1e9, dOHP=D_OHP*1e9;
+  if(model==="G") s+=plane(dIHP,"IHP","var(--ox)");
+  if(!bare(model)) s+=plane(dOHP,"OHP","var(--red-)");
+
+  var pts=[], N=240, i, x, p;
+  var xStart=bare(model)?0:dOHP;
+  var prof=diffuseProfile(pOHP, lamM, nu, mpb,
+                          xStart*1e-9, xmax*1e-9, N);
+  for(i=0;i<=N;i++){
+    x=i/N*xmax;
+    if(model==="H"){
+      p = x<=dOHP ? p0*(1-x/dOHP) : 0;
+    }else if(bare(model)){
+      p = prof[i];
+    }else{
+      var pIHP;
+      if(model==="G"){
+        pIHP = p0 + (pOHP-p0)*(dIHP/dOHP) - a.s*p0*0.55;
+      }
+      if(x<=xStart){
+        if(model==="G"){
+          p = x<=dIHP ? p0+(pIHP-p0)*(x/dIHP)
+                      : pIHP+(pOHP-pIHP)*((x-dIHP)/(dOHP-dIHP));
+        }else{
+          p = p0+(pOHP-p0)*(x/dOHP);
+        }
+      }else{
+        var j=Math.round((x-xStart)/(xmax-xStart)*N);
+        p = prof[Math.max(0,Math.min(N,j))];
+      }
+    }
+    pts.push(X(x).toFixed(1)+","+Y(Math.max(-pmax,Math.min(pmax,p))).toFixed(1));
+  }
+  s+='<polyline points="'+pts.join(" ")+'" fill="none" stroke="var(--ox)" stroke-width="2.4"/>';
+
+  if(model!=="H"){
+    var x0=(bare(model)?0:dOHP), xl=x0+lam;
+    if(xl<xmax){
+      s+='<line x1="'+X(x0)+'" y1="'+(H-B-10)+'" x2="'+X(xl)+'" y2="'+(H-B-10)+'" stroke="var(--go)" stroke-width="1.5"/>';
+      s+='<text x="'+((X(x0)+X(xl))/2)+'" y="'+(H-B-15)+'" text-anchor="middle" fill="var(--go)" '+mono+' font-size="9.5">κ⁻¹ = '+fmt(lam,2)+' nm</text>';
+    }
+  }
+  document.getElementById("dlplot").innerHTML=s;
+}
+
+/* ---- differential capacitance against potential: the curve you can measure ----
+   Two curves, because the interesting one is usually hidden.  The diffuse layer
+   is what the model actually changes — its V, its camel, its runaway — but it
+   sits in series with the compact layer, and 1/C = 1/C_H + 1/C_d is dominated
+   by whichever is smaller.  With C_H near 20 uF/cm2 the diffuse structure is
+   almost entirely masked except in dilute solution, which is exactly why the
+   diffuse minimum is a low-concentration observation.  So the diffuse branch is
+   drawn dashed behind the solid series result. */
+function plotCD(c,p0,lamM,nu,a){
+  var W=520,H=300,L=58,Rr=18,Tp=20,B=52;
+  var pm=0.42, N=240, i, v;
+  var mpb=(model==="B");
+  var shift=(model==="G")? -a.s*0.12 : 0;     /* adsorbed anions move the pzc */
+
+  var tot=[], dif=[], maxTot=0;
+  for(i=0;i<=N;i++){
+    v=-pm+2*pm*i/N;
+    var ct=uF(cTotal(model,v-shift,lamM,nu));
+    var cd=(model==="H") ? NaN
+         : bare(model) ? uF(cTotal(model,v-shift,lamM,nu))
+         : uF(cdOf(solvePd(v-shift,lamM,nu,mpb),lamM,nu,mpb));
+    tot.push(ct); dif.push(cd);
+    if(isFinite(ct)) maxTot=Math.max(maxTot,ct);
+  }
+  /* Scale to the diffuse branch, not the series result.  All the structure the
+     models differ by lives in the diffuse curve, and it is one to two orders of
+     magnitude above C_H; scaling to the series result would flatten it against
+     the ceiling.  C_H sets the floor of the range so the measured curve still
+     has room to move. */
+  var cPzc=uF(EPS/lamM);
+  var cmaxPlot=Math.min(400,Math.max(40,1.8*uF(CH),4*cPzc));
+  if(model==="H") cmaxPlot=Math.min(200,Math.max(40,maxTot*1.6));
+
+  function X(x){ return L+(x+pm)/(2*pm)*(W-L-Rr); }
+  function Y(cv){ return Tp+(cmaxPlot-cv)/cmaxPlot*(H-Tp-B); }
+  var mono='font-family="IBM Plex Mono,monospace"';
+  var s="";
+  s+='<line x1="'+L+'" y1="'+Tp+'" x2="'+L+'" y2="'+(H-B)+'" stroke="var(--line-2)" stroke-width="1.2"/>';
+  s+='<line x1="'+L+'" y1="'+(H-B)+'" x2="'+(W-Rr)+'" y2="'+(H-B)+'" stroke="var(--line-2)" stroke-width="1.2"/>';
+  [-0.4,-0.2,0,0.2,0.4].forEach(function(t){
+    s+='<line x1="'+X(t)+'" y1="'+(H-B)+'" x2="'+X(t)+'" y2="'+(H-B+4)+'" stroke="var(--line-2)"/>';
+    s+='<text x="'+X(t)+'" y="'+(H-B+16)+'" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="9">'+fmt(t,1)+'</text>';
+  });
+  s+='<text x="'+((L+W-Rr)/2)+'" y="'+(H-24)+'" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="10">φ₀ relative to the pzc / V</text>';
+  for(i=0;i<=4;i++){
+    var cv=cmaxPlot*i/4;
+    s+='<line x1="'+(L-4)+'" y1="'+Y(cv)+'" x2="'+L+'" y2="'+Y(cv)+'" stroke="var(--line-2)"/>';
+    s+='<text x="'+(L-7)+'" y="'+(Y(cv)+3.5)+'" text-anchor="end" fill="var(--muted)" '+mono+' font-size="9">'+cv.toFixed(0)+'</text>';
+  }
+  s+='<text transform="rotate(-90 16 '+((Tp+H-B)/2)+')" x="16" y="'+((Tp+H-B)/2)+'" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="10">C / µF cm⁻²</text>';
+
+  if(!bare(model)&&uF(CH)<cmaxPlot){
+    s+='<line x1="'+L+'" y1="'+Y(uF(CH))+'" x2="'+(W-Rr)+'" y2="'+Y(uF(CH))+'" stroke="var(--red-)" stroke-width="1" stroke-dasharray="4 3"/>';
+    s+='<text x="'+(W-Rr)+'" y="'+(Y(uF(CH))-5)+'" text-anchor="end" fill="var(--red-)" '+mono+' font-size="9">C_H = '+fmt(uF(CH),0)+'</text>';
+  }
+  s+='<line x1="'+X(shift)+'" y1="'+Tp+'" x2="'+X(shift)+'" y2="'+(H-B)+'" stroke="var(--line)" stroke-width="1" stroke-dasharray="2 4"/>';
+  s+='<text x="'+(X(shift)+4)+'" y="'+(Tp+11)+'" fill="var(--muted)" '+mono+' font-size="9">pzc</text>';
+
+  function poly(arr,col,dash,wid){
+    var pts=[];
+    for(var k=0;k<=N;k++){
+      if(!isFinite(arr[k])) continue;
+      pts.push(X(-pm+2*pm*k/N).toFixed(1)+","+Y(Math.min(arr[k],cmaxPlot*1.03)).toFixed(1));
+    }
+    return pts.length ? '<polyline points="'+pts.join(" ")+'" fill="none" stroke="'+col+'" stroke-width="'+wid+'"'+dash+'/>' : "";
+  }
+  if(model!=="H"&&!bare(model)) s+=poly(dif,"var(--go)",' stroke-dasharray="5 4"',1.6);
+  s+=poly(tot,"var(--ox)","",2.4);
+
+  /* legend */
+  if(model!=="H"&&!bare(model)){
+    s+='<line x1="'+(L+8)+'" y1="'+(H-8)+'" x2="'+(L+30)+'" y2="'+(H-8)+'" stroke="var(--go)" stroke-width="1.6" stroke-dasharray="5 4"/>';
+    s+='<text x="'+(L+34)+'" y="'+(H-5)+'" fill="var(--go)" '+mono+' font-size="9">diffuse alone</text>';
+    s+='<line x1="'+(L+128)+'" y1="'+(H-8)+'" x2="'+(L+150)+'" y2="'+(H-8)+'" stroke="var(--ox)" stroke-width="2.4"/>';
+    s+='<text x="'+(L+154)+'" y="'+(H-5)+'" fill="var(--ox)" '+mono+' font-size="9">in series with C_H — what you measure</text>';
+  }
+
+  var pv=p0+shift, cvNow=uF(cTotal(model,p0,lamM,nu));
+  if(Math.abs(pv)<=pm){
+    var px=X(pv), py=Y(Math.min(cvNow,cmaxPlot));
+    s+='<line x1="'+L+'" y1="'+py+'" x2="'+px+'" y2="'+py+'" stroke="var(--red-)" stroke-width="1" stroke-dasharray="2 3"/>';
+    s+='<line x1="'+px+'" y1="'+(H-B)+'" x2="'+px+'" y2="'+py+'" stroke="var(--red-)" stroke-width="1" stroke-dasharray="2 3"/>';
+    s+='<circle cx="'+px+'" cy="'+py+'" r="5" fill="var(--red-)"/>';
+    var flip=px>W-Rr-64;
+    s+='<text x="'+(flip?px-9:px+9)+'" y="'+(py-9)+'" text-anchor="'+(flip?"end":"start")+'" fill="var(--red-)" '+mono+' font-size="10.5" font-weight="500">'+cvNow.toFixed(1)+'</text>';
+  }
+  document.getElementById("cdplot").innerHTML=s;
+}
+
+/* ================= CAPACITOR CV ================= */
+var nu=document.getElementById("nu"), cap=document.getElementById("cap"),
+    res=document.getElementById("res"), mass=document.getElementById("mass");
+[nu,cap,res,mass].forEach(function(el){ el.addEventListener("input",cv); });
+document.getElementById("ideal").addEventListener("click",function(){ res.value=0; cv(); });
+
+function cv(){
+  var v=Math.pow(10,+nu.value);      /* V/s */
+  var C=+cap.value/1000;             /* F  (slider is mF) */
+  var R=+res.value;                  /* ohm */
+  var m=+mass.value/1000;            /* g -> not used directly; slider is mg */
+  var mg=+mass.value;
+  var iPlateau=C*v;                  /* A */
+  var tau=R*C;                       /* s */
+  var Vwin=1.0;                      /* V window */
+  var half=Vwin/v;                   /* s per sweep */
+
+  document.getElementById("nuV").textContent = v>=0.1? fmt(v,2)+" V/s" : (v*1000).toFixed(0)+" mV/s";
+  document.getElementById("capV").textContent = cap.value+" mF";
+  document.getElementById("resV").textContent = res.value+" Ω";
+  document.getElementById("massV").textContent = mg+" mg";
+
+  document.getElementById("rI").textContent = (iPlateau*1000).toFixed(2)+" mA";
+  document.getElementById("rCs").textContent = (C/(mg/1000)).toFixed(1)+" F/g";
+  document.getElementById("rRC").textContent = tau<1 ? (tau*1000).toFixed(0)+" ms" : tau.toFixed(2)+" s";
+
+  document.getElementById("cvEq").innerHTML=
+    "i = C · dV/dt = C · ν<br>"
+   +"i = "+cap.value+" mF × "+(v>=0.1?fmt(v,2)+" V/s":(v*1000).toFixed(0)+" mV/s")
+   +" = <b>"+(iPlateau*1000).toFixed(2)+" mA</b><br>"
+   +"from a galvanostatic test instead:  C = i·Δt / ΔV";
+
+  var ratio=tau/half;
+  var vd=document.getElementById("cvVerdict");
+  if(ratio<0.02){
+    vd.className="verdict go";
+    vd.innerHTML="<b>Near-ideal rectangle.</b> RC is only "+(ratio*100).toFixed(1)+" % of the sweep time, so the current reaches its plateau almost the instant the potential reverses. This is what a good capacitor looks like.";
+  }else if(ratio<0.15){
+    vd.className="verdict flat";
+    vd.innerHTML="<b>Rounded corners.</b> RC is "+(ratio*100).toFixed(0)+" % of the sweep time. The current now takes a visible fraction of the scan to settle, so the box is losing its sharp edges — series resistance is beginning to show.";
+  }else{
+    vd.className="verdict stop";
+    vd.innerHTML="<b>Collapsing into a lens.</b> RC is "+(ratio*100).toFixed(0)+" % of the sweep time, so the double layer never finishes charging before the sweep turns around. Capacitance measured from this curve will read far too low — the electrode is not worse, your scan rate is.";
+  }
+  plotCV(v,C,R,iPlateau,tau,half,Vwin);
+}
+
+function plotCV(v,C,R,iP,tau,half,Vwin){
+  var W=520,H=320,L=56,Rr=18,Tp=20,B=46;
+  var imax=iP*1.45+1e-9;
+  function X(V){ return L+V/Vwin*(W-L-Rr); }
+  function Y(i){ return Tp+(imax-i)/(2*imax)*(H-Tp-B); }
+  var mono='font-family="IBM Plex Mono,monospace"';
+  var s="";
+  s+='<line x1="'+L+'" y1="'+Y(0)+'" x2="'+(W-Rr)+'" y2="'+Y(0)+'" stroke="var(--line-2)" stroke-width="1.2"/>';
+  s+='<line x1="'+L+'" y1="'+Tp+'" x2="'+L+'" y2="'+(H-B)+'" stroke="var(--line-2)" stroke-width="1.2"/>';
+  for(var t=0;t<=1.001;t+=0.25){
+    s+='<line x1="'+X(t)+'" y1="'+Y(0)+'" x2="'+X(t)+'" y2="'+(Y(0)+4)+'" stroke="var(--line-2)"/>';
+    s+='<text x="'+X(t)+'" y="'+(Y(0)+16)+'" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="9">'+t.toFixed(2)+'</text>';
+  }
+  s+='<text x="'+((L+W-Rr)/2)+'" y="'+(H-12)+'" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="10">potential / V</text>';
+  s+='<text transform="rotate(-90 15 '+((Tp+H-B)/2)+')" x="15" y="'+((Tp+H-B)/2)+'" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="10">current / mA</text>';
+  [imax,imax/2,0,-imax/2,-imax].forEach(function(i){
+    s+='<text x="'+(L-6)+'" y="'+(Y(i)+3.5)+'" text-anchor="end" fill="var(--muted)" '+mono+' font-size="9">'+(i*1000).toFixed(1)+'</text>';
+  });
+
+  /* steady-state series-RC response to a triangular sweep */
+  function branch(sign){
+    var pts=[], N=160;
+    for(var k=0;k<=N;k++){
+      var frac=k/N, t=frac*half, V=sign>0?frac*Vwin:(1-frac)*Vwin;
+      var i=sign*iP*(1-2*Math.exp(-t/(tau||1e-9)));
+      pts.push(X(V).toFixed(1)+","+Y(Math.max(-imax,Math.min(imax,i))).toFixed(1));
+    }
+    return pts.join(" ");
+  }
+  s+='<polyline points="'+branch(1)+'" fill="none" stroke="var(--ox)" stroke-width="2.2"/>';
+  s+='<polyline points="'+branch(-1)+'" fill="none" stroke="var(--red-)" stroke-width="2.2"/>';
+  s+='<text x="'+(W-Rr-4)+'" y="'+(Y(iP)-6)+'" text-anchor="end" fill="var(--ox)" '+mono+' font-size="9.5">forward</text>';
+  s+='<text x="'+(L+6)+'" y="'+(Y(-iP)+14)+'" fill="var(--red-)" '+mono+' font-size="9.5">reverse</text>';
+  document.getElementById("cvplot").innerHTML=s;
+}
+
+/* ================= CONCEPT CHECK ================= */
+var QZ=[
+ {q:"You dilute the supporting electrolyte from 0.1 M to 0.001 M. What happens to the Debye length?",
+  o:["It grows about ten-fold, from roughly 1 nm to roughly 10 nm",
+     "It shrinks about ten-fold",
+     "It is unchanged — it depends only on the electrode",
+     "It grows about a hundred-fold"],
+  a:0,
+  w:"κ⁻¹ ∝ 1/√c, so a hundred-fold dilution lengthens it ten-fold: 0.96 nm at 0.1 M becomes 9.6 nm at 0.001 M. This is why a <b>concentrated</b> supporting electrolyte is added — it compresses the diffuse layer so the potential drop sits where you want it, and it keeps migration from contributing to the current."},
+
+ {q:"What does the <b>Stern</b> model add to Gouy–Chapman?",
+  o:["It removes the diffuse layer entirely",
+     "It gives ions a finite size, so they cannot approach closer than the OHP",
+     "It adds specifically adsorbed ions at the inner Helmholtz plane",
+     "It makes the capacitance independent of concentration"],
+  a:1,
+  w:"Gouy–Chapman treats ions as point charges that can reach the surface, which makes it fail at high concentration. Stern reinstates the Helmholtz distance of closest approach and keeps the diffuse tail beyond it — the two layers then act as capacitors in <b>series</b>. Specific adsorption is Grahame's later addition, not Stern's."},
+
+ {q:"A student records a cyclic voltammogram, sees a large rectangular background current that grows in proportion to the scan rate, and concludes “the reaction at this electrode must be very fast”. Which belief is this?",
+  o:["Reading charging current as reaction current — non-faradaic current was attributed to chemistry",
+     "Linear-time diffusion — the diffusion layer was assumed to grow in proportion to time",
+     "Inverted electron ratio — moles of electrons were confused with moles of substance",
+     "Reference-frame arithmetic run backwards"],
+  a:0,
+  w:"A current that is flat with potential and proportional to ν is the double layer charging, <code>i = Cν</code>. It is not chemistry, and no amount of it says anything about a reaction rate. Faradaic peak currents grow as ν<sup>1/2</sup>, not as ν — that difference in exponent is how you tell the two apart, and it is worth committing to memory."},
+
+ {q:"In a cyclic voltammogram of an ideal capacitor with no reaction at all, what shape do you expect?",
+  o:["A pair of peaks, one on each sweep",
+     "A straight diagonal line through the origin",
+     "No current at all, since nothing reacts",
+     "A rectangle: current flat at ±Cν and flipping sign at each reversal"],
+  a:3,
+  w:"i = C·dV/dt, and on a linear sweep dV/dt is constant, so the current is constant too — flat on the way up, equal and opposite on the way back. A box. Note that current flows even though <b>no species reacts</b>: it is charge rearranging in the double layer."},
+
+ {q:"You raise the scan rate and the rectangular CV collapses into a lens shape. What does that mean?",
+  o:["The capacitor has been damaged by the fast sweep",
+     "RC is no longer small compared with the sweep time, so the double layer cannot finish charging",
+     "A faradaic reaction has started",
+     "The capacitance genuinely increased"],
+  a:1,
+  w:"The double layer charges with time constant RC. Sweep fast enough and it never reaches its plateau before the potential reverses, so the corners round and the box becomes a lens. The capacitance you calculate from such a curve is an <b>underestimate</b> — the electrode is unchanged, the measurement is simply too fast for it."},
+
+ {q:"A faradaic reaction at an electrode involves five steps. Which is usually the one that limits the current in a quiet solution?",
+  o:["Electron transfer at the surface",
+     "Adsorption of the reactant",
+     "Mass transport of reactant to and from the electrode",
+     "Desorption of the product"],
+  a:2,
+  w:"In an unstirred solution the reaction consumes species at the surface far faster than diffusion can resupply them across a diffusion layer of order 0.1 mm — five orders of magnitude thicker than the ~1 nm double layer. Electron transfer itself is usually fast. That separation of scales is what the next lectures are built on."}
+];
+
+var LETTERS="ABCD", STORE="ch40051-l4-check-v1";
+var picks=new Array(QZ.length).fill(-1);
+var sId=document.getElementById("sId"), elTally=document.getElementById("tally"),
+    elBar=document.getElementById("scorebar"), elScore=document.getElementById("scoreNum"),
+    elWho=document.getElementById("whoLine"), elIdHint=document.getElementById("idHint"),
+    dlBtn=document.getElementById("dlBtn"), dlHint=document.getElementById("dlHint");
+var startedAt=null, finishedAt=null;
+
+function save(){
+  try{ localStorage.setItem(STORE,JSON.stringify({i:sId.value,p:picks,s:startedAt,t:finishedAt})); }catch(e){}
+}
+function loadState(){
+  try{
+    var d=JSON.parse(localStorage.getItem(STORE)||"null");
+    if(d){ sId.value=d.i||""; if(Array.isArray(d.p)&&d.p.length===QZ.length) picks=d.p.slice();
+           startedAt=d.s||null; finishedAt=d.t||null; }
+  }catch(e){}
+}
+function started(){ return picks.some(function(p){return p>=0;}); }
+function code(str){
+  var h=0x811c9dc5;
+  for(var i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=(h+((h<<1)+(h<<4)+(h<<7)+(h<<8)+(h<<24)))>>>0; }
+  return ("0000000"+h.toString(16).toUpperCase()).slice(-8);
+}
+function scoreOf(){ var s=0; for(var i=0;i<QZ.length;i++) if(picks[i]===QZ[i].a) s++; return s; }
+function answered(){ return picks.filter(function(p){return p>=0;}).length; }
+
+function receipt(){
+  var s=scoreOf(), pct=Math.round(s/QZ.length*100), id=(sId.value||"").trim();
+  var stamp=finishedAt||new Date().toISOString();
+  var vc=code(id+"|"+stamp+"|"+picks.join(""));
+  var head=["lecture","student_id","completed_utc","score","total","percent","verification"];
+  var row=["L4",id,stamp,s,QZ.length,pct,vc];
+  for(var i=0;i<QZ.length;i++){ head.push("a"+(i+1)); row.push(picks[i]>=0?LETTERS[picks[i]]:"-"); }
+  for(var j=0;j<QZ.length;j++){ head.push("ok"+(j+1)); row.push(picks[j]===QZ[j].a?1:0); }
+  function cell(v){ v=String(v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
+  return {csv:head.join(",")+"\n"+row.map(cell).join(",")+"\n", vcode:vc, score:s, pct:pct, id:id};
+}
+
+function render(){
+  var done=answered(), all=(done===QZ.length);
+  elTally.textContent=done+" / "+QZ.length+" answered";
+  elBar.hidden=!all;
+  sId.readOnly=started();
+  elIdHint.innerHTML = all
+    ? "<strong>Attempt complete.</strong> Your answers are final. Every question now shows the correct answer and why — read them before you close this page."
+    : started() ? "<strong>Attempt in progress.</strong><span class=\"locked\">ID locked</span><br>Each answer is final."
+                : "<strong>One attempt.</strong> Enter your student ID before you begin — it locks once you answer the first question.";
+  if(all){
+    if(!finishedAt){ finishedAt=new Date().toISOString(); save(); }
+    var r=receipt();
+    elScore.innerHTML=r.score+' <small>/ '+QZ.length+'  ·  '+r.pct+' %</small>';
+    elWho.innerHTML="Student ID <b>"+esc(r.id||"—")+"</b> &nbsp;·&nbsp; Verification <b>"+r.vcode+"</b>";
+  }
+  for(var i=0;i<QZ.length;i++){
+    var box=document.querySelector('.opts[data-q="'+i+'"]');
+    var kids=[].slice.call(box.children), why=box.parentNode.querySelector(".why");
+    if(picks[i]<0){ kids.forEach(function(o){o.disabled=false;o.className="opt";}); why.hidden=true; }
+    else{
+      (function(qi){ kids.forEach(function(o,j){
+        o.disabled=true;
+        o.className="opt"+(j===QZ[qi].a?" right":(j===picks[qi]?" wrong":""));
+      }); })(i);
+      var _note=(picks[i]!==QZ[i].a)
+        ? '<span class="misc">You chose <b>'+LETTERS[picks[i]]+'</b>. '
+          + 'The correct answer is <b>'+LETTERS[QZ[i].a]+'</b>.</span>'
+        : "";
+      why.innerHTML=_note+QZ[i].w; why.hidden=false;
+    }
+  }
+}
+
+document.getElementById("quiz").innerHTML=QZ.map(function(item,i){
+  return '<div class="card q"><div class="card-b">'
+    +'<p class="stem"><b style="font-family:IBM Plex Mono,monospace;color:var(--muted);font-size:12px">Q'+(i+1)+'</b>  '+item.q+'</p>'
+    +'<div class="opts" data-q="'+i+'">'+item.o.map(function(o,j){
+        return '<button class="opt" data-i="'+j+'"><span class="ltr">'+LETTERS[j]+'</span><span>'+o+'</span></button>';
+      }).join("")+'</div><p class="why" hidden></p></div></div>';
+}).join("");
+
+[].slice.call(document.querySelectorAll(".opts")).forEach(function(box){
+  box.addEventListener("click",function(ev){
+    var b=ev.target.closest(".opt");
+    if(!b||b.disabled) return;
+    var qi=+box.getAttribute("data-q");
+    if(picks[qi]>=0) return;
+    if(!(sId.value||"").trim()){
+      elIdHint.innerHTML="<strong style=\"color:var(--stop)\">Enter your student ID first.</strong> It is written into the result file you submit.";
+      sId.focus(); return;
+    }
+    if(!startedAt) startedAt=new Date().toISOString();
+    picks[qi]=+b.getAttribute("data-i");
+    save(); render();
+  });
+});
+sId.addEventListener("input",save);
+
+dlBtn.addEventListener("click",function(){
+  var id=(sId.value||"").trim();
+  if(!id){ dlHint.textContent="Enter your student ID first — it goes into the file."; return; }
+  var r=receipt();
+  try{
+    var blob=new Blob([r.csv],{type:"text/csv;charset=utf-8"});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement("a");
+    a.href=url; a.download="CH40051-L4-check_"+id.replace(/[^A-Za-z0-9_-]/g,"")+".csv";
+    a.style.display="none";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(url);},1000);
+    dlHint.textContent="Saved. Hand it in as your instructor directs.";
+  }catch(e){
+    dlHint.textContent="Your browser blocked the download. Screenshot this panel and submit that instead.";
+  }
+});
+
+dl();
+cv();
+
+/* ---- submit straight to the course sheet ----------------------------------
+   Paste the Apps Script /exec URL between the quotes to switch this on.
+   Left empty, the button stays hidden and only the download exists.        */
+var SUBMIT_URL = "https://script.google.com/macros/s/AKfycbxPm7WrbttFu6-gnTi__IcUPt-816GthK0eI8TPuwOZyYlcRW3RAWJlmsr791moxBc5GA/exec";
+
+var sendBtn=document.getElementById("sendBtn");
+if(SUBMIT_URL){
+  sendBtn.hidden=false;
+  dlHint.textContent="Press Submit to send your result to the course. The download is a backup.";
+}
+
+sendBtn.addEventListener("click",function(){
+  var id=(sId.value||"").trim();
+  if(!id){ dlHint.textContent="Enter your student ID first."; return; }
+  var r=receipt();
+  var payload={
+    lecture:"L4", student_id:id, completed_utc:finishedAt||new Date().toISOString(),
+    score:r.score, total:QZ.length, percent:r.pct, verification:r.vcode,
+    answers:picks.map(function(p){ return p>=0?LETTERS[p]:"-"; }),
+    ok:picks.map(function(p,i){ return p===QZ[i].a?1:0; })
+  };
+  sendBtn.disabled=true;
+  dlHint.textContent="Sending...";
+
+  /* text/plain keeps this a simple request, so the browser sends it without
+     a preflight the Apps Script endpoint cannot answer */
+  fetch(SUBMIT_URL,{
+    method:"POST",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify(payload)
+  })
+  .then(function(res){ return res.json(); })
+  .then(function(j){
+    if(j && j.ok){
+      sendBtn.textContent="Submitted ✓";
+      dlHint.textContent="Recorded for student ID "+id+". You can close this page.";
+    }else{
+      throw new Error((j && j.error) || "rejected");
+    }
+  })
+  .catch(function(){
+    /* the response could not be read - resend blind so the record still lands,
+       then tell the student to keep the file as proof */
+    fetch(SUBMIT_URL,{method:"POST",mode:"no-cors",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(payload)}).catch(function(){});
+    sendBtn.disabled=false;
+    sendBtn.textContent="Submit to the course";
+    dlHint.textContent="Sent, but the confirmation did not come back. "
+      + "Download the file as well and keep it - it is your proof of submission.";
+  });
+});
+
+loadState();
+render();
+
+})();
+</script>
+</body>
+</html>
