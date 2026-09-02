@@ -146,13 +146,81 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
   </header>
 
   <div class="tabs" role="tablist">
-    <button class="tab" role="tab" aria-selected="true" aria-controls="p-dl" id="t-dl">Double Layer Models</button>
+    <button class="tab" role="tab" aria-selected="true" aria-controls="p-ions" id="t-ions">Charging vs Reacting</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-dl" id="t-dl">Double Layer Models</button>
     <button class="tab" role="tab" aria-selected="false" aria-controls="p-cv" id="t-cv">Capacitor CV</button>
     <button class="tab" role="tab" aria-selected="false" aria-controls="p-quiz" id="t-quiz">Concept Check</button>
   </div>
 
+  <!-- ============== CHARGING VS REACTING ============== -->
+  <section class="panel" id="p-ions" role="tabpanel" aria-labelledby="t-ions">
+    <div class="two">
+
+      <div class="stack">
+        <div class="card">
+          <div class="card-h"><h2>The sweep</h2></div>
+          <div class="card-b stack">
+            <div>
+              <span class="fld">What is in the solution</span>
+              <div class="pill-row" id="ivMode">
+                <button class="pill" data-r="0" aria-pressed="true">Inert salt only</button>
+                <button class="pill" data-r="1" aria-pressed="false">Add a redox couple</button>
+              </div>
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">Scan rate ν</span><span class="val" id="ivNuV"></span></div>
+              <input type="range" id="ivNu" min="-2" max="2" step="0.05" value="-1">
+            </div>
+            <div id="ivCwrap">
+              <div class="slider-row"><span class="fld" style="margin:0">Bulk [O]</span><span class="val" id="ivCV"></span></div>
+              <input type="range" id="ivC" min="0.1" max="10" step="0.1" value="1">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">Where in the sweep</span><span class="val" id="ivTV"></span></div>
+              <input type="range" id="ivScrub" min="0" max="150" step="1" value="0">
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="solid" id="ivPlay" type="button">Run the sweep</button>
+              <button class="ghost" id="ivReset" type="button">Back to the start</button>
+            </div>
+            <p style="margin:0;font-size:12px;color:var(--muted);line-height:1.6">
+              1 cm² electrode, C<sub>dl</sub> = 20 µF cm⁻², D = 10⁻⁵ cm² s⁻¹. The pzc sits 0.15 V above E°.
+            </p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h2>Which current is which</h2></div>
+          <div class="card-b">
+            <div class="readout"><span class="k">Charging, <em>C</em>ν<em>A</em></span><span class="v" id="ivRc">—</span></div>
+            <div class="readout"><span class="k">Faradaic peak, Randles–Ševčík</span><span class="v" id="ivRp">—</span></div>
+            <div class="readout"><span class="k">Peak ÷ charging</span><span class="v" id="ivRr">—</span></div>
+            <div class="readout"><span class="k">Diffusion layer, √(<em>Dt</em>)</span><span class="v" id="ivRd">—</span></div>
+            <div class="readout"><span class="k">Peak separation, Δ<em>E</em><sub>p</sub></span><span class="v" id="ivRdE">—</span></div>
+            <div class="readout"><span class="k">Now</span><span class="v" id="ivRnow">—</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stack">
+        <div class="card">
+          <div class="card-h"><h2>The voltammogram</h2><span class="note" id="ivCVnote"></span></div>
+          <div class="card-b scrollx"><svg id="ivcv" viewBox="0 0 520 280" width="520" height="280" style="margin:0 auto" role="img" aria-label="Cyclic voltammogram with the current position marked"></svg></div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>What the ions are doing</h2><span class="note">two views, 10 000× apart in scale</span></div>
+          <div class="card-b scrollx"><svg id="ivsurf" viewBox="0 0 520 300" width="520" height="300" style="margin:0 auto" role="img" aria-label="Ion arrangement in the double layer and the diffusion layer"></svg></div>
+        </div>
+        <div class="card">
+          <div class="card-b"><div class="verdict" id="ivVerdict"></div></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
   <!-- ============== DOUBLE LAYER ============== -->
-  <section class="panel" id="p-dl" role="tabpanel" aria-labelledby="t-dl">
+  <section class="panel" id="p-dl" role="tabpanel" aria-labelledby="t-dl" hidden>
     <div class="two">
 
       <div class="stack">
@@ -668,6 +736,340 @@ function plotCD(c,p0,lamM,nu,a){
   }
   document.getElementById("cdplot").innerHTML=s;
 }
+
+/* ================= CHARGING VS REACTING =================
+   Two things happen at an electrode during a sweep and they are easy to
+   confuse, so this panel runs both and shows where each one lives.
+
+   Charging is non-faradaic: no electron crosses the interface, the metal
+   simply takes on charge and the ions in the double layer rearrange to
+   screen it. It is over in nanoseconds and confined to about a nanometre.
+   Its current is C A dE/dt — flat, and proportional to the scan rate.
+
+   Reacting is faradaic: electrons cross, O is consumed at the surface, and
+   the depletion spreads outward by diffusion over the whole sweep, reaching
+   tens of micrometres. Its current peaks and then decays.
+
+   The faradaic part is not a formula here. The diffusion equation is
+   integrated explicitly on a grid with a Nernstian surface condition, which
+   is what makes the concentration profile in the lower panel real rather
+   than drawn: the current and the profile come out of the same calculation.
+
+   Sign convention: positive current is anodic, so sweeping down from the
+   positive limit gives negative charging current and negative faradaic
+   current together. */
+var IV = {
+  A: 1.0,            /* cm2   */
+  Cdl: 20e-6,        /* F/cm2 */
+  D: 1e-5,           /* cm2/s */
+  n: 1,
+  Espan: 0.35,       /* V either side of E0 */
+  Epzc: 0.15,        /* V above E0 */
+  NX: 200,
+  FRAMES: 150
+};
+
+var ivMode = 1, ivFrames = null, ivAnim = null, ivIdx = 0;
+var ivNu = document.getElementById('ivNu'),
+    ivC  = document.getElementById('ivC'),
+    ivScrub = document.getElementById('ivScrub'),
+    ivPlayBtn = document.getElementById('ivPlay');
+
+[].slice.call(document.querySelectorAll('#ivMode .pill')).forEach(function (b) {
+  b.addEventListener('click', function () {
+    ivMode = +b.getAttribute('data-r');
+    [].slice.call(document.querySelectorAll('#ivMode .pill')).forEach(function (o) {
+      o.setAttribute('aria-pressed', o === b ? 'true' : 'false');
+    });
+    ivBuild();
+  });
+});
+[ivNu, ivC].forEach(function (el) { el.addEventListener('input', ivBuild); });
+ivScrub.addEventListener('input', function () { ivStop(); ivIdx = +ivScrub.value; ivShow(); });
+ivPlayBtn.addEventListener('click', function () { if (ivAnim) ivStop(); else ivPlay(); });
+document.getElementById('ivReset').addEventListener('click', function () {
+  ivStop(); ivIdx = 0; ivScrub.value = 0; ivShow();
+});
+
+/**
+ * Explicit finite difference for semi-infinite linear diffusion of O and R,
+ * with the surface held at the Nernst ratio for the instantaneous potential.
+ *
+ * The surface condition comes from two statements: whatever O loses at the
+ * surface R gains, so C_O(0) + C_R(0) equals C_O(1) + C_R(1); and the couple
+ * is reversible, so C_O(0)/C_R(0) is exp(nF(E-E0)/RT). Solving the pair gives
+ * the two surface values directly, with no iteration.
+ */
+function ivSim(nu, cstar) {
+  var NX = IV.NX, lam = 0.4;
+  var ttot = 4 * IV.Espan / nu;                  /* down and back up */
+  var Lx = 6 * Math.sqrt(IV.D * ttot);
+  var dx = Lx / NX;
+  var NT = Math.ceil(ttot / (lam * dx * dx / IV.D));
+  var dt = ttot / NT;
+  lam = IV.D * dt / (dx * dx);                   /* recomputed: must stay < 0.5 */
+
+  var O = new Float64Array(NX + 1), R = new Float64Array(NX + 1);
+  var On = new Float64Array(NX + 1), Rn = new Float64Array(NX + 1);
+  var i, k;
+  for (i = 0; i <= NX; i++) { O[i] = cstar; R[i] = 0; }
+
+  var keep = Math.max(1, Math.floor(NT / IV.FRAMES));
+  var frames = [], iMax = 0;
+  /* the peaks are tracked at full time resolution, not from the stored
+     frames: 150 frames over a 1.4 V cycle resolve E only to about 9 mV,
+     which is enough to turn a 59 mV separation into 69 */
+  var pkC = 0, pkA = 0, EpC = 0, EpA = 0;
+
+  for (k = 0; k <= NT; k++) {
+    var t = k * dt;
+    var E = (t < ttot / 2) ? IV.Espan - nu * t
+                           : -IV.Espan + nu * (t - ttot / 2);
+    var dEdt = (t < ttot / 2) ? -nu : nu;
+
+    var th = Math.exp(IV.n * Fc * E / (Rg * T));
+    var S = O[1] + R[1];
+    O[0] = th * S / (1 + th);
+    R[0] = S / (1 + th);
+
+    /* anodic positive, so reduction (O consumed) comes out negative */
+    var iF = ivMode ? -IV.n * Fc * IV.A * IV.D * (O[1] - O[0]) / dx : 0;
+    var iC = IV.Cdl * IV.A * dEdt;
+
+    if (ivMode) {
+      if (iF < pkC) { pkC = iF; EpC = E; }
+      if (iF > pkA) { pkA = iF; EpA = E; }
+    }
+    if (k % keep === 0 || k === NT) {
+      var prof = new Float64Array(61);
+      for (i = 0; i <= 60; i++) prof[i] = O[Math.min(NX, i * 2)] / cstar;
+      frames.push({ E: E, iF: iF, iC: iC, t: t, prof: prof, dx: dx });
+      if (Math.abs(iF) > iMax) iMax = Math.abs(iF);
+    }
+
+    for (i = 1; i < NX; i++) {
+      On[i] = O[i] + lam * (O[i + 1] - 2 * O[i] + O[i - 1]);
+      Rn[i] = R[i] + lam * (R[i + 1] - 2 * R[i] + R[i - 1]);
+    }
+    On[0] = O[0]; Rn[0] = R[0];
+    On[NX] = cstar; Rn[NX] = 0;
+    var sw = O; O = On; On = sw;
+    sw = R; R = Rn; Rn = sw;
+  }
+  return { frames: frames, iPeak: iMax, ttot: ttot, Lx: Lx,
+           pkC: pkC, pkA: pkA, EpC: EpC, EpA: EpA };
+}
+
+/* fixed scatter so the dots do not shimmer from frame to frame */
+var ivDots = (function () {
+  var a = [], seed = 12345;
+  function rnd() { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; }
+  for (var i = 0; i < 220; i++) a.push({ x: rnd(), y: rnd(), r: rnd() });
+  return a;
+})();
+
+function ivBuild() {
+  var nu = Math.pow(10, +ivNu.value);          /* V/s */
+  var cstar = (+ivC.value) * 1e-6;             /* mol/cm3, slider is mM */
+  document.getElementById('ivCwrap').hidden = !ivMode;
+  ivFrames = ivSim(nu, cstar);
+  ivScrub.max = ivFrames.frames.length - 1;
+  if (ivIdx > ivScrub.max) ivIdx = 0;
+  ivScrub.value = ivIdx;
+  ivShow();
+}
+
+function ivStop() {
+  if (ivAnim) { cancelAnimationFrame(ivAnim); ivAnim = null; ivPlayBtn.textContent = 'Run the sweep'; }
+}
+function ivPlay() {
+  ivPlayBtn.textContent = 'Stop';
+  if (ivIdx >= ivFrames.frames.length - 1) ivIdx = 0;
+  var step = function () {
+    ivIdx++;
+    if (ivIdx >= ivFrames.frames.length) { ivIdx = ivFrames.frames.length - 1; ivShow(); ivStop(); return; }
+    ivScrub.value = ivIdx;
+    ivShow();
+    ivAnim = requestAnimationFrame(step);
+  };
+  ivAnim = requestAnimationFrame(step);
+}
+
+function ivShow() {
+  var f = ivFrames.frames[ivIdx];
+  var nu = Math.pow(10, +ivNu.value);
+  var cstar = (+ivC.value) * 1e-6;
+  var iC = IV.Cdl * IV.A * nu;                                   /* magnitude */
+  var iP = ivMode ? 2.69e5 * Math.pow(IV.n, 1.5) * IV.A
+                    * Math.sqrt(IV.D) * cstar * Math.sqrt(nu) : 0;
+  var delta = Math.sqrt(IV.D * Math.max(f.t, 1e-9)) * 1e4;       /* um */
+
+  document.getElementById('ivNuV').textContent =
+    nu >= 1 ? fmt(nu, 2) + ' V/s' : fmt(nu * 1000, 0) + ' mV/s';
+  document.getElementById('ivCV').textContent = fmt(+ivC.value, 1) + ' mM';
+  document.getElementById('ivTV').textContent = fmt(f.E, 3) + ' V vs E°';
+  document.getElementById('ivRc').textContent = fmt(iC * 1e6, 1) + ' µA';
+  document.getElementById('ivRp').textContent = ivMode ? fmt(iP * 1e6, 0) + ' µA' : '— (no couple)';
+  document.getElementById('ivRr').textContent = ivMode ? fmt(iP / iC, 0) + ' ×' : '—';
+  document.getElementById('ivRd').textContent = fmt(delta, 1) + ' µm';
+  document.getElementById('ivRdE').textContent = ivMode
+    ? fmt((ivFrames.EpA - ivFrames.EpC) * 1000, 0) + ' mV  (59 if reversible)'
+    : '— (no couple)';
+
+  var tot = f.iF + f.iC;
+  var far = Math.abs(f.iF) > Math.abs(f.iC);
+  document.getElementById('ivRnow').textContent =
+    fmt(tot * 1e6, 1) + ' µA · ' + (ivMode ? (far ? 'faradaic' : 'charging') : 'charging');
+
+  var v = document.getElementById('ivVerdict');
+  if (!ivMode) {
+    v.className = 'verdict flat';
+    v.innerHTML = 'Nothing reacts. The current is <b>' + fmt(iC * 1e6, 1) + ' µA</b> of charging '
+      + 'and it does not care where in the window you are — only which way you are going. '
+      + 'The ions rearrange within a nanometre of the metal and nothing moves in the bulk, '
+      + 'which is why the lower panel is empty.';
+  } else if (far) {
+    v.className = 'verdict go';
+    v.innerHTML = '<b>Faradaic.</b> Electrons are crossing. O is being consumed at the surface '
+      + 'faster than diffusion can replace it, so the depletion has spread <b>' + fmt(delta, 1)
+      + ' µm</b> — about ' + fmt(delta * 1000, 0) + ' times the thickness of the double layer above it.';
+  } else {
+    v.className = 'verdict stop';
+    v.innerHTML = 'Charging dominates here: the potential is too far from E° for the couple to '
+      + 'react, so all that flows is the <b>' + fmt(iC * 1e6, 1) + ' µA</b> needed to move charge '
+      + 'onto the metal. This is the flat background a voltammogram sits on.';
+  }
+  document.getElementById('ivCVnote').textContent =
+    ivMode ? 'charging plus reaction' : 'charging only — a featureless box';
+
+  ivPlotCV();
+  ivPlotSurf(f, cstar);
+}
+
+function ivPlotCV() {
+  var W = 520, H = 280, L = 62, Rr = 18, Tp = 18, B = 46;
+  var fr = ivFrames.frames, mono = 'font-family="IBM Plex Mono,monospace"';
+  var lo = 0, hi = 0, i;
+  for (i = 0; i < fr.length; i++) {
+    var y = fr[i].iF + fr[i].iC;
+    if (y < lo) lo = y; if (y > hi) hi = y;
+  }
+  var pad = Math.max(1e-7, (hi - lo) * 0.15);
+  lo -= pad; hi += pad;
+  function X(e) { return L + (e + IV.Espan) / (2 * IV.Espan) * (W - L - Rr); }
+  function Y(c) { return Tp + (hi - c) / (hi - lo) * (H - Tp - B); }
+  var s = '';
+  s += '<line x1="' + L + '" y1="' + Y(0) + '" x2="' + (W - Rr) + '" y2="' + Y(0) + '" stroke="var(--line-2)" stroke-width="1.2"/>';
+  s += '<line x1="' + L + '" y1="' + Tp + '" x2="' + L + '" y2="' + (H - B) + '" stroke="var(--line-2)" stroke-width="1.2"/>';
+  [-0.3, -0.15, 0, 0.15, 0.3].forEach(function (e) {
+    s += '<line x1="' + X(e) + '" y1="' + Y(0) + '" x2="' + X(e) + '" y2="' + (Y(0) + 4) + '" stroke="var(--line-2)"/>';
+    s += '<text x="' + X(e) + '" y="' + (Y(0) + 15) + '" text-anchor="middle" fill="var(--muted)" ' + mono + ' font-size="9">' + fmt(e, 2) + '</text>';
+  });
+  s += '<text x="' + ((L + W - Rr) / 2) + '" y="' + (H - 8) + '" text-anchor="middle" fill="var(--muted)" ' + mono + ' font-size="10">E − E° / V</text>';
+  for (i = 0; i <= 4; i++) {
+    var cv = lo + (hi - lo) * i / 4;
+    s += '<line x1="' + (L - 4) + '" y1="' + Y(cv) + '" x2="' + L + '" y2="' + Y(cv) + '" stroke="var(--line-2)"/>';
+    s += '<text x="' + (L - 7) + '" y="' + (Y(cv) + 3.5) + '" text-anchor="end" fill="var(--muted)" ' + mono + ' font-size="9">' + fmt(cv * 1e6, 0) + '</text>';
+  }
+  s += '<text transform="rotate(-90 15 ' + ((Tp + H - B) / 2) + ')" x="15" y="' + ((Tp + H - B) / 2) + '" text-anchor="middle" fill="var(--muted)" ' + mono + ' font-size="10">current / µA  (anodic +)</text>';
+
+  /* the pzc: where the metal carries no charge and the ions swap sides */
+  s += '<line x1="' + X(IV.Epzc) + '" y1="' + Tp + '" x2="' + X(IV.Epzc) + '" y2="' + (H - B) + '" stroke="var(--go)" stroke-width="1" stroke-dasharray="3 3"/>';
+  s += '<text x="' + (X(IV.Epzc) + 4) + '" y="' + (Tp + 11) + '" fill="var(--go)" ' + mono + ' font-size="9">pzc</text>';
+
+  /* charging alone, so the faradaic part is visibly what sits on top of it */
+  if (ivMode) {
+    var pts0 = [];
+    for (i = 0; i < fr.length; i++) pts0.push(X(fr[i].E).toFixed(1) + ',' + Y(fr[i].iC).toFixed(1));
+    s += '<polyline points="' + pts0.join(' ') + '" fill="none" stroke="var(--line-2)" stroke-width="1.4" stroke-dasharray="4 3"/>';
+  }
+  var pts = [];
+  for (i = 0; i < fr.length; i++) pts.push(X(fr[i].E).toFixed(1) + ',' + Y(fr[i].iF + fr[i].iC).toFixed(1));
+  s += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="var(--ox)" stroke-width="2.2"/>';
+
+  var f = fr[ivIdx], px = X(f.E), py = Y(f.iF + f.iC);
+  s += '<circle cx="' + px + '" cy="' + py + '" r="5.5" fill="var(--red-)"/>';
+  document.getElementById('ivcv').innerHTML = s;
+}
+
+function ivPlotSurf(f, cstar) {
+  var W = 520, H = 300, mono = 'font-family="IBM Plex Mono,monospace"';
+  var s = '';
+  var mx = 46;                                  /* metal slab width */
+
+  /* ---------- upper strip: the double layer, about a nanometre ---------- */
+  var y0 = 26, hgt = 96;
+  var sig = IV.Cdl * (f.E - IV.Epzc);           /* C/cm2, sign = metal charge */
+  var neg = sig < 0;
+  var frac = Math.min(1, Math.abs(sig) / (IV.Cdl * IV.Espan));
+
+  s += '<text x="8" y="16" fill="var(--muted)" ' + mono + ' font-size="9.5" letter-spacing="0.08em">THE DOUBLE LAYER — a nanometre</text>';
+  s += '<rect x="0" y="' + y0 + '" width="' + mx + '" height="' + hgt + '" fill="var(--surface-2)"/>';
+  s += '<rect x="' + mx + '" y="' + y0 + '" width="' + (W - mx) + '" height="' + hgt + '" fill="var(--red-soft)" opacity="0.45"/>';
+  s += '<text x="' + (mx / 2) + '" y="' + (y0 + hgt + 13) + '" text-anchor="middle" fill="var(--muted)" ' + mono + ' font-size="9">metal</text>';
+
+  /* charge written on the metal face */
+  var nq = Math.round(frac * 7);
+  for (var q = 0; q < nq; q++) {
+    var qy = y0 + 12 + q * (hgt - 24) / Math.max(1, nq - 1 || 1);
+    s += '<text x="' + (mx - 8) + '" y="' + (qy + 4) + '" text-anchor="end" fill="' + (neg ? 'var(--red-)' : 'var(--ox)') + '" ' + mono + ' font-size="11" font-weight="600">' + (neg ? '−' : '+') + '</text>';
+  }
+
+  /* counter-ions pressed against the metal, co-ions pushed back */
+  var nIon = Math.round(3 + frac * 16);
+  for (var i = 0; i < nIon; i++) {
+    var d = ivDots[i];
+    var ix = mx + 10 + d.x * 46 * (1 - 0.45 * frac);
+    var iy = y0 + 8 + d.y * (hgt - 16);
+    s += '<circle cx="' + ix.toFixed(1) + '" cy="' + iy.toFixed(1) + '" r="6" fill="' + (neg ? 'var(--ox)' : 'var(--red-)') + '" opacity="0.85"/>';
+    s += '<text x="' + ix.toFixed(1) + '" y="' + (iy + 3.5).toFixed(1) + '" text-anchor="middle" fill="var(--surface)" ' + mono + ' font-size="9" font-weight="600">' + (neg ? '+' : '−') + '</text>';
+  }
+  for (i = 0; i < 10; i++) {
+    var e = ivDots[i + 30];
+    var ex = mx + 120 + e.x * (W - mx - 150);
+    var ey = y0 + 8 + e.y * (hgt - 16);
+    s += '<circle cx="' + ex.toFixed(1) + '" cy="' + ey.toFixed(1) + '" r="5" fill="var(--line-2)" opacity="0.7"/>';
+  }
+  s += '<text x="' + (W - 8) + '" y="' + (y0 + hgt + 13) + '" text-anchor="end" fill="var(--muted)" ' + mono + ' font-size="9">'
+     + (Math.abs(sig) < 1e-9 ? 'at the pzc — no charge, no crowding'
+        : (neg ? 'metal negative — cations crowd in' : 'metal positive — anions crowd in')) + '</text>';
+
+  /* ---------- lower strip: the diffusion layer, tens of micrometres ---------- */
+  var y1 = 168, h1 = 88;
+  s += '<text x="8" y="' + (y1 - 10) + '" fill="var(--muted)" ' + mono + ' font-size="9.5" letter-spacing="0.08em">THE DIFFUSION LAYER — a hundred micrometres</text>';
+  s += '<rect x="0" y="' + y1 + '" width="' + mx + '" height="' + h1 + '" fill="var(--surface-2)"/>';
+  s += '<rect x="' + mx + '" y="' + y1 + '" width="' + (W - mx) + '" height="' + h1 + '" fill="var(--red-soft)" opacity="0.25"/>';
+
+  if (!ivMode) {
+    s += '<text x="' + ((W + mx) / 2) + '" y="' + (y1 + h1 / 2 + 4) + '" text-anchor="middle" fill="var(--muted)" ' + mono + ' font-size="10">nothing reacts, so nothing is consumed — the bulk never notices</text>';
+  } else {
+    /* dots thinned in proportion to the local concentration of O */
+    for (i = 0; i < ivDots.length; i++) {
+      var p = ivDots[i];
+      var xf = p.x;
+      var c = f.prof[Math.min(60, Math.round(xf * 60))];
+      if (p.r > c) continue;                    /* this one has been consumed */
+      var dxp = mx + 6 + xf * (W - mx - 12);
+      var dyp = y1 + 6 + p.y * (h1 - 12);
+      s += '<circle cx="' + dxp.toFixed(1) + '" cy="' + dyp.toFixed(1) + '" r="3.4" fill="var(--ox)" opacity="0.8"/>';
+    }
+    /* and the profile drawn over them */
+    var pp = [];
+    for (i = 0; i <= 60; i++) {
+      pp.push((mx + 6 + (i / 60) * (W - mx - 12)).toFixed(1) + ','
+            + (y1 + h1 - 6 - f.prof[i] * (h1 - 14)).toFixed(1));
+    }
+    s += '<polyline points="' + pp.join(' ') + '" fill="none" stroke="var(--red-)" stroke-width="2"/>';
+    s += '<text x="' + (W - 8) + '" y="' + (y1 + 14) + '" text-anchor="end" fill="var(--red-)" ' + mono + ' font-size="9">[O] / [O]bulk</text>';
+    s += '<text x="' + (mx + 8) + '" y="' + (y1 + h1 - 8) + '" fill="var(--muted)" ' + mono + ' font-size="9">surface</text>';
+  }
+  s += '<text x="' + (W - 8) + '" y="' + (y1 + h1 + 14) + '" text-anchor="end" fill="var(--muted)" ' + mono + ' font-size="9">'
+     + (ivFrames.Lx * 1e4).toFixed(0) + ' µm across</text>';
+
+  document.getElementById('ivsurf').innerHTML = s;
+}
+
+ivBuild();
 
 /* ================= CAPACITOR CV ================= */
 var nu=document.getElementById("nu"), cap=document.getElementById("cap"),

@@ -146,79 +146,20 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
     <div style="flex:1 1 380px">
       <p class="eyebrow"><a href="index.html">CH40051 Electroanalytical Chemistry</a> · Lecture 2 · Potentials</p>
       <h1>Potential Explorer</h1>
-      <p class="sub">Lecture 1 held everything at standard state. Start from the electron's point of view — what "applying a potential" actually does to an electrode — then leave standard state behind and watch E move: in one couple, in a cell with no driving chemistry at all, and in the cell that started the whole subject.</p>
+      <p class="sub">Lecture 1 held everything at standard state. Here you leave it and watch E move: in one couple, in a cell with no driving chemistry at all, and in the cell that started the whole subject. Then switch to the electron's point of view and see what "applying a potential" actually does to an electrode.</p>
     </div>
   </header>
 
   <div class="tabs" role="tablist">
-    <button class="tab" role="tab" aria-selected="true" aria-controls="p-fermi" id="t-fermi">Fermi Level &amp; Sweep</button>
-    <button class="tab" role="tab" aria-selected="false" aria-controls="p-nernst" id="t-nernst">Nernst Explorer</button>
+    <button class="tab" role="tab" aria-selected="true" aria-controls="p-nernst" id="t-nernst">Nernst Explorer</button>
     <button class="tab" role="tab" aria-selected="false" aria-controls="p-conc" id="t-conc">Concentration Cell</button>
     <button class="tab" role="tab" aria-selected="false" aria-controls="p-dan" id="t-dan">Daniell Cell · E vs discharge</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-fermi" id="t-fermi">Fermi Level &amp; Sweep</button>
     <button class="tab" role="tab" aria-selected="false" aria-controls="p-quiz" id="t-quiz">Concept Check</button>
   </div>
 
-  <!-- ================= FERMI ================= -->
-  <section class="panel" id="p-fermi" role="tabpanel" aria-labelledby="t-fermi">
-    <div class="grid3">
-
-      <div class="stack">
-        <div class="card">
-          <div class="card-h"><h2>The experiment</h2></div>
-          <div class="card-b stack">
-            <div>
-              <label class="fld" for="fc">Couple in solution</label>
-              <select id="fc"></select>
-            </div>
-            <div>
-              <div class="slider-row"><span class="fld" style="margin:0">Applied potential</span><span class="val" id="valE"></span></div>
-              <input type="range" id="fE" min="-3.6" max="2.4" step="0.01" value="0">
-            </div>
-            <button class="ghost" id="toEq" type="button">Set to equilibrium (η = 0)</button>
-            <button class="solid" id="stepBtn" type="button">Step the potential &amp; watch the current</button>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-h"><h2>Work functions</h2><span class="note">vacuum reference</span></div>
-          <div class="card-b">
-            <div class="wf" id="wfList"></div>
-            <p class="hint">These are <strong>surface</strong> properties measured against vacuum, and they are not the same thing as an electrode potential. An electrode potential is the Fermi level referred to a redox couple in solution — usually H⁺/H₂. Changing a surface coating changes W without moving the bulk E<sub>F</sub>.</p>
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <div class="card">
-          <div class="card-h"><h2>Electron energy</h2><span class="note">raise E<sub>F</sub> and electrons fall into solution</span></div>
-          <div class="card-b scrollx"><svg id="fplot" viewBox="0 0 380 380" width="380" height="380" style="margin:0 auto" role="img" aria-label="Energy level diagram of the electrode Fermi level against the solution redox level"></svg></div>
-        </div>
-      </div>
-
-      <div class="c3 stack">
-        <div class="card">
-          <div class="card-h"><h2>What is happening</h2></div>
-          <div class="card-b stack" style="gap:12px">
-            <div class="verdict" id="fVerdict"></div>
-            <div class="readout"><span class="k">Equilibrium potential</span><span class="v" id="fEeq">—</span></div>
-            <div class="readout"><span class="k">Applied potential</span><span class="v" id="fEapp">—</span></div>
-            <div class="readout"><span class="k">Overpotential η</span><span class="v" id="fEta">—</span></div>
-            <div class="readout"><span class="k">E<sub>F</sub> vs vacuum</span><span class="v" id="fEf">—</span></div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-h"><h2>Current after a potential step</h2><span class="note">two currents, not one</span></div>
-          <div class="card-b scrollx">
-            <svg id="iplot" viewBox="0 0 340 170" width="340" height="170" role="img" aria-label="Current against time after a potential step"></svg>
-            <p class="hint" id="iNote">Press the step button to charge the double layer.</p>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
   <!-- ================= NERNST ================= -->
-  <section class="panel" id="p-nernst" role="tabpanel" aria-labelledby="t-nernst" hidden>
+  <section class="panel" id="p-nernst" role="tabpanel" aria-labelledby="t-nernst">
     <div class="grid3">
 
       <div class="stack">
@@ -243,13 +184,6 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
             </div>
             <button class="ghost" id="resetN" type="button">Back to standard state</button>
             <p class="hint" style="margin:0">The sliders are labelled as concentrations, but the quantity the equation actually wants is the <strong>activity</strong>. See the note below.</p>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-h"><h2>Activities, not concentrations</h2><span class="note">what the log term really contains</span></div>
-          <div class="card-b" style="font-size:13px;color:var(--ink-2);line-height:1.7">
-            The Nernst equation is written in terms of <strong>activities</strong>: <em>E</em> = <em>E</em>° + (2.303<em>RT</em>/<em>nF</em>) log(<em>a</em><sub>O</sub>/<em>a</em><sub>R</sub>), where <em>a</em> = γ·<em>c</em>/<em>c</em>° and γ is the activity coefficient. On this page, <strong>activities are approximated by concentrations</strong> — that is, γ ≈ 1 — purely for simplicity.
-            That approximation is decent in dilute solution and gets worse as the solution becomes concentrated or the ions more highly charged, where γ can fall well below 1 and shift <em>E</em> by tens of millivolts. So read every number here as an idealised value, not a prediction for a real 1 M solution.
           </div>
         </div>
         <div class="card">
@@ -294,6 +228,14 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
           <div class="card-b stack" style="gap:11px">
             <div class="eqline" id="nEq"></div>
             <div class="verdict flat" id="nNote"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h2>Activities, not concentrations</h2><span class="note">what the log term really contains</span></div>
+          <div class="card-b" style="font-size:13px;color:var(--ink-2);line-height:1.7">
+            The Nernst equation is written in terms of <strong>activities</strong>: <em>E</em> = <em>E</em>° + (2.303<em>RT</em>/<em>nF</em>) log(<em>a</em><sub>O</sub>/<em>a</em><sub>R</sub>), where <em>a</em> = γ·<em>c</em>/<em>c</em>° and γ is the activity coefficient. On this page, <strong>activities are approximated by concentrations</strong> — that is, γ ≈ 1 — purely for simplicity.
+            That approximation is decent in dilute solution and gets worse as the solution becomes concentrated or the ions more highly charged, where γ can fall well below 1 and shift <em>E</em> by tens of millivolts. So read every number here as an idealised value, not a prediction for a real 1 M solution.
           </div>
         </div>
       </div>
@@ -384,11 +326,11 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
             </div>
             <div>
               <div class="slider-row"><span class="fld" style="margin:0">Starting [Zn²⁺]</span><span class="val" id="valdZn"></span></div>
-              <input type="range" id="dZn" min="-3" max="0.3" step="0.05" value="0">
+              <input type="range" id="dZn" min="-3" max="0.3" step="0.05" value="-3">
             </div>
             <div>
               <div class="slider-row"><span class="fld" style="margin:0">Starting [Cu²⁺]</span><span class="val" id="valdCu"></span></div>
-              <input type="range" id="dCu" min="-3" max="0.3" step="0.05" value="0">
+              <input type="range" id="dCu" min="-3" max="0.3" step="0.05" value="-3">
             </div>
             <div>
               <div class="slider-row"><span class="fld" style="margin:0">Temperature</span><span class="val" id="valdT"></span></div>
@@ -448,6 +390,71 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
           <div class="card-b stack" style="gap:11px">
             <div class="eqline" id="dK"></div>
             <p style="margin:0;font-size:12.5px;color:var(--muted);line-height:1.6">Raising T shrinks this log K, but only because the slope grew — E° is held fixed here. A real K also moves with the reaction's own ΔH°, which this page does not model.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= FERMI ================= -->
+  <section class="panel" id="p-fermi" role="tabpanel" aria-labelledby="t-fermi" hidden>
+    <div class="grid3">
+
+      <div class="stack">
+        <div class="card">
+          <div class="card-h"><h2>The experiment</h2></div>
+          <div class="card-b stack">
+            <div>
+              <label class="fld" for="fc">Couple in solution</label>
+              <select id="fc"></select>
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">Applied potential</span><span class="val" id="valE"></span></div>
+              <input type="range" id="fE" min="-3.6" max="2.4" step="0.01" value="0">
+            </div>
+            <button class="ghost" id="toEq" type="button">Set to equilibrium (η = 0)</button>
+            <button class="solid" id="stepBtn" type="button">Step the potential &amp; watch the current</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>Work functions</h2><span class="note">vacuum reference</span></div>
+          <div class="card-b">
+            <div class="wf" id="wfList"></div>
+            <p class="hint">These are <strong>surface</strong> properties measured against vacuum, and they are not the same thing as an electrode potential. An electrode potential is the Fermi level referred to a redox couple in solution — usually H⁺/H₂. Changing a surface coating changes W without moving the bulk E<sub>F</sub>.</p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <div class="card-h"><h2>Electron energy</h2><span class="note">raise E<sub>F</sub> and electrons fall into solution</span></div>
+          <div class="card-b scrollx"><svg id="fplot" viewBox="0 0 380 380" width="380" height="380" style="margin:0 auto" role="img" aria-label="Energy level diagram of the electrode Fermi level against the solution redox level"></svg></div>
+        </div>
+      </div>
+
+      <div class="c3 stack">
+        <div class="card">
+          <div class="card-h"><h2>What is happening</h2></div>
+          <div class="card-b stack" style="gap:12px">
+            <div class="verdict" id="fVerdict"></div>
+            <div class="readout"><span class="k">Equilibrium potential</span><span class="v" id="fEeq">—</span></div>
+            <div class="readout"><span class="k">Applied potential</span><span class="v" id="fEapp">—</span></div>
+            <div class="readout"><span class="k">Overpotential η</span><span class="v" id="fEta">—</span></div>
+            <div class="readout"><span class="k">E<sub>F</sub> vs vacuum</span><span class="v" id="fEf">—</span></div>
+            <div class="eqline" id="fEtaEq"></div>
+            <p style="margin:0;font-size:12.5px;color:var(--ink-2);line-height:1.7">
+              η is not a potential in its own right — it is the <strong>distance from equilibrium</strong>, and it only exists relative to a couple. At η = 0 the interface is not idle: oxidation and reduction both run, at equal rates, so nothing appears in the wire. Making η negative raises E<sub>F</sub> above the couple's level and reduction outruns oxidation; making it positive does the reverse.
+              <br><br>
+              Its <em>size</em> sets the rate. The faradaic current grows by roughly a decade for every <strong>120 mV</strong> of η, which is why the useful range is a few hundred millivolts wide rather than a few volts — and why the counter electrode in Lecture 3 needs its own η to carry the same current.
+            </p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>Current after a potential step</h2><span class="note">two currents, not one</span></div>
+          <div class="card-b scrollx">
+            <svg id="iplot" viewBox="0 0 340 170" width="340" height="170" role="img" aria-label="Current against time after a potential step"></svg>
+            <p class="hint" id="iNote">Press the step button to charge the double layer.</p>
           </div>
         </div>
       </div>
@@ -629,17 +636,29 @@ function nplot2(c,slope,ratio,E){
     pts.push(X(r).toFixed(1)+","+Y(v).toFixed(1));
   }
   s+='<polyline points="'+pts.join(" ")+'" fill="none" stroke="var(--ox)" stroke-width="2.2"/>';
-  /* where the sliders are — the ratio can easily run off a linear axis */
+  /* Where the sliders are.  This is the axis that runs out: the frame holds
+     ratios from 0.01 to 10, while the concentration sliders reach 1e-7 and
+     1e7 between them.  An off-scale point is therefore common, so it is
+     pinned to the edge it left through and given an arrow rather than simply
+     vanishing — a point that disappears reads as a broken plot, where a point
+     pressed against the edge reads as the axis being too short, which is the
+     whole reason this panel sits next to the log one. */
   var rr=Math.pow(10,ratio);
-  if(rr<=RMAX && E>=ymin){
-    var px=X(rr), py=Y(E);
+  var rtxt=(rr>=0.01&&rr<1000)?fmt(rr,2):rr.toExponential(1);
+  var inX=(rr<=RMAX), inY=(E>=ymin&&E<=ymax);
+  var px=X(Math.min(rr,RMAX)), py=Y(Math.max(ymin,Math.min(ymax,E)));
+  if(inX&&inY){
     s+='<circle cx="'+px+'" cy="'+py+'" r="5" fill="var(--red-)"/>';
     var flip=px>W-Rr-70;
-    s+='<text x="'+(flip?px-9:px+9)+'" y="'+(py+16)+'" text-anchor="'+(flip?"end":"start")+'" fill="var(--red-)" '+mono+' font-size="10.5" font-weight="500">'+(rr<0.01?rr.toExponential(1):fmt(rr,2))+'</text>';
+    s+='<text x="'+(flip?px-9:px+9)+'" y="'+(py+16)+'" text-anchor="'+(flip?"end":"start")+'" fill="var(--red-)" '+mono+' font-size="10.5" font-weight="500">'+rtxt+'</text>';
   }else{
-    var off=rr>RMAX;
-    var rtxt=(rr>=0.01&&rr<1000)?fmt(rr,2):rr.toExponential(1);
-    s+='<text x="'+(off?W-Rr-4:L+6)+'" y="'+(off?Tp+14:H-B-8)+'" text-anchor="'+(off?"end":"start")+'" fill="var(--red-)" '+mono+' font-size="9.5">ratio = '+rtxt+' — '+(off?"past the right edge":"below the floor")+'</text>';
+    /* off the right edge if the ratio is too big, off the bottom if too small */
+    var right=!inX;
+    var tx=right?(W-Rr-7):px, ty=right?py:(H-B-7);
+    var tri=right ? (tx+7)+","+ty+" "+(tx-4)+","+(ty-6)+" "+(tx-4)+","+(ty+6)
+                  : tx+","+(ty+7)+" "+(tx-6)+","+(ty-4)+" "+(tx+6)+","+(ty-4);
+    s+='<polygon points="'+tri+'" fill="var(--red-)"/>';
+    s+='<text x="'+(right?tx-10:tx+11)+'" y="'+(right?ty+4:ty-1)+'" text-anchor="'+(right?"end":"start")+'" fill="var(--red-)" '+mono+' font-size="10" font-weight="500">'+rtxt+' — off this way</text>';
   }
   document.getElementById("nplot2").innerHTML=s;
 }
@@ -715,6 +734,9 @@ function runD(){
   dAnim=requestAnimationFrame(tick);
 }
 
+/* the cell holds 53 A.h at 1 M and 53 mA.h at 1 mM, so the unit has to
+   follow the number — otherwise every tick on the capacity axis reads 0 */
+function ahShow(q){ return q>=1 ? fmt(q,2)+" A·h" : fmt(q*1000,1)+" mA·h"; }
 function cShow(x){ return x>=0.01 ? x.toFixed(x>=1?2:3)+" M" : x.toExponential(1)+" M"; }
 
 /* concentrations after a fraction xi of the starting Cu2+ has plated out */
@@ -745,7 +767,7 @@ function daniell(){
   document.getElementById("dQ").textContent=(Q>=0.01&&Q<1e4)?fmt(Q,2):Q.toExponential(1);
   document.getElementById("dLogQ").textContent=(lg>=0?"+":"")+fmt(lg,2);
   document.getElementById("dSlope").textContent=fmt(slope*1000,1)+" mV/decade";
-  document.getElementById("dCharge").textContent=fmt(charge,1)+" A·h";
+  document.getElementById("dCharge").textContent=ahShow(charge);
 
   document.getElementById("dEq").innerHTML=
      "E = E°<sub>cell</sub> − (2.303RT/nF) · log( [Zn²⁺] / [Cu²⁺] )<br>"
@@ -869,6 +891,7 @@ function dplot(xi,a,b,slope,E){
   var mono='font-family="IBM Plex Mono,monospace"';
   var s="";
   var qmax=DAN.n*b*DAN.vol*F/3600;               /* A.h at full conversion */
+  var qBig=qmax>=1, qScale=qBig?1:1000, qUnit=qBig?"A·h":"mA·h";
   /* frame */
   s+='<line x1="'+L+'" y1="'+Tp+'" x2="'+L+'" y2="'+(H-B)+'" stroke="var(--line-2)" stroke-width="1.2"/>';
   s+='<line x1="'+L+'" y1="'+(H-B)+'" x2="'+(W-Rr)+'" y2="'+(H-B)+'" stroke="var(--line-2)" stroke-width="1.2"/>';
@@ -876,9 +899,9 @@ function dplot(xi,a,b,slope,E){
     var tt=Math.min(t,XMAX);
     s+='<line x1="'+X(tt)+'" y1="'+(H-B)+'" x2="'+X(tt)+'" y2="'+(H-B+4)+'" stroke="var(--line-2)"/>';
     s+='<text x="'+X(tt)+'" y="'+(H-B+16)+'" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="9.5">'+t.toFixed(2)+'</text>';
-    s+='<text x="'+X(tt)+'" y="'+(H-B+29)+'" text-anchor="middle" fill="var(--line-2)" '+mono+' font-size="8.5">'+(qmax*t).toFixed(0)+'</text>';
+    s+='<text x="'+X(tt)+'" y="'+(H-B+29)+'" text-anchor="middle" fill="var(--line-2)" '+mono+' font-size="8.5">'+(qmax*t*qScale).toFixed(qBig?0:1)+'</text>';
   });
-  s+='<text x="'+(L-7)+'" y="'+(H-B+29)+'" text-anchor="end" fill="var(--line-2)" '+mono+' font-size="8.5">A·h</text>';
+  s+='<text x="'+(L-7)+'" y="'+(H-B+29)+'" text-anchor="end" fill="var(--line-2)" '+mono+' font-size="8.5">'+qUnit+'</text>';
   s+='<text x="'+((L+W-Rr)/2)+'" y="'+(H-8)+'" text-anchor="middle" fill="var(--muted)" '+mono+' font-size="10">ξ — fraction of the Cu²⁺ used up</text>';
   for(i=0;i<=4;i++){
     v=ymin+(ymax-ymin)*i/4;
@@ -1059,6 +1082,15 @@ function fermi(){
   document.getElementById("fEapp").textContent=fmt(Eapp,2)+" V";
   document.getElementById("fEta").textContent=(eta>=0?"+":"")+fmt(eta,2)+" V";
   document.getElementById("fEf").textContent=fmt(-(VAC+Eapp),2)+" eV";
+
+  /* the definition, filled in — the readouts above are its three terms */
+  document.getElementById("fEtaEq").innerHTML=
+     "η &equiv; E &minus; E<sub>eq</sub><br>"
+    +"η = ("+fmt(Eapp,2)+") &minus; ("+fmt(Eeq,2)+")<br>"
+    +"η = <b>"+(eta>=0?"+":"")+fmt(eta,3)+" V</b>"
+    +(Math.abs(eta)<0.02 ? " &mdash; at equilibrium"
+      : eta<0 ? " &mdash; cathodic, driving reduction"
+              : " &mdash; anodic, driving oxidation");
 
   var v=document.getElementById("fVerdict");
   if(Math.abs(eta)<0.02){
