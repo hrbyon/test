@@ -127,10 +127,6 @@ footer{margin-top:44px;padding-top:20px;border-top:1px solid var(--line);color:v
 .why[hidden]{display:none}
 .why b{color:var(--ox)}
 
-/* --- the defence slip --- */
-.slip{margin:14px 18px 18px;padding:13px 15px;border:1px dashed var(--line-2);border-radius:8px;
-  background:var(--surface-2);font-size:13px;line-height:1.7;color:var(--ink-2)}
-.slip b{color:var(--ox);font-family:"IBM Plex Mono",monospace}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 </style>
 </head>
@@ -175,18 +171,20 @@ footer{margin-top:44px;padding-top:20px;border-top:1px solid var(--line);color:v
   <div id="sheet" hidden></div>
 
   <div class="card" id="summary" hidden>
-    <div class="card-h"><h2>Submission</h2><span class="note">hand the file to the LMS assignment</span></div>
+    <div class="card-h"><h2>Submission</h2><span class="note">one button &mdash; the file is only a backup</span></div>
     <div class="scorebar">
       <div>
         <div class="scorenum" id="scoreNum">&mdash;</div>
         <div class="vcode" style="margin-top:5px" id="whoLine">&mdash;</div>
       </div>
-      <div style="flex:1 1 260px">
-        <button class="solid" id="dlBtn" type="button">Download my result</button>
-        <p class="hint" id="dlHint">Answer every problem first &mdash; unanswered ones are recorded as incomplete.</p>
+      <div style="flex:1 1 300px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="solid" id="sendBtn" type="button" hidden>Submit to the course</button>
+          <button class="ghost" id="dlBtn" type="button">Download my result</button>
+        </div>
+        <p class="hint" id="dlHint" style="margin-top:8px">Answer every problem first &mdash; unanswered ones are recorded as incomplete.</p>
       </div>
     </div>
-    <p class="slip" id="slip">&mdash;</p>
   </div>
 
   <footer>
@@ -646,7 +644,7 @@ var CONCEPTS = {
 
 /* ---------- state ---------- */
 var STORE = "ch40051-ps1-v1";
-var probs = [], state = [], sid = "", defence = 0;
+var probs = [], state = [], sid = "";
 var sId       = document.getElementById("sId"),
     genBtn    = document.getElementById("genBtn"),
     sheet     = document.getElementById("sheet"),
@@ -679,8 +677,6 @@ function build(id){
       });
     }
   });
-  /* one problem is named for the five-minute reproduction at the next class */
-  defence = 1 + Math.floor(r() * probs.length);
 }
 
 /* ---------- rendering ---------- */
@@ -748,12 +744,6 @@ function render(){
   var solved = state.filter(function(s){ return s.solved; }).length;
   document.getElementById("scoreNum").innerHTML = solved + ' <small>/ ' + probs.length + ' correct</small>';
   document.getElementById("whoLine").innerHTML = esc(sid) + " &middot; verification <b>" + vcode() + "</b>";
-  var dp = probs[defence - 1];
-  document.getElementById("slip").innerHTML =
-      "<b>Defence problem: " + (defence < 10 ? "0" : "") + defence + "</b> &mdash; " + esc(dp.topic)
-    + " (" + esc(dp.lec) + "). Bring this one to the next class. You will have five minutes and a blank sheet to "
-    + "reproduce it with your own numbers, no notes. It is drawn from your ID, so it is yours alone, and it is "
-    + "fixed &mdash; regenerating the page will not change it.";
 }
 
 /* A short code over the student ID and the exact answers this set expects, so a
@@ -859,19 +849,40 @@ genBtn.addEventListener("click", function(){
 });
 sId.addEventListener("keydown", function(e){ if (e.key === "Enter") genBtn.click(); });
 
-/* ---------- submission file ---------- */
-document.getElementById("dlBtn").addEventListener("click", function(){
+/* ---------- the result, in one shape ----------
+   The download and the course submission carry exactly the same columns, so a
+   sheet export and a handed-in file can be marked by the same tool. */
+function result(){
   var solved = state.filter(function(s){ return s.solved; }).length;
-  var head = ["assignment", "student_id", "completed_utc", "solved", "total", "defence_problem", "verification"];
-  var row  = ["PS1", sid, new Date().toISOString(), solved, probs.length, defence, vcode()];
+  var r = {
+    assignment:"PS1", student_id:sid, completed_utc:new Date().toISOString(),
+    solved:solved, total:probs.length, verification:vcode(),
+    kinds:[], topics:[], expected:[], given:[], tries:[], ok:[]
+  };
   probs.forEach(function(p, i){
     var g = state[i].given;
-    head.push("q" + (i+1) + "_kind");     row.push(p.kind);
-    head.push("q" + (i+1) + "_topic");    row.push(p.topic);
-    head.push("q" + (i+1) + "_expected"); row.push(p.kind === "calc" ? sig(p.answer, 5) : LETTER[p.answer]);
-    head.push("q" + (i+1) + "_given");    row.push(p.kind === "calc" ? g : (g === "" ? "" : LETTER[+g]));
-    head.push("q" + (i+1) + "_tries");    row.push(state[i].tries);
-    head.push("q" + (i+1) + "_solved");   row.push(state[i].solved ? 1 : 0);
+    r.kinds.push(p.kind);
+    r.topics.push(p.topic);
+    r.expected.push(p.kind === "calc" ? sig(p.answer, 5) : LETTER[p.answer]);
+    r.given.push(p.kind === "calc" ? g : (g === "" ? "" : LETTER[+g]));
+    r.tries.push(state[i].tries);
+    r.ok.push(state[i].solved ? 1 : 0);
+  });
+  return r;
+}
+
+/* ---------- submission file ---------- */
+document.getElementById("dlBtn").addEventListener("click", function(){
+  var res = result();
+  var head = ["assignment", "student_id", "completed_utc", "solved", "total", "verification"];
+  var row  = [res.assignment, res.student_id, res.completed_utc, res.solved, res.total, res.verification];
+  probs.forEach(function(p, i){
+    head.push("q" + (i+1) + "_kind");     row.push(res.kinds[i]);
+    head.push("q" + (i+1) + "_topic");    row.push(res.topics[i]);
+    head.push("q" + (i+1) + "_expected"); row.push(res.expected[i]);
+    head.push("q" + (i+1) + "_given");    row.push(res.given[i]);
+    head.push("q" + (i+1) + "_tries");    row.push(res.tries[i]);
+    head.push("q" + (i+1) + "_solved");   row.push(res.ok[i]);
   });
   function cell(v){ v = String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
   var csv = head.join(",") + "\n" + row.map(cell).join(",") + "\n";
@@ -884,11 +895,67 @@ document.getElementById("dlBtn").addEventListener("click", function(){
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
     document.getElementById("dlHint").textContent =
-      "Saved. Submit that file to the LMS assignment for Problem Set 1.";
+      "Saved. Keep it as your backup — the submission itself is the button beside this one.";
   } catch(e){
     document.getElementById("dlHint").textContent =
       "Your browser blocked the download. Screenshot this page and submit that instead.";
   }
+});
+
+/* ---- submit straight to the course sheet ----------------------------------
+   The same endpoint the concept checks use; the assignment field is what
+   routes this row to the "Problem set" tab of the submissions sheet. Left
+   empty, the button stays hidden and only the download exists.             */
+var SUBMIT_URL = "https://script.google.com/macros/s/AKfycbxPm7WrbttFu6-gnTi__IcUPt-816GthK0eI8TPuwOZyYlcRW3RAWJlmsr791moxBc5GA/exec";
+
+var sendBtn = document.getElementById("sendBtn"),
+    dlHint  = document.getElementById("dlHint");
+if (SUBMIT_URL){
+  sendBtn.hidden = false;
+  dlHint.textContent = "Press Submit to send your result to the course. The download is a backup.";
+}
+
+sendBtn.addEventListener("click", function(){
+  if (!sid){ dlHint.textContent = "Generate your set first."; return; }
+  var payload = result();
+  sendBtn.disabled = true;
+  dlHint.textContent = "Sending\u2026";
+
+  /* text/plain keeps this a simple request, so the browser sends it without
+     a preflight the Apps Script endpoint cannot answer */
+  fetch(SUBMIT_URL, {
+    method:"POST",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify(payload)
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(j){
+    if (j && j.ok){
+      sendBtn.textContent = "Submitted \u2713";
+      dlHint.textContent = "Recorded for student ID " + payload.student_id + " \u2014 "
+        + payload.solved + " of " + payload.total + " correct. You can close this page.";
+    } else {
+      var e = new Error((j && j.error) || "rejected"); e.fromServer = !!(j && j.error); throw e;
+    }
+  })
+  .catch(function(err){
+    /* a refusal the endpoint gave us is the student's to act on and resending
+       would not help; a reply we could not read is ours, so resend blind and
+       let the downloaded file stand as proof */
+    if (err && err.fromServer){
+      sendBtn.disabled = false;
+      sendBtn.textContent = "Submit to the course";
+      dlHint.textContent = err.message;
+      return;
+    }
+    fetch(SUBMIT_URL, {method:"POST", mode:"no-cors",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(payload)}).catch(function(){});
+    sendBtn.disabled = false;
+    sendBtn.textContent = "Submit to the course";
+    dlHint.textContent = "Sent, but the confirmation did not come back. "
+      + "Download the file as well and keep it \u2014 it is your proof of submission.";
+  });
 });
 
 /* resume a set from a previous visit */
