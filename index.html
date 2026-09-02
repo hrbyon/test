@@ -14,6 +14,7 @@
   --ground:#F1F3F2; --surface:#FFFFFF; --surface-2:#E9EDEB;
   --ink:#14191B; --ink-2:#3E4A4D; --muted:#68767A; --line:#D6DDDA; --line-2:#C3CCC8;
   --ox:#A85B33; --ox-soft:#F3E4DA;
+  --flag:#B02A2A;
   --red-:#15618E; --red-soft:#DDE9F2;
   --go:#2C7355; --go-soft:#DCEBE3;
   --shadow:0 1px 2px rgba(20,25,27,.05),0 8px 24px -12px rgba(20,25,27,.18);
@@ -23,6 +24,7 @@
     --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
     --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
     --ox:#D08551; --ox-soft:#33231A;
+    --flag:#E8756E;
     --red-:#5AA6D4; --red-soft:#152833;
     --go:#5DBB8D; --go-soft:#152A21;
     --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
@@ -32,6 +34,7 @@
   --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
   --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
   --ox:#D08551; --ox-soft:#33231A;
+  --flag:#E8756E;
   --red-:#5AA6D4; --red-soft:#152833;
   --go:#5DBB8D; --go-soft:#152A21;
   --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
@@ -59,6 +62,10 @@ h2.sec{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.18em
 a.lect:hover{border-color:var(--ox);transform:translateY(-1px)}
 a.lect:focus-visible{outline:2px solid var(--red-);outline-offset:2px}
 .lect.soon{opacity:.72;box-shadow:none;border-style:dashed}
+/* the problem set is flagged in red so it is not lost among the lecture cards */
+.lect.flag{border-color:var(--flag);box-shadow:0 0 0 1px var(--flag),var(--shadow)}
+.lect.flag .ltitle{color:var(--flag)}
+a.lect.flag:hover{border-color:var(--flag)}
 .lhead{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
 .lnum{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);flex:0 0 auto;letter-spacing:.1em}
 .ltitle{font-size:18px;font-weight:600;letter-spacing:-.01em;flex:1 1 240px}
@@ -145,23 +152,9 @@ footer{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);color:v
     </div>
   </a>
 
-  <a class="lect" href="lecture04.html">
-    <div class="lhead">
-      <span class="lnum">LECTURE 4</span>
-      <span class="ltitle">Double Layer Bench</span>
-      <span class="state live">Open</span>
-    </div>
-    <p class="ldesc">Ion distribution at the interface. Build the double layer one model at a time — Helmholtz, Gouy-Chapman, Stern, Grahame — and watch where the potential actually drops, then see what that structure does to a voltammogram when nothing reacts at all.</p>
-    <div class="parts">
-      <span class="part">Double Layer Models</span>
-      <span class="part">Capacitor CV</span>
-      <span class="part">Concept Check · graded</span>
-    </div>
-  </a>
-
   <div class="lect soon">
     <div class="lhead">
-      <span class="lnum">LECTURE 5+</span>
+      <span class="lnum">LECTURE 4+</span>
       <span class="ltitle">Further topics</span>
       <span class="state soon">Coming</span>
     </div>
@@ -170,6 +163,17 @@ footer{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);color:v
 
 
 
+
+  <h2 class="sec">Practice</h2>
+
+  <a class="lect flag" href="problemset01.html">
+    <div class="lhead">
+      <span class="lnum">PROBLEM SET 1</span>
+      <span class="ltitle">Your own problem set</span>
+      <span class="state live">Open</span>
+    </div>
+    <p class="ldesc">Twelve problems across Lectures 1&ndash;3: six calculations and six concept questions carried over from the concept checks. Every number is generated from your student ID, so no two of you get the same set. Answers are checked as you go, and one of your twelve is drawn at random to be reproduced in class.</p>
+  </a>
 
   <h2 class="sec">How the concept checks work</h2>
 

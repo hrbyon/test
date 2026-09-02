@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Problem Set 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+:root{
+  --ground:#F1F3F2; --surface:#FFFFFF; --surface-2:#E9EDEB;
+  --ink:#14191B; --ink-2:#3E4A4D; --muted:#68767A; --line:#D6DDDA; --line-2:#C3CCC8;
+  --ox:#A85B33; --ox-soft:#F3E4DA;
+  --red-:#15618E; --red-soft:#DDE9F2;
+  --go:#2C7355; --go-soft:#DCEBE3;
+  --stop:#8A5F0C; --stop-soft:#F3E9D3;
+  --shadow:0 1px 2px rgba(20,25,27,.05),0 8px 24px -12px rgba(20,25,27,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+    --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+    --ox:#D08551; --ox-soft:#33231A;
+    --red-:#5AA6D4; --red-soft:#152833;
+    --go:#5DBB8D; --go-soft:#152A21;
+    --stop:#D6A33F; --stop-soft:#2B2415;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+  --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+  --ox:#D08551; --ox-soft:#33231A;
+  --red-:#5AA6D4; --red-soft:#152833;
+  --go:#5DBB8D; --go-soft:#152A21;
+  --stop:#D6A33F; --stop-soft:#2B2415;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:880px;margin:0 auto;padding:32px 20px 80px}
+
+.masthead{padding-bottom:20px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.eyebrow a{color:inherit}
+h1{font-family:"IBM Plex Serif",Georgia,serif;font-weight:600;font-size:clamp(28px,4.2vw,40px);line-height:1.12;margin:0;letter-spacing:-.015em}
+.sub{margin:10px 0 0;color:var(--ink-2);font-size:15px;max-width:62ch}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);margin-top:16px}
+.card-h{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.card-h h2{font-size:15px;font-weight:600;margin:0}
+.card-h .note{font-size:12.5px;color:var(--muted)}
+.card-b{padding:18px}
+
+label.fld{display:block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+input[type=text]{width:100%;font-family:inherit;font-size:14px;color:var(--ink);background:var(--surface-2);
+  border:1px solid var(--line-2);border-radius:7px;padding:9px 10px}
+input:read-only{background:var(--surface);color:var(--muted);cursor:not-allowed}
+input:focus-visible,button:focus-visible{outline:2px solid var(--red-);outline-offset:1px}
+.startrow{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:end}
+@media(max-width:560px){.startrow{grid-template-columns:1fr}}
+
+.solid{appearance:none;background:var(--ox);border:1px solid var(--ox);color:#fff;font-family:inherit;
+  font-size:13.5px;font-weight:500;padding:10px 18px;border-radius:7px;cursor:pointer;white-space:nowrap}
+.solid:hover{filter:brightness(1.08)}
+.solid:disabled{background:var(--line-2);border-color:var(--line-2);color:var(--muted);cursor:not-allowed;filter:none}
+.ghost{appearance:none;background:var(--surface-2);border:1px solid var(--line-2);color:var(--ink-2);
+  font-family:inherit;font-size:12.5px;padding:8px 13px;border-radius:7px;cursor:pointer}
+.ghost:hover{border-color:var(--ox);color:var(--ox)}
+
+.pnum{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);letter-spacing:.1em}
+.ptopic{font-size:14px;font-weight:600;flex:1 1 auto}
+.stem{font-size:15px;line-height:1.7;margin:0 0 16px}
+.stem b{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--ox);font-size:14.5px}
+.answer{display:grid;grid-template-columns:minmax(120px,190px) auto auto;gap:10px;align-items:center}
+@media(max-width:560px){.answer{grid-template-columns:1fr}}
+.unit{font-family:"IBM Plex Mono",monospace;font-size:13.5px;color:var(--muted)}
+.verdict{margin:14px 0 0;padding:11px 14px;border-radius:8px;font-size:13.5px;line-height:1.6}
+.verdict[hidden]{display:none}
+.verdict.ok{background:var(--go-soft);color:var(--go)}
+.verdict.no{background:var(--stop-soft);color:var(--stop)}
+.sol{margin:14px 0 0;border-left:2px solid var(--line-2);padding-left:14px}
+.sol[hidden]{display:none}
+.sol h3{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 10px;font-weight:500}
+.sol ol{margin:0;padding-left:20px}
+.sol li{font-size:13.5px;line-height:1.8;color:var(--ink-2);margin-bottom:6px}
+.sol code{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--ink)}
+.sol .final{color:var(--ox);font-weight:600}
+.done .card-h{background:var(--go-soft)}
+
+.scorebar{display:flex;flex-wrap:wrap;align-items:center;gap:14px 22px;padding:16px 18px}
+.scorenum{font-family:"IBM Plex Mono",monospace;font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+.scorenum small{font-size:14px;font-weight:400;color:var(--muted)}
+.vcode{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted)}
+.vcode b{color:var(--ink);font-weight:600;letter-spacing:.08em}
+.hint{font-size:12.5px;color:var(--muted);line-height:1.65;margin:10px 0 0}
+footer{margin-top:44px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;line-height:1.8}
+
+/* --- section rules between Part A and Part B --- */
+.sect{margin:34px 0 0;padding:0 0 8px;border-bottom:1px solid var(--line-2);
+  display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.sect h2{font-family:"IBM Plex Serif",Georgia,serif;font-size:19px;font-weight:600;margin:0;letter-spacing:-.01em}
+.sect p{margin:0;font-size:12.5px;color:var(--muted)}
+
+/* --- multiple-choice items --- */
+.lect{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--muted);border:1px solid var(--line-2);border-radius:99px;padding:2px 8px}
+.opts{display:grid;gap:8px;margin:0}
+.opt{display:flex;gap:11px;align-items:flex-start;width:100%;text-align:left;
+  background:var(--surface-2);border:1px solid var(--line-2);border-radius:8px;
+  padding:11px 13px;font-family:inherit;font-size:13.5px;line-height:1.6;color:var(--ink);cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--ox)}
+.opt:disabled{cursor:default}
+.opt .k{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);flex:0 0 auto;padding-top:1px}
+.opt.picked{border-color:var(--ink-2)}
+.opt.right{background:var(--go-soft);border-color:var(--go);color:var(--go)}
+.opt.right .k{color:var(--go)}
+.opt.wrong{background:var(--stop-soft);border-color:var(--stop);color:var(--stop)}
+.opt.wrong .k{color:var(--stop)}
+.why{margin:14px 0 0;border-left:2px solid var(--line-2);padding-left:14px;
+  font-size:13.5px;line-height:1.75;color:var(--ink-2)}
+.why[hidden]{display:none}
+.why b{color:var(--ox)}
+
+/* --- the defence slip --- */
+.slip{margin:14px 18px 18px;padding:13px 15px;border:1px dashed var(--line-2);border-radius:8px;
+  background:var(--surface-2);font-size:13px;line-height:1.7;color:var(--ink-2)}
+.slip b{color:var(--ox);font-family:"IBM Plex Mono",monospace}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow"><a href="index.html" style="color:inherit">CH40051 Electroanalytical Chemistry</a> · Problem Set 1</p>
+    <h1>Your own problem set</h1>
+    <p class="sub">Twelve problems on Lectures 1&ndash;3: charge and Faraday's law, cell potentials, the Nernst
+      equation, reference scales and ohmic error. Six are calculations and six are concept questions carried over
+      from the concept checks. Every number is generated from your student ID, so no two of you get the same set
+      &mdash; an answer copied from anyone else will simply be wrong.</p>
+  </header>
+
+  <div class="card" id="startCard">
+    <div class="card-h"><h2>Generate your set</h2><span class="note">same ID always gives the same problems</span></div>
+    <div class="card-b">
+      <div class="startrow">
+        <div>
+          <label class="fld" for="sId">Student ID</label>
+          <input type="text" id="sId" inputmode="numeric" placeholder="e.g. 20261234" autocomplete="off">
+        </div>
+        <button class="solid" id="genBtn" type="button">Generate my problems</button>
+      </div>
+      <p class="hint" id="startHint">You can close this page and come back &mdash; your work is saved in this
+        browser, and the same ID regenerates the same set.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h2>How this is marked</h2><span class="note">read once before you start</span></div>
+    <div class="card-b">
+      <p class="hint" style="margin-top:0">
+        <b style="color:var(--ink)">Calculations</b> allow two attempts. A wrong first attempt earns one diagnostic
+        hint; the worked solution opens after the second. <b style="color:var(--ink)">Concept questions</b> allow
+        one attempt, then the reasoning is shown &mdash; guessing costs you the mark, so think before you click.
+      </p>
+    </div>
+  </div>
+
+  <div id="sheet" hidden></div>
+
+  <div class="card" id="summary" hidden>
+    <div class="card-h"><h2>Submission</h2><span class="note">hand the file to the LMS assignment</span></div>
+    <div class="scorebar">
+      <div>
+        <div class="scorenum" id="scoreNum">&mdash;</div>
+        <div class="vcode" style="margin-top:5px" id="whoLine">&mdash;</div>
+      </div>
+      <div style="flex:1 1 260px">
+        <button class="solid" id="dlBtn" type="button">Download my result</button>
+        <p class="hint" id="dlHint">Answer every problem first &mdash; unanswered ones are recorded as incomplete.</p>
+      </div>
+    </div>
+    <p class="slip" id="slip">&mdash;</p>
+  </div>
+
+  <footer>
+    F = 96 485 C mol⁻¹ · RT ln10 / F = 59.16 mV per decade at 25 °C · standard potentials at 25 °C and unit activity<br>
+    CH40051 Electroanalytical Chemistry · Fall 2026
+  </footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+var F = 96485.33;
+var S = 0.05916;          /* RT ln10 / F at 25 °C, in volts per decade */
+
+/* ---------- deterministic RNG: same student ID -> same problem set ---------- */
+function hash32(s){
+  var h = 0x811c9dc5;
+  for (var i = 0; i < s.length; i++){
+    h ^= s.charCodeAt(i);
+    h = (h + ((h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24))) >>> 0;
+  }
+  return h >>> 0;
+}
+function mulberry32(a){
+  return function(){
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    var t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function ri(r, a, b){ return a + Math.floor(r() * (b - a + 1)); }
+function rf(r, a, b, d){ var v = a + r() * (b - a); return +v.toFixed(d); }
+function pick(r, arr){ return arr[Math.floor(r() * arr.length)]; }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function gcd(a,b){ while(b){ var t=b; b=a%b; a=t; } return a; }
+function lcm(a,b){ return a*b/gcd(a,b); }
+function sig(x, d){
+  if (x === 0) return "0";
+  var e = Math.floor(Math.log10(Math.abs(x)));
+  if (e >= 4 || e <= -3) return x.toExponential(d - 1);
+  return (+x.toPrecision(d)).toString();
+}
+/* Fisher-Yates on a copy, reporting where a tracked index landed. */
+function shuffle(r, arr, track){
+  var a = arr.slice(), pos = track;
+  for (var i = a.length - 1; i > 0; i--){
+    var j = Math.floor(r() * (i + 1));
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+    if (pos === i) pos = j; else if (pos === j) pos = i;
+  }
+  return { list: a, at: pos };
+}
+
+/* ---------- chemistry data ---------- */
+var METALS = [
+ {id:"Ag", M:107.87, n:1, ion:"Ag⁺",  rxn:"Ag⁺ + e⁻ → Ag(s)"},
+ {id:"Cu", M:63.55,  n:2, ion:"Cu²⁺", rxn:"Cu²⁺ + 2e⁻ → Cu(s)"},
+ {id:"Ni", M:58.69,  n:2, ion:"Ni²⁺", rxn:"Ni²⁺ + 2e⁻ → Ni(s)"},
+ {id:"Zn", M:65.38,  n:2, ion:"Zn²⁺", rxn:"Zn²⁺ + 2e⁻ → Zn(s)"},
+ {id:"Cd", M:112.41, n:2, ion:"Cd²⁺", rxn:"Cd²⁺ + 2e⁻ → Cd(s)"},
+ {id:"Cr", M:52.00,  n:3, ion:"Cr³⁺", rxn:"Cr³⁺ + 3e⁻ → Cr(s)"},
+ {id:"Al", M:26.98,  n:3, ion:"Al³⁺", rxn:"Al³⁺ + 3e⁻ → Al(s)"}
+];
+var COUPLES = [
+ {id:"Li",  E:-3.04, n:1, half:"Li⁺ + e⁻ → Li(s)"},
+ {id:"Mg",  E:-2.37, n:2, half:"Mg²⁺ + 2e⁻ → Mg(s)"},
+ {id:"Al",  E:-1.66, n:3, half:"Al³⁺ + 3e⁻ → Al(s)"},
+ {id:"Zn",  E:-0.76, n:2, half:"Zn²⁺ + 2e⁻ → Zn(s)"},
+ {id:"Fe",  E:-0.44, n:2, half:"Fe²⁺ + 2e⁻ → Fe(s)"},
+ {id:"Ni",  E:-0.25, n:2, half:"Ni²⁺ + 2e⁻ → Ni(s)"},
+ {id:"Sn",  E:-0.14, n:2, half:"Sn²⁺ + 2e⁻ → Sn(s)"},
+ {id:"Cu",  E: 0.34, n:2, half:"Cu²⁺ + 2e⁻ → Cu(s)"},
+ {id:"Ag",  E: 0.80, n:1, half:"Ag⁺ + e⁻ → Ag(s)"},
+ {id:"Fe3", E: 0.77, n:1, half:"Fe³⁺ + e⁻ → Fe²⁺"},
+ {id:"Cl2", E: 1.36, n:2, half:"Cl₂(g) + 2e⁻ → 2Cl⁻"}
+];
+/* couples with both halves in solution — the Nernst term has a real numerator and denominator */
+var SOLC = [
+ {ox:"Fe³⁺",        red:"Fe²⁺",        n:1, E: 0.771, half:"Fe³⁺ + e⁻ → Fe²⁺"},
+ {ox:"Ce⁴⁺",        red:"Ce³⁺",        n:1, E: 1.720, half:"Ce⁴⁺ + e⁻ → Ce³⁺"},
+ {ox:"Fe(CN)₆³⁻",   red:"Fe(CN)₆⁴⁻",   n:1, E: 0.361, half:"Fe(CN)₆³⁻ + e⁻ → Fe(CN)₆⁴⁻"},
+ {ox:"Ru(NH₃)₆³⁺",  red:"Ru(NH₃)₆²⁺",  n:1, E:-0.200, half:"Ru(NH₃)₆³⁺ + e⁻ → Ru(NH₃)₆²⁺"},
+ {ox:"Sn⁴⁺",        red:"Sn²⁺",        n:2, E: 0.151, half:"Sn⁴⁺ + 2e⁻ → Sn²⁺"},
+ {ox:"VO₂⁺",        red:"VO²⁺",        n:1, E: 1.000, half:"VO₂⁺ + 2H⁺ + e⁻ → VO²⁺ + H₂O"}
+];
+var REFS = [
+ {id:"SHE",   name:"the standard hydrogen electrode (SHE)",   E:0.000},
+ {id:"AgClS", name:"Ag/AgCl in saturated KCl",                E:0.197},
+ {id:"AgCl3", name:"Ag/AgCl in 3 M KCl",                      E:0.210},
+ {id:"SCE",   name:"the saturated calomel electrode (SCE)",   E:0.241},
+ {id:"HgO",   name:"Hg/HgO in 1 M NaOH",                      E:0.098},
+ {id:"HgSO4", name:"Hg/Hg₂SO₄ in saturated K₂SO₄",            E:0.640}
+];
+
+/* ---------- Part A: calculations ---------- */
+/* each returns {kind:"calc", lec, topic, stem, unit, answer, abstol, solution[]} */
+
+function pElectrolysis(r){
+  var m = pick(r, METALS), I = rf(r, 0.20, 2.50, 2), t = ri(r, 25, 180);
+  var Q = I * t * 60, mol = Q / F, molM = mol / m.n, W = molM * m.M;
+  return {
+    kind:"calc", lec:"Lecture 1", topic:"Faraday's law — mass deposited", unit:"g", answer:W,
+    stem:"A current of <b>" + I.toFixed(2) + " A</b> is passed for <b>" + t + " minutes</b> through a solution "
+        + "containing " + m.ion + ". The cathode reaction is " + m.rxn + ".<br><br>"
+        + "What mass of " + m.id + " is deposited?",
+    solution:[
+      "Charge passed: <code>Q = I·t = " + I.toFixed(2) + " A × " + (t*60).toLocaleString() + " s = " + sig(Q,4) + " C</code>",
+      "Moles of electrons: <code>N(e⁻) = Q/F = " + sig(Q,4) + " / 96485 = " + sig(mol,4) + " mol</code>",
+      "This reaction needs <code>n = " + m.n + "</code> electron" + (m.n>1?"s":"") + " per " + m.id + " atom, so "
+        + "<code>N(" + m.id + ") = " + sig(mol,4) + " / " + m.n + " = " + sig(molM,4) + " mol</code>",
+      "<span class='final'>W = N·M = " + sig(molM,4) + " × " + m.M + " = " + sig(W,4) + " g</span>"
+    ]
+  };
+}
+
+function pCellPotential(r){
+  var a, b;
+  do { a = pick(r, COUPLES); b = pick(r, COUPLES); } while (a.id === b.id || Math.abs(a.E - b.E) < 0.30);
+  var cat = (a.E > b.E) ? a : b, an = (a.E > b.E) ? b : a;
+  var E = cat.E - an.E, n = lcm(cat.n, an.n), dG = -n * F * E / 1000;
+  return {
+    kind:"calc", lec:"Lecture 1", topic:"Standard cell potential", unit:"V", answer:E, abstol:0.004,
+    stem:"A galvanic cell is built from these two couples:<br><br>"
+        + "<b>" + a.half + "</b>&nbsp;&nbsp;E° = " + a.E.toFixed(2) + " V<br>"
+        + "<b>" + b.half + "</b>&nbsp;&nbsp;E° = " + b.E.toFixed(2) + " V<br><br>"
+        + "What is E°<sub>cell</sub> when the cell runs spontaneously?",
+    solution:[
+      "For a spontaneous cell the couple with the <b>higher</b> E° is reduced, so <code>" + cat.half
+        + "</code> is the cathode and " + an.id + " is oxidised at the anode.",
+      "<code>E°cell = E°cathode − E°anode = (" + cat.E.toFixed(2) + ") − (" + an.E.toFixed(2) + ")</code>",
+      "<span class='final'>E°cell = " + E.toFixed(2) + " V</span>",
+      "As a check: with <code>n = " + n + "</code>, <code>ΔG° = −nFE° = " + sig(dG,4) + " kJ/mol</code>, which is "
+        + "negative — consistent with a spontaneous cell."
+    ]
+  };
+}
+
+function pNernst(r){
+  var c, cO, cR, E, k = 0;
+  do {
+    c  = pick(r, SOLC);
+    cO = rf(r, 0.20, 20.0, 2);
+    cR = rf(r, 0.20, 20.0, 2);
+    E  = c.E + (S / c.n) * Math.log10(cO / cR);
+    k++;
+  } while (k < 60 && (Math.abs(Math.log10(cO/cR)) < 0.7 || Math.abs(E) < 0.05));
+  var lg = Math.log10(cO / cR), shift = (S / c.n) * lg;
+  return {
+    kind:"calc", lec:"Lecture 2", topic:"The Nernst equation — a shifted couple", unit:"V", answer:E, abstol:0.004,
+    stem:"For the couple <b>" + c.half + "</b>, E° = <b>" + c.E.toFixed(3) + " V vs SHE</b>.<br><br>"
+        + "A solution is made <b>" + cO.toFixed(2) + " mM</b> in " + c.ox + " and <b>" + cR.toFixed(2)
+        + " mM</b> in " + c.red + ". An inert electrode is dipped into it and the potential is measured at 25 °C "
+        + "against SHE.<br><br>What potential does it read? (Take activity coefficients as 1.)",
+    solution:[
+      "The Nernst equation for this couple is <code>E = E° + (0.05916/n)·log([" + c.ox + "]/[" + c.red + "])</code>, "
+        + "with <code>n = " + c.n + "</code>.",
+      "The concentration ratio is <code>" + cO.toFixed(2) + " / " + cR.toFixed(2) + " = " + sig(cO/cR,4)
+        + "</code>. Because both species sit in the same solution the millimolar units cancel — you never need "
+        + "to convert to mol L⁻¹.",
+      "<code>log(" + sig(cO/cR,4) + ") = " + sig(lg,4) + "</code>, so the shift from E° is "
+        + "<code>(0.05916/" + c.n + ") × " + sig(lg,4) + " = " + sig(shift,3) + " V</code>"
+        + (c.n > 1 ? " — note the division by n; forgetting it is the commonest slip here." : "."),
+      "<span class='final'>E = " + c.E.toFixed(3) + " + (" + sig(shift,3) + ") = " + E.toFixed(3) + " V vs SHE</span>"
+    ]
+  };
+}
+
+function pConcCell(r){
+  var m = pick(r, [{id:"Cu",ion:"Cu²⁺",n:2},{id:"Zn",ion:"Zn²⁺",n:2},{id:"Ag",ion:"Ag⁺",n:1},
+                   {id:"Ni",ion:"Ni²⁺",n:2},{id:"Cd",ion:"Cd²⁺",n:2}]);
+  var cHi = rf(r, 0.050, 0.500, 3);
+  var cLo = +(cHi / Math.pow(10, rf(r, 1.2, 3.2, 2))).toPrecision(3);
+  var lg = Math.log10(cHi / cLo), E = (S / m.n) * lg * 1000;
+  return {
+    kind:"calc", lec:"Lecture 2", topic:"Concentration cell", unit:"mV", answer:E, abstol:1.5,
+    stem:"Two identical " + m.id + " electrodes sit in two half-cells joined by a salt bridge. One is in "
+        + "<b>" + cHi.toFixed(3) + " M</b> " + m.ion + ", the other in <b>" + sig(cLo,3) + " M</b> " + m.ion + ". "
+        + "Both electrodes are the same metal, so there is no standard-potential difference between them.<br><br>"
+        + "What voltage does a high-impedance voltmeter read across this cell, in millivolts?",
+    solution:[
+      "Both electrodes are the same couple, so <code>E°</code> cancels completely and the whole voltage comes from "
+        + "the concentration term: <code>E = (0.05916/n)·log(c_high / c_low)</code>.",
+      "<code>c_high / c_low = " + cHi.toFixed(3) + " / " + sig(cLo,3) + " = " + sig(cHi/cLo,4)
+        + "</code>, and <code>log = " + sig(lg,4) + "</code> — that is " + sig(lg,3) + " decades of separation.",
+      "<code>E = (0.05916/" + m.n + ") × " + sig(lg,4) + " = " + sig(E/1000,4) + " V</code>",
+      "<span class='final'>E = " + sig(E,4) + " mV</span>",
+      "Direction, as a check on yourself: the <b>concentrated</b> side is the cathode. Reducing " + m.ion
+        + " there while metal dissolves on the dilute side moves the cell toward equal concentrations, which is "
+        + "the direction that lowers the free energy."
+    ]
+  };
+}
+
+function pRefConv(r){
+  var a, b;
+  do { a = pick(r, REFS); b = pick(r, REFS); } while (a.id === b.id || Math.abs(a.E - b.E) < 0.05);
+  var EvsA = rf(r, -0.800, 0.800, 3);
+  var EvsB = EvsA + a.E - b.E;
+  return {
+    kind:"calc", lec:"Lecture 3", topic:"Converting between reference scales", unit:"V", answer:EvsB, abstol:0.004,
+    stem:"You measure a redox peak at <b>" + EvsA.toFixed(3) + " V</b> against " + a.name + ", which sits at "
+        + "<b>" + a.E.toFixed(3) + " V vs SHE</b>.<br><br>"
+        + "A referee asks for the value against " + b.name + ", which sits at <b>" + b.E.toFixed(3)
+        + " V vs SHE</b>.<br><br>What number do you report?",
+    solution:[
+      "Go through SHE, the one scale both references are quoted on. "
+        + "<code>E(vs SHE) = E(vs " + a.id + ") + E(" + a.id + " vs SHE)</code> — you <b>add</b> the reference's "
+        + "own potential, because that reference was the zero you measured from.",
+      "<code>E(vs SHE) = (" + EvsA.toFixed(3) + ") + (" + a.E.toFixed(3) + ") = " + (EvsA+a.E).toFixed(3) + " V</code>",
+      "Now step down onto the new scale by subtracting the new reference: "
+        + "<code>E(vs " + b.id + ") = " + (EvsA+a.E).toFixed(3) + " − (" + b.E.toFixed(3) + ")</code>",
+      "<span class='final'>E = " + EvsB.toFixed(3) + " V vs " + b.id + "</span>",
+      "Sanity check without arithmetic: " + b.name + " is the <b>" + (b.E > a.E ? "more positive" : "more negative")
+        + "</b> reference of the two, so one and the same physical potential must read "
+        + (b.E > a.E ? "more negative" : "more positive") + " against it. It does."
+    ]
+  };
+}
+
+function pOhmic(r){
+  var r0mm = pick(r, [0.50, 0.75, 1.00, 1.50, 2.00]);
+  var kap  = pick(r, [0.010, 0.020, 0.050, 0.100]);
+  var dmm  = rf(r, 0.5, 6.0, 1);
+  var imA  = rf(r, 0.10, 2.00, 2);
+  var r0 = r0mm / 10, d = dmm / 10;                 /* cm */
+  var Rinf = 1 / (4 * kap * r0);
+  var frac = (2 / Math.PI) * Math.atan(2 * d / r0);
+  var Ru = Rinf * frac;
+  var err = imA * Ru;                               /* mA × Ω = mV */
+  return {
+    kind:"calc", lec:"Lecture 3", topic:"Uncompensated resistance and ohmic error", unit:"mV", answer:err, abstol:1.0,
+    stem:"A disk working electrode of radius <b>" + r0mm.toFixed(2) + " mm</b> is mounted flush in an insulating "
+        + "wall. The electrolyte has conductivity <b>κ = " + kap.toFixed(3) + " S cm⁻¹</b>, and the reference tip "
+        + "is placed <b>" + dmm.toFixed(1) + " mm</b> from the disk face. The cell passes <b>" + imA.toFixed(2)
+        + " mA</b>.<br><br>For a disk electrode the resistance out to a point at distance d is<br>"
+        + "<b>R∞ = 1/(4κr₀)</b> and <b>R<sub>u</sub>(d) = R∞ · (2/π)·arctan(2d/r₀)</b><br><br>"
+        + "How large is the ohmic error in the measured potential, in millivolts?",
+    solution:[
+      "Work in centimetres: <code>r₀ = " + r0.toFixed(3) + " cm</code>, <code>d = " + d.toFixed(2) + " cm</code>.",
+      "The whole spreading resistance of the disk, out to infinity: "
+        + "<code>R∞ = 1/(4 × " + kap.toFixed(3) + " × " + r0.toFixed(3) + ") = " + sig(Rinf,4) + " Ω</code>",
+      "The fraction of it that lies inside the reference tip: <code>(2/π)·arctan(2 × " + d.toFixed(2) + " / "
+        + r0.toFixed(3) + ") = (2/π)·arctan(" + sig(2*d/r0,3) + ") = " + sig(frac,3) + "</code>"
+        + " — that is <b>" + Math.round(frac*100) + " %</b> of everything the solution has to give.",
+      "<code>R_u = " + sig(Rinf,4) + " × " + sig(frac,3) + " = " + sig(Ru,4) + " Ω</code>",
+      "<span class='final'>ΔE = i·R_u = " + imA.toFixed(2) + " mA × " + sig(Ru,4) + " Ω = " + sig(err,4) + " mV</span>",
+      "Notice that the arctan saturates: pulling the tip further back barely changes R_u, because nearly all of a "
+        + "disk's resistance is crowded into the first few radii. Moving the tip <b>closer</b> is what helps."
+    ]
+  };
+}
+
+var CALC = [pElectrolysis, pCellPotential, pNernst, pConcCell, pRefConv, pOhmic];
+
+/* ---------- Part B: concepts ----------
+   Nine per lecture. Six of them are the concept-check questions from that
+   lecture, so revising the checks is exactly the right preparation; three are
+   new, so a student who only memorised the check answers is still working.
+   Two are drawn per lecture, and the options are shuffled per student. */
+var CONCEPTS = {
+"Lecture 1": [
+ {q:"In a galvanic cell the anode is the (−) terminal, but in an electrolytic cell the anode is (+). What accounts for the difference?",
+  o:["The definition of &ldquo;anode&rdquo; changes with the type of cell",
+     "The anode is always where oxidation happens; the polarity label answers a separate question",
+     "The direction of the current is reversed in an electrolytic cell",
+     "The external supply reverses the sign of the ions"],
+  a:1,
+  why:"<b>Anode</b> answers <i>what reaction happens there</i> — oxidation, in every cell ever built. <b>+ and −</b> answer a different question: which terminal is at the higher potential. In a galvanic cell the oxidation is spontaneous and pushes electrons out, making that terminal negative. In an electrolytic cell a supply pulls electrons out of that terminal, making it positive. Two labels, two questions; only one of them moves."},
+ {q:"The table lists Cu²⁺ + 2e⁻ → Cu(s), E° = +0.34 V. What is E° for the oxidation of Cu(s)?",
+  o:["−0.34 V", "+0.34 V — E° is a property of the substance and does not change",
+     "+0.17 V — divide by the number of electrons", "−0.68 V — multiply by the number of electrons"],
+  a:0,
+  why:"Reversing a half-reaction reverses the sign of E°, and does nothing else. The magnitude is untouched: E° is intensive, so neither dividing nor multiplying by n has any place here."},
+ {q:"A classmate balances the electrons in a cell by doubling a half-reaction and writes 2Fe³⁺ + 2e⁻ → 2Fe²⁺, E° = 2 × 0.77 = +1.54 V. Which belief produced that line?",
+  o:["Unit-agnostic formula — a quantity was used without converting its units",
+     "Scaling an intensive quantity — E° was treated as though it grows with the amount of reaction",
+     "Inverted electron ratio — the electron count was multiplied where it should divide",
+     "Double sign flip — a reversed half-reaction was also subtracted"],
+  a:1,
+  why:"E° is energy <i>per unit charge</i>. Doubling the reaction doubles both the energy and the charge, so the ratio is unchanged: E° stays 0.77 V. ΔG°, which is extensive, does double — that is the quantity you scale."},
+ {q:"You pass the same 1 000 C through a solution of Ag⁺ and through a solution of Al³⁺. How do the deposited masses compare?",
+  o:["Far more Ag — its atomic mass is larger and it needs only one electron",
+     "The same, because the number of moles is the same",
+     "More Al, because it accepts three electrons",
+     "The same, whenever the current is the same"],
+  a:0,
+  why:"The same charge delivers the same moles of electrons, about 0.0104 mol. Silver takes one electron per atom and weighs 107.87 g mol⁻¹, giving ≈ 1.12 g. Aluminium takes three and weighs 26.98, giving ≈ 0.093 g. Both factors push the same way, so the gap is more than tenfold."},
+ {q:"A plating cell passes 1.00 A for ten minutes, but the cathode gains only 85 % of the mass Faraday's law predicts. What happened to the rest of the charge?",
+  o:["It drove a competing reaction at the same electrode, most often hydrogen evolution",
+     "It was lost as heat in the wires, so it never reached the electrode",
+     "Faraday's law is approximate and holds only at low current",
+     "It stayed in the double layer and was never passed"],
+  a:0,
+  why:"Every coulomb that crosses the interface does <i>some</i> chemistry — but not necessarily yours. In aqueous plating the usual competitor is 2H⁺ + 2e⁻ → H₂, which is why the bubbles appear. Faraday's law is exact for the total charge; what it does not promise is that all of it went to the reaction you wanted, and the ratio is the current efficiency."},
+ {q:"A cell is found to have ΔG° = +212 kJ/mol with n = 2. Which statement is correct?",
+  o:["E°cell ≈ +1.10 V and it discharges spontaneously",
+     "ΔG° is positive, so the reaction is impossible under any conditions",
+     "n = 2, so the voltage doubles",
+     "E°cell ≈ −1.10 V, and an external supply is needed to drive the reaction"],
+  a:3,
+  why:"ΔG° = −nFE° gives E° = −212 000 / (2 × 96 485) = −1.10 V. A negative E° means the reaction will not run on its own — but &ldquo;impossible&rdquo; is too strong: it is exactly what an electrolysis supply is for, and changing the concentrations shifts E through the Nernst equation too."},
+ {q:"Two plating baths run in series from one power supply, one depositing Cu²⁺ and one depositing Ag⁺. To double the mass of copper deposited in a run, which change is guaranteed to do it?",
+  o:["Doubling the total charge passed, by any combination of current and time",
+     "Doubling the current, whatever happens to the run time",
+     "Doubling the concentration of Cu²⁺ in the bath",
+     "Doubling the electrode area"],
+  a:0,
+  why:"Faraday's law depends on charge alone: W = (Q/F)(M/n). Q = I·t, so doubling the current only doubles the mass if the time is held fixed — which the option deliberately does not say. Concentration and area change the rate and the current density, not the mass per coulomb."},
+ {q:"On the E-vs-SHE ladder drawn with negative potentials at the top, a couple near the top is connected to a couple near the bottom. Which way do electrons go, and what would reverse them?",
+  o:["Down the page, toward the more positive couple; reversing it needs a power supply",
+     "Up the page, toward the more negative couple; reversing it needs only a switch",
+     "Down the page; reversing it needs only a larger external resistor",
+     "Neither way — electrons stay in the metal and only ions move"],
+  a:0,
+  why:"Electrons fall spontaneously from low E to high E, which on this axis is from the top of the ladder to the bottom. That is the whole content of a positive E°cell. Running them back uphill is not a matter of wiring — it takes a supply doing work on them, and that is an electrolytic cell."},
+ {q:"Why can no instrument report the absolute potential of a single electrode?",
+  o:["The potential is too small to measure",
+     "A voltmeter has two terminals, so any reading is a difference between two electrodes; the second one has to be defined as zero",
+     "Because electrodes polarise as soon as they are connected",
+     "Because the solution shields the electrode from the meter"],
+  a:1,
+  why:"Every measured potential is a difference. To quote a single electrode you must nominate a second one as the zero, which is precisely what the SHE convention does. This is why every number in the course carries a &ldquo;vs&rdquo; — a potential without a reference is not a measurement."}
+],
+"Lecture 2": [
+ {q:"A student writes: &ldquo;For any redox couple, E shifts by 59 mV for every ten-fold change in [O]/[R] at 25 °C.&rdquo; Which belief is this?",
+  o:["Dropping n from a per-decade slope — the 59 mV figure is quoted without dividing by the number of electrons",
+     "Scaling an intensive quantity — a per-charge quantity was multiplied by a coefficient",
+     "Activity blindness — a pure solid was given a concentration term",
+     "Reference-frame arithmetic run backwards — a potential was quoted against the wrong zero"],
+  a:0,
+  why:"The slope is 59.16/n mV per decade. It is 59 mV only when n = 1. For a two-electron couple the same tenfold change moves E by about 30 mV, and quoting 59 doubles your answer."},
+ {q:"For Zn²⁺ + 2e⁻ → Zn(s), why does no term for the zinc metal appear in the Nernst equation?",
+  o:["Because solids do not conduct",
+     "Because zinc is the anode and anodes are excluded",
+     "Because its concentration is too large to measure",
+     "Because a pure solid has an activity of 1, so its log term is zero"],
+  a:3,
+  why:"Activity, not concentration, is what enters the Nernst equation, and a pure condensed phase in its standard state has a = 1. log(1) = 0, so the term vanishes. The same argument removes a pure solvent and a gas at 1 bar."},
+ {q:"You make the electrode potential more negative. What happens to the Fermi level of the electrode?",
+  o:["It moves up — electrons in the metal become higher in energy",
+     "It moves down — electrons become more tightly bound",
+     "It does not move; only the solution changes",
+     "It moves up or down depending on the metal's work function"],
+  a:0,
+  why:"Electron energy and electrode potential run in opposite directions, because the electron's charge is negative: E<sub>F</sub> ≈ −eE. Pushing the potential negative raises the Fermi level, and once it is above the acceptor level of the solution species, electrons can cross — which is reduction."},
+ {q:"A cell reaction has E°<sub>cell</sub> = +0.46 V with n = 2 at 25 °C. What does that say about its equilibrium constant?",
+  o:["K ≈ 10¹⁵·⁶ — the reaction runs essentially to completion",
+     "K ≈ 10⁷·⁸ — one decade for every 59 mV, whatever n is",
+     "K ≈ 0.46, since E° and K carry the same number",
+     "Nothing, until the concentrations are given"],
+  a:0,
+  why:"At equilibrium the driving force is spent, so 0 = E° − (0.05916/n)·log K, giving log K = nE°/0.05916 = 2 × 0.46 / 0.05916 = 15.6. Dropping the n is the same slip as quoting a 59 mV slope for a two-electron couple, and here it costs you eight orders of magnitude. K is fixed by E° alone; the concentrations tell you where you are, not where equilibrium is."},
+ {q:"Why is an open-circuit voltage measured through a very large resistance?",
+  o:["To protect the voltmeter from high current",
+     "So that almost no current flows, leaving the equilibrium undisturbed",
+     "To increase the measured voltage",
+     "Because electrolytes have low resistance"],
+  a:1,
+  why:"The moment current flows, two things corrupt the reading: the electrode is driven away from equilibrium by its overpotential, and the solution drops iR. Both scale with i, so making i negligible removes both, and what is left is the thermodynamic quantity you wanted."},
+ {q:"Immediately after a potential step you see a current spike that decays, on top of a steady current. What are these two?",
+  o:["Both are faradaic; the spike is the faster reaction",
+     "The spike is faradaic; the steady part is double-layer charging",
+     "The spike is non-faradaic double-layer charging; the steady part is faradaic",
+     "The spike is instrument noise and should be ignored"],
+  a:2,
+  why:"Charging the double layer is charging a capacitor through the solution resistance: a spike that decays with time constant R<sub>u</sub>C<sub>dl</sub>, typically microseconds to milliseconds, and it transfers no electrons across the interface. The current that survives is the faradaic one, and it is the one carrying chemistry."},
+ {q:"The Nernst slope is quoted as 59.16 mV per decade at 25 °C. What happens to that slope if the cell is run at 60 °C instead, with everything else unchanged?",
+  o:["It rises to about 66 mV per decade, because the slope is proportional to absolute temperature",
+     "It falls to about 53 mV, because higher temperature narrows the potential window",
+     "It is unchanged — 59.16 mV is a constant of nature",
+     "It rises, but only for couples with n &gt; 1"],
+  a:0,
+  why:"The slope is (RT/nF)·ln10, and only T is free to move: 59.16 × (333/298) ≈ 66 mV. Note this is the slope only — E° itself also drifts with temperature, through ΔS° of the cell reaction, so a full temperature correction needs both."},
+ {q:"The course writes the Nernst equation with concentrations while noting this is an approximation. In which case is the approximation worst?",
+  o:["A dilute solution of a neutral species in pure water",
+     "A millimolar redox couple in 1 M supporting electrolyte, where activity coefficients depart well below 1",
+     "Any solution at exactly 25 °C",
+     "A solution containing a pure solid electrode"],
+  a:1,
+  why:"Activity coefficients approach 1 only at low ionic strength. Adding a molar supporting electrolyte — which you do to suppress migration and lower R<sub>u</sub> — is exactly what drives γ away from 1, especially for multiply charged ions. The usual defence is to hold the ionic strength constant so the error becomes a fixed offset rather than a drifting one."},
+ {q:"Overpotential is defined as η ≡ E − E<sub>eq</sub>. An electrode is held at η = −0.15 V. What does that mean?",
+  o:["It is driven cathodic — the electrode is pushed below its equilibrium potential, favouring reduction",
+     "It is driven anodic, favouring oxidation",
+     "It is at equilibrium, since η is small",
+     "Its equilibrium potential is −0.15 V"],
+  a:0,
+  why:"η is measured from that electrode's own equilibrium potential, not from zero and not from any reference. Negative η means the applied potential sits below E<sub>eq</sub>, raising the Fermi level and driving net reduction. The size of the resulting current follows from Butler–Volmer, and E<sub>eq</sub> itself comes from Nernst."}
+],
+"Lecture 3": [
+ {q:"A student measures −0.30 V vs Ag/AgCl (sat. KCl, which sits at +0.197 V vs SHE) and reports &ldquo;−0.497 V vs SHE&rdquo;. Which belief produced that number?",
+  o:["Dropping n from a per-decade slope",
+     "Reference-frame arithmetic run backwards — the reference potential was subtracted where it must be added",
+     "Scaling an intensive quantity — the potential was multiplied by the number of electrons",
+     "Activity blindness — the chloride activity was left out"],
+  a:1,
+  why:"E(vs SHE) = E(vs ref) + E(ref vs SHE) = −0.30 + 0.197 = −0.103 V. The reference was the zero you measured from, so you add its position on the SHE scale to get back onto it. The reported −0.497 V is the same size of error in the wrong direction — nearly 400 mV out."},
+ {q:"Why does a three-electrode cell measure the working electrode better than a two-electrode cell?",
+  o:["Three electrodes pass more current, so the signal is larger",
+     "The reference electrode amplifies the measured potential",
+     "The reference carries almost no current, so its potential stays fixed while the counter electrode absorbs the current",
+     "It removes the need for a supporting electrolyte"],
+  a:2,
+  why:"The job is split. The counter electrode takes the current and whatever overpotential that costs it; the reference only senses, through a high-impedance input, so it stays at its equilibrium value. In a two-electrode cell one electrode has to do both jobs, and its polarisation lands in your measurement."},
+ {q:"Why must the counter electrode normally have a larger area than the working electrode?",
+  o:["To lower the solution resistance",
+     "Because it must be the same material as the working electrode",
+     "To keep the reference electrode clean",
+     "So its current density stays low and its reaction never becomes the limiting one"],
+  a:3,
+  why:"The same current through a larger area is a smaller current density, and overpotential grows with current density — roughly 120 mV per decade in the Tafel regime. Keeping the counter electrode's overpotential small keeps the potentiostat inside its compliance voltage and keeps the counter reaction from limiting the experiment."},
+ {q:"A calomel electrode (Hg/Hg₂Cl₂) gives +0.336 V vs SHE in 0.1 M KCl but +0.241 V in saturated KCl — only the saturated one is properly called an SCE. Why does the value depend on the KCl?",
+  o:["The electrode's potential is set by the chloride activity, through the Nernst equation",
+     "The KCl concentration changes the temperature of the cell",
+     "Saturated KCl leaks mercury and shifts the potential",
+     "It is an experimental artefact with no thermodynamic basis"],
+  a:0,
+  why:"The half-reaction is Hg₂Cl₂ + 2e⁻ → 2Hg + 2Cl⁻, so chloride appears in the Nernst term and the potential shifts by about 59 mV per decade of chloride activity. Saturated KCl is used because its activity is fixed by the solid salt — the reference is stable precisely because the concentration cannot drift."},
+ {q:"In non-aqueous work you are urged to report potentials against the ferrocene Fc/Fc⁺ couple. Why?",
+  o:["Ferrocene has exactly 0.000 V in every solvent",
+     "It is the only species that does not react with the analyte",
+     "It is an internal standard measured in the same solution, so it sidesteps the unknown junction potential of an external reference",
+     "It makes the measured currents larger and easier to read"],
+  a:2,
+  why:"Dipping an aqueous reference into an organic solvent creates a liquid-junction potential nobody can measure reliably, and it drifts. Ferrocene is added to the same solution and measured under the same conditions, so the junction cancels out of the difference. Its own potential is not zero and does depend on the solvent — it is a common ruler, not an absolute one."},
+ {q:"You halve the current in a cell. What happens to the ohmic error, and to the electrode's own overpotential?",
+  o:["The ohmic error halves exactly; the overpotential falls, but by far less, because it is logarithmic in current",
+     "Both halve, since both are proportional to current",
+     "The ohmic error halves; the overpotential is unchanged",
+     "Neither changes — both are set by the cell geometry"],
+  a:0,
+  why:"iR<sub>u</sub> is linear in current, so halving i halves it. In the Tafel regime the overpotential goes as a log of current, so halving i removes only about 120 × log 2 ≈ 36 mV for a one-electron process. This is why the two errors have to be separated rather than lumped together: dropping the current is a good cure for iR and a poor one for polarisation."},
+ {q:"For a disk electrode, R<sub>u</sub>(d) = R∞·(2/π)·arctan(2d/r₀). Why does R<sub>u</sub> barely grow once the reference tip is several radii away?",
+  o:["Because the current lines crowd near the disk, so almost all of the resistance lies within the first few radii",
+     "Because the electrolyte conductivity falls with distance",
+     "Because the reference electrode starts drawing current at that distance",
+     "Because the counter electrode's overpotential takes over beyond that point"],
+  a:0,
+  why:"Current spreading out from a small disk passes through rapidly widening cross-sections, so the resistance per unit length collapses with distance. The arctan expresses exactly that: at d = r₀ you have already captured about 70 % of R∞, and the remaining volume of solution — however large — contributes the rest. The practical consequence is that the payoff comes from moving the tip <i>close</i>, not from moving the cell walls."},
+ {q:"You switch a measurement from a three-electrode cell to a two-electrode cell, keeping the same current. Which error appears in the recorded potential that was not there before?",
+  o:["The counter electrode's own overpotential, plus the solution drop over the whole path to it",
+     "Only the solution drop; the overpotential cancels",
+     "Only the counter electrode's overpotential; the solution drop is unchanged",
+     "Neither — the two arrangements measure the same thing at the same current"],
+  a:0,
+  why:"With only two electrodes, the second one is both the reference and the current path. Its polarisation adds to your reading, and so does iR over the entire distance to it rather than the shorter distance to a reference tip. At an appreciable current these can add hundreds of millivolts, all of it attributed to the working electrode."},
+ {q:"You add 0.1 M KCl to a cell that contains 1 mM of your analyte. What is the principal effect on the measurement?",
+  o:["The conductivity rises, so R<sub>u</sub> and the ohmic error fall, and the analyte reaches the electrode by diffusion rather than migration",
+     "The analyte concentration rises, so the faradaic current rises",
+     "The reference electrode potential shifts to zero",
+     "The double layer disappears"],
+  a:0,
+  why:"A supporting electrolyte carries the current through the solution so the analyte does not have to, which removes migration and leaves diffusion — the transport law the standard equations assume. The higher conductivity also cuts R<sub>u</sub> directly, since R∞ = 1/(4κr₀). The price is the activity-coefficient error from the raised ionic strength."}
+]
+};
+
+/* ---------- state ---------- */
+var STORE = "ch40051-ps1-v1";
+var probs = [], state = [], sid = "", defence = 0;
+var sId       = document.getElementById("sId"),
+    genBtn    = document.getElementById("genBtn"),
+    sheet     = document.getElementById("sheet"),
+    summary   = document.getElementById("summary"),
+    startHint = document.getElementById("startHint");
+
+function save(){
+  try { localStorage.setItem(STORE, JSON.stringify({id:sid, st:state})); } catch(e){}
+}
+function load(){
+  try {
+    var d = JSON.parse(localStorage.getItem(STORE) || "null");
+    if (d && d.id){ sId.value = d.id; return d; }
+  } catch(e){}
+  return null;
+}
+
+function build(id){
+  sid = id;
+  var r = mulberry32(hash32("CH40051-PS1-" + id));
+  probs = CALC.map(function(fn){ return fn(r); });
+  ["Lecture 1", "Lecture 2", "Lecture 3"].forEach(function(L){
+    var pool = CONCEPTS[L].map(function(c, i){ return {c:c, i:i}; });
+    for (var k = 0; k < 2; k++){
+      var take = pool.splice(Math.floor(r() * pool.length), 1)[0];
+      var sh = shuffle(r, take.c.o, take.c.a);
+      probs.push({
+        kind:"mcq", lec:L, topic:"Concept — " + L + " #" + (take.i + 1),
+        stem:take.c.q, opts:sh.list, answer:sh.at, why:take.c.why
+      });
+    }
+  });
+  /* one problem is named for the five-minute reproduction at the next class */
+  defence = 1 + Math.floor(r() * probs.length);
+}
+
+/* ---------- rendering ---------- */
+var LETTER = ["A", "B", "C", "D", "E"];
+
+function section(title, note){
+  return '<div class="sect"><h2>' + title + '</h2><p>' + note + '</p></div>';
+}
+
+function render(){
+  sheet.hidden = false;
+  summary.hidden = false;
+  sId.readOnly = true;
+
+  var h = "";
+  probs.forEach(function(p, i){
+    if (i === 0) h += section("Part A &mdash; calculations", "six problems &middot; two attempts each &middot; answers within 2 %");
+    if (i === 6) h += section("Part B &mdash; concepts", "six questions &middot; one attempt each &middot; think before you click");
+
+    var st = state[i];
+    h += '<div class="card' + (st.solved ? " done" : "") + '">'
+       +   '<div class="card-h">'
+       +     '<span class="pnum">' + (i < 9 ? "0" : "") + (i + 1) + '</span>'
+       +     '<span class="ptopic">' + esc(p.topic) + '</span>'
+       +     '<span class="lect">' + esc(p.lec) + '</span>'
+       +   '</div>'
+       +   '<div class="card-b">'
+       +     '<p class="stem">' + p.stem + '</p>';
+
+    if (p.kind === "calc"){
+      h += '<div class="answer">'
+         +   '<input type="text" id="in' + i + '" inputmode="decimal" autocomplete="off"'
+         +     ' placeholder="your answer" value="' + esc(st.given) + '"'
+         +     (st.solved ? " readonly" : "") + '>'
+         +   '<span class="unit">' + esc(p.unit) + '</span>'
+         +   '<button class="ghost" type="button" data-check="' + i + '"'
+         +     (st.solved ? " disabled" : "") + '>Check</button>'
+         + '</div>';
+      if (st.msg) h += '<p class="verdict ' + st.msgKind + '">' + st.msg + '</p>';
+      if (st.showSol){
+        h += '<div class="sol"><h3>Worked solution</h3><ol>';
+        p.solution.forEach(function(s){ h += "<li>" + s + "</li>"; });
+        h += '</ol></div>';
+      }
+    } else {
+      h += '<div class="opts">';
+      p.opts.forEach(function(o, j){
+        var cls = "opt";
+        if (st.showSol){
+          if (j === p.answer) cls += " right";
+          else if (String(j) === String(st.given)) cls += " wrong";
+        }
+        h += '<button type="button" class="' + cls + '" data-mcq="' + i + '" data-opt="' + j + '"'
+           +   (st.showSol ? " disabled" : "") + '>'
+           +   '<span class="k">' + LETTER[j] + '</span><span>' + o + '</span></button>';
+      });
+      h += '</div>';
+      if (st.msg) h += '<p class="verdict ' + st.msgKind + '">' + st.msg + '</p>';
+      if (st.showSol) h += '<div class="why"><b>Why.</b> ' + p.why + '</div>';
+    }
+    h += '</div></div>';
+  });
+  sheet.innerHTML = h;
+
+  var solved = state.filter(function(s){ return s.solved; }).length;
+  document.getElementById("scoreNum").innerHTML = solved + ' <small>/ ' + probs.length + ' correct</small>';
+  document.getElementById("whoLine").innerHTML = esc(sid) + " &middot; verification <b>" + vcode() + "</b>";
+  var dp = probs[defence - 1];
+  document.getElementById("slip").innerHTML =
+      "<b>Defence problem: " + (defence < 10 ? "0" : "") + defence + "</b> &mdash; " + esc(dp.topic)
+    + " (" + esc(dp.lec) + "). Bring this one to the next class. You will have five minutes and a blank sheet to "
+    + "reproduce it with your own numbers, no notes. It is drawn from your ID, so it is yours alone, and it is "
+    + "fixed &mdash; regenerating the page will not change it.";
+}
+
+/* A short code over the student ID and the exact answers this set expects, so a
+   marker can confirm a submitted file was produced by this page and not edited. */
+function vcode(){
+  var s = sid + "|";
+  probs.forEach(function(p){ s += sig(p.answer, 6) + "|"; });
+  var v = hash32(s).toString(36).toUpperCase();
+  while (v.length < 7) v = "0" + v;
+  return v.slice(0, 4) + "-" + v.slice(4);
+}
+
+/* ---------- checking ---------- */
+function check(i){
+  var el = document.getElementById("in" + i);
+  var raw = (el.value || "").trim().replace(/,/g, "").replace(/\s+/g, "");
+  var v = parseFloat(raw);
+  var st = state[i], p = probs[i];
+  if (!raw || !isFinite(v)){
+    st.msg = "Type a number. Use a decimal point, and scientific notation like <code>1.7e-2</code> if you need it.";
+    st.msgKind = "no";
+    render(); return;
+  }
+  st.tries++;
+  st.given = raw;
+  var tol = Math.max(Math.abs(p.answer) * 0.02, p.abstol || 1e-9);
+  if (Math.abs(v - p.answer) <= tol){
+    st.solved = true; st.showSol = true;
+    st.msg = "Correct. The exact value is <b>" + sig(p.answer, 4) + " " + esc(p.unit) + "</b>.";
+    st.msgKind = "ok";
+  } else if (st.tries >= 2){
+    st.showSol = true;
+    st.msg = "Not correct, and that was your second attempt &mdash; the worked solution is below. "
+           + "Read it, then try the number again.";
+    st.msgKind = "no";
+  } else {
+    var ratio = v / p.answer, diff = v - p.answer, nudge = "";
+    if (ratio < 0)
+      nudge = " Check the sign &mdash; which way round is the subtraction?";
+    else if (ratio > 0.9 && ratio < 1.1)
+      nudge = " You are very close &mdash; check your rounding or significant figures.";
+    else if (Math.abs(ratio - 60) < 6 || Math.abs(ratio - 1/60) < 0.005)
+      nudge = " That is off by a factor of 60 &mdash; check whether the answer is wanted in seconds or in minutes.";
+    else if (Math.abs(ratio - 2) < 0.05 || Math.abs(ratio - 3) < 0.05
+          || Math.abs(ratio - 0.5) < 0.02 || Math.abs(ratio - 1/3) < 0.02)
+      nudge = " That is out by a whole-number factor &mdash; look at n, the electrons transferred.";
+    else if (Math.abs(ratio - 1000) < 50 || Math.abs(ratio - 0.001) < 0.0002)
+      nudge = " That is out by a factor of 1000 &mdash; check a milli- prefix somewhere.";
+    else if (p.unit === "V" && Math.abs(Math.abs(diff) - 0.394) < 0.02)
+      nudge = " You are out by twice a reference potential &mdash; that is a subtraction that should have been an addition.";
+    else if (p.unit === "V" && Math.abs(diff) > 0.05 && Math.abs(diff) < 1.4)
+      nudge = " The size is plausible but the offset is not &mdash; check which quantity is added and which subtracted.";
+    st.msg = "Not correct." + nudge + " One more attempt before the solution appears.";
+    st.msgKind = "no";
+  }
+  save(); render();
+}
+
+function choose(i, j){
+  var st = state[i], p = probs[i];
+  if (st.showSol) return;
+  st.tries = 1;
+  st.given = String(j);
+  st.showSol = true;
+  st.solved = (j === p.answer);
+  st.msg = st.solved
+    ? "Correct."
+    : "Not correct &mdash; the right option is <b>" + LETTER[p.answer] + "</b>. Concept questions get one attempt.";
+  st.msgKind = st.solved ? "ok" : "no";
+  save(); render();
+}
+
+sheet.addEventListener("click", function(ev){
+  var b = ev.target.closest("[data-check]");
+  if (b){ check(+b.getAttribute("data-check")); return; }
+  var m = ev.target.closest("[data-mcq]");
+  if (m) choose(+m.getAttribute("data-mcq"), +m.getAttribute("data-opt"));
+});
+sheet.addEventListener("keydown", function(ev){
+  if (ev.key !== "Enter") return;
+  var m = (ev.target.id || "").match(/^in(\d+)$/);
+  if (m){ ev.preventDefault(); check(+m[1]); }
+});
+
+function start(id){
+  build(id);
+  if (!state.length || state.length !== probs.length){
+    state = probs.map(function(){
+      return {solved:false, tries:0, given:"", msg:"", msgKind:"", showSol:false};
+    });
+  }
+  save(); render();
+}
+
+genBtn.addEventListener("click", function(){
+  var id = (sId.value || "").trim();
+  if (!id){
+    startHint.innerHTML = "<b style='color:var(--stop)'>Enter your student ID first.</b> "
+                        + "It is what generates your particular problems.";
+    sId.focus(); return;
+  }
+  state = []; start(id);
+});
+sId.addEventListener("keydown", function(e){ if (e.key === "Enter") genBtn.click(); });
+
+/* ---------- submission file ---------- */
+document.getElementById("dlBtn").addEventListener("click", function(){
+  var solved = state.filter(function(s){ return s.solved; }).length;
+  var head = ["assignment", "student_id", "completed_utc", "solved", "total", "defence_problem", "verification"];
+  var row  = ["PS1", sid, new Date().toISOString(), solved, probs.length, defence, vcode()];
+  probs.forEach(function(p, i){
+    var g = state[i].given;
+    head.push("q" + (i+1) + "_kind");     row.push(p.kind);
+    head.push("q" + (i+1) + "_topic");    row.push(p.topic);
+    head.push("q" + (i+1) + "_expected"); row.push(p.kind === "calc" ? sig(p.answer, 5) : LETTER[p.answer]);
+    head.push("q" + (i+1) + "_given");    row.push(p.kind === "calc" ? g : (g === "" ? "" : LETTER[+g]));
+    head.push("q" + (i+1) + "_tries");    row.push(state[i].tries);
+    head.push("q" + (i+1) + "_solved");   row.push(state[i].solved ? 1 : 0);
+  });
+  function cell(v){ v = String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+  var csv = head.join(",") + "\n" + row.map(cell).join(",") + "\n";
+  try {
+    var blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = "CH40051-PS1_" + sid.replace(/[^A-Za-z0-9_-]/g, "") + ".csv";
+    a.style.display = "none";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+    document.getElementById("dlHint").textContent =
+      "Saved. Submit that file to the LMS assignment for Problem Set 1.";
+  } catch(e){
+    document.getElementById("dlHint").textContent =
+      "Your browser blocked the download. Screenshot this page and submit that instead.";
+  }
+});
+
+/* resume a set from a previous visit */
+var prev = load();
+if (prev){ state = prev.st || []; start(prev.id); }
+
+})();
+</script>
+</body>
+</html>

@@ -416,6 +416,18 @@ function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").repl
 function fmt(x,d){var s=x.toFixed(d);return /^-0(\.0*)?$/.test(s)?s.slice(1):s;}
 function uF(Cf){ return Cf*100; }            /* F/m2 -> uF/cm2 */
 
+/* ---------------- tabs ---------------- */
+var tabs=[].slice.call(document.querySelectorAll(".tab"));
+tabs.forEach(function(t){
+  t.addEventListener("click",function(){
+    tabs.forEach(function(o){
+      var on=(o===t);
+      o.setAttribute("aria-selected",on?"true":"false");
+      document.getElementById(o.getAttribute("aria-controls")).hidden=!on;
+    });
+  });
+});
+
 /* Debye length in m for a 1:1 electrolyte of concentration c (mol/L) */
 function debyeM(c){ return Math.sqrt(EPS*Rg*T/(2*Fc*Fc*c*1000)); }
 function debye(c){ return debyeM(c)*1e9; }   /* nm, for display */
