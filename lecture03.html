@@ -160,6 +160,42 @@ svg{display:block;max-width:100%}
 .locked{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.1em;
   text-transform:uppercase;background:var(--go-soft);color:var(--go);padding:2px 7px;border-radius:4px;margin-left:8px}
 footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;line-height:1.8}
+/* --- ferrocene referencing tab --- */
+.fc3{display:grid;grid-template-columns:minmax(230px,.85fr) minmax(300px,1.35fr) minmax(240px,1fr);
+  gap:16px;align-items:start}
+@media(max-width:1080px){.fc3{grid-template-columns:1fr 1fr}}
+@media(max-width:760px){.fc3{grid-template-columns:1fr}}
+#p-fc svg{width:100%;height:auto;display:block;max-width:700px;margin:0 auto}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px;counter-reset:none}
+.steps li{display:flex;align-items:center;gap:10px;padding:7px 9px;border-radius:7px;font-size:13px;color:var(--muted)}
+.steps li .sn{font-family:"IBM Plex Mono",monospace;font-size:11px;width:19px;height:19px;flex:0 0 auto;
+  display:flex;align-items:center;justify-content:center;border-radius:50%;
+  background:var(--surface-2);color:var(--muted)}
+.steps li.done{color:var(--ink-2)}
+.steps li.done .sn{background:var(--go-soft);color:var(--go)}
+.steps li.on{background:var(--ox-soft);color:var(--ink);font-weight:500}
+.steps li.on .sn{background:var(--ox);color:#fff}
+.fccalc{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;align-items:end}
+.fcout{display:flex;flex-direction:column;gap:4px}
+.fcout .k{font-size:12px;color:var(--muted)}
+.fcout .big{color:var(--go)}
+/* the table is wider than a phone; it scrolls in its own box rather than
+   dragging the whole page sideways */
+.ftab{width:100%;min-width:520px;border-collapse:collapse;font-size:13px;margin-top:4px}
+.ftab th{text-align:left;font-weight:600;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--line-2)}
+.ftab td{padding:9px 10px;border-bottom:1px dotted var(--line);vertical-align:baseline}
+.ftab tr[data-i]{cursor:pointer}
+.ftab tr[data-i]:hover td{background:var(--surface-2)}
+.ftab tr.on td{background:var(--ox-soft)}
+.ftab .n{text-align:right;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ftab .m{color:var(--ink-2);font-size:12.5px}
+.ftab .s{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--muted);white-space:nowrap}
+.ftab tr.ref td:first-child{color:var(--ox)}
+.ftab tr.cpl td:first-child{color:var(--red-)}
+.fc3 .eqline{overflow-wrap:anywhere}
+.srcbox{margin-top:14px;padding:12px 14px;border-radius:8px;background:var(--surface-2);
+  font-size:12.5px;line-height:1.7;color:var(--ink-2)}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -170,12 +206,13 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
     <div style="flex:1 1 380px">
       <p class="eyebrow"><a href="index.html">CH40051 Electroanalytical Chemistry</a> · Lecture 3 · Electrochemical cells</p>
       <h1>Reference Bench</h1>
-      <p class="sub">A potential means nothing until you say what it is measured against. Convert between reference electrodes without losing a sign, and see why a working measurement needs three electrodes rather than two.</p>
+      <p class="sub">A potential means nothing until you say what it is measured against. Convert between reference electrodes without losing a sign, refer a non-aqueous measurement to ferrocene the way IUPAC asks you to, and see why a working measurement needs three electrodes rather than two.</p>
     </div>
   </header>
 
   <div class="tabs" role="tablist">
     <button class="tab" role="tab" aria-selected="true" aria-controls="p-conv" id="t-conv">Reference Converter</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-fc" id="t-fc">Ferrocene Referencing</button>
     <button class="tab" role="tab" aria-selected="false" aria-controls="p-cell" id="t-cell">Ohmic Error</button>
     <button class="tab" role="tab" aria-selected="false" aria-controls="p-quiz" id="t-quiz">Concept Check</button>
   </div>
@@ -222,6 +259,110 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
       </div>
 
     </div>
+  </section>
+
+  <!-- ============== FERROCENE REFERENCING ============== -->
+  <section class="panel" id="p-fc" role="tabpanel" aria-labelledby="t-fc" hidden>
+
+    <div class="fc3">
+
+      <div class="card">
+        <div class="card-h"><h2>The procedure</h2><span class="note">six steps, in order</span></div>
+        <div class="card-b stack" style="gap:14px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="solid" id="fcPlay" type="button">Play</button>
+            <button class="ghost" id="fcPrev" type="button">Back</button>
+            <button class="ghost" id="fcNext" type="button">Next step</button>
+          </div>
+          <ol class="steps" id="fcSteps"></ol>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2>The voltammogram</h2><span class="note" id="fcCVNote"></span></div>
+        <div class="card-b"><svg id="fccv" viewBox="0 0 520 300" role="img" aria-label="Cyclic voltammogram of the analyte, then of the analyte with ferrocene added, then referred to the ferrocene scale"></svg></div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2>What you write down</h2><span class="note" id="fcArithNote"></span></div>
+        <div class="card-b stack" style="gap:12px">
+          <div class="eqline" id="fcEq"></div>
+          <div class="verdict" id="fcSay"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="card-h"><h2>Your own numbers</h2><span class="note">the only two you need to measure</span></div>
+      <div class="card-b">
+        <div class="fccalc">
+          <div>
+            <label class="fld" for="fcEa">E<sub>½</sub> of your couple, vs your Ag/Ag⁺</label>
+            <input type="number" id="fcEa" value="-1.196" step="0.001">
+          </div>
+          <div>
+            <label class="fld" for="fcEfc">E<sub>½</sub> of Fc/Fc⁺ in the <em>same</em> cell</label>
+            <input type="number" id="fcEfc" value="0.084" step="0.001">
+          </div>
+          <div class="fcout">
+            <span class="k">E<sub>½</sub> vs Fc/Fc⁺</span>
+            <span class="big" id="fcAns">—</span>
+          </div>
+        </div>
+        <p class="hint" id="fcCalcHint" style="margin-top:14px"></p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="card-h">
+        <h2>Where things sit on the Fc/Fc⁺ scale</h2>
+        <span class="note">reported values &mdash; anchors to sanity-check your own conversion against</span>
+      </div>
+      <div class="card-b scrollx"><svg id="fcscale" viewBox="0 0 700 330" role="img" aria-label="Potential axis on the ferrocene scale showing reference electrodes below and example redox couples above"></svg></div>
+      <div class="card-b" style="padding-top:0">
+        <div class="scrollx"><table class="ftab" id="fctab"></table></div>
+        <div class="srcbox" id="fcsrc"></div>
+        <p class="hint" style="margin-top:14px">
+          Click a row to place it on the axis. Every value moves with solvent, supporting electrolyte and
+          temperature &mdash; the couples listed here shift by tens of millivolts between papers, and the
+          Ag/Ag⁺ entries shift by more than that as the filling solution ages. Use them to check that your
+          own conversion is not out by a sign or by a volt; do not use them <em>instead of</em> measuring
+          ferrocene in your own cell.
+        </p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="card-h"><h2>When ferrocene will not do</h2></div>
+      <div class="card-b">
+        <div class="roles" style="cursor:default">
+          <div class="role" style="cursor:default">
+            <span class="tagn">Overlap</span>
+            <h3>Your wave sits on top of Fc</h3>
+            <p>Fc/Fc⁺ lands near 0 V on its own scale, so anything oxidising between roughly &minus;0.1 and
+              +0.2 V vs Fc will be buried. Use <b>decamethylferrocene</b> (about &minus;0.5 V vs Fc) or
+              <b>cobaltocenium</b> (about &minus;1.35 V vs Fc) as the internal standard instead, then report
+              against Fc through the known offset.</p>
+          </div>
+          <div class="role" style="cursor:default">
+            <span class="tagn">Reactivity</span>
+            <h3>Fc⁺ attacks your analyte</h3>
+            <p>Ferrocenium is a mild oxidant and is not stable indefinitely in every solvent. If adding Fc
+              changes your own wave, run the standard <b>after</b> your measurement, or in a second identical
+              cell, and check that your wave is unchanged before you trust the offset.</p>
+          </div>
+          <div class="role" style="cursor:default">
+            <span class="tagn">Junction</span>
+            <h3>You changed the solvent</h3>
+            <p>Fc/Fc⁺ is only <em>approximately</em> solvent independent &mdash; that is the assumption the
+              IUPAC recommendation rests on, and it is good to perhaps ±50 mV, not to ±5 mV. Potentials
+              measured in different solvents are comparable on the Fc scale, but not interchangeable.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </section>
 
   <!-- ============== CELL ============== -->
@@ -839,6 +980,421 @@ function drawErr(iMA,Ru,Rtot){
   s+='<text x="'+(flip?px-9:px+9)+'" y="'+(py-9)+'" text-anchor="'+(flip?"end":"start")+'" fill="var(--stop)" '+mono+' font-size="10.5" font-weight="500">'+ec.toFixed(0)+' mV</text>';
   document.getElementById("errsvg").innerHTML=s;
 }
+
+/* ================= REFERRING A NON-AQUEOUS MEASUREMENT TO Fc/Fc⁺ =================
+   An Ag/Ag⁺ electrode is the convenient reference in a non-aqueous cell, but it
+   is not a standard: its potential depends on [Ag⁺], on the solvent, on the
+   liquid junction, and it drifts as the frit fouls. So a number reported
+   "vs Ag/Ag⁺" is not reproducible in anyone else's laboratory.
+
+   The fix, recommended by IUPAC for non-aqueous solvents (Gritzner & Kůta,
+   Pure Appl. Chem. 1984, 56, 461), is an INTERNAL standard: dissolve ferrocene
+   in the very same solution and measure both waves against the same reference
+   in the same scan. Whatever the reference happened to be, it is common to both
+   waves and cancels in the difference:
+
+       E(vs Fc) = E(vs your RE) − E½(Fc/Fc⁺ vs the same RE)
+
+   That subtraction is the whole method. Everything below is there to make the
+   cancellation visible rather than asserted. */
+
+var FC = {
+  Ea:   -1.196,     /* V vs Ag/Ag+ — the analyte, as measured */
+  Efc:   0.084,     /* V vs Ag/Ag+ — ferrocene, in the same cell */
+  n: 1
+};
+
+var fcStep = 0, fcAnim = null, fcShift = 0, fcPlaying = false;   /* fcShift: 0 = Ag/Ag+ axis, 1 = Fc axis */
+
+var FCSTEPS = [
+  { t: "Build the cell",
+    waves: 0,
+    cvn: "nothing run yet",
+    say: ["flat",
+      "Three electrodes in dry, deaerated MeCN with 0.1 M TBAPF₆: glassy carbon working, "
+      + "platinum counter, and a silver wire in its own compartment of 0.01 M AgNO₃. That last one is "
+      + "<b>convenient, not standard</b> — its potential depends on [Ag⁺], on the solvent, on the junction "
+      + "across the frit, and it moves as the frit fouls."] },
+
+  { t: "Run your couple against it",
+    waves: 1,
+    cvn: "your couple only, on the Ag/Ag⁺ axis",
+    say: ["stop",
+      "A clean reversible wave at <b>E½ = " + (-1.196).toFixed(3) + " V vs Ag/Ag⁺</b>. Written down like "
+      + "that the number is useless to anybody else: it is tied to this particular silver electrode on this "
+      + "particular afternoon."] },
+
+  { t: "Drop in ferrocene powder",
+    waves: 1,
+    cvn: "unchanged — nothing has been re-run yet",
+    say: ["flat",
+      "A few milligrams of Fc into the <b>same solution</b>. Change nothing else — not the solvent, the "
+      + "electrolyte, the electrodes, the temperature, or the reference. Ferrocene is neutral, so about "
+      + "1 mM of it barely touches the ionic strength."] },
+
+  { t: "Run the same scan again",
+    waves: 2,
+    cvn: "your couple and Fc/Fc⁺, measured together",
+    say: ["stop",
+      "Two waves now. Yours has not moved; Fc/Fc⁺ appears at <b>+" + (0.084).toFixed(3) + " V vs the same "
+      + "reference</b>. Both numbers still carry whatever error the silver electrode has — but they carry "
+      + "<b>the same error</b>."] },
+
+  { t: "Subtract — the reference cancels",
+    waves: 2, shifting: true,
+    cvn: "sliding the zero onto ferrocene",
+    say: ["go",
+      "This is the whole trick. Both waves were measured against the same reference in the same scan, so "
+      + "the reference potential is common to both and <b>drops out of the difference</b>. Nothing about the "
+      + "silver electrode needs to be known — not even whether it drifted between the two runs, as long as "
+      + "it did not drift <em>within</em> one."] },
+
+  { t: "Report against Fc/Fc⁺",
+    waves: 2, shifted: true,
+    cvn: "referred to Fc/Fc⁺ = 0",
+    say: ["go",
+      "<b>E½ = " + (-1.196 - 0.084).toFixed(3) + " V vs Fc/Fc⁺</b>, and quote the conditions with it: "
+      + "MeCN, 0.1 M TBAPF₆, glassy carbon, 100 mV s⁻¹, 25 °C. Anyone with a bottle of ferrocene can now "
+      + "put their electrode on your scale."] }
+];
+
+/* Reported anchor values on the Fc/Fc⁺ scale. `kind` separates the two things
+   a student conflates: reference ELECTRODES (where a scale sits) and redox
+   COUPLES (where a molecule sits). */
+var FCDATA = [
+  { kind: "ref", nm: "Ag/Ag⁺, 0.001 M AgNO₃", med: "MeCN, 0.1 M Et₄N salt", E: -0.134, src: "PA" },
+  { kind: "ref", nm: "Ag/Ag⁺, 0.01 M AgNO₃",  med: "MeCN, 0.1 M Et₄N salt", E: -0.082, src: "PA" },
+  { kind: "ref", nm: "Ag/Ag⁺, 0.1 M AgNO₃",   med: "MeCN, 0.1 M Et₄N salt", E: -0.037, src: "PA" },
+  { kind: "ref", nm: "SCE (aqueous)",         med: "against MeCN solutions", E: -0.380, src: "PA" },
+  { kind: "ref", nm: "SHE",                   med: "against MeCN solutions", E: -0.624, src: "PA" },
+
+  { kind: "cpl", nm: "Cobaltocenium, Cc⁺/Cc",       med: "MeCN, 0.1 M [NBu₄][PF₆]", E: -1.350, src: "CC" },
+  { kind: "cpl", nm: "O₂ / O₂•⁻",                    med: "DMF",                     E: -1.220, src: "O2" },
+  { kind: "cpl", nm: "Decamethylferrocene, Fc*⁺/Fc*", med: "MeCN, 0.1 M [NBu₄][PF₆]", E: -0.520, src: "DM" },
+  { kind: "cpl", nm: "Ferrocene, Fc⁺/Fc",            med: "any solvent, by definition", E: 0.000, src: "IU" },
+  { kind: "cpl", nm: "TEMPO⁺/TEMPO",                 med: "MeCN",                    E: 0.249, src: "TE" }
+];
+
+var FCSRC = {
+  IU: { tag: "IUPAC", txt: "Gritzner &amp; Kůta, <i>Pure Appl. Chem.</i> <b>1984</b>, 56, 461 — the recommendation to report non-aqueous potentials against Fc/Fc⁺ as an internal standard." },
+  PA: { tag: "P&amp;A 2000", txt: "Pavlishchuk &amp; Addison, <i>Inorg. Chim. Acta</i> <b>2000</b>, 298, 97 — conversion constants between reference electrodes in acetonitrile at 25 °C (a 2025 corrigendum revises the supporting-electrolyte concentration of the ferrocene experiment)." },
+  CC: { tag: "metallocene refs", txt: "The Fc/Fc⁺ − Cc⁺/Cc separation is reported as 1.350 ± 0.020 V in MeCN/[NBu₄][PF₆]; cobaltocenium is often preferred as a reference couple because its diffusion coefficient is less concentration-dependent." },
+  DM: { tag: "decamethyl-Fc", txt: "E°′(Fc*) = −0.520 V vs Fc/Fc⁺ reported in MeCN/[NBu₄][PF₆]. Values between about −0.45 and −0.59 V appear in the literature depending on solvent and electrolyte." },
+  TE: { tag: "TEMPO", txt: "Nutting, Rafiee et al., <i>J. Org. Chem.</i> <b>2023</b>, 88, 540 — the TEMPO nitroxyl/oxoammonium couple at E½ = 249 mV vs Fc/Fc⁺ in MeCN." },
+  O2: { tag: "O₂ couples", txt: "Standard reduction potentials for oxygen and carbon dioxide couples in MeCN and DMF, <i>Inorg. Chem.</i> (DOI 10.1021/acs.inorgchem.5b02136) — O₂/O₂•⁻ near −1.22 V vs Fc/Fc⁺ in DMF." }
+};
+
+var fcPick = 8;   /* the highlighted row — ferrocene itself, to start */
+
+/* ---------------- wiring ---------------- */
+document.getElementById("fcNext").addEventListener("click", function () { fcStop(); fcGo(fcStep + 1); });
+document.getElementById("fcPrev").addEventListener("click", function () { fcStop(); fcGo(fcStep - 1); });
+document.getElementById("fcPlay").addEventListener("click", function () { if (fcPlaying) fcStop(); else fcPlay(); });
+["fcEa", "fcEfc"].forEach(function (id) {
+  document.getElementById(id).addEventListener("input", fcCalc);
+});
+
+function fcGo(k) {
+  fcStep = Math.max(0, Math.min(FCSTEPS.length - 1, k));
+  var st = FCSTEPS[fcStep];
+  /* The subtraction step is the one that has to be watched rather than read, so
+     it slides whether it was reached by pressing Next or by pressing Play. */
+  if (st.shifting) { fcShift = 0; fcShow(); fcSlide(); return; }
+  fcShift = st.shifted ? 1 : 0;
+  fcShow();
+}
+
+/* Slide the axis zero from the reference onto ferrocene. `done` runs after. */
+function fcSlide(done) {
+  var t0 = performance.now(), dur = 1400;
+  var step = function (now) {
+    var u = Math.min(1, (now - t0) / dur);
+    fcShift = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;   /* ease in-out */
+    fcShow();
+    if (u < 1) { fcAnim = requestAnimationFrame(step); }
+    else if (done) { fcAnim = setTimeout(done, 900); }
+    else { fcAnim = null; }
+  };
+  fcAnim = requestAnimationFrame(step);
+}
+
+function fcStop() {
+  /* fcAnim holds either a timeout id or a frame id, so both are cancelled */
+  if (fcAnim) { clearTimeout(fcAnim); cancelAnimationFrame(fcAnim); }
+  fcAnim = null;
+  fcPlaying = false;
+  document.getElementById("fcPlay").textContent = "Play";
+}
+
+/* The one step worth animating rather than cutting to is the subtraction: the
+   axis slides under the waves, which is exactly what the arithmetic does. */
+function fcPlay() {
+  fcPlaying = true;
+  document.getElementById("fcPlay").textContent = "Stop";
+  fcStep = 0; fcShift = 0; fcShow();
+  var advance = function () {
+    if (fcStep >= FCSTEPS.length - 1) { fcStop(); return; }
+    fcStep++;
+    var st = FCSTEPS[fcStep];
+    if (st.shifting) { fcShift = 0; fcShow(); fcSlide(advance); return; }
+    fcShift = st.shifted ? 1 : 0;
+    fcShow();
+    fcAnim = setTimeout(advance, 1900);
+  };
+  fcAnim = setTimeout(advance, 1500);
+}
+
+function fcShow() {
+  var st = FCSTEPS[fcStep];
+
+  document.getElementById("fcSteps").innerHTML = FCSTEPS.map(function (s, i) {
+    return '<li class="' + (i === fcStep ? "on" : (i < fcStep ? "done" : "")) + '">'
+         + '<span class="sn">' + (i + 1) + '</span><span class="st">' + s.t + '</span></li>';
+  }).join("");
+
+  document.getElementById("fcCVNote").textContent = st.cvn;
+
+  var v = document.getElementById("fcSay");
+  v.className = "verdict " + st.say[0];
+  v.innerHTML = st.say[1];
+
+  document.getElementById("fcArithNote").textContent =
+    fcStep < 3 ? "not enough measured yet" : "both numbers in hand";
+  document.getElementById("fcEq").innerHTML = fcEqText();
+
+  document.getElementById("fcPrev").disabled = (fcStep === 0);
+  document.getElementById("fcNext").disabled = (fcStep === FCSTEPS.length - 1);
+
+  fcDrawCV(st);
+}
+
+function fcEqText() {
+  var A = FC.Ea, F = FC.Efc, D = A - F;
+  if (fcStep < 1) {
+    return 'E(vs Fc) = E(vs RE) − E½(Fc vs the same RE)<br>'
+         + '<span style="color:var(--muted)">nothing measured yet — the equation is the whole method</span>';
+  }
+  if (fcStep < 3) {
+    return 'E½(couple) = <b>' + A.toFixed(3) + ' V</b> vs Ag/Ag⁺<br>'
+         + 'E½(Fc/Fc⁺)&nbsp; = <span style="color:var(--muted)">not measured yet</span><br>'
+         + '<span style="color:var(--muted)">E(vs Fc) = ?</span>';
+  }
+  return 'E½(couple) = <b>' + A.toFixed(3) + ' V</b> vs Ag/Ag⁺<br>'
+       + 'E½(Fc/Fc⁺)&nbsp; = <b>' + (F >= 0 ? "+" : "") + F.toFixed(3) + ' V</b> vs Ag/Ag⁺<br>'
+       + 'E(vs Fc) = ' + A.toFixed(3) + ' − (' + (F >= 0 ? "+" : "") + F.toFixed(3) + ') = <b>'
+       + D.toFixed(3) + ' V vs Fc/Fc⁺</b>';
+}
+
+/* ---------------- the voltammogram ----------------
+   The waves never move. Only the axis does: fcShift slides the zero of the
+   potential axis from the Ag/Ag⁺ reference onto ferrocene, which is precisely
+   what subtracting E½(Fc) does to every number on the plot. */
+function fcDrawCV(st) {
+  var W = 520, H = 300, L = 60, R = 20, T = 26, B = 52;
+  var mono = 'font-family="IBM Plex Mono,monospace"';
+  var lo = -1.60, hi = 0.45;                       /* window, V vs Ag/Ag+ */
+  function X(e) { return L + (e - lo) / (hi - lo) * (W - L - R); }
+  function Y(c) { return T + (1 - c) / 2 * (H - T - B); }   /* c in [-1, 1] */
+  var s = '';
+
+  /* frame */
+  s += '<line x1="' + L + '" y1="' + (H - B) + '" x2="' + (W - R) + '" y2="' + (H - B) + '" stroke="var(--line-2)" stroke-width="1.2"/>';
+  s += '<line x1="' + L + '" y1="' + T + '" x2="' + L + '" y2="' + (H - B) + '" stroke="var(--line-2)" stroke-width="1.2"/>';
+  s += '<line x1="' + L + '" y1="' + Y(0) + '" x2="' + (W - R) + '" y2="' + Y(0) + '" stroke="var(--line-2)" stroke-width="1" stroke-dasharray="2 3"/>';
+  s += '<text transform="rotate(-90 16 ' + ((T + H - B) / 2) + ')" x="16" y="' + ((T + H - B) / 2) + '" text-anchor="middle" fill="var(--muted)" ' + mono + ' font-size="10">current  (anodic +)</text>';
+
+  /* the axis labels are what move: at fcShift = 0 they read against Ag/Ag+,
+     at fcShift = 1 against ferrocene */
+  var off = fcShift * FC.Efc;
+  var ticks = [-1.5, -1.0, -0.5, 0.0];
+  ticks.forEach(function (tv) {
+    var e = tv + off;                       /* keep the labelled values fixed on screen */
+    if (e < lo || e > hi) return;
+    s += '<line x1="' + X(e) + '" y1="' + (H - B) + '" x2="' + X(e) + '" y2="' + (H - B + 4) + '" stroke="var(--line-2)"/>';
+    s += '<text x="' + X(e) + '" y="' + (H - B + 16) + '" text-anchor="middle" fill="var(--muted)" ' + mono + ' font-size="9">' + tv.toFixed(1) + '</text>';
+  });
+  var axname = fcShift < 0.02 ? 'E / V vs Ag/Ag⁺'
+             : (fcShift > 0.98 ? 'E / V vs Fc/Fc⁺' : 'E / V — sliding the zero…');
+  var axcol = fcShift > 0.98 ? 'var(--go)' : (fcShift < 0.02 ? 'var(--ox)' : 'var(--red-)');
+  s += '<text x="' + ((L + W - R) / 2) + '" y="' + (H - 12) + '" text-anchor="middle" fill="' + axcol + '" ' + mono + ' font-size="10.5" font-weight="600">' + axname + '</text>';
+
+  /* the zero of whichever scale is currently in force */
+  var zero = off;
+  if (zero >= lo && zero <= hi) {
+    s += '<line x1="' + X(zero) + '" y1="' + T + '" x2="' + X(zero) + '" y2="' + (H - B) + '" stroke="' + axcol + '" stroke-width="1.2" stroke-dasharray="4 3"/>';
+    s += '<text x="' + (X(zero) + 4) + '" y="' + (T + 10) + '" fill="' + axcol + '" ' + mono + ' font-size="9">0</text>';
+  }
+
+  /* a reversible wave, drawn as the classic duck around E½ */
+  function duck(E12, amp, col, name, dim) {
+    var t = '', i, pts = [], ptsB = [];
+    for (i = 0; i <= 120; i++) {
+      var e = lo + (hi - lo) * i / 120;
+      var u = (e - E12) / 0.045;
+      /* forward (reducing) sweep: a peak just past E½ with a t^-1/2 tail */
+      var f = -Math.exp(-u * u / 2) + (u < 0 ? -0.55 * Math.exp(-Math.abs(u) / 9) : 0);
+      var b = Math.exp(-(u - 1.35) * (u - 1.35) / 2) * 0.92 + (u > 0 ? 0.5 * Math.exp(-Math.abs(u) / 9) : 0);
+      pts.push(X(e).toFixed(1) + ',' + Y(amp * f).toFixed(1));
+      ptsB.push(X(e).toFixed(1) + ',' + Y(amp * b).toFixed(1));
+    }
+    var o = dim ? '0.28' : '1';
+    t += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="' + col + '" stroke-width="2.1" opacity="' + o + '"/>';
+    t += '<polyline points="' + ptsB.join(' ') + '" fill="none" stroke="' + col + '" stroke-width="2.1" opacity="' + o + '"/>';
+    if (!dim) {
+      t += '<line x1="' + X(E12) + '" y1="' + Y(-1.02) + '" x2="' + X(E12) + '" y2="' + Y(1.02) + '" stroke="' + col + '" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"/>';
+      var lx = X(E12), flip = lx > W - R - 96;
+      t += '<text x="' + (flip ? lx - 6 : lx + 6) + '" y="' + (T + 12) + '" text-anchor="' + (flip ? 'end' : 'start') + '" fill="' + col + '" ' + mono + ' font-size="9.5" font-weight="600">' + name + '</text>';
+      t += '<text x="' + (flip ? lx - 6 : lx + 6) + '" y="' + (T + 24) + '" text-anchor="' + (flip ? 'end' : 'start') + '" fill="' + col + '" ' + mono + ' font-size="9.5">E½ = ' + fcAxisVal(E12) + '</text>';
+    }
+    return t;
+  }
+
+  if (st.waves >= 1) s += duck(FC.Ea, 0.62, 'var(--red-)', 'your couple', false);
+  if (st.waves >= 2) s += duck(FC.Efc, 0.48, 'var(--go)', 'Fc/Fc⁺', false);
+
+  if (!st.waves) {
+    s += '<text x="' + ((L + W - R) / 2) + '" y="' + ((T + H - B) / 2) + '" text-anchor="middle" fill="var(--muted)" ' + mono + ' font-size="11">no scan yet</text>';
+  }
+
+  /* while the axis slides, show the subtraction as a bracket between the waves */
+  if (st.shifting || st.shifted) {
+    var y = Y(-0.88), x1 = X(FC.Efc), x2 = X(FC.Ea);
+    s += '<line x1="' + x2 + '" y1="' + y + '" x2="' + x1 + '" y2="' + y + '" stroke="var(--red-)" stroke-width="1.4"/>';
+    s += '<line x1="' + x1 + '" y1="' + (y - 4) + '" x2="' + x1 + '" y2="' + (y + 4) + '" stroke="var(--red-)" stroke-width="1.4"/>';
+    s += '<line x1="' + x2 + '" y1="' + (y - 4) + '" x2="' + x2 + '" y2="' + (y + 4) + '" stroke="var(--red-)" stroke-width="1.4"/>';
+    s += '<text x="' + ((x1 + x2) / 2) + '" y="' + (y - 8) + '" text-anchor="middle" fill="var(--red-)" ' + mono + ' font-size="9.5" font-weight="600">'
+       + (FC.Ea - FC.Efc).toFixed(3) + ' V — this gap never moves</text>';
+  }
+
+  document.getElementById("fccv").innerHTML = s;
+}
+
+/* a potential written on whichever scale the axis is currently showing */
+function fcAxisVal(e) {
+  var v = e - fcShift * FC.Efc;
+  return (v >= 0 ? "+" : "") + v.toFixed(3) + " V";
+}
+
+/* ---------------- your own numbers ---------------- */
+function fcCalc() {
+  var a = parseFloat(document.getElementById("fcEa").value);
+  var f = parseFloat(document.getElementById("fcEfc").value);
+  var out = document.getElementById("fcAns");
+  var hint = document.getElementById("fcCalcHint");
+  if (!isFinite(a) || !isFinite(f)) {
+    out.textContent = "—";
+    hint.innerHTML = "Enter both potentials, measured in the same cell against the same reference.";
+    return;
+  }
+  var d = a - f;
+  out.textContent = (d >= 0 ? "+" : "") + d.toFixed(3) + " V";
+
+  /* the one sanity check worth running automatically */
+  var msg = "<b>E(vs Fc) = " + a.toFixed(3) + " − (" + (f >= 0 ? "+" : "") + f.toFixed(3) + ") = "
+          + d.toFixed(3) + " V.</b> ";
+  /* the sign check goes first: swapping the two inputs trips the magnitude test
+     as well, and "you have them the wrong way round" is the more useful answer */
+  if (f < 0) {
+    msg += "A negative Fc offset puts your reference positive of ferrocene, which an Ag/Ag⁺ electrode "
+         + "in MeCN normally is not. Check that the two boxes are not the wrong way round.";
+  } else if (f > 0.4) {
+    msg += "But a ferrocene wave " + f.toFixed(2) + " V away from your reference is a long way "
+         + "from the ≈ +0.08 V expected of a healthy Ag/Ag⁺ (0.01 M AgNO₃) electrode in MeCN — check the "
+         + "filling solution and the frit before you trust the offset.";
+  } else {
+    msg += "Ferrocene is +" + f.toFixed(3) + " V from your reference, which is in the usual range for "
+         + "Ag/Ag⁺ (0.01 M AgNO₃) in MeCN — the offset looks healthy.";
+  }
+  hint.innerHTML = msg;
+}
+
+/* ---------------- the anchor scale ---------------- */
+function fcDrawScale() {
+  var W = 700, H = 330, L = 32, R = 32, mono = 'font-family="IBM Plex Mono,monospace"';
+  var lo = -1.55, hi = 0.45, ax = 150;
+  function X(e) { return L + (e - lo) / (hi - lo) * (W - L - R); }
+  var s = '', i;
+
+  s += '<text x="' + L + '" y="15" fill="var(--red-)" ' + mono + ' font-size="9.5" letter-spacing="0.06em">REDOX COUPLES — where a molecule sits</text>';
+  s += '<text x="' + (W - R) + '" y="15" text-anchor="end" fill="var(--go)" ' + mono + ' font-size="10.5" font-weight="600">E / V vs Fc/Fc⁺</text>';
+  s += '<text x="' + L + '" y="' + (H - 8) + '" fill="var(--ox)" ' + mono + ' font-size="9.5" letter-spacing="0.06em">REFERENCE ELECTRODES — where a whole scale sits</text>';
+
+  s += '<line x1="' + L + '" y1="' + ax + '" x2="' + (W - R) + '" y2="' + ax + '" stroke="var(--ink-2)" stroke-width="1.6"/>';
+  for (i = -15; i <= 4; i++) {
+    var e = i / 10;
+    if (e < lo || e > hi) continue;
+    var maj = (i % 5 === 0);
+    s += '<line x1="' + X(e) + '" y1="' + ax + '" x2="' + X(e) + '" y2="' + (ax + (maj ? 7 : 4)) + '" stroke="var(--line-2)"/>';
+    if (maj) s += '<text x="' + X(e) + '" y="' + (ax + 19) + '" text-anchor="middle" fill="var(--muted)" ' + mono + ' font-size="9.5">' + e.toFixed(1) + '</text>';
+  }
+  s += '<line x1="' + X(0) + '" y1="24" x2="' + X(0) + '" y2="' + (ax + 8) + '" stroke="var(--go)" stroke-width="1.2" stroke-dasharray="4 3"/>';
+
+  /* One lane per entry rather than a repeating cycle: with five of each and
+     both lists already sorted by potential, the leader lines fan out without
+     a single label ever landing on another. */
+  var up = [], dn = [];
+  FCDATA.forEach(function (d, idx) { (d.kind === "cpl" ? up : dn).push({ d: d, i: idx }); });
+
+  function put(list, above) {
+    var o = '';
+    list.forEach(function (row, lane) {
+      var d = row.d, x = X(d.E), on = (row.i === fcPick);
+      var col = above ? 'var(--red-)' : 'var(--ox)';
+      var ty = above ? (ax - 20 - lane * 23) : (ax + 42 + lane * 23);
+      o += '<line x1="' + x + '" y1="' + ax + '" x2="' + x + '" y2="' + (above ? ty + 5 : ty - 9)
+         + '" stroke="' + col + '" stroke-width="' + (on ? 1.8 : 1) + '" opacity="' + (on ? 1 : 0.45) + '"/>';
+      o += '<circle cx="' + x + '" cy="' + ax + '" r="' + (on ? 5.5 : 3.4) + '" fill="' + col + '" opacity="' + (on ? 1 : 0.75) + '"/>';
+      var flip = x > W - 210;
+      o += '<text x="' + (flip ? x - 8 : x + 8) + '" y="' + ty + '" text-anchor="' + (flip ? 'end' : 'start')
+         + '" fill="' + col + '" ' + mono + ' font-size="9.5"' + (on ? ' font-weight="600"' : ' opacity="0.8"') + '>'
+         + d.nm + '   ' + (d.E >= 0 ? '+' : '') + d.E.toFixed(3) + '</text>';
+    });
+    return o;
+  }
+  s += put(up, true);
+  s += put(dn, false);
+
+  document.getElementById("fcscale").innerHTML = s;
+}
+
+function fcDrawTable() {
+  var rows = '<tr><th>Couple or reference</th><th>Medium</th><th class="n">vs Fc/Fc⁺</th>'
+           + '<th class="n">vs Ag/Ag⁺ 0.01 M</th><th>Reported in</th></tr>';
+  FCDATA.forEach(function (d, idx) {
+    /* the second column is the number a student actually reads off their own
+       screen, so it is worth showing rather than leaving as an exercise */
+    var vsAg = d.E - (-0.082);
+    rows += '<tr class="' + (idx === fcPick ? 'on ' : '') + d.kind + '" data-i="' + idx + '">'
+          + '<td>' + d.nm + '</td>'
+          + '<td class="m">' + d.med + '</td>'
+          + '<td class="n">' + (d.E >= 0 ? '+' : '') + d.E.toFixed(3) + '</td>'
+          + '<td class="n">' + (d.kind === 'ref' && d.nm.indexOf('0.01 M') > 0
+              ? '<span style="color:var(--muted)">0 (this is it)</span>'
+              : (vsAg >= 0 ? '+' : '') + vsAg.toFixed(3)) + '</td>'
+          + '<td class="s">' + FCSRC[d.src].tag + '</td></tr>';
+  });
+  var t = document.getElementById("fctab");
+  t.innerHTML = rows;
+  [].slice.call(t.querySelectorAll("tr[data-i]")).forEach(function (tr) {
+    tr.addEventListener("click", function () {
+      fcPick = +tr.getAttribute("data-i");
+      fcDrawScale(); fcDrawTable(); fcDrawSrc();
+    });
+  });
+}
+
+function fcDrawSrc() {
+  var d = FCDATA[fcPick];
+  document.getElementById("fcsrc").innerHTML =
+    '<b>' + d.nm + '</b> &middot; ' + d.med + ' &middot; <b>'
+    + (d.E >= 0 ? '+' : '') + d.E.toFixed(3) + ' V vs Fc/Fc⁺</b><br>' + FCSRC[d.src].txt;
+}
+
+fcGo(0);
+fcCalc();
+fcDrawScale();
+fcDrawTable();
+fcDrawSrc();
 
 /* ================= CONCEPT CHECK ================= */
 var QZ=[
