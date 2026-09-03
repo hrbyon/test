@@ -279,7 +279,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
       </div>
 
       <div class="card">
-        <div class="card-h"><h2>The voltammogram</h2><span class="note" id="fcCVNote"></span></div>
+        <div class="card-h"><h2>The voltammogram</h2><span class="note" id="fcCVNote"></span><span class="note" style="margin-left:auto">drawn from the two numbers below</span></div>
         <div class="card-b"><svg id="fccv" viewBox="0 0 520 300" role="img" aria-label="Cyclic voltammogram of the analyte, then of the analyte with ferrocene added, then referred to the ferrocene scale"></svg></div>
       </div>
 
@@ -1020,9 +1020,9 @@ var FCSTEPS = [
     waves: 1,
     cvn: "your couple only, on the Ag/Ag⁺ axis",
     say: ["stop",
-      "A clean reversible wave at <b>E½ = " + (-1.196).toFixed(3) + " V vs Ag/Ag⁺</b>. Written down like "
-      + "that the number is useless to anybody else: it is tied to this particular silver electrode on this "
-      + "particular afternoon."] },
+      "A clean reversible wave at <b>E½ = {EA} vs Ag/Ag⁺</b>. Written down like that the number is "
+      + "useless to anybody else: it is tied to this particular silver electrode on this particular "
+      + "afternoon."] },
 
   { t: "Drop in ferrocene powder",
     waves: 1,
@@ -1036,8 +1036,8 @@ var FCSTEPS = [
     waves: 2,
     cvn: "your couple and Fc/Fc⁺, measured together",
     say: ["stop",
-      "Two waves now. Yours has not moved; Fc/Fc⁺ appears at <b>+" + (0.084).toFixed(3) + " V vs the same "
-      + "reference</b>. Both numbers still carry whatever error the silver electrode has — but they carry "
+      "Two waves now. Yours has not moved; Fc/Fc⁺ appears at <b>{EFC} vs the same reference</b>. Both "
+      + "numbers still carry whatever error the silver electrode has — but they carry "
       + "<b>the same error</b>."] },
 
   { t: "Subtract — the reference cancels",
@@ -1053,7 +1053,7 @@ var FCSTEPS = [
     waves: 2, shifted: true,
     cvn: "referred to Fc/Fc⁺ = 0",
     say: ["go",
-      "<b>E½ = " + (-1.196 - 0.084).toFixed(3) + " V vs Fc/Fc⁺</b>, and quote the conditions with it: "
+      "<b>E½ = {ED} vs Fc/Fc⁺</b>, and quote the conditions with it: "
       + "MeCN, 0.1 M TBAPF₆, glassy carbon, 100 mV s⁻¹, 25 °C. Anyone with a bottle of ferrocene can now "
       + "put their electrode on your scale."] }
 ];
@@ -1156,7 +1156,9 @@ function fcShow() {
 
   var v = document.getElementById("fcSay");
   v.className = "verdict " + st.say[0];
-  v.innerHTML = st.say[1];
+  v.innerHTML = st.say[1].replace(/\{EA\}/g, fcV(FC.Ea))
+                         .replace(/\{EFC\}/g, fcV(FC.Efc))
+                         .replace(/\{ED\}/g, fcV(FC.Ea - FC.Efc));
 
   document.getElementById("fcArithNote").textContent =
     fcStep < 3 ? "not enough measured yet" : "both numbers in hand";
@@ -1185,6 +1187,20 @@ function fcEqText() {
        + D.toFixed(3) + ' V vs Fc/Fc⁺</b>';
 }
 
+/* Round tick values covering [a, b] — the axis is no longer a fixed window, so
+   the ticks cannot be a fixed list either. */
+function fcTicks(a, b) {
+  var raw = (b - a) / 4;
+  var mag = Math.pow(10, Math.floor(Math.log(raw) / Math.LN10));
+  var step = mag;
+  [1, 2, 2.5, 5, 10].forEach(function (m) {
+    if (Math.abs(m * mag - raw) < Math.abs(step - raw)) step = m * mag;
+  });
+  var out = [], t = Math.ceil(a / step - 1e-9) * step;
+  for (; t <= b + 1e-9; t += step) out.push(Math.abs(t) < step / 1e6 ? 0 : t);
+  return { vals: out, dp: step >= 0.5 ? 1 : (step >= 0.05 ? 2 : 3) };
+}
+
 /* ---------------- the voltammogram ----------------
    The waves never move. Only the axis does: fcShift slides the zero of the
    potential axis from the Ag/Ag⁺ reference onto ferrocene, which is precisely
@@ -1192,7 +1208,12 @@ function fcEqText() {
 function fcDrawCV(st) {
   var W = 520, H = 300, L = 60, R = 20, T = 26, B = 52;
   var mono = 'font-family="IBM Plex Mono,monospace"';
-  var lo = -1.60, hi = 0.45;                       /* window, V vs Ag/Ag+ */
+  /* The window follows whatever was typed in, so a couple anywhere in the
+     usable range still lands on the plot with room for its tails. */
+  var pin = [FC.Ea, FC.Efc, 0];
+  var lo = Math.min.apply(null, pin) - 0.34;
+  var hi = Math.max.apply(null, pin) + 0.30;
+  if (hi - lo < 0.9) { var mid = (lo + hi) / 2; lo = mid - 0.45; hi = mid + 0.45; }
   function X(e) { return L + (e - lo) / (hi - lo) * (W - L - R); }
   function Y(c) { return T + (1 - c) / 2 * (H - T - B); }   /* c in [-1, 1] */
   var s = '';
@@ -1206,12 +1227,12 @@ function fcDrawCV(st) {
   /* the axis labels are what move: at fcShift = 0 they read against Ag/Ag+,
      at fcShift = 1 against ferrocene */
   var off = fcShift * FC.Efc;
-  var ticks = [-1.5, -1.0, -0.5, 0.0];
-  ticks.forEach(function (tv) {
-    var e = tv + off;                       /* keep the labelled values fixed on screen */
+  var tk = fcTicks(lo - off, hi - off);
+  tk.vals.forEach(function (tv) {
+    var e = tv + off;                       /* tv is read off the axis, e is where it sits */
     if (e < lo || e > hi) return;
     s += '<line x1="' + X(e) + '" y1="' + (H - B) + '" x2="' + X(e) + '" y2="' + (H - B + 4) + '" stroke="var(--line-2)"/>';
-    s += '<text x="' + X(e) + '" y="' + (H - B + 16) + '" text-anchor="middle" fill="var(--muted)" ' + mono + ' font-size="9">' + tv.toFixed(1) + '</text>';
+    s += '<text x="' + X(e) + '" y="' + (H - B + 16) + '" text-anchor="middle" fill="var(--muted)" ' + mono + ' font-size="9">' + tv.toFixed(tk.dp) + '</text>';
   });
   var axname = fcShift < 0.02 ? 'E / V vs Ag/Ag⁺'
              : (fcShift > 0.98 ? 'E / V vs Fc/Fc⁺' : 'E / V — sliding the zero…');
@@ -1269,6 +1290,9 @@ function fcDrawCV(st) {
   document.getElementById("fccv").innerHTML = s;
 }
 
+/* a signed potential, three decimals, the way it would be written in a paper */
+function fcV(e) { return (e >= 0 ? "+" : "") + e.toFixed(3) + " V"; }
+
 /* a potential written on whichever scale the axis is currently showing */
 function fcAxisVal(e) {
   var v = e - fcShift * FC.Efc;
@@ -1286,12 +1310,23 @@ function fcCalc() {
     hint.innerHTML = "Enter both potentials, measured in the same cell against the same reference.";
     return;
   }
+  /* the boxes ARE the measurement: everything else on the tab is drawn from
+     them, so they are written back into FC before anything is redrawn */
+  FC.Ea = a; FC.Efc = f;
+  fcShow();
+
   var d = a - f;
-  out.textContent = (d >= 0 ? "+" : "") + d.toFixed(3) + " V";
+  out.textContent = fcV(d);
 
   /* the one sanity check worth running automatically */
   var msg = "<b>E(vs Fc) = " + a.toFixed(3) + " − (" + (f >= 0 ? "+" : "") + f.toFixed(3) + ") = "
           + d.toFixed(3) + " V.</b> ";
+  if (Math.abs(d) < 0.06) {
+    hint.innerHTML = msg + "But your wave and ferrocene are only " + Math.abs(d * 1000).toFixed(0)
+      + " mV apart, so the two are on top of each other in the plot — this is exactly the case for "
+      + "reaching for decamethylferrocene or cobaltocenium instead.";
+    return;
+  }
   /* the sign check goes first: swapping the two inputs trips the magnitude test
      as well, and "you have them the wrong way round" is the more useful answer */
   if (f < 0) {
