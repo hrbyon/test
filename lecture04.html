@@ -288,7 +288,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
           <div>
             <div class="readout"><span class="k">Potential now</span><span class="v" id="ivRE0">&mdash;</span></div>
             <div class="readout"><span class="k">Time into the sweep</span><span class="v" id="ivRt0">&mdash;</span></div>
-            <div class="readout"><span class="k">Diffusion layer, &radic;(<em>Dt</em>)</span><span class="v" id="ivRd0">&mdash;</span></div>
+            <div class="readout"><span class="k">Diffusion length, &radic;(<em>Dt</em>)</span><span class="v" id="ivRd0">&mdash;</span></div>
             <div class="readout"><span class="k">Current now</span><span class="v" id="ivRnow0">&mdash;</span></div>
           </div>
           <p class="fine" id="ivFine0"></p>
@@ -298,7 +298,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
       <div class="card">
         <div class="card-h"><h2>2 &middot; What it does at the electrode</h2><span class="note" id="ivEnNote0"></span></div>
         <div class="card-b"><svg id="iven0" viewBox="0 0 520 285" role="img" aria-label="Electron energy diagram: the metal Fermi level against the occupied and empty levels of the redox couple"></svg></div>
-        <div class="card-b" style="padding-top:0"><svg id="ivsurf0" viewBox="0 0 520 350" role="img" aria-label="Ion arrangement in the double layer and the concentration gradient in the diffusion layer"></svg></div>
+        <div class="card-b" style="padding-top:0"><svg id="ivsurf0" viewBox="0 0 520 350" role="img" aria-label="Ion arrangement in the double layer, and the undisturbed solution beyond it: diffusion has reached a given distance but nothing is consumed"></svg></div>
       </div>
 
       <div class="card">
@@ -1335,8 +1335,10 @@ function ivShowRow(m) {
     v.className = 'verdict flat';
     v.innerHTML = 'Nothing reacts. The current is <b>' + fmt(iC * 1e6, 1) + ' µA</b> of charging '
       + 'and it does not care where in the window you are — only which way you are going. '
-      + '√(Dt) has still reached <b>' + fmt(delta, 1) + ' µm</b>, exactly as below, but with '
-      + 'nothing being consumed there is no gradient inside it.';
+      + 'Diffusion has still reached <b>' + fmt(delta, 1) + ' µm</b> in that time, exactly as below — '
+      + 'but with nothing being consumed there is no concentration gradient, and so no diffusion '
+      + 'layer here. √(Dt) is a length; a diffusion layer is a depleted region, and it takes a '
+      + 'faradaic reaction to make one.';
   } else if (far) {
     v.className = 'verdict go';
     v.innerHTML = '<b>Faradaic.</b> Electrons are crossing. O is being consumed at the surface '
@@ -1663,7 +1665,7 @@ function ivPlotSurf(m, f) {
   /* ---------- lower strip: the diffusion layer, tens of micrometres ---------- */
   var y1 = 168, h1 = 88;
   var delta = Math.sqrt(IV.D * Math.max(f.t, 1e-9)) * 1e4;      /* um */
-  s += '<text x="8" y="' + (y1 - 10) + '" fill="var(--muted)" ' + mono + ' font-size="9.5" letter-spacing="0.08em">THE DIFFUSION LAYER — √(Dt) = ' + fmt(delta, 1) + ' µm</text>';
+  s += '<text x="8" y="' + (y1 - 10) + '" fill="var(--muted)" ' + mono + ' font-size="9.5" letter-spacing="0.08em">' + (m ? 'THE DIFFUSION LAYER' : 'HOW FAR DIFFUSION HAS REACHED') + ' — √(Dt) = ' + fmt(delta, 1) + ' µm</text>';
   if (ivOn(f, m)) {
     s += '<text x="' + (W - 8) + '" y="' + (y1 - 10) + '" text-anchor="end" fill="var(--ox)" ' + mono + ' font-size="9.5" font-weight="600">FARADAIC</text>';
   }
