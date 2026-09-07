@@ -150,6 +150,98 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
 .trio{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;align-items:start}
 @media(max-width:1180px){.trio{grid-template-columns:1fr 1fr}}
 @media(max-width:820px){.trio{grid-template-columns:1fr}}
+/* The key to the diffusion-layer figure. It has to live outside the svg: that
+   figure is rebuilt from a string every frame, so text inside it flickers. */
+.ivkey{margin:10px 0 0;display:flex;flex-direction:column;gap:5px;
+  font-family:"IBM Plex Mono",monospace;font-size:11px;line-height:1.5;color:var(--ink-2)}
+/* The swatch and the wording are two flex items, and the wording must be ONE of
+   them: leave it as loose text and the <sub> becomes an item of its own, which
+   strands "bulk" on a line by itself. */
+.ivkey span{display:flex;align-items:flex-start;gap:8px}
+.ivkey em{font-style:normal}
+.ivkey sub{line-height:0}
+.ivkey i{flex:none;display:inline-block;width:14px}
+.ivkey i.dot{width:7px;height:7px;margin:5px 3.5px 0;border-radius:50%;background:var(--ox);opacity:.85}
+.ivkey i.bar{height:2px;margin-top:7px;background:var(--red-)}
+.ghchk{display:flex;align-items:flex-start;gap:9px;font-size:12.5px;color:var(--ink-2);cursor:pointer;line-height:1.5}
+.ghchk input{margin:2px 0 0;accent-color:var(--ox);flex:none}
+/* equations and their symbol table */
+.eqrow{display:flex;gap:18px;align-items:baseline;flex-wrap:wrap;padding:10px 0;border-bottom:1px dashed var(--line)}
+.eqrow:last-child{border-bottom:0}
+.eqrow b{font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:500;color:var(--ox);
+  white-space:nowrap;flex:none}
+.eqrow span{font-size:12.5px;color:var(--muted);flex:1;min-width:220px}
+.symhead{margin:18px 0 2px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted)}
+.symrow{display:flex;gap:14px;align-items:baseline;padding:7px 0;border-bottom:1px solid var(--line)}
+.symrow:last-child{border-bottom:0}
+.symrow b{flex:none;width:62px;font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--red-);font-weight:600}
+.symrow span{flex:1;font-size:13px;color:var(--ink-2);line-height:1.5}
+.symrow i{flex:none;min-width:104px;text-align:right;font-style:normal;font-size:13px;
+  font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;color:var(--ink)}
+/* too narrow for three columns: symbol and value keep the top line, the
+   definition drops under them — the value still has to sit hard right */
+@media(max-width:640px){
+  .symrow{flex-wrap:wrap}
+  .symrow span{min-width:100%;order:3}
+  .symrow i{flex:1}
+}
+/* key under the interface figure — static, because that svg is redrawn on every
+   frame of the sweep and text inside it would flicker */
+.gxkey{margin:0;display:flex;flex-wrap:wrap;gap:6px 18px;
+  font-family:"IBM Plex Mono",monospace;font-size:11px;line-height:1.5;color:var(--ink-2)}
+.gxkey span{display:flex;align-items:center;gap:7px}
+.gxkey i{flex:none;width:11px;height:11px;border-radius:50%}
+.gxkey i.pos{background:var(--ox)}
+.gxkey i.neg{background:var(--red-)}
+/* The double-layer bench reads left to right — pick a model, watch the potential
+   fall, read the capacitance it predicts. The controls take the narrowest column
+   because they carry no plot. */
+.ghgrid{display:grid;grid-template-columns:minmax(240px,.82fr) minmax(300px,1fr) minmax(300px,1fr);
+  gap:16px;align-items:start}
+/* Two independent columns rather than one grid of cells: each side then packs
+   against its own contents, so Numbers sits under the controls and the equations
+   sit under the figures, no matter which side happens to be taller. A single
+   grid cannot do that — its rows are shared, so the taller column dictates where
+   the other column's second card may start. */
+.dlgrid{display:grid;grid-template-columns:minmax(240px,.82fr) minmax(560px,2fr);
+  gap:16px;align-items:start}
+.dlg-left{display:flex;flex-direction:column;gap:16px}
+.dlg-right{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.dlg-eq{grid-column:1 / span 2}
+/* Grahame reads the same way, mirrored: the interface figure is the tall one,
+   so it takes the whole right column and the readouts sit directly under the
+   controls and the curve.  Those two stretch to a common height. */
+.ghg-sol{grid-column:1;grid-row:1;align-self:stretch}
+.ghg-cap{grid-column:2;grid-row:1;align-self:stretch}
+.ghg-int{grid-column:3;grid-row:1 / span 2}
+.ghg-num{grid-column:1 / span 2;grid-row:2}
+.ghg-say{grid-column:1 / span 3;grid-row:3}
+/* four blocks of prose across the full width would run to 140 characters a
+   line, so they pair up instead */
+.verdictgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.whylist{margin:8px 0 0;padding-left:18px}
+.whylist li{margin:0 0 7px;line-height:1.6}
+.whylist li:last-child{margin-bottom:0}
+@media(max-width:820px){.verdictgrid{grid-template-columns:1fr}}
+/* In a narrow column the sub-note wraps under the heading on some cards and not
+   others, which lands the figures at different heights. Give every note its own
+   line so all three headers are two lines deep and the figures start level. */
+.dlg-left>.card>.card-h,.dlg-right>.card>.card-h,.ghgrid>.card>.card-h{display:block}
+.dlg-left>.card>.card-h .note,.dlg-right>.card>.card-h .note,.ghgrid>.card>.card-h .note{display:block;margin-top:3px}
+@media(max-width:1100px){
+  .dlgrid{grid-template-columns:1fr}
+  .ghgrid{grid-template-columns:1fr 1fr}
+  .ghgrid>.card{grid-column:auto;grid-row:auto;align-self:auto}
+  /* only the full-width card keeps its span here; Numbers flows into the cell
+     beside the interface figure instead of leaving it empty */
+  .ghgrid>.ghg-say{grid-column:1 / span 2}
+}
+@media(max-width:820px){
+  .ghgrid{grid-template-columns:1fr}
+  .dlg-right{grid-template-columns:1fr}
+  .dlg-right>.dlg-eq,.ghgrid>.card,.ghgrid>.ghg-num,.ghgrid>.ghg-say{grid-column:auto;grid-row:auto;align-self:auto}
+}
 #p-ions svg{width:100%;height:auto;display:block;max-width:520px;margin:0 auto}
 .fine{margin:0;font-size:11.5px;color:var(--muted);line-height:1.6}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
@@ -169,6 +261,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
   <div class="tabs" role="tablist">
     <button class="tab" role="tab" aria-selected="true" aria-controls="p-ions" id="t-ions">CV</button>
     <button class="tab" role="tab" aria-selected="false" aria-controls="p-dl" id="t-dl">Double Layer Models</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-gh" id="t-gh">Grahame 1947</button>
     <button class="tab" role="tab" aria-selected="false" aria-controls="p-quiz" id="t-quiz">Concept Check</button>
   </div>
 
@@ -246,7 +339,13 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
       <div class="card">
         <div class="card-h"><h2>2 &middot; What it does at the electrode</h2><span class="note" id="ivEnNote1"></span></div>
         <div class="card-b"><svg id="iven1" viewBox="0 0 520 285" role="img" aria-label="Electron energy diagram: the metal Fermi level against the occupied and empty levels of the redox couple"></svg></div>
-        <div class="card-b" style="padding-top:0"><svg id="ivsurf1" viewBox="0 0 520 350" role="img" aria-label="Ion arrangement in the double layer and the concentration gradient in the diffusion layer"></svg></div>
+        <div class="card-b" style="padding-top:0">
+          <svg id="ivsurf1" viewBox="0 0 520 350" role="img" aria-label="Ion arrangement in the double layer and the concentration gradient in the diffusion layer"></svg>
+          <p class="ivkey">
+            <span><i class="dot"></i><em>each dot is one O left in solution — they thin out where it has been consumed</em></span>
+            <span><i class="bar"></i><em>the curve is [O]/[O]<sub>bulk</sub> — that same thinning read off as a concentration profile</em></span>
+          </p>
+        </div>
       </div>
 
       <div class="card">
@@ -260,9 +359,9 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
 
   <!-- ============== DOUBLE LAYER ============== -->
   <section class="panel" id="p-dl" role="tabpanel" aria-labelledby="t-dl" hidden>
-    <div class="two">
+    <div class="dlgrid">
 
-      <div class="stack">
+      <div class="dlg-left">
         <div class="card">
           <div class="card-h"><h2>The model</h2><span class="note">each one fixes the previous one</span></div>
           <div class="card-b stack">
@@ -307,28 +406,213 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
         </div>
       </div>
 
-      <div class="stack">
-        <div class="card">
+      <div class="dlg-right">
+        <div class="card dlg-pot">
           <div class="card-h"><h2>Potential against distance</h2><span class="note" id="dlNote"></span></div>
-          <div class="card-b scrollx"><svg id="dlplot" viewBox="0 0 520 340" width="520" height="340" style="margin:0 auto" role="img" aria-label="Potential profile from the electrode surface into the solution"></svg></div>
+          <div class="card-b"><svg id="dlplot" viewBox="0 0 520 340" width="100%" role="img" aria-label="Potential profile from the electrode surface into the solution"></svg></div>
         </div>
-        <div class="card">
+
+        <div class="card dlg-cap">
           <div class="card-h"><h2>Differential capacitance</h2><span class="note">the curve an experiment actually gives you</span></div>
-          <div class="card-b scrollx"><svg id="cdplot" viewBox="0 0 520 300" width="520" height="300" style="margin:0 auto" role="img" aria-label="Differential capacitance against potential for the selected double layer model"></svg></div>
+          <div class="card-b"><svg id="cdplot" viewBox="0 0 520 340" width="100%" role="img" aria-label="Differential capacitance against potential for the selected double layer model"></svg></div>
         </div>
-        <div class="card">
-          <div class="card-h"><h2>What this model says</h2></div>
-          <div class="card-b stack" style="gap:12px">
-            <div class="verdict" id="mDesc"></div>
-            <div class="verdict stop" id="mFail"></div>
+
+        <div class="card dlg-eq">
+          <div class="card-h"><h2>The equations behind it</h2><span class="note" id="eqNote"></span></div>
+          <div class="card-b">
+            <div id="eqList"></div>
+            <div class="symhead">every symbol in them, with the value it currently has</div>
+            <div id="symList"></div>
           </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="card-h"><h2>What this model says</h2></div>
+      <div class="card-b verdictgrid">
+        <div class="verdict" id="mDesc"></div>
+        <div class="verdict stop" id="mFail"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== GRAHAME 1947 ============== -->
+  <section class="panel" id="p-gh" role="tabpanel" aria-labelledby="t-gh" hidden>
+
+    <div class="rowhead">
+      <span class="tag ox">The measurement</span>
+      <h3>Mercury in sodium fluoride</h3>
+      <span class="note">one metal, one salt, four concentrations — and the pzc never moves</span>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>Why this system</h2><span class="note">neither choice is incidental — together they are what made the double layer measurable</span></div>
+      <div class="card-b verdictgrid">
+        <div class="verdict">
+          <b>Why mercury.</b>
+          <ul class="whylist">
+            <li><b>It is a liquid.</b> A dropping electrode renews an atomically smooth,
+              reproducible surface every few seconds. A solid metal carries grain boundaries,
+              steps, oxide and whatever adsorbed on it last — its capacitance depends on the
+              history of the surface, so no two laboratories measure the same number.</li>
+            <li><b>Its area is known exactly.</b> Capacitance is quoted per unit area, and on a
+              solid electrode the true area exceeds the geometric one by a roughness factor
+              nobody can measure. A drop is a sphere: its area follows from the flow rate and
+              the drop time, so µF cm⁻² means what it says.</li>
+            <li><b>It is ideally polarizable over an enormous window.</b> Hydrogen evolution on
+              mercury has a huge overpotential, so the electrode can be taken to about
+              −2 V vs SCE with <i>no</i> faradaic current at all. Every microamp measured is
+              double-layer charging — there is no reaction current to subtract, and that is what
+              makes the differential capacitance a clean measurement rather than an inference.
+              The positive end is the limit: mercury itself oxidises past roughly +0.2 V.</li>
+            <li><b>One uniform surface.</b> A liquid has no crystal facets, so there is a single
+              surface energy and a single pzc — not the facet-by-facet spread a solid gives.</li>
+          </ul>
+        </div>
+        <div class="verdict">
+          <b>Why fluoride.</b>
+          <ul class="whylist">
+            <li><b>It will not shed its water.</b> Specific adsorption requires an ion to strip
+              its hydration shell and touch the metal. F⁻ is the smallest halide and so has the
+              highest charge density and the largest hydration enthalpy of them all; the
+              dehydration cost is never repaid by binding to the metal.</li>
+            <li><b>Hard anion, soft metal.</b> Mercury is polarizable and interacts partly
+              covalently with polarizable anions — which is why the tendency runs
+              F⁻ &lt; PF₆⁻ &lt; BF₄⁻ &lt; ClO₄⁻ &lt; NO₃⁻ &lt; Cl⁻ &lt; Br⁻ &lt; I⁻. Fluoride sits at the
+              bottom because it is hard and barely polarizable. Na⁺ keeps its shell for the
+              same reason.</li>
+            <li><b>So the interface is electrostatics and nothing else.</b> Gouy–Chapman–Stern
+              assumes exactly that: ions as charges held off at the OHP, interacting through the
+              field alone. NaF is the one common aqueous system that honours the assumption, so
+              it is the control experiment the theory can actually be tested against.</li>
+            <li><b>And the data prove it.</b> The minimum stays at −0.472 V through a
+              thousandfold change in concentration. Specific adsorption would drag the pzc with
+              the coverage; that it does not move is the evidence that nothing is adsorbing.
+              Repeat the measurement in KCl or KI and the pzc shifts and the positive branch
+              climbs — you would be measuring adsorption chemistry, not the double layer.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="ghgrid">
+
+        <div class="card ghg-sol">
+          <div class="card-h"><h2>The solution</h2><span class="note">dilute it and watch the dip open</span></div>
+          <div class="card-b stack" style="gap:14px">
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="solid" id="ghPlay" type="button">Dilute 1 M → 1 mM</button>
+              <button class="ghost" id="ghReset" type="button">Back to 0.1 M</button>
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">NaF concentration</span><span class="val" id="ghCv"></span></div>
+              <input type="range" id="ghConc" min="-3" max="0" step="0.01" value="-1">
+            </div>
+            <div class="models" id="ghSet">
+              <button class="mbtn" data-c="-3" aria-pressed="false"><b>1 mM</b><span>deep dip</span></button>
+              <button class="mbtn" data-c="-2" aria-pressed="false"><b>10 mM</b><span>still clear</span></button>
+              <button class="mbtn" data-c="-1" aria-pressed="true"><b>0.1 M</b><span>shallow</span></button>
+              <button class="mbtn" data-c="0"  aria-pressed="false"><b>1 M</b><span>gone</span></button>
+            </div>
+            <label class="ghchk"><input type="checkbox" id="ghFamily" checked>
+              <span>keep the other three on the plot</span></label>
+            <label class="ghchk"><input type="checkbox" id="ghHump">
+              <span>overlay the hump Grahame actually measured</span></label>
+          </div>
+        </div>
+
+        <div class="card ghg-cap">
+          <div class="card-h"><h2>Differential capacitance</h2><span class="note" id="ghNote"></span></div>
+          <div class="card-b"><svg id="ghplot" viewBox="0 0 520 340" width="100%" role="img" aria-label="Differential capacitance of mercury against potential in sodium fluoride at four concentrations, with the minimum fixed at the potential of zero charge"></svg></div>
+          <div class="card-b" style="padding-top:0">
+            <p class="fine" id="ghFine"></p>
+          </div>
+        </div>
+
+        <div class="card ghg-int">
+          <div class="card-h"><h2>What the interface is doing</h2><span class="note" id="gxNote"></span></div>
+          <div class="card-b stack" style="gap:14px">
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="solid" id="gxPlay" type="button">Sweep the potential</button>
+              <button class="ghost" id="gxReset" type="button">Back to the pzc</button>
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">Electrode potential</span><span class="val" id="gxEv"></span></div>
+              <input type="range" id="gxE" min="-1.6" max="0.3" step="0.002" value="-0.472">
+            </div>
+          </div>
+          <div class="card-b" style="padding-top:0">
+            <svg id="gxsurf" viewBox="0 0 520 250" width="100%" role="img" aria-label="The metal face, the compact layer at the outer Helmholtz plane and the diffuse cloud beyond it, redrawn as the electrode potential moves through the potential of zero charge"></svg>
+            <p class="gxkey">
+              <span><i class="pos"></i>positive charge — metal holes, or Na⁺</span>
+              <span><i class="neg"></i>negative charge — metal electrons, or F⁻</span>
+            </p>
+          </div>
+          <div class="card-b" style="padding-top:14px">
+            <div class="readout"><span class="k">Charge on the metal, σ<sub>M</sub></span><span class="v" id="gxSig">—</span></div>
+            <div class="readout"><span class="k">Dropped across the compact layer</span><span class="v" id="gxPh">—</span></div>
+            <div class="readout"><span class="k">Dropped across the diffuse layer</span><span class="v" id="gxPd">—</span></div>
+            <div class="readout"><span class="k">Reach of the diffuse cloud</span><span class="v" id="gxLam">—</span></div>
+            <div class="readout"><span class="k">C here</span><span class="v" id="gxC">—</span></div>
+            <div class="readout"><span class="k">so 100 mV more moves</span><span class="v" id="gxBuy">—</span></div>
+          </div>
+        </div>
+
+        <div class="card ghg-num">
+          <div class="card-h"><h2>Numbers at this concentration</h2></div>
+          <div class="card-b">
+          <div class="readout"><span class="k">Debye length, κ⁻¹</span><span class="v" id="ghDeb">—</span></div>
+          <div class="readout"><span class="k">Diffuse at the pzc, <em>C</em><sub>GC</sub></span><span class="v" id="ghCgc">—</span></div>
+          <div class="readout"><span class="k">Compact, <em>C</em><sub>H</sub></span><span class="v" id="ghCh">—</span></div>
+          <div class="readout"><span class="k">In series at the pzc</span><span class="v" id="ghMin">—</span></div>
+          <div class="readout"><span class="k">Far from the pzc</span><span class="v" id="ghFar">—</span></div>
+          <div class="readout"><span class="k">Depth of the dip</span><span class="v" id="ghDepth">—</span></div>
+          </div>
+        </div>
+
+        <div class="card ghg-say">
+          <div class="card-h"><h2>What the curve set settles</h2></div>
+          <div class="card-b verdictgrid">
+            <div class="verdict">
+              <b>Why fluoride.</b> F⁻ is the one anion at the bottom of the mercury adsorption
+              series — F⁻ &lt; PF₆⁻ &lt; BF₄⁻ &lt; ClO₄⁻ &lt; NO₃⁻ &lt; Cl⁻ &lt; Br⁻ &lt; I⁻ — and Na⁺
+              keeps its hydration shell. Neither ion touches the metal, so the interface is
+              electrostatics and nothing else. That is what makes this the clean test of
+              Gouy–Chapman–Stern: with any other salt you would be measuring chemistry as well.
+            </div>
+            <div class="verdict">
+              <b>How the pzc is read off.</b> The minimum sits at the same potential in every
+              solution — only its depth changes. A feature that ignores how much salt you added
+              belongs to the metal and the solvent, not to the electrolyte. That invariance is
+              the measurement of E<sub>pzc</sub>, and for mercury it lands at −0.472 V vs NCE
+              (−0.43 V vs SCE, −0.19 V vs SHE).
+            </div>
+            <div class="verdict">
+              <b>Why the dip fills in.</b> The two capacitors are in series, so the smaller one
+              wins: 1/C = 1/C<sub>H</sub> + 1/C<sub>GC</sub>, with
+              C<sub>GC</sub> = ε₀ε<sub>r</sub>κ·cosh(zFφ₀/2RT). At the pzc the cosh is 1, so
+              C<sub>GC</sub> = ε₀ε<sub>r</sub>/κ⁻¹ and nothing but the Debye length sets it.
+              Dilute, κ⁻¹ is long and C<sub>GC</sub> is small enough to dominate — a deep dip.
+              Concentrated, κ⁻¹ collapses, C<sub>GC</sub> is large, and C<sub>H</sub> takes the
+              whole measurement.
+            </div>
+            <div class="verdict stop">
+              <b>What it does not explain.</b> Turn on the overlay. The measured curves carry a
+              hump near −0.3 V that Gouy–Chapman–Stern cannot produce, because that model holds
+              C<sub>H</sub> constant and a constant capacitance has no structure to give. Grahame's
+              own conclusion was that the compact layer's capacitance depends on the charge it
+              carries — the water in it reorients as the field turns over. That is the loose end
+              Bockris, Devanathan and Müller pick up in 1963.
+            </div>
         </div>
       </div>
 
     </div>
   </section>
 
-  <!-- ============== QUIZ ============== -->  <!-- ============== QUIZ ============== -->
+  <!-- ============== QUIZ ============== -->
   <section class="panel" id="p-quiz" role="tabpanel" aria-labelledby="t-quiz" hidden>
     <div class="card" style="margin-bottom:16px">
       <div class="card-h">
@@ -515,6 +799,77 @@ var MODEL_TEXT={
     f:"The humps move inwards as the packing fraction ν = 2c/c<sub>max</sub> grows — near ±150 mV at ν = 0.01, ±50 mV at ν = 0.26 — and merge into the bell once ν passes about ⅓. Raise the concentration or the ion size and watch it happen. It is still a mean-field model: it counts volume but not the correlations between individual ions, which is where molecular simulation has to take over."}
 };
 
+/* ---------------- the equations, per model ----------------
+   Each model is listed with the equations this page actually evaluates, so the
+   plots and the algebra cannot drift apart.  Symbols are pulled from one table
+   and carry the value they hold right now, which is the part a static textbook
+   figure can never show. */
+var MODEL_EQ={
+ H:{note:"one capacitor, and no concentration anywhere in it",
+   eq:[["σ<sub>M</sub> = C<sub>H</sub> · φ₀","charge is proportional to potential, and to nothing else"],
+       ["C<sub>H</sub> = ε₀ε<sub>c</sub> / x<sub>H</sub>","a parallel-plate capacitor whose gap is one solvation shell"],
+       ["φ(x) = φ₀ (1 − x/x<sub>H</sub>)","linear across the gap, and field-free past the OHP"]],
+   sym:["phi0","xH","epsC","CH","sigM"]},
+ GC:{note:"the diffuse layer alone — no compact layer in front of it",
+   eq:[["σ<sub>M</sub> = √(8ε₀ε<sub>r</sub>RTc) · sinh(zFφ₀ / 2RT)","the Grahame equation: Poisson–Boltzmann solved without linearising"],
+       ["C<sub>GC</sub> = ∂σ<sub>M</sub>/∂φ₀ = ε₀ε<sub>r</sub>κ · cosh(zFφ₀ / 2RT)","differentiate a sinh and you get a cosh — that is where the V comes from"],
+       ["κ⁻¹ = √(ε₀ε<sub>r</sub>RT / 2F²I)","the Debye length; only the salt sets it"],
+       ["φ(x) = φ₀ e<sup>−κx</sup>","the decay, valid while |φ₀| stays under about 25 mV"]],
+   sym:["phi0","epsR","kinv","conc","z","VT","CGC","sigM"]},
+ S:{note:"the two in series, matched by the charge they share",
+   eq:[["φ₀ = (φ₀ − φ<sub>d</sub>) + φ<sub>d</sub>","the potential splits: compact share first, diffuse share beyond the OHP"],
+       ["σ<sub>M</sub> = C<sub>H</sub>(φ₀ − φ<sub>d</sub>) = σ<sub>diff</sub>(φ<sub>d</sub>)","one charge described twice — solving this is what fixes φ<sub>d</sub>"],
+       ["1/C = 1/C<sub>H</sub> + 1/C<sub>GC</sub>","capacitors in series, so the smaller one takes the measurement"]],
+   sym:["phi0","phid","xH","CH","CGC","kinv","sigM"]},
+ G:{note:"Stern, plus a third sheet of charge that arrived chemically",
+   eq:[["σ<sub>M</sub> + σ<sub>i</sub> + σ<sub>d</sub> = 0","electroneutrality, now with an adsorbed term at the IHP"],
+       ["σ<sub>d</sub> = −(σ<sub>M</sub> + σ<sub>i</sub>)","the diffuse layer balances whatever the metal and the adsorbed ions leave over"],
+       ["E<sub>pzc</sub> → E<sub>pzc</sub> + Δ(σ<sub>i</sub>)","adsorbed charge slides the whole capacitance curve along the potential axis"]],
+   sym:["sigM","sigI","x1","xH","phid","CH"]},
+ B:{note:"Gouy–Chapman with the ions given a volume",
+   eq:[["ν = 2c / c<sub>max</sub>,   c<sub>max</sub> = 1 / (N<sub>A</sub> a³)","how full the layer already is before any potential is applied"],
+       ["u = zFφ₀ / 2RT","the same reduced potential as everywhere else"],
+       ["σ<sub>M</sub> = (ε₀ε<sub>r</sub>V<sub>T</sub>/κ⁻¹) · √( (2/ν) ln[1 + 2ν sinh²u] )","as ν → 0 the log → 2ν sinh²u and this collapses back onto Gouy–Chapman"]],
+   sym:["nu","ionsize","cmax","phi0","kinv","VT","sigM"]}
+};
+
+/* symbol -> [glyph, what it means, its value now] */
+function symTable(v){
+  return {
+   phi0:   ["φ₀","potential of the metal measured against the bulk solution", fmt(v.p0,2)+" V"],
+   phid:   ["φ<sub>d</sub>","what is left of it at the OHP — the diffuse layer's share", fmt(v.pOHP*1000,0)+" mV"],
+   xH:     ["x<sub>H</sub>","OHP: how close a solvated ion can bring its centre", (D_OHP*1e9).toFixed(2)+" nm"],
+   x1:     ["x₁","IHP: centres of the ions that shed their shell and touched the metal", (D_IHP*1e9).toFixed(2)+" nm"],
+   epsC:   ["ε<sub>c</sub>","permittivity inside the compact layer — that water cannot rotate, so it is near 10, not 78.5", erC.toFixed(0)],
+   epsR:   ["ε<sub>r</sub>","permittivity of bulk water at 25 °C", er.toFixed(1)],
+   kinv:   ["κ⁻¹","Debye length — how far the diffuse cloud reaches out", fmt(v.lam,2)+" nm"],
+   conc:   ["c","bulk concentration of the 1:1 salt", v.c>=0.01 ? fmt(v.c,3)+" M" : v.c.toExponential(1)+" M"],
+   z:      ["z","charge number of the ions", "1"],
+   VT:     ["RT/F","thermal voltage — the scale every exponential here is measured in", (VT*1000).toFixed(1)+" mV"],
+   CH:     ["C<sub>H</sub>","capacitance of the compact layer", bare(model)?"— (none)":fmt(uF(CH),1)+" µF/cm²"],
+   CGC:    ["C<sub>GC</sub>","capacitance of the diffuse layer at this potential", model==="H"?"— (none)":fmt(uF(v.cDiff),1)+" µF/cm²"],
+   sigM:   ["σ<sub>M</sub>","excess charge sitting on the metal, per unit area", fmt(v.sig,2)+" µC/cm²"],
+   sigI:   ["σ<sub>i</sub>","charge of the ions specifically adsorbed at the IHP — turning that into a number needs an adsorption isotherm, so this page carries only a relative strength", v.a && v.a.s ? v.a.nm+" — strength "+fmt(v.a.s,2) : "0 — this ion does not adsorb"],
+   nu:     ["ν","packing fraction 2c/c<sub>max</sub>: how much of the lattice the ions already occupy", fmt(v.nu,3)],
+   ionsize:["a","effective ion size, hydration shell included", fmt(v.aNm,2)+" nm"],
+   cmax:   ["c<sub>max</sub>","the concentration at which the lattice is completely full", fmt(1/(NA*Math.pow(v.aNm*1e-9,3))/1000,1)+" M"]
+  };
+}
+
+function renderEq(v){
+  var spec=MODEL_EQ[model], t=symTable(v), s="", i;
+  document.getElementById("eqNote").textContent=spec.note;
+  for(i=0;i<spec.eq.length;i++)
+    s+='<div class="eqrow"><b>'+spec.eq[i][0]+'</b><span>'+spec.eq[i][1]+'</span></div>';
+  document.getElementById("eqList").innerHTML=s;
+  s="";
+  for(i=0;i<spec.sym.length;i++){
+    var r=t[spec.sym[i]];
+    s+='<div class="symrow"><b>'+r[0]+'</b><span>'+r[1]+'</span><i>'+r[2]+'</i></div>';
+  }
+  document.getElementById("symList").innerHTML=s;
+}
+
 function dl(){
   var c=Math.pow(10,+conc.value), p0=+phi.value;
   var lamM=debyeM(c), lam=lamM*1e9;
@@ -554,6 +909,14 @@ function dl(){
     model==="GC"? "all of it in a diffuse cloud" :
     model==="S" ? "compact, then diffuse" :
     model==="G" ? "compact, diffuse, plus adsorbed ions" : "crowding caps the diffuse layer";
+
+  /* charge on the metal, taken from whichever layer the model actually has:
+     the compact layer carries it in H/S/G, the diffuse layer alone in GC/B */
+  var sigM = (model==="H") ? CH*p0
+           : bare(model)   ? sigOf(p0,lamM,nu,mpb)
+                           : CH*(p0-pOHP);
+  renderEq({p0:p0, pOHP:pOHP, lam:lam, c:c, nu:nu, aNm:aNm, cDiff:cDiff, a:a,
+            sig:sigM*100});                      /* C/m2 -> uC/cm2 */
 
   plotDL(c,p0,lamM,pOHP,a,nu,mpb);
   plotCD(c,p0,lamM,nu,a);
@@ -656,7 +1019,8 @@ function plotDL(c,p0,lamM,pOHP,a,nu,mpb){
    diffuse minimum is a low-concentration observation.  So the diffuse branch is
    drawn dashed behind the solid series result. */
 function plotCD(c,p0,lamM,nu,a){
-  var W=520,H=300,L=58,Rr=18,Tp=20,B=52;
+  /* H matches plotDL so the two cards finish at the same height */
+  var W=520,H=340,L=58,Rr=18,Tp=20,B=52;
   var pm=0.42, N=240, i, v;
   var mpb=(model==="B");
   var shift=(model==="G")? -a.s*0.12 : 0;     /* adsorbed anions move the pzc */
@@ -679,6 +1043,12 @@ function plotCD(c,p0,lamM,nu,a){
   var cPzc=uF(EPS/lamM);
   var cmaxPlot=Math.min(400,Math.max(40,1.8*uF(CH),4*cPzc));
   if(model==="H") cmaxPlot=Math.min(200,Math.max(40,maxTot*1.6));
+  /* Bikerman turns over instead of running away, so its peak is a finite number
+     and the frame has to contain it.  Scaled to the diffuse-layer ceiling above,
+     the curve is pinned flat against the top over the lower half of the ion-size
+     slider - two thirds of the points at a = 0.3 nm - and the slider looks dead
+     when it is in fact doing exactly what the model says it should. */
+  else if(mpb) cmaxPlot=Math.max(40,maxTot*1.12);
 
   function X(x){ return L+(x+pm)/(2*pm)*(W-L-Rr); }
   function Y(cv){ return Tp+(cmaxPlot-cv)/cmaxPlot*(H-Tp-B); }
@@ -924,13 +1294,26 @@ function ivStop() {
   if (ivAnim) { cancelAnimationFrame(ivAnim); ivAnim = null; }
   [0, 1].forEach(function (m) { ivEl('ivPlay', m).textContent = 'Run the sweep'; });
 }
+/* One frame per repaint ran the sweep faster than anyone can follow the
+   interface, so the index is advanced on the clock instead of on the repaint:
+   40 frames a second is the old 60 slowed by half again, and it comes out the
+   same on a 120 Hz screen. */
+var IV_FPS = 40;
 function ivPlay() {
   [0, 1].forEach(function (m) { ivEl('ivPlay', m).textContent = 'Stop'; });
   if (ivIdx >= ivFrameCount() - 1) ivIdx = 0;
-  var step = function () {
-    ivIdx++;
-    if (ivIdx >= ivFrameCount()) { ivIdx = ivFrameCount() - 1; ivShow(); ivStop(); return; }
-    ivShow();
+  var last = null, owed = 0;
+  var step = function (now) {
+    if (last === null) last = now;
+    owed += Math.min(now - last, 100) / (1000 / IV_FPS);   /* a backgrounded tab must not jump */
+    last = now;
+    var due = Math.floor(owed);
+    if (due > 0) {
+      owed -= due;
+      ivIdx += due;
+      if (ivIdx >= ivFrameCount()) { ivIdx = ivFrameCount() - 1; ivShow(); ivStop(); return; }
+      ivShow();
+    }
     ivAnim = requestAnimationFrame(step);
   };
   ivAnim = requestAnimationFrame(step);
@@ -1338,6 +1721,11 @@ function ivPlotSurf(m, f) {
        in the corner the curve has left empty */
     s += '<text x="' + (W - 8) + '" y="' + (y1 + h1 - 8) + '" text-anchor="end" fill="var(--red-)" ' + mono + ' font-size="9">[O] / [O]bulk</text>';
     s += '<text x="' + (mx + 8) + '" y="' + (y1 + 14) + '" fill="var(--muted)" ' + mono + ' font-size="9">surface</text>';
+
+    /* The key to the dots and the curve is NOT drawn here.  This whole figure is
+       rebuilt from a string on every frame, so any text inside it is destroyed
+       and recreated forty times a second and flickers too badly to read.  It
+       lives in the markup instead, under the svg — see p.ivkey. */
     if (ivOn(f, m)) {
       /* the two faradaic steps, in their own band so neither one is written
          across the concentration profile above them */
@@ -1362,6 +1750,381 @@ function ivPlotSurf(m, f) {
 }
 
 ivBuild();
+
+/* ================= GRAHAME 1947 =================
+   Grahame measured the differential capacitance of a mercury drop in NaF from
+   1 mM to 1 M and published the curve set that every double-layer chapter has
+   reprinted since (Chem. Rev. 1947, 41, 441).
+
+   The curves drawn here are COMPUTED from Gouy-Chapman-Stern using this page's
+   own constants - they are not digitised data.  That is the point: the model
+   reproduces the dip, its depth, and the fact that the minimum never moves,
+   which is most of what the figure is famous for.  The one thing it cannot do
+   is the hump on the positive branch, so the overlay adds it the way Grahame
+   explained it - by letting C_H depend on the charge it carries instead of
+   holding it constant.  The overlay is a schematic of that shape, tuned to sit
+   where the published curves sit, not a reproduction of the measurements.      */
+
+var GH_EPZC = -0.472;          /* V vs NCE, mercury in NaF */
+var GH_EMIN = -1.60, GH_EMAX = 0.30;
+var GH_CMAX = 45;              /* uF/cm2, top of the plot */
+var GH_SET  = [-3, -2, -1, 0]; /* log10 c for the classic four */
+
+/* Compact layer.  Flat is textbook GCS; the hump is Grahame's reading of it -
+   a Gaussian in phi0 centred just positive of the pzc, where the water in the
+   compact layer turns over. */
+function ghCH(p0, hump){
+  if(!hump) return CH;
+  var d = (p0 - 0.19) / 0.20;
+  return CH + 0.25 * Math.exp(-d * d);      /* +25 uF/cm2 at the top */
+}
+/* Same charge balance as solvePd, but with a C_H that can vary. */
+function ghPd(p0, lam, ch){
+  if(Math.abs(p0) < 1e-9) return 0;
+  var s = sgn(p0), a0 = Math.abs(p0), lo = 0, hi = a0, mid, i;
+  for(i = 0; i < 60; i++){
+    mid = (lo + hi) / 2;
+    if(sigGC(mid, lam) - ch * (a0 - mid) > 0) hi = mid; else lo = mid;
+  }
+  return s * (lo + hi) / 2;
+}
+/* Differential capacitance at potential E (V vs NCE), in uF/cm2 */
+function ghC(E, lam, hump){
+  var p0 = E - GH_EPZC, ch = ghCH(p0, hump);
+  return uF(1 / (1 / ch + 1 / cdGC(ghPd(p0, lam, ch), lam)));
+}
+
+var ghLogC = -1, ghAnim = null, ghLast = null;
+
+function ghPlot(){
+  var W = 520, H = 340, L = 58, Rr = 18, Tp = 20, B = 58;
+  var N = 260, i, k;
+  var family = document.getElementById("ghFamily").checked;
+  var hump   = document.getElementById("ghHump").checked;
+  var lam    = debyeM(Math.pow(10, ghLogC));
+
+  function X(E){ return L + (E - GH_EMIN) / (GH_EMAX - GH_EMIN) * (W - L - Rr); }
+  function Y(c){ return Tp + (GH_CMAX - c) / GH_CMAX * (H - Tp - B); }
+  function curve(lm, hp){
+    var pts = [];
+    for(k = 0; k <= N; k++){
+      var E = GH_EMIN + (GH_EMAX - GH_EMIN) * k / N;
+      pts.push(X(E).toFixed(1) + "," + Y(Math.min(ghC(E, lm, hp), GH_CMAX * 1.02)).toFixed(1));
+    }
+    return pts.join(" ");
+  }
+
+  var mono = 'font-family="IBM Plex Mono,monospace"', s = "";
+
+  /* axes */
+  s += '<line x1="' + L + '" y1="' + Tp + '" x2="' + L + '" y2="' + (H - B) + '" stroke="var(--line-2)" stroke-width="1.2"/>';
+  s += '<line x1="' + L + '" y1="' + (H - B) + '" x2="' + (W - Rr) + '" y2="' + (H - B) + '" stroke="var(--line-2)" stroke-width="1.2"/>';
+  [-1.6, -1.2, -0.8, -0.4, 0].forEach(function(t){
+    s += '<line x1="' + X(t) + '" y1="' + (H - B) + '" x2="' + X(t) + '" y2="' + (H - B + 4) + '" stroke="var(--line-2)"/>';
+    s += '<text x="' + X(t) + '" y="' + (H - B + 16) + '" text-anchor="middle" fill="var(--muted)" ' + mono + ' font-size="9">' + fmt(t, 1) + '</text>';
+  });
+  s += '<text x="' + ((L + W - Rr) / 2) + '" y="' + (H - B + 32) + '" text-anchor="middle" fill="var(--muted)" ' + mono + ' font-size="10">E / V vs NCE  —  positive to the right (IUPAC)</text>';
+  for(i = 0; i <= 3; i++){
+    var cv = GH_CMAX * i / 3;
+    s += '<line x1="' + (L - 4) + '" y1="' + Y(cv) + '" x2="' + L + '" y2="' + Y(cv) + '" stroke="var(--line-2)"/>';
+    s += '<text x="' + (L - 7) + '" y="' + (Y(cv) + 3.5) + '" text-anchor="end" fill="var(--muted)" ' + mono + ' font-size="9">' + cv.toFixed(0) + '</text>';
+  }
+  s += '<text transform="rotate(-90 16 ' + ((Tp + H - B) / 2) + ')" x="16" y="' + ((Tp + H - B) / 2) + '" text-anchor="middle" fill="var(--muted)" ' + mono + ' font-size="10">C / µF cm⁻²</text>';
+
+  /* the pzc: the one line that never moves */
+  s += '<line x1="' + X(GH_EPZC) + '" y1="' + Tp + '" x2="' + X(GH_EPZC) + '" y2="' + (H - B) + '" stroke="var(--red-)" stroke-width="1.2" stroke-dasharray="3 3"/>';
+  s += '<text x="' + (X(GH_EPZC) + 5) + '" y="' + (Tp + 11) + '" fill="var(--red-)" ' + mono + ' font-size="9.5" font-weight="600">pzc  −0.472 V</text>';
+
+  /* C_H floor */
+  s += '<line x1="' + L + '" y1="' + Y(uF(CH)) + '" x2="' + (W - Rr) + '" y2="' + Y(uF(CH)) + '" stroke="var(--go)" stroke-width="1" stroke-dasharray="4 3"/>';
+  /* left end, above the line: every curve runs just under C_H on the right, so a
+     label anchored over there lands on top of them */
+  s += '<text x="' + (L + 5) + '" y="' + (Y(uF(CH)) - 5) + '" fill="var(--go)" ' + mono + ' font-size="9">C_H = ' + fmt(uF(CH), 0) + ' — the compact layer alone</text>';
+
+  /* the other three, faint, so the family is visible at once */
+  if(family){
+    GH_SET.forEach(function(lg){
+      if(Math.abs(lg - ghLogC) < 0.02) return;
+      s += '<polyline points="' + curve(debyeM(Math.pow(10, lg)), false)
+         + '" fill="none" stroke="var(--line-2)" stroke-width="1.3"/>';
+    });
+  }
+
+  /* the schematic measurement, under the model curve so the model reads on top */
+  if(hump){
+    s += '<polyline points="' + curve(lam, true)
+       + '" fill="none" stroke="var(--red-)" stroke-width="2" stroke-dasharray="6 4"/>';
+  }
+
+  /* the live curve */
+  s += '<polyline points="' + curve(lam, false) + '" fill="none" stroke="var(--ox)" stroke-width="2.6" stroke-linejoin="round"/>';
+
+  /* the minimum — it slides up and down, never sideways */
+  var cMin = ghC(GH_EPZC, lam, false);
+  s += '<circle cx="' + X(GH_EPZC) + '" cy="' + Y(cMin) + '" r="5" fill="var(--ox)" stroke="var(--surface)" stroke-width="1.6"/>';
+  /* below the marker, never beside it: this is a minimum, so the space under it
+     is the one place on the plot guaranteed to be empty at every concentration */
+  s += '<text x="' + (X(GH_EPZC) - 8) + '" y="' + (Y(cMin) + 15) + '" text-anchor="end" fill="var(--ox)" ' + mono + ' font-size="10.5" font-weight="600">' + cMin.toFixed(1) + '</text>';
+
+  /* the potential the interface figure below is drawn at — this is the link
+     between a point on the x axis and what the ions are actually doing */
+  if(gxE >= GH_EMIN && gxE <= GH_EMAX){
+    var gx = X(gxE), gy = Y(Math.min(ghC(gxE, lam, false), GH_CMAX));
+    s += '<line x1="' + gx.toFixed(1) + '" y1="' + Tp + '" x2="' + gx.toFixed(1) + '" y2="' + (H - B) + '" stroke="var(--ink)" stroke-width="1.2"/>';
+    s += '<circle cx="' + gx.toFixed(1) + '" cy="' + gy.toFixed(1) + '" r="5.5" fill="var(--ink)" stroke="var(--surface)" stroke-width="1.6"/>';
+    var gflip = gx > W - Rr - 72;
+    s += '<text x="' + (gflip ? gx - 9 : gx + 9).toFixed(1) + '" y="' + (Tp + 27) + '" text-anchor="'
+       + (gflip ? "end" : "start") + '" fill="var(--ink)" ' + mono + ' font-size="9.5" font-weight="600">'
+       + fmt(gxE, 2) + ' V</text>';
+  }
+
+  /* legend */
+  var ly = H - 6;
+  s += '<line x1="' + L + '" y1="' + (ly - 3) + '" x2="' + (L + 22) + '" y2="' + (ly - 3) + '" stroke="var(--ox)" stroke-width="2.6"/>';
+  s += '<text x="' + (L + 27) + '" y="' + ly + '" fill="var(--ox)" ' + mono + ' font-size="9">GCS at ' + ghLabel(ghLogC) + '</text>';
+  if(hump){
+    s += '<line x1="' + (L + 168) + '" y1="' + (ly - 3) + '" x2="' + (L + 190) + '" y2="' + (ly - 3) + '" stroke="var(--red-)" stroke-width="2" stroke-dasharray="6 4"/>';
+    s += '<text x="' + (L + 195) + '" y="' + ly + '" fill="var(--red-)" ' + mono + ' font-size="9">measured shape (schematic)</text>';
+  } else if(family){
+    s += '<line x1="' + (L + 168) + '" y1="' + (ly - 3) + '" x2="' + (L + 190) + '" y2="' + (ly - 3) + '" stroke="var(--line-2)" stroke-width="1.3"/>';
+    s += '<text x="' + (L + 195) + '" y="' + ly + '" fill="var(--muted)" ' + mono + ' font-size="9">the other three concentrations</text>';
+  }
+
+  document.getElementById("ghplot").innerHTML = s;
+}
+
+function ghLabel(lg){
+  var c = Math.pow(10, lg);
+  return c >= 0.995 ? "1 M" : c >= 0.0995 ? "0.1 M"
+       : c >= 0.00995 ? "10 mM" : c >= 0.000995 ? "1 mM"
+       : (c * 1000).toFixed(1) + " mM";
+}
+
+function ghUpdate(){
+  var c = Math.pow(10, ghLogC), lam = debyeM(c);
+  document.getElementById("ghConc").value = ghLogC;
+  document.getElementById("ghCv").textContent = ghLabel(ghLogC);
+  [].slice.call(document.querySelectorAll("#ghSet .mbtn")).forEach(function(b){
+    b.setAttribute("aria-pressed", Math.abs(+b.dataset.c - ghLogC) < 0.02 ? "true" : "false");
+  });
+
+  var cgc = uF(EPS / lam);                    /* cosh = 1 at the pzc */
+  var cMin = ghC(GH_EPZC, lam, false);
+  var cFar = ghC(GH_EMIN, lam, false);
+  document.getElementById("ghDeb").textContent   = fmt(lam * 1e9, 2) + " nm";
+  document.getElementById("ghCgc").textContent   = fmt(cgc, 1) + " µF/cm²";
+  document.getElementById("ghCh").textContent    = fmt(uF(CH), 1) + " µF/cm²";
+  document.getElementById("ghMin").textContent   = fmt(cMin, 1) + " µF/cm²";
+  document.getElementById("ghFar").textContent   = fmt(cFar, 1) + " µF/cm²";
+  document.getElementById("ghDepth").textContent = fmt(cFar - cMin, 1) + " µF/cm²";
+
+  document.getElementById("ghNote").textContent =
+    ghLogC > -0.5  ? "the dip has closed — C_H is all you can see" :
+    ghLogC > -1.5  ? "shallow: the two capacitors are comparable" :
+    ghLogC > -2.5  ? "the diffuse layer is starting to win" :
+                     "deep: the diffuse layer sets the whole measurement";
+
+  document.getElementById("ghFine").innerHTML =
+    "At the pzc the diffuse layer contributes " + fmt(cgc, 1) + " µF/cm² and the compact layer "
+    + fmt(uF(CH), 1) + ", so the series pair reads " + fmt(cMin, 1)
+    + " — closer to whichever is <b>smaller</b>. Curves computed from Gouy–Chapman–Stern with "
+    + "ε<sub>r</sub> = 78.5 in the diffuse layer and 10 across a 0.45 nm compact layer; they are "
+    + "not digitised data. Grahame's own axis ran the other way, with negative potentials to the right.";
+
+  ghPlot();
+  if(typeof gxRefresh === "function") gxRefresh();   /* diluting stretches the cloud too */
+}
+
+function ghStop(){
+  if(ghAnim){ cancelAnimationFrame(ghAnim); ghAnim = null; }
+  ghLast = null;
+  document.getElementById("ghPlay").textContent = "Dilute 1 M → 1 mM";
+}
+function ghGo(){
+  /* Paced on the clock, not on the repaint, so the dilution takes the same
+     seven seconds on a 60 Hz screen and on a 120 Hz one. */
+  document.getElementById("ghPlay").textContent = "Stop";
+  if(ghLogC <= -2.98) ghLogC = 0;
+  ghLast = null;
+  var stepFn = function(now){
+    if(ghLast === null) ghLast = now;
+    var dt = Math.min(now - ghLast, 100) / 1000;
+    ghLast = now;
+    ghLogC -= dt * (3 / 7);                   /* 3 decades in 7 s */
+    if(ghLogC <= -3){ ghLogC = -3; ghUpdate(); ghStop(); return; }
+    ghUpdate();
+    ghAnim = requestAnimationFrame(stepFn);
+  };
+  ghAnim = requestAnimationFrame(stepFn);
+}
+
+document.getElementById("ghPlay").addEventListener("click", function(){
+  if(ghAnim) ghStop(); else ghGo();
+});
+document.getElementById("ghReset").addEventListener("click", function(){
+  ghStop(); ghLogC = -1; ghUpdate();
+});
+document.getElementById("ghConc").addEventListener("input", function(){
+  ghStop(); ghLogC = +this.value; ghUpdate();
+});
+[].slice.call(document.querySelectorAll("#ghSet .mbtn")).forEach(function(b){
+  b.addEventListener("click", function(){ ghStop(); ghLogC = +b.dataset.c; ghUpdate(); });
+});
+document.getElementById("ghFamily").addEventListener("change", ghPlot);
+document.getElementById("ghHump").addEventListener("change", ghPlot);
+
+/* ---------- what the interface is doing at the marked potential ----------
+   The plot above says how much charge a volt buys.  This says what that charge
+   IS: how many carriers sit on the metal, which ion comes to face them, and how
+   far out the cloud that balances them reaches.  Moving along the x axis flips
+   the sign of all of it; moving down the y axis (by diluting) stretches the
+   cloud without changing the charge much. */
+var gxE = GH_EPZC, gxAnim = null, gxLast = null;
+
+/* fixed scatter, so the picture does not jitter between frames */
+var gxDots = (function(){
+  var out = [], s = 20260910, i;
+  for(i = 0; i < 220; i++){
+    s = (s * 1103515245 + 12345) & 0x7fffffff;   var u = (s >>> 8) / 8388608;
+    s = (s * 1103515245 + 12345) & 0x7fffffff;   var v = (s >>> 8) / 8388608;
+    out.push({u: u, y: v});
+  }
+  return out;
+})();
+
+function gxState(){
+  var lam = debyeM(Math.pow(10, ghLogC));
+  var p0  = gxE - GH_EPZC;
+  var pd  = ghPd(p0, lam, CH);
+  return { lam: lam, p0: p0, pd: pd,
+           sig: CH * (p0 - pd) * 100,                    /* uC/cm2 */
+           lamEff: lam / Math.cosh(pd / (2 * VT)) * 1e9,  /* nm */
+           C: ghC(gxE, lam, false) };
+}
+
+function gxDraw(){
+  var W = 520, H = 250, st = gxState();
+  var mx = 64, ohp = 122, y0 = 30, hgt = 150, i;
+  var pos = st.sig > 0;                                   /* metal positive? */
+  var mCol = pos ? "var(--ox)" : "var(--red-)";
+  var iCol = pos ? "var(--red-)" : "var(--ox)";           /* the counter-ion */
+  var n    = Math.min(9, Math.round(Math.abs(st.sig) / 2.2));
+  var mono = 'font-family="IBM Plex Mono,monospace"', s = "";
+
+  /* metal | compact layer | solution */
+  s += '<rect x="0" y="' + y0 + '" width="' + mx + '" height="' + hgt + '" fill="var(--surface-2)"/>';
+  s += '<rect x="' + mx + '" y="' + y0 + '" width="' + (ohp - mx) + '" height="' + hgt + '" fill="var(--line-2)" opacity="0.16"/>';
+  s += '<rect x="' + ohp + '" y="' + y0 + '" width="' + (W - ohp) + '" height="' + hgt + '" fill="var(--red-soft)" opacity="0.30"/>';
+  s += '<line x1="' + ohp + '" y1="' + y0 + '" x2="' + ohp + '" y2="' + (y0 + hgt) + '" stroke="var(--line-2)" stroke-width="1.2" stroke-dasharray="3 3"/>';
+  s += '<text x="' + ohp + '" y="' + (y0 - 8) + '" text-anchor="middle" fill="var(--muted)" ' + mono + ' font-size="9">OHP</text>';
+  s += '<text x="4" y="' + (y0 + hgt + 15) + '" fill="var(--muted)" ' + mono + ' font-size="9">metal</text>';
+  s += '<text x="' + ((mx + ohp) / 2) + '" y="' + (y0 + hgt + 15) + '" text-anchor="middle" fill="var(--muted)" ' + mono + ' font-size="9">compact</text>';
+  s += '<text x="' + (W - 4) + '" y="' + (y0 + hgt + 15) + '" text-anchor="end" fill="var(--muted)" ' + mono + ' font-size="9">bulk solution</text>';
+
+  /* how far the cloud reaches, to scale in nanometres, so 1 mM and 1 M look as
+     different as they really are */
+  var pxPerNm = 34, reach = Math.min(W - ohp - 24, Math.max(9, st.lamEff * pxPerNm));
+
+  if(n > 0){
+    s += '<rect x="' + ohp + '" y="' + y0 + '" width="' + reach.toFixed(1) + '" height="' + hgt
+       + '" fill="' + iCol + '" opacity="0.12"/>';
+    /* the diffuse excess: small, unlabelled, thinning outwards over lamEff */
+    var nd = Math.round(5 + n * 2.4);
+    for(i = 0; i < nd; i++){
+      var d = gxDots[i];
+      var dx = ohp + 13 + (-Math.log(1 - 0.94 * d.u)) * reach * 0.5;
+      if(dx > W - 12) continue;
+      s += '<circle cx="' + dx.toFixed(1) + '" cy="' + (y0 + 11 + d.y * (hgt - 22)).toFixed(1)
+         + '" r="4.5" fill="' + iCol + '" opacity="0.55"/>';
+    }
+  }
+
+  /* carriers on the metal face, and the solvated counter-ions whose centres
+     define the OHP — so they sit ON that plane, not in front of it */
+  for(i = 0; i < n; i++){
+    var qy = y0 + 17 + i * (hgt - 34) / Math.max(1, n - 1);
+    s += '<text x="' + (mx - 7) + '" y="' + (qy + 5) + '" text-anchor="end" fill="' + mCol + '" ' + mono
+       + ' font-size="14" font-weight="700">' + (pos ? '+' : '−') + '</text>';
+    s += '<circle cx="' + ohp + '" cy="' + qy + '" r="8.5" fill="' + iCol + '"/>';
+    s += '<text x="' + ohp + '" y="' + (qy + 3.5) + '" text-anchor="middle" fill="var(--surface)" ' + mono
+       + ' font-size="10" font-weight="700">' + (pos ? '−' : '+') + '</text>';
+  }
+
+  /* and the ions that belong to neither sheet, out where the bulk starts */
+  for(i = 40; i < 54; i++){
+    var b = gxDots[i], bx = ohp + reach + 28 + b.u * (W - ohp - reach - 46);
+    if(bx > W - 10 || bx < ohp + reach + 20) continue;
+    s += '<circle cx="' + bx.toFixed(1) + '" cy="' + (y0 + 11 + b.y * (hgt - 22)).toFixed(1)
+       + '" r="4.5" fill="var(--line-2)" opacity="0.6"/>';
+  }
+
+  document.getElementById("gxsurf").innerHTML = s;
+}
+
+/* gxRefresh redraws the interface only.  gxUpdate also repaints the curve, so
+   that changing the potential moves the marker — while diluting, which already
+   repaints the curve, calls gxRefresh and does not paint it twice per frame. */
+function gxRefresh(){
+  var st = gxState(), pos = st.sig > 0;
+  document.getElementById("gxE").value = gxE;
+  document.getElementById("gxEv").textContent = fmt(gxE, 3) + " V";
+  document.getElementById("gxSig").textContent = (pos ? "+" : "") + fmt(st.sig, 2) + " µC/cm²";
+  document.getElementById("gxPh").textContent  = fmt(Math.abs(st.p0 - st.pd) * 1000, 0) + " mV";
+  document.getElementById("gxPd").textContent  = fmt(Math.abs(st.pd) * 1000, 0) + " mV";
+  document.getElementById("gxLam").textContent = fmt(st.lamEff, 2) + " nm";
+  document.getElementById("gxC").textContent   = fmt(st.C, 1) + " µF/cm²";
+  /* C is a rate: this is the same number said in ions instead of farads */
+  var perNm2 = st.C * 1e-6 * 0.1 / 1.602e-19 / 1e14;      /* charges per nm2 per 100 mV */
+  document.getElementById("gxBuy").textContent = "1 charge per " + fmt(1 / perNm2, 0) + " nm²";
+
+  document.getElementById("gxNote").textContent =
+    Math.abs(gxE - GH_EPZC) < 0.02 ? "at the pzc — no charge, no layer, nothing to screen" :
+    gxE < GH_EPZC ? "metal negative — Na⁺ comes in to face it"
+                  : "metal positive — F⁻ comes in, still holding its water";
+
+  gxDraw();
+}
+function gxUpdate(){
+  gxRefresh();
+  ghPlot();                                    /* move the marker on the curve */
+}
+
+function gxStop(){
+  if(gxAnim){ cancelAnimationFrame(gxAnim); gxAnim = null; }
+  gxLast = null;
+  document.getElementById("gxPlay").textContent = "Sweep the potential";
+}
+function gxGo(){
+  document.getElementById("gxPlay").textContent = "Stop";
+  /* always from the negative end: the point of the sweep is to cross the pzc and
+     watch every charge in the picture change sign, and starting wherever the
+     slider happens to sit would skip that */
+  gxE = GH_EMIN;
+  gxLast = null;
+  var stepFn = function(now){
+    if(gxLast === null) gxLast = now;
+    var dt = Math.min(now - gxLast, 100) / 1000;
+    gxLast = now;
+    gxE += dt * ((GH_EMAX - GH_EMIN) / 11);    /* the full window in 11 s */
+    if(gxE >= GH_EMAX){ gxE = GH_EMAX; gxUpdate(); gxStop(); return; }
+    gxUpdate();
+    gxAnim = requestAnimationFrame(stepFn);
+  };
+  gxAnim = requestAnimationFrame(stepFn);
+}
+
+document.getElementById("gxPlay").addEventListener("click", function(){
+  if(gxAnim) gxStop(); else gxGo();
+});
+document.getElementById("gxReset").addEventListener("click", function(){
+  gxStop(); gxE = GH_EPZC; gxUpdate();
+});
+document.getElementById("gxE").addEventListener("input", function(){
+  gxStop(); gxE = +this.value; gxUpdate();
+});
+
+ghUpdate();
+gxUpdate();
 
 /* ================= CONCEPT CHECK ================= */
 var QZ=[
