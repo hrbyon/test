@@ -219,7 +219,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
 .ghg-say{grid-column:1 / span 3;grid-row:3}
 /* four blocks of prose across the full width would run to 140 characters a
    line, so they pair up instead */
-.verdictgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.verdictgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
 .whylist{margin:8px 0 0;padding-left:18px}
 .whylist li{margin:0 0 7px;line-height:1.6}
 .whylist li:last-child{margin-bottom:0}
@@ -487,11 +487,8 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
               assumes exactly that: ions as charges held off at the OHP, interacting through the
               field alone. NaF is the one common aqueous system that honours the assumption, so
               it is the control experiment the theory can actually be tested against.</li>
-            <li><b>And the data prove it.</b> The minimum stays at −0.472 V through a
-              thousandfold change in concentration. Specific adsorption would drag the pzc with
-              the coverage; that it does not move is the evidence that nothing is adsorbing.
-              Repeat the measurement in KCl or KI and the pzc shifts and the positive branch
-              climbs — you would be measuring adsorption chemistry, not the double layer.</li>
+            <li><b>Whether the assumption holds is testable</b>, and the curve set at the foot
+              of this page is the test. Run it before reading that card.</li>
           </ul>
         </div>
       </div>
@@ -576,18 +573,14 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
           <div class="card-h"><h2>What the curve set settles</h2></div>
           <div class="card-b verdictgrid">
             <div class="verdict">
-              <b>Why fluoride.</b> F⁻ is the one anion at the bottom of the mercury adsorption
-              series — F⁻ &lt; PF₆⁻ &lt; BF₄⁻ &lt; ClO₄⁻ &lt; NO₃⁻ &lt; Cl⁻ &lt; Br⁻ &lt; I⁻ — and Na⁺
-              keeps its hydration shell. Neither ion touches the metal, so the interface is
-              electrostatics and nothing else. That is what makes this the clean test of
-              Gouy–Chapman–Stern: with any other salt you would be measuring chemistry as well.
-            </div>
-            <div class="verdict">
-              <b>How the pzc is read off.</b> The minimum sits at the same potential in every
-              solution — only its depth changes. A feature that ignores how much salt you added
-              belongs to the metal and the solvent, not to the electrolyte. That invariance is
-              the measurement of E<sub>pzc</sub>, and for mercury it lands at −0.472 V vs NCE
-              (−0.43 V vs SCE, −0.19 V vs SHE).
+              <b>Where the pzc is, and that nothing adsorbs.</b> The minimum sits at the same
+              potential in every solution — only its depth changes. A feature that ignores how
+              much salt you added belongs to the metal and the solvent, not to the electrolyte,
+              so that invariance is the measurement of E<sub>pzc</sub>: −0.472 V vs NCE for
+              mercury (−0.43 V vs SCE, −0.19 V vs SHE). It is also the proof that the fluoride
+              argument was right, because specific adsorption would drag the pzc along with the
+              coverage. Repeat this in KCl or KI and the minimum shifts and the positive branch
+              climbs — you would be measuring adsorption chemistry instead of the double layer.
             </div>
             <div class="verdict">
               <b>Why the dip fills in.</b> The two capacitors are in series, so the smaller one
