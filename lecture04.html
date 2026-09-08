@@ -147,7 +147,9 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
   font-variant-numeric:tabular-nums;color:var(--ink-2);background:var(--surface-2);
   padding:3px 9px;border-radius:5px;white-space:nowrap}
 @media(max-width:820px){.rowhead .cond{margin-left:0}}
-.trio{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;align-items:start}
+.trio{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;align-items:stretch}
+.trio>.card{display:flex;flex-direction:column}
+.trio>.card>.card-b:last-child{flex:1 1 auto}
 @media(max-width:1180px){.trio{grid-template-columns:1fr 1fr}}
 @media(max-width:820px){.trio{grid-template-columns:1fr}}
 /* The key to the diffusion-layer figure. It has to live outside the svg: that
@@ -355,6 +357,28 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
       </div>
 
     </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="card-h"><h2>How fast is too fast &mdash; the sweep against RC</h2><span class="note">why the box has corners at all</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqline">
+          &tau; = R<sub>u</sub>C<sub>dl</sub> &nbsp;&nbsp;&middot;&nbsp;&nbsp; t<sub>sweep</sub> = &Delta;E / &nu;
+          &nbsp;&nbsp;&middot;&nbsp;&nbsp; the box needs <b>t<sub>sweep</sub> &gt;&gt; &tau;</b>
+        </div>
+        <p class="hint" style="margin:0">The double layer does not charge instantly. It charges through the uncompensated
+        resistance of the solution, so it follows exp(&minus;t/&tau;) with <b>&tau; = R<sub>u</sub>C<sub>dl</sub></b> &mdash; the
+        same R<sub>u</sub> that Lecture 3 spent a whole tab on. Every time the sweep reverses, the current needs a few &tau; to
+        settle onto its new plateau. While the sweep is slow compared with &tau; those settling periods are invisible and you get
+        the clean rectangle above; once t<sub>sweep</sub> falls to within an order of magnitude of &tau; the corners never finish
+        and the box closes into a lens &mdash; and the capacitance read off it is an underestimate.</p>
+        <p class="hint" style="margin:0"><b>For the cell drawn above.</b> A = 1 cm&sup2; and C<sub>dl</sub> = 20 &micro;F cm&#8315;&sup2;
+        give C = 20 &micro;F; in 0.05 S cm&#8315;&sup1; aqueous electrolyte a 1 cm&sup2; disk has R<sub>u</sub> &asymp; 9 &Omega;, so
+        <b>&tau; &asymp; 0.2 ms</b>. The 4 V window at 1 V s&#8315;&sup1; takes 4 s &mdash; some twenty thousand &tau;, which is why
+        the trace above is square to the eye. Reach a few kV s&#8315;&sup1;, or move to a resistive organic electrolyte where
+        R<sub>u</sub> is kilohms rather than ohms, and t<sub>sweep</sub> drops to a handful of &tau;. That is when the lens appears.</p>
+      </div>
+    </div>
+
   </section>
 
   <!-- ============== DOUBLE LAYER ============== -->
@@ -621,6 +645,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
           </div>
         </div>
         <p class="hint" id="idHint"></p>
+        <p class="hint">Questions 4 and 5 are about the charging box on the <b>CV</b> tab. If the lens shape is new, read <b>&ldquo;How fast is too fast&rdquo;</b> at the foot of that tab first &mdash; it is the one step from i = C&nu; to what happens when the sweep outruns R<sub>u</sub>C<sub>dl</sub>.</p>
       </div>
       <div class="scorebar" id="scorebar" hidden>
         <div>
