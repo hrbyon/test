@@ -99,14 +99,19 @@ input[type=range]:focus-visible{outline:2px solid var(--red-);outline-offset:3px
 .eqline{font-family:"IBM Plex Mono",monospace;font-size:13px;line-height:1.9;color:var(--ink-2);
   background:var(--surface-2);border-radius:7px;padding:11px 13px}
 .eqline b{color:var(--ox);font-weight:600}
+/* the capacitance block under panel 3 carries two equations in a narrow
+   column, so its formulae run at 0.8x the standard .eqline size          */
+.capblk .eqline{font-size:10.4px;line-height:1.8;padding:9px 11px}
 svg{display:block;max-width:100%}
 .scrollx{overflow-x:auto}
 .solid{appearance:none;background:var(--ox);border:1px solid var(--ox);color:#fff;font-family:inherit;
   font-size:13.5px;font-weight:500;padding:10px 16px;border-radius:7px;cursor:pointer}
-.solid:hover{filter:brightness(1.08)}
+.solid:hover:not(:disabled){filter:brightness(1.08)}
+.solid:disabled{background:var(--line-2);border-color:var(--line-2);color:var(--muted);cursor:not-allowed;filter:none}
 .ghost{appearance:none;background:var(--surface-2);border:1px solid var(--line-2);color:var(--ink-2);
   font-family:inherit;font-size:12.5px;padding:8px 12px;border-radius:7px;cursor:pointer;text-align:left}
-.ghost:hover{border-color:var(--ox);color:var(--ox)}
+.ghost:hover:not(:disabled){border-color:var(--ox);color:var(--ox)}
+.ghost:disabled{opacity:.45;cursor:not-allowed}
 .idgrid{display:grid;grid-template-columns:1fr;gap:14px;max-width:340px}
 .scorebar{display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;padding:14px 18px;border-top:1px solid var(--line)}
 .scorenum{font-family:"IBM Plex Mono",monospace;font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
@@ -284,6 +289,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
         <div class="card-b stack" style="gap:14px">
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button class="solid" id="ivPlay0" type="button">Run the sweep</button>
+            <button class="ghost" id="ivPause0" type="button" disabled>Pause</button>
             <button class="ghost" id="ivReset0" type="button">Back to the start</button>
           </div>
           <svg id="ivet0" viewBox="0 0 520 220" role="img" aria-label="Applied potential against time, a linear ramp down and back up"></svg>
@@ -292,6 +298,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
             <div class="readout"><span class="k">Time into the sweep</span><span class="v" id="ivRt0">&mdash;</span></div>
             <div class="readout"><span class="k">Diffusion length, &radic;(<em>Dt</em>)</span><span class="v" id="ivRd0">&mdash;</span></div>
             <div class="readout"><span class="k">Current now</span><span class="v" id="ivRnow0">&mdash;</span></div>
+            <div class="readout"><span class="k">C = |i| / &nu;</span><span class="v" id="ivRcap0">&mdash;</span></div>
           </div>
           <p class="fine" id="ivFine0"></p>
         </div>
@@ -301,12 +308,25 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
         <div class="card-h"><h2>2 &middot; What it does at the electrode</h2><span class="note" id="ivEnNote0"></span></div>
         <div class="card-b"><svg id="iven0" viewBox="0 0 520 285" role="img" aria-label="Electron energy diagram: the metal Fermi level against the occupied and empty levels of the redox couple"></svg></div>
         <div class="card-b" style="padding-top:0"><svg id="ivsurf0" viewBox="0 0 520 350" role="img" aria-label="Ion arrangement in the double layer, and the undisturbed solution beyond it: diffusion has reached a given distance but nothing is consumed"></svg></div>
+        <div class="card-b" style="padding-top:0"><div class="verdict" id="ivVerdict0"></div></div>
       </div>
 
       <div class="card">
         <div class="card-h"><h2>3 &middot; The voltammogram it gives</h2><span class="note" id="ivCVnote0"></span></div>
         <div class="card-b"><svg id="ivcv0" viewBox="0 0 520 280" role="img" aria-label="Cyclic voltammogram with the current position marked"></svg></div>
-        <div class="card-b" style="padding-top:0"><div class="verdict" id="ivVerdict0"></div></div>
+        <div class="card-b capblk" style="padding-top:0">
+          <span class="fld">From a voltammogram</span>
+          <div class="eqline"><b>C = i / &nu;</b> &nbsp;&nbsp;&middot;&nbsp;&nbsp; [A] / [V s&#8315;&#185;] = [A s V&#8315;&#185;] = [C V&#8315;&#185;] = <b>[F]</b></div>
+          <p class="hint" style="margin:9px 0 11px">Sweep the potential, read the plateau current. d<em>E</em>/d<em>t</em>
+          is constant on a linear sweep, so the flat top of the box is simply C &times; &nu;.</p>
+          <div class="eqline" id="ivCapEg0"></div>
+          <p class="hint" style="margin:11px 0 0"><b>The unit.</b> One <b>farad</b> is one coulomb of charge held per volt
+          applied: 1 F = 1 C V&#8315;&#185;. Named for Michael Faraday, and it is an enormous unit &mdash; a 1 F capacitor
+          moves a whole coulomb, some 6 &times; 10<sup>18</sup> electrons, for each volt. An electrode this size stores tens of
+          <em>micro</em>coulombs per volt, so double layers are quoted in <b>&micro;F</b>, and &mdash; because the number scales
+          with how much metal is wetted &mdash; normalised to area as <b>&micro;F cm&#8315;&#178;</b>. That per-area figure is the one
+          worth memorising: 10&ndash;40 &micro;F cm&#8315;&#178; on a metal in aqueous electrolyte.</p>
+        </div>
       </div>
 
     </div>
@@ -325,6 +345,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
         <div class="card-b stack" style="gap:14px">
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button class="solid" id="ivPlay1" type="button">Run the sweep</button>
+            <button class="ghost" id="ivPause1" type="button" disabled>Pause</button>
             <button class="ghost" id="ivReset1" type="button">Back to the start</button>
           </div>
           <svg id="ivet1" viewBox="0 0 520 220" role="img" aria-label="Applied potential against time, a linear ramp down and back up"></svg>
@@ -333,6 +354,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
             <div class="readout"><span class="k">Time into the sweep</span><span class="v" id="ivRt1">&mdash;</span></div>
             <div class="readout"><span class="k">Diffusion layer, &radic;(<em>Dt</em>)</span><span class="v" id="ivRd1">&mdash;</span></div>
             <div class="readout"><span class="k">Current now</span><span class="v" id="ivRnow1">&mdash;</span></div>
+            <div class="readout"><span class="k">C = |i| / &nu;</span><span class="v" id="ivRcap1">&mdash;</span></div>
           </div>
           <p class="fine" id="ivFine1"></p>
         </div>
@@ -358,27 +380,6 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
 
     </div>
 
-    <div class="card" style="margin-top:16px">
-      <div class="card-h"><h2>How fast is too fast &mdash; the sweep against RC</h2><span class="note">why the box has corners at all</span></div>
-      <div class="card-b stack" style="gap:12px">
-        <div class="eqline">
-          &tau; = R<sub>u</sub>C<sub>dl</sub> &nbsp;&nbsp;&middot;&nbsp;&nbsp; t<sub>sweep</sub> = &Delta;E / &nu;
-          &nbsp;&nbsp;&middot;&nbsp;&nbsp; the box needs <b>t<sub>sweep</sub> &gt;&gt; &tau;</b>
-        </div>
-        <p class="hint" style="margin:0">The double layer does not charge instantly. It charges through the uncompensated
-        resistance of the solution, so it follows exp(&minus;t/&tau;) with <b>&tau; = R<sub>u</sub>C<sub>dl</sub></b> &mdash; the
-        same R<sub>u</sub> that Lecture 3 spent a whole tab on. Every time the sweep reverses, the current needs a few &tau; to
-        settle onto its new plateau. While the sweep is slow compared with &tau; those settling periods are invisible and you get
-        the clean rectangle above; once t<sub>sweep</sub> falls to within an order of magnitude of &tau; the corners never finish
-        and the box closes into a lens &mdash; and the capacitance read off it is an underestimate.</p>
-        <p class="hint" style="margin:0"><b>For the cell drawn above.</b> A = 1 cm&sup2; and C<sub>dl</sub> = 20 &micro;F cm&#8315;&sup2;
-        give C = 20 &micro;F; in 0.05 S cm&#8315;&sup1; aqueous electrolyte a 1 cm&sup2; disk has R<sub>u</sub> &asymp; 9 &Omega;, so
-        <b>&tau; &asymp; 0.2 ms</b>. The 4 V window at 1 V s&#8315;&sup1; takes 4 s &mdash; some twenty thousand &tau;, which is why
-        the trace above is square to the eye. Reach a few kV s&#8315;&sup1;, or move to a resistive organic electrolyte where
-        R<sub>u</sub> is kilohms rather than ohms, and t<sub>sweep</sub> drops to a handful of &tau;. That is when the lens appears.</p>
-      </div>
-    </div>
-
   </section>
 
   <!-- ============== DOUBLE LAYER ============== -->
@@ -399,6 +400,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
             <div>
               <div class="slider-row"><span class="fld" style="margin:0">Electrolyte concentration</span><span class="val" id="cV"></span></div>
               <input type="range" id="conc" min="-4" max="0.3" step="0.05" value="-1">
+              <div class="verdict stop" id="cWarn" style="margin-top:9px;font-size:12.5px" hidden></div>
             </div>
             <div>
               <div class="slider-row"><span class="fld" style="margin:0">Surface potential φ₀</span><span class="val" id="pV"></span></div>
@@ -537,10 +539,20 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
               <button class="mbtn" data-c="-1" aria-pressed="true"><b>0.1 M</b><span>shallow</span></button>
               <button class="mbtn" data-c="0"  aria-pressed="false"><b>1 M</b><span>gone</span></button>
             </div>
+            <div>
+              <span class="fld">Anion &mdash; specific adsorption</span>
+              <div class="models" id="ghAnSet">
+                <button class="mbtn" data-a="F"    aria-pressed="true"  type="button"><b>F&#8315;</b><span>none</span></button>
+                <button class="mbtn" data-a="PF6"  aria-pressed="false" type="button"><b>PF&#8326;&#8315;</b><span>very weak</span></button>
+                <button class="mbtn" data-a="BF4"  aria-pressed="false" type="button"><b>BF&#8324;&#8315;</b><span>weak</span></button>
+                <button class="mbtn" data-a="ClO4" aria-pressed="false" type="button"><b>ClO&#8324;&#8315;</b><span>moderate</span></button>
+                <button class="mbtn" data-a="Cl"   aria-pressed="false" type="button"><b>Cl&#8315;</b><span>strong</span></button>
+                <button class="mbtn" data-a="Br"   aria-pressed="false" type="button"><b>Br&#8315;</b><span>stronger</span></button>
+                <button class="mbtn" data-a="I"    aria-pressed="false" type="button" style="grid-column:1/-1"><b>I&#8315;</b><span>strongest &mdash; the anodic branch runs away</span></button>
+              </div>
+            </div>
             <label class="ghchk"><input type="checkbox" id="ghFamily" checked>
               <span>keep the other three on the plot</span></label>
-            <label class="ghchk"><input type="checkbox" id="ghHump">
-              <span>overlay the hump Grahame actually measured</span></label>
           </div>
         </div>
 
@@ -573,6 +585,8 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
           </div>
           <div class="card-b" style="padding-top:14px">
             <div class="readout"><span class="k">Charge on the metal, σ<sub>M</sub></span><span class="v" id="gxSig">—</span></div>
+          <div class="readout"><span class="k">Adsorbed at the IHP, σ<sup>i</sup></span><span class="v" id="gxSigI">—</span></div>
+          <div class="readout"><span class="k">Left for the diffuse layer, σ<sup>d</sup></span><span class="v" id="gxSigD">—</span></div>
             <div class="readout"><span class="k">Dropped across the compact layer</span><span class="v" id="gxPh">—</span></div>
             <div class="readout"><span class="k">Dropped across the diffuse layer</span><span class="v" id="gxPd">—</span></div>
             <div class="readout"><span class="k">Reach of the diffuse cloud</span><span class="v" id="gxLam">—</span></div>
@@ -616,12 +630,13 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
               whole measurement.
             </div>
             <div class="verdict stop">
-              <b>What it does not explain.</b> Turn on the overlay. The measured curves carry a
+              <b>What it does not explain.</b> The measured NaF curves carry a
               hump near −0.3 V that Gouy–Chapman–Stern cannot produce, because that model holds
               C<sub>H</sub> constant and a constant capacitance has no structure to give. Grahame's
               own conclusion was that the compact layer's capacitance depends on the charge it
               carries — the water in it reorients as the field turns over. That is the loose end
-              Bockris, Devanathan and Müller pick up in 1963.
+              Bockris, Devanathan and Müller pick up in 1963. Note it is a different mechanism
+              from the anion adsorption above: F⁻ does not adsorb at all, and the hump is there anyway.
             </div>
         </div>
       </div>
@@ -645,7 +660,6 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
           </div>
         </div>
         <p class="hint" id="idHint"></p>
-        <p class="hint">Questions 4 and 5 are about the charging box on the <b>CV</b> tab. If the lens shape is new, read <b>&ldquo;How fast is too fast&rdquo;</b> at the foot of that tab first &mdash; it is the one step from i = C&nu; to what happens when the sweep outruns R<sub>u</sub>C<sub>dl</sub>.</p>
       </div>
       <div class="scorebar" id="scorebar" hidden>
         <div>
@@ -918,6 +932,27 @@ function dl(){
   document.getElementById("rCT").textContent = fmt(uF(Cd),1)+" µF/cm²";
   document.getElementById("rNu").textContent = mpb ? fmt(nu,3) : "—";
 
+  /* Above roughly half a molar the Debye length has shrunk to about one ion
+     diameter, and the point-charge model underneath κ⁻¹ stops describing
+     anything.  Measurement says the screening length turns round and grows
+     with concentration from there, so the slider is allowed to go on but
+     the number it produces is labelled for what it is.                    */
+  var cw = document.getElementById("cWarn");
+  if (c > 0.5 && model !== "H") {
+    var dIon = 0.7;                                   /* nm, a hydrated 1:1 ion */
+    var lamS = Math.pow(dIon, 3) / (lam * lam);        /* Smith/Perkin scaling  */
+    cw.hidden = false;
+    cw.innerHTML = "<b>Past 0.5 M this is extrapolation.</b> κ⁻¹ = " + fmt(lam, 2)
+      + " nm is what Gouy–Chapman says here, not what is measured. Once the Debye length falls to "
+      + "about one ion diameter the point-charge picture fails, and the <i>measured</i> screening "
+      + "length turns round and grows with concentration: λ<sub>S</sub>/λ<sub>D</sub> ≈ "
+      + "(d/λ<sub>D</sub>)³ gives <b>≈ " + fmt(lamS, 1) + " nm</b> for a 0.7 nm ion — "
+      + fmt(lamS / lam, 0) + "× the other way. Smith, Lee &amp; Perkin, <i>J. Phys. Chem. Lett.</i> "
+      + "<b>2016</b>, 7, 2157. The 0.1 M supporting electrolyte this course assumes sits safely below the turn.";
+  } else {
+    cw.hidden = true;
+  }
+
   document.getElementById("mDesc").className="verdict flat";
   document.getElementById("mDesc").innerHTML=MODEL_TEXT[model].d;
   document.getElementById("mFail").innerHTML=MODEL_TEXT[model].f;
@@ -1172,9 +1207,25 @@ var ivYlo = 0, ivYhi = 0;          /* the shared current axis for panel 3 */
 function ivEl(base, m) { return document.getElementById(base + m); }
 
 [0, 1].forEach(function (m) {
-  ivEl('ivPlay', m).addEventListener('click', function () { if (ivAnim) ivStop(); else ivPlay(); });
-  ivEl('ivReset', m).addEventListener('click', function () { ivStop(); ivIdx = 0; ivShow(); });
+  ivEl('ivPlay', m).addEventListener('click', function () { if (!ivAnim) ivPlay(); });
+  ivEl('ivPause', m).addEventListener('click', function () { if (ivAnim) ivStop(); });
+  ivEl('ivReset', m).addEventListener('click', function () { ivStop(); ivIdx = 0; ivShow(); ivButtons(); });
 });
+
+/* One clock drives both rows, so pausing either one pauses both - that is
+   the point of the panel, and the buttons are kept in step to say so.
+   Exactly one of Run and Pause is live at any moment, and Run comes back
+   as Resume when the sweep was stopped part-way rather than finished.   */
+function ivButtons() {
+  var playing = !!ivAnim, last = ivFrameCount() - 1;
+  var midway = !playing && ivIdx > 0 && ivIdx < last;
+  [0, 1].forEach(function (m) {
+    var play = ivEl('ivPlay', m), pause = ivEl('ivPause', m);
+    play.textContent = midway ? 'Resume' : 'Run the sweep';
+    play.disabled = playing;
+    pause.disabled = !playing;
+  });
+}
 
 /**
  * Explicit finite difference for semi-infinite linear diffusion of O and R,
@@ -1303,6 +1354,17 @@ function ivLabelConditions() {
   ivEl('ivFine', 0).innerHTML = common
     + 'Supporting electrolyte only — <b>no redox couple</b>, swept at <b>ν = ' + nu + '</b> over '
     + win + '.';
+
+  /* The worked example under panel 3 is computed from IV rather than typed
+     out, so it can never disagree with the trace drawn beside it.        */
+  var iCuA = IV.Cdl * IV.A * IV.nu * 1e6;      /* µA */
+  var CuF  = IV.Cdl * IV.A * 1e6;              /* µF */
+  ivEl('ivCapEg', 0).innerHTML =
+      'i (plateau) = <b>' + fmt(iCuA, 1) + ' µA</b>   read off the box<br>'
+    + 'ν&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = <b>' + nu + '</b>   the rate you set<br>'
+    + 'C = i / ν&nbsp;&nbsp; = ' + fmt(iCuA, 1) + ' µA / ' + nu + ' = <b>' + fmt(CuF, 1) + ' µF</b><br>'
+    + 'C / A&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = ' + fmt(CuF, 1) + ' µF / ' + fmt(IV.A, 0) + ' cm² = <b>'
+    + fmt(CuF / IV.A, 1) + ' µF cm⁻²</b>';
   ivEl('ivFine', 1).innerHTML = common
     + 'Same electrode, same clock, same <b>ν = ' + nu + '</b> — with <b>[O] = ' + cmM + ' mM</b> added. '
     + 'Both rows share one current axis in panel 3, so the boxes and the peaks are drawn to the same microamps.';
@@ -1310,7 +1372,7 @@ function ivLabelConditions() {
 
 function ivStop() {
   if (ivAnim) { cancelAnimationFrame(ivAnim); ivAnim = null; }
-  [0, 1].forEach(function (m) { ivEl('ivPlay', m).textContent = 'Run the sweep'; });
+  ivButtons();
 }
 /* One frame per repaint ran the sweep faster than anyone can follow the
    interface, so the index is advanced on the clock instead of on the repaint:
@@ -1318,7 +1380,6 @@ function ivStop() {
    same on a 120 Hz screen. */
 var IV_FPS = 40;
 function ivPlay() {
-  [0, 1].forEach(function (m) { ivEl('ivPlay', m).textContent = 'Stop'; });
   if (ivIdx >= ivFrameCount() - 1) ivIdx = 0;
   var last = null, owed = 0;
   var step = function (now) {
@@ -1335,6 +1396,7 @@ function ivPlay() {
     ivAnim = requestAnimationFrame(step);
   };
   ivAnim = requestAnimationFrame(step);
+  ivButtons();
 }
 
 /* Both rows are driven off the one frame index, so the ramp, the interface and
@@ -1354,6 +1416,15 @@ function ivShowRow(m) {
   ivEl('ivRd', m).textContent = fmt(delta, 1) + ' µm';
   ivEl('ivRnow', m).textContent =
     fmt(tot * 1e6, 1) + ' µA · ' + (m && far ? 'faradaic' : 'charging');
+  /* i/ν is a capacitance only while NOTHING is reacting - not merely while
+     charging happens to be the larger half.  On the diffusion tail the
+     faradaic current is smaller than the charging current but nowhere near
+     zero, and dividing there returns a plausible number that is not a
+     capacitance at all, so the test is against zero, not against iC.      */
+  var clean = Math.abs(f.iF) <= 0.02 * Math.abs(f.iC);
+  ivEl('ivRcap', m).textContent = clean
+    ? fmt(Math.abs(tot) / IV.nu * 1e6, 1) + ' µF'
+    : 'n/a — faradaic';
 
   var v = ivEl('ivVerdict', m);
   if (!m) {
@@ -1770,6 +1841,7 @@ function ivPlotSurf(m, f) {
 }
 
 ivBuild();
+ivButtons();
 
 /* ================= GRAHAME 1947 =================
    Grahame measured the differential capacitance of a mercury drop in NaF from
@@ -1780,25 +1852,16 @@ ivBuild();
    own constants - they are not digitised data.  That is the point: the model
    reproduces the dip, its depth, and the fact that the minimum never moves,
    which is most of what the figure is famous for.  The one thing it cannot do
-   is the hump on the positive branch, so the overlay adds it the way Grahame
-   explained it - by letting C_H depend on the charge it carries instead of
-   holding it constant.  The overlay is a schematic of that shape, tuned to sit
-   where the published curves sit, not a reproduction of the measurements.      */
+   is the hump on the positive branch of the NaF curves: that needs C_H to
+   depend on the charge it carries, which is a separate mechanism from the
+   anion adsorption modelled below and is left to the prose.                    */
 
 var GH_EPZC = -0.472;          /* V vs NCE, mercury in NaF */
 var GH_EMIN = -1.60, GH_EMAX = 0.30;
 var GH_CMAX = 45;              /* uF/cm2, top of the plot */
 var GH_SET  = [-3, -2, -1, 0]; /* log10 c for the classic four */
 
-/* Compact layer.  Flat is textbook GCS; the hump is Grahame's reading of it -
-   a Gaussian in phi0 centred just positive of the pzc, where the water in the
-   compact layer turns over. */
-function ghCH(p0, hump){
-  if(!hump) return CH;
-  var d = (p0 - 0.19) / 0.20;
-  return CH + 0.25 * Math.exp(-d * d);      /* +25 uF/cm2 at the top */
-}
-/* Same charge balance as solvePd, but with a C_H that can vary. */
+/* Same charge balance as solvePd, but with a C_H passed in. */
 function ghPd(p0, lam, ch){
   if(Math.abs(p0) < 1e-9) return 0;
   var s = sgn(p0), a0 = Math.abs(p0), lo = 0, hi = a0, mid, i;
@@ -1809,9 +1872,63 @@ function ghPd(p0, lam, ch){
   return s * (lo + hi) / 2;
 }
 /* Differential capacitance at potential E (V vs NCE), in uF/cm2 */
-function ghC(E, lam, hump){
-  var p0 = E - GH_EPZC, ch = ghCH(p0, hump);
-  return uF(1 / (1 / ch + 1 / cdGC(ghPd(p0, lam, ch), lam)));
+function ghC(E, lam){
+  var p0 = E - GH_EPZC;
+  return uF(1 / (1 / CH + 1 / cdGC(ghPd(p0, lam, CH), lam)));
+}
+
+/* ---- Grahame's specific adsorption -------------------------------------
+   Grahame cut the compact layer at the IHP and wrote the measured
+   differential capacitance as
+
+       1/C  =  1/C1  +  (1 + dq)(1/C2 + 1/Cd)
+
+   C1 is metal-to-IHP, C2 is IHP-to-OHP, Cd is the diffuse layer, and
+   dq = (∂σⁱ/∂σᴹ) is how fast specifically adsorbed charge answers a change in
+   the charge on the metal.  With no adsorption dq = 0 and the bracket opens
+   back out into 1/C1 + 1/C2 + 1/Cd = 1/C_H + 1/Cd — the plain GCS series that
+   is already drawn, so the F⁻ curve here is identical to the old one.  As
+   anions crowd the IHP, dq runs toward −1, the bracket collapses, and the
+   measurement climbs toward C1 on its own: a larger capacitance, because the
+   counter-charge now sits one plane closer to the metal.  That whole anodic
+   rise is one term going to zero, and it is Grahame's own reading of it.
+
+   What is NOT derived here is dq: that needs an adsorption isotherm, which
+   this page does not carry.  It is supplied per anion as a switch-on curve
+   whose onset and depth follow the measured sequence.  The shape of the
+   family is Grahame's; the numbers inside it are calibration.            */
+var GH_C1 = EPSC / D_IHP;                    /* F/m2, metal -> IHP */
+var GH_C2 = EPSC / (D_OHP - D_IHP);          /* F/m2, IHP  -> OHP */
+
+var GH_AN = [
+  {id:"F",    nm:"F⁻",    s:0.00},
+  {id:"PF6",  nm:"PF₆⁻",  s:0.12},
+  {id:"BF4",  nm:"BF₄⁻",  s:0.22},
+  {id:"ClO4", nm:"ClO₄⁻", s:0.35},
+  {id:"Cl",   nm:"Cl⁻",   s:0.52},
+  {id:"Br",   nm:"Br⁻",   s:0.72},
+  {id:"I",    nm:"I⁻",    s:0.95}
+];
+var ghAnion = "F";
+function ghAn(id){
+  for(var i = 0; i < GH_AN.length; i++) if(GH_AN[i].id === id) return GH_AN[i];
+  return GH_AN[0];
+}
+/* adsorbed anions sit on the metal before it is charged, so the potential of
+   zero charge moves negative - the shift Grahame used to rank them */
+function ghEpzcOf(a){ return GH_EPZC - 0.25 * a.s; }
+/* dq: nothing on the negative branch, running to -s as the metal turns
+   positive.  A stronger adsorber switches on at a more negative potential. */
+function ghDq(E, a){
+  if(a.s <= 0) return 0;
+  var Eon = GH_EPZC + 0.35 - 0.75 * a.s;
+  return -a.s / (1 + Math.exp(-(E - Eon) / 0.12));
+}
+function ghCads(E, lam, a){
+  var p0 = E - ghEpzcOf(a);
+  var cd = cdGC(ghPd(p0, lam, CH), lam);
+  var inv = 1 / GH_C1 + (1 + ghDq(E, a)) * (1 / GH_C2 + 1 / cd);
+  return uF(1 / inv);
 }
 
 var ghLogC = -1, ghAnim = null, ghLast = null;
@@ -1819,17 +1936,28 @@ var ghLogC = -1, ghAnim = null, ghLast = null;
 function ghPlot(){
   var W = 520, H = 340, L = 58, Rr = 18, Tp = 20, B = 58;
   var N = 260, i, k;
-  var family = document.getElementById("ghFamily").checked;
-  var hump   = document.getElementById("ghHump").checked;
+  var anion  = ghAn(ghAnion), adsorbing = anion.s > 0;
+  /* the two stories fight for one pair of axes, so only one runs at a time:
+     F⁻ keeps the concentration family, any other anion switches the plot over
+     to the adsorption series.                                            */
+  var family = document.getElementById("ghFamily").checked && !adsorbing;
   var lam    = debyeM(Math.pow(10, ghLogC));
 
   function X(E){ return L + (E - GH_EMIN) / (GH_EMAX - GH_EMIN) * (W - L - Rr); }
   function Y(c){ return Tp + (GH_CMAX - c) / GH_CMAX * (H - Tp - B); }
-  function curve(lm, hp){
+  function curve(lm){
     var pts = [];
     for(k = 0; k <= N; k++){
       var E = GH_EMIN + (GH_EMAX - GH_EMIN) * k / N;
-      pts.push(X(E).toFixed(1) + "," + Y(Math.min(ghC(E, lm, hp), GH_CMAX * 1.02)).toFixed(1));
+      pts.push(X(E).toFixed(1) + "," + Y(Math.min(ghC(E, lm), GH_CMAX * 1.02)).toFixed(1));
+    }
+    return pts.join(" ");
+  }
+  function curveA(lm, a){
+    var pts = [];
+    for(k = 0; k <= N; k++){
+      var E = GH_EMIN + (GH_EMAX - GH_EMIN) * k / N;
+      pts.push(X(E).toFixed(1) + "," + Y(Math.min(ghCads(E, lm, a), GH_CMAX * 1.02)).toFixed(1));
     }
     return pts.join(" ");
   }
@@ -1851,9 +1979,13 @@ function ghPlot(){
   }
   s += '<text transform="rotate(-90 16 ' + ((Tp + H - B) / 2) + ')" x="16" y="' + ((Tp + H - B) / 2) + '" text-anchor="middle" fill="var(--muted)" ' + mono + ' font-size="10">C / µF cm⁻²</text>';
 
-  /* the pzc: the one line that never moves */
-  s += '<line x1="' + X(GH_EPZC) + '" y1="' + Tp + '" x2="' + X(GH_EPZC) + '" y2="' + (H - B) + '" stroke="var(--red-)" stroke-width="1.2" stroke-dasharray="3 3"/>';
-  s += '<text x="' + (X(GH_EPZC) + 5) + '" y="' + (Tp + 11) + '" fill="var(--red-)" ' + mono + ' font-size="9.5" font-weight="600">pzc  −0.472 V</text>';
+  /* the pzc: the one line that never moves - as long as nothing adsorbs.
+     With an adsorbing anion the pzc has moved, and leaving the F⁻ line on the
+     plot beside the one that matters just invites the wrong reading.      */
+  if(!adsorbing){
+    s += '<line x1="' + X(GH_EPZC) + '" y1="' + Tp + '" x2="' + X(GH_EPZC) + '" y2="' + (H - B) + '" stroke="var(--red-)" stroke-width="1.2" stroke-dasharray="3 3"/>';
+    s += '<text x="' + (X(GH_EPZC) + 5) + '" y="' + (Tp + 11) + '" fill="var(--red-)" ' + mono + ' font-size="9.5" font-weight="600">pzc  −0.472 V</text>';
+  }
 
   /* C_H floor */
   s += '<line x1="' + L + '" y1="' + Y(uF(CH)) + '" x2="' + (W - Rr) + '" y2="' + Y(uF(CH)) + '" stroke="var(--go)" stroke-width="1" stroke-dasharray="4 3"/>';
@@ -1865,31 +1997,42 @@ function ghPlot(){
   if(family){
     GH_SET.forEach(function(lg){
       if(Math.abs(lg - ghLogC) < 0.02) return;
-      s += '<polyline points="' + curve(debyeM(Math.pow(10, lg)), false)
+      s += '<polyline points="' + curve(debyeM(Math.pow(10, lg)))
          + '" fill="none" stroke="var(--line-2)" stroke-width="1.3"/>';
     });
   }
 
-  /* the schematic measurement, under the model curve so the model reads on top */
-  if(hump){
-    s += '<polyline points="' + curve(lam, true)
-       + '" fill="none" stroke="var(--red-)" stroke-width="2" stroke-dasharray="6 4"/>';
+  if(adsorbing){
+    /* C1 is where the anodic branch is heading: the bracket in Grahame's
+       formula goes to zero and metal-to-IHP is all that is left */
+    s += '<line x1="' + L + '" y1="' + Y(uF(GH_C1)) + '" x2="' + (W - Rr) + '" y2="' + Y(uF(GH_C1))
+       + '" stroke="var(--stop)" stroke-width="1" stroke-dasharray="2 3"/>';
+    s += '<text x="' + (L + 5) + '" y="' + (Y(uF(GH_C1)) + 11) + '" fill="var(--stop)" ' + mono
+       + ' font-size="9">C_1 = ' + fmt(uF(GH_C1), 0) + ' — metal to IHP, the ceiling</text>';
+    /* where this anion puts the pzc */
+    var ep = ghEpzcOf(anion);
+    s += '<line x1="' + X(ep) + '" y1="' + Tp + '" x2="' + X(ep) + '" y2="' + (H - B)
+       + '" stroke="var(--ox)" stroke-width="1.2" stroke-dasharray="3 3"/>';
+    s += '<text x="' + (X(ep) - 5) + '" y="' + (Tp + 28) + '" text-anchor="end" fill="var(--ox)" ' + mono
+       + ' font-size="9.5" font-weight="600">pzc ' + fmt(ep, 2) + '</text>';
   }
 
   /* the live curve */
-  s += '<polyline points="' + curve(lam, false) + '" fill="none" stroke="var(--ox)" stroke-width="2.6" stroke-linejoin="round"/>';
+  s += '<polyline points="' + (adsorbing ? curveA(lam, anion) : curve(lam))
+     + '" fill="none" stroke="var(--ox)" stroke-width="2.6" stroke-linejoin="round"/>';
 
-  /* the minimum — it slides up and down, never sideways */
-  var cMin = ghC(GH_EPZC, lam, false);
-  s += '<circle cx="' + X(GH_EPZC) + '" cy="' + Y(cMin) + '" r="5" fill="var(--ox)" stroke="var(--surface)" stroke-width="1.6"/>';
+  /* the minimum — it slides up and down, and sideways only if an anion moved it */
+  var eMin = adsorbing ? ghEpzcOf(anion) : GH_EPZC;
+  var cMin = adsorbing ? ghCads(eMin, lam, anion) : ghC(GH_EPZC, lam);
+  s += '<circle cx="' + X(eMin) + '" cy="' + Y(cMin) + '" r="5" fill="var(--ox)" stroke="var(--surface)" stroke-width="1.6"/>';
   /* below the marker, never beside it: this is a minimum, so the space under it
      is the one place on the plot guaranteed to be empty at every concentration */
-  s += '<text x="' + (X(GH_EPZC) - 8) + '" y="' + (Y(cMin) + 15) + '" text-anchor="end" fill="var(--ox)" ' + mono + ' font-size="10.5" font-weight="600">' + cMin.toFixed(1) + '</text>';
+  s += '<text x="' + (X(eMin) - 8) + '" y="' + (Y(cMin) + 15) + '" text-anchor="end" fill="var(--ox)" ' + mono + ' font-size="10.5" font-weight="600">' + cMin.toFixed(1) + '</text>';
 
   /* the potential the interface figure below is drawn at — this is the link
      between a point on the x axis and what the ions are actually doing */
   if(gxE >= GH_EMIN && gxE <= GH_EMAX){
-    var gx = X(gxE), gy = Y(Math.min(ghC(gxE, lam, false), GH_CMAX));
+    var gx = X(gxE), gy = Y(Math.min(adsorbing ? ghCads(gxE, lam, anion) : ghC(gxE, lam), GH_CMAX));
     s += '<line x1="' + gx.toFixed(1) + '" y1="' + Tp + '" x2="' + gx.toFixed(1) + '" y2="' + (H - B) + '" stroke="var(--ink)" stroke-width="1.2"/>';
     s += '<circle cx="' + gx.toFixed(1) + '" cy="' + gy.toFixed(1) + '" r="5.5" fill="var(--ink)" stroke="var(--surface)" stroke-width="1.6"/>';
     var gflip = gx > W - Rr - 72;
@@ -1901,11 +2044,9 @@ function ghPlot(){
   /* legend */
   var ly = H - 6;
   s += '<line x1="' + L + '" y1="' + (ly - 3) + '" x2="' + (L + 22) + '" y2="' + (ly - 3) + '" stroke="var(--ox)" stroke-width="2.6"/>';
-  s += '<text x="' + (L + 27) + '" y="' + ly + '" fill="var(--ox)" ' + mono + ' font-size="9">GCS at ' + ghLabel(ghLogC) + '</text>';
-  if(hump){
-    s += '<line x1="' + (L + 168) + '" y1="' + (ly - 3) + '" x2="' + (L + 190) + '" y2="' + (ly - 3) + '" stroke="var(--red-)" stroke-width="2" stroke-dasharray="6 4"/>';
-    s += '<text x="' + (L + 195) + '" y="' + ly + '" fill="var(--red-)" ' + mono + ' font-size="9">measured shape (schematic)</text>';
-  } else if(family){
+  s += '<text x="' + (L + 27) + '" y="' + ly + '" fill="var(--ox)" ' + mono + ' font-size="9">'
+     + (adsorbing ? anion.nm + ' at ' + ghLabel(ghLogC) : 'GCS at ' + ghLabel(ghLogC)) + '</text>';
+  if(family){
     s += '<line x1="' + (L + 168) + '" y1="' + (ly - 3) + '" x2="' + (L + 190) + '" y2="' + (ly - 3) + '" stroke="var(--line-2)" stroke-width="1.3"/>';
     s += '<text x="' + (L + 195) + '" y="' + ly + '" fill="var(--muted)" ' + mono + ' font-size="9">the other three concentrations</text>';
   }
@@ -1928,21 +2069,55 @@ function ghUpdate(){
     b.setAttribute("aria-pressed", Math.abs(+b.dataset.c - ghLogC) < 0.02 ? "true" : "false");
   });
 
+  var an = ghAn(ghAnion), ads = an.s > 0;
+  [].slice.call(document.querySelectorAll("#ghAnSet .mbtn")).forEach(function(b){
+    b.setAttribute("aria-pressed", b.dataset.a === ghAnion ? "true" : "false");
+  });
+
   var cgc = uF(EPS / lam);                    /* cosh = 1 at the pzc */
-  var cMin = ghC(GH_EPZC, lam, false);
-  var cFar = ghC(GH_EMIN, lam, false);
+  var eMin = ads ? ghEpzcOf(an) : GH_EPZC;
+  var cMin = ads ? ghCads(eMin, lam, an)      : ghC(GH_EPZC, lam);
+  var cFar = ads ? ghCads(GH_EMIN, lam, an)   : ghC(GH_EMIN, lam);
   document.getElementById("ghDeb").textContent   = fmt(lam * 1e9, 2) + " nm";
   document.getElementById("ghCgc").textContent   = fmt(cgc, 1) + " µF/cm²";
   document.getElementById("ghCh").textContent    = fmt(uF(CH), 1) + " µF/cm²";
   document.getElementById("ghMin").textContent   = fmt(cMin, 1) + " µF/cm²";
   document.getElementById("ghFar").textContent   = fmt(cFar, 1) + " µF/cm²";
-  document.getElementById("ghDepth").textContent = fmt(cFar - cMin, 1) + " µF/cm²";
+  var dRow = document.getElementById("ghDepth").parentElement.querySelector(".k");
+  /* with an adsorbing anion the anodic branch only climbs, so a "depth" is not
+     a thing any more - the row is repurposed to the number that matters there */
+  dRow.innerHTML = ads ? "At the anodic limit, +0.3 V" : "Depth of the dip";
+  document.getElementById("ghDepth").textContent = ads
+    ? fmt(ghCads(GH_EMAX, lam, an), 1) + " µF/cm²"
+    : fmt(cFar - cMin, 1) + " µF/cm²";
 
-  document.getElementById("ghNote").textContent =
+  document.getElementById("ghNote").textContent = ads
+    ? an.nm + " — ∂σⁱ/∂σᴹ reaches −" + an.s.toFixed(2) + ", so the anodic branch climbs toward C₁"
+    :
     ghLogC > -0.5  ? "the dip has closed — C_H is all you can see" :
     ghLogC > -1.5  ? "shallow: the two capacitors are comparable" :
     ghLogC > -2.5  ? "the diffuse layer is starting to win" :
                      "deep: the diffuse layer sets the whole measurement";
+
+  if(ads){
+    document.getElementById("ghFine").innerHTML =
+      "<b>" + an.nm + " adsorbs specifically.</b> Grahame wrote the measurement as "
+      + "1/C = 1/C₁ + (1 + ∂σⁱ/∂σᴹ)(1/C₂ + 1/C<sub>d</sub>), splitting the compact layer at the "
+      + "IHP. On the anodic branch ∂σⁱ/∂σᴹ runs to −" + an.s.toFixed(2) + ": every extra positive "
+      + "charge on the metal is answered by an anion arriving at the IHP rather than by the diffuse "
+      + "layer. The bracket collapses, C₂ and C<sub>d</sub> drop out of the measurement, and C climbs "
+      + "toward <b>C₁ = " + fmt(uF(GH_C1), 0) + " µF/cm²</b> — larger than C_H only because the "
+      + "counter-charge now sits at " + (D_IHP * 1e9).toFixed(2) + " nm instead of "
+      + (D_OHP * 1e9).toFixed(2) + " nm. The pzc moves to <b>" + fmt(eMin, 2) + " V</b>, since anions "
+      + "are already on the surface before the metal carries any charge. "
+      + "F⁻ is the reference case: ∂σⁱ/∂σᴹ = 0, the bracket opens back out, and the formula "
+      + "returns exactly the Gouy–Chapman–Stern curve. "
+      + "<i>The charge balance is Grahame’s; the isotherm behind ∂σⁱ/∂σᴹ is parametrised to the "
+      + "measured sequence F⁻ &lt; PF₆⁻ &lt; BF₄⁻ &lt; ClO₄⁻ &lt; Cl⁻ &lt; Br⁻ &lt; I⁻, not derived. "
+      + "The NaF hump is a separate, compact-layer effect and is not drawn here.</i>";
+    ghPlot();
+    return;
+  }
 
   document.getElementById("ghFine").innerHTML =
     "At the pzc the diffuse layer contributes " + fmt(cgc, 1) + " µF/cm² and the compact layer "
@@ -1987,11 +2162,13 @@ document.getElementById("ghReset").addEventListener("click", function(){
 document.getElementById("ghConc").addEventListener("input", function(){
   ghStop(); ghLogC = +this.value; ghUpdate();
 });
+[].slice.call(document.querySelectorAll("#ghAnSet .mbtn")).forEach(function(b){
+  b.addEventListener("click", function(){ ghAnion = b.dataset.a; ghUpdate(); });
+});
 [].slice.call(document.querySelectorAll("#ghSet .mbtn")).forEach(function(b){
   b.addEventListener("click", function(){ ghStop(); ghLogC = +b.dataset.c; ghUpdate(); });
 });
 document.getElementById("ghFamily").addEventListener("change", ghPlot);
-document.getElementById("ghHump").addEventListener("change", ghPlot);
 
 /* ---------- what the interface is doing at the marked potential ----------
    The plot above says how much charge a volt buys.  This says what that charge
@@ -2012,14 +2189,29 @@ var gxDots = (function(){
   return out;
 })();
 
+/* The charge on a specifically adsorbing surface, drawn to the same switch-on
+   as the capacitance model above.  It is negative (these are anions) and it
+   is already there at the pzc - which is the whole reason the pzc moved: the
+   metal has to be pulled negative before it carries no charge of its own.
+   14 uC/cm2 is the full-coverage scale; like dq it is calibration, not a
+   result, and the figure is a schematic of Grahame's three-charge balance
+           sigma_M + sigma_i + sigma_d = 0                                */
+function gxSigI(E, an){
+  if(an.s <= 0) return 0;
+  var Eon = GH_EPZC + 0.35 - 0.75 * an.s;
+  return -an.s * 14 / (1 + Math.exp(-(E - Eon) / 0.12));
+}
 function gxState(){
+  var an  = ghAn(ghAnion), ads = an.s > 0;
   var lam = debyeM(Math.pow(10, ghLogC));
-  var p0  = gxE - GH_EPZC;
+  var p0  = gxE - (ads ? ghEpzcOf(an) : GH_EPZC);
   var pd  = ghPd(p0, lam, CH);
-  return { lam: lam, p0: p0, pd: pd,
-           sig: CH * (p0 - pd) * 100,                    /* uC/cm2 */
+  var sig = CH * (p0 - pd) * 100;                        /* uC/cm2 */
+  var sigI = gxSigI(gxE, an);
+  return { an: an, ads: ads, lam: lam, p0: p0, pd: pd,
+           sig: sig, sigI: sigI, sigD: -(sig + sigI),
            lamEff: lam / Math.cosh(pd / (2 * VT)) * 1e9,  /* nm */
-           C: ghC(gxE, lam, false) };
+           C: ads ? ghCads(gxE, lam, an) : ghC(gxE, lam) };
 }
 
 function gxDraw(){
@@ -2027,8 +2219,16 @@ function gxDraw(){
   var mx = 64, ohp = 122, y0 = 30, hgt = 150, i;
   var pos = st.sig > 0;                                   /* metal positive? */
   var mCol = pos ? "var(--ox)" : "var(--red-)";
-  var iCol = pos ? "var(--red-)" : "var(--ox)";           /* the counter-ion */
-  var n    = Math.min(9, Math.round(Math.abs(st.sig) / 2.2));
+  /* Grahame's balance: what the metal carries is answered partly at the IHP
+     and only the remainder out in the diffuse layer.  With a strong adsorber
+     the IHP can more than answer it, and then sigma_d flips sign - cations
+     facing a positively charged metal, which is charge reversal.          */
+  var dPos = st.sigD > 0;                                 /* diffuse charge sign */
+  var iCol = dPos ? "var(--ox)" : "var(--red-)";
+  var n    = Math.min(9, Math.round(Math.abs(st.sigD) / 2.2));
+  var nM   = Math.min(9, Math.round(Math.abs(st.sig) / 2.2));
+  var nA   = Math.min(9, Math.round(Math.abs(st.sigI) / 2.2));
+  var ihp  = mx + (ohp - mx) * (D_IHP / D_OHP);
   var mono = 'font-family="IBM Plex Mono,monospace"', s = "";
 
   /* metal | compact layer | solution */
@@ -2037,6 +2237,11 @@ function gxDraw(){
   s += '<rect x="' + ohp + '" y="' + y0 + '" width="' + (W - ohp) + '" height="' + hgt + '" fill="var(--red-soft)" opacity="0.30"/>';
   s += '<line x1="' + ohp + '" y1="' + y0 + '" x2="' + ohp + '" y2="' + (y0 + hgt) + '" stroke="var(--line-2)" stroke-width="1.2" stroke-dasharray="3 3"/>';
   s += '<text x="' + ohp + '" y="' + (y0 - 8) + '" text-anchor="middle" fill="var(--muted)" ' + mono + ' font-size="9">OHP</text>';
+  if(st.ads){
+    s += '<line x1="' + ihp.toFixed(1) + '" y1="' + y0 + '" x2="' + ihp.toFixed(1) + '" y2="' + (y0 + hgt)
+       + '" stroke="var(--red-)" stroke-width="1.2" stroke-dasharray="3 3"/>';
+    s += '<text x="' + ihp.toFixed(1) + '" y="' + (y0 - 8) + '" text-anchor="middle" fill="var(--red-)" ' + mono + ' font-size="9">IHP</text>';
+  }
   s += '<text x="4" y="' + (y0 + hgt + 15) + '" fill="var(--muted)" ' + mono + ' font-size="9">metal</text>';
   s += '<text x="' + ((mx + ohp) / 2) + '" y="' + (y0 + hgt + 15) + '" text-anchor="middle" fill="var(--muted)" ' + mono + ' font-size="9">compact</text>';
   s += '<text x="' + (W - 4) + '" y="' + (y0 + hgt + 15) + '" text-anchor="end" fill="var(--muted)" ' + mono + ' font-size="9">bulk solution</text>';
@@ -2049,7 +2254,7 @@ function gxDraw(){
     s += '<rect x="' + ohp + '" y="' + y0 + '" width="' + reach.toFixed(1) + '" height="' + hgt
        + '" fill="' + iCol + '" opacity="0.12"/>';
     /* the diffuse excess: small, unlabelled, thinning outwards over lamEff */
-    var nd = Math.round(5 + n * 2.4);
+    var nd = Math.round(5 + n * 2.4);          /* n is now the diffuse count */
     for(i = 0; i < nd; i++){
       var d = gxDots[i];
       var dx = ohp + 13 + (-Math.log(1 - 0.94 * d.u)) * reach * 0.5;
@@ -2061,13 +2266,30 @@ function gxDraw(){
 
   /* carriers on the metal face, and the solvated counter-ions whose centres
      define the OHP — so they sit ON that plane, not in front of it */
-  for(i = 0; i < n; i++){
-    var qy = y0 + 17 + i * (hgt - 34) / Math.max(1, n - 1);
+  for(i = 0; i < nM; i++){
+    var qy = y0 + 17 + i * (hgt - 34) / Math.max(1, nM - 1);
     s += '<text x="' + (mx - 7) + '" y="' + (qy + 5) + '" text-anchor="end" fill="' + mCol + '" ' + mono
        + ' font-size="14" font-weight="700">' + (pos ? '+' : '−') + '</text>';
-    s += '<circle cx="' + ohp + '" cy="' + qy + '" r="8.5" fill="' + iCol + '"/>';
-    s += '<text x="' + ohp + '" y="' + (qy + 3.5) + '" text-anchor="middle" fill="var(--surface)" ' + mono
-       + ' font-size="10" font-weight="700">' + (pos ? '−' : '+') + '</text>';
+  }
+  /* the specifically adsorbed sheet: in contact with the metal at the IHP,
+     drawn small and bare because the shell it lost is what let it get there */
+  for(i = 0; i < nA; i++){
+    var ay = y0 + 17 + i * (hgt - 34) / Math.max(1, nA - 1);
+    s += '<circle cx="' + ihp.toFixed(1) + '" cy="' + ay + '" r="6" fill="var(--red-)"/>';
+    s += '<text x="' + ihp.toFixed(1) + '" y="' + (ay + 3) + '" text-anchor="middle" fill="var(--surface)" ' + mono
+       + ' font-size="9" font-weight="700">−</text>';
+  }
+  /* and the solvated counter-ions whose centres define the OHP - the dashed
+     ring is the water the adsorbed ones had to give up                    */
+  for(i = 0; i < n; i++){
+    var qy2 = y0 + 17 + i * (hgt - 34) / Math.max(1, n - 1);
+    if(st.ads){
+      s += '<circle cx="' + ohp + '" cy="' + qy2 + '" r="12" fill="none" stroke="' + iCol
+         + '" stroke-width="1" stroke-dasharray="2 2" opacity="0.55"/>';
+    }
+    s += '<circle cx="' + ohp + '" cy="' + qy2 + '" r="8.5" fill="' + iCol + '"/>';
+    s += '<text x="' + ohp + '" y="' + (qy2 + 3.5) + '" text-anchor="middle" fill="var(--surface)" ' + mono
+       + ' font-size="10" font-weight="700">' + (dPos ? '+' : '−') + '</text>';
   }
 
   /* and the ions that belong to neither sheet, out where the bulk starts */
@@ -2089,6 +2311,8 @@ function gxRefresh(){
   document.getElementById("gxE").value = gxE;
   document.getElementById("gxEv").textContent = fmt(gxE, 3) + " V";
   document.getElementById("gxSig").textContent = (pos ? "+" : "") + fmt(st.sig, 2) + " µC/cm²";
+  document.getElementById("gxSigI").textContent = st.ads ? fmt(st.sigI, 2) + " µC/cm²" : "0 — F⁻ does not adsorb";
+  document.getElementById("gxSigD").textContent = (st.sigD > 0 ? "+" : "") + fmt(st.sigD, 2) + " µC/cm²";
   document.getElementById("gxPh").textContent  = fmt(Math.abs(st.p0 - st.pd) * 1000, 0) + " mV";
   document.getElementById("gxPd").textContent  = fmt(Math.abs(st.pd) * 1000, 0) + " mV";
   document.getElementById("gxLam").textContent = fmt(st.lamEff, 2) + " nm";
@@ -2097,10 +2321,20 @@ function gxRefresh(){
   var perNm2 = st.C * 1e-6 * 0.1 / 1.602e-19 / 1e14;      /* charges per nm2 per 100 mV */
   document.getElementById("gxBuy").textContent = "1 charge per " + fmt(1 / perNm2, 0) + " nm²";
 
+  var ep = st.ads ? ghEpzcOf(st.an) : GH_EPZC;
   document.getElementById("gxNote").textContent =
-    Math.abs(gxE - GH_EPZC) < 0.02 ? "at the pzc — no charge, no layer, nothing to screen" :
-    gxE < GH_EPZC ? "metal negative — Na⁺ comes in to face it"
-                  : "metal positive — F⁻ comes in, still holding its water";
+    st.ads
+      ? (Math.abs(st.sigI) < 1
+          ? st.an.nm + " has not reached the surface yet at this potential"
+          /* charge reversal is a POSITIVE metal still facing a positive diffuse
+             layer - on the cathodic branch a positive diffuse layer is just the
+             ordinary counter-charge and means nothing of the kind            */
+          : (st.sig > 0 && st.sigD > 0
+              ? st.an.nm + " has over-answered the metal — charge reversal, the diffuse layer turns positive"
+              : st.an.nm + " sheds its water and sits on the metal at the IHP"))
+      : Math.abs(gxE - ep) < 0.02 ? "at the pzc — no charge, no layer, nothing to screen" :
+        gxE < ep ? "metal negative — Na⁺ comes in to face it"
+                 : "metal positive — F⁻ comes in, still holding its water";
 
   gxDraw();
 }
