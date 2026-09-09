@@ -2129,6 +2129,9 @@ function ghUpdate(){
       + "measured sequence F⁻ &lt; PF₆⁻ &lt; BF₄⁻ &lt; ClO₄⁻ &lt; Cl⁻ &lt; Br⁻ &lt; I⁻, not derived. "
       + "The NaF hump is a separate, compact-layer effect and is not drawn here.</i>";
     ghPlot();
+    /* the interface figure below reads the anion too, and this branch used to
+       return before the refresh at the foot of the function ever ran         */
+    if(typeof gxRefresh === "function") gxRefresh();
     return;
   }
 
@@ -2342,6 +2345,12 @@ function gxRefresh(){
     st.ads
       ? (Math.abs(st.sigI) < 1
           ? st.an.nm + " has been driven off this far negative — the IHP is bare"
+          /* The pzc itself, and the whole point of the panel: the metal carries
+             nothing and the anion is on it anyway.  Checked FIRST, because at
+             sigma_M = 0 a hair either side would otherwise fall into the
+             charge-reversal or the negative-metal branch and read as neither. */
+          : (Math.abs(st.sig) < 0.5
+              ? st.an.nm + " sits on the metal while the metal carries no charge at all — this is why the pzc moved"
           /* charge reversal is a POSITIVE metal still facing a positive diffuse
              layer - on the cathodic branch a positive diffuse layer is just the
              ordinary counter-charge and means nothing of the kind            */
@@ -2351,7 +2360,7 @@ function gxRefresh(){
                  Electrostatics alone would forbid it; chemistry does not.   */
               : (st.sig < 0
                   ? st.an.nm + " is on the surface even though the metal is negative — this is chemical, not electrostatic"
-                  : st.an.nm + " sheds its water and sits on the metal at the IHP")))
+                  : st.an.nm + " sheds its water and sits on the metal at the IHP"))))
       : Math.abs(gxE - ep) < 0.02 ? "at the pzc — no charge, no layer, nothing to screen" :
         gxE < ep ? "metal negative — Na⁺ comes in to face it"
                  : "metal positive — F⁻ comes in, still holding its water";
@@ -2391,7 +2400,9 @@ document.getElementById("gxPlay").addEventListener("click", function(){
   if(gxAnim) gxStop(); else gxGo();
 });
 document.getElementById("gxReset").addEventListener("click", function(){
-  gxStop(); gxE = GH_EPZC; gxUpdate();
+  /* the pzc is not a constant once an anion adsorbs - ghEpzcOf returns the
+     F⁻ value unchanged when nothing is adsorbing, so this covers both cases */
+  gxStop(); gxE = ghEpzcOf(ghAn(ghAnion)); gxUpdate();
 });
 document.getElementById("gxE").addEventListener("input", function(){
   gxStop(); gxE = +this.value; gxUpdate();
