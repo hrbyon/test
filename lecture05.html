@@ -106,6 +106,16 @@ tr.analyte td{color:var(--ox);font-weight:500}
 .tstrip i{display:block;height:100%}
 .tlegend{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted)}
 .tlegend span b{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px}
+/* the Fick 1 cell band is a CONTINUOUS scale, so its key is a ramp, not chips.
+   It lives in HTML under the svg: the svg is rebuilt every animation frame and
+   any key drawn inside it would flicker.                                     */
+.fkkey{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;font-family:"IBM Plex Mono",monospace;
+  font-size:11px;color:var(--muted);line-height:1.5}
+.fkkey .ramp{display:inline-flex;align-items:center;gap:6px}
+.fkkey .ramp i{display:inline-block;width:92px;height:11px;border-radius:2px;border:1px solid var(--line-2);
+  background:linear-gradient(90deg,var(--surface),var(--red-))}
+.fkkey b{color:var(--ink-2);font-weight:600}
+.fkkey .blue{color:var(--red-)}
 .idgrid{display:grid;grid-template-columns:1fr;gap:14px;max-width:340px}
 .scorebar{display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;padding:14px 18px;border-top:1px solid var(--line)}
 .scorenum{font-family:"IBM Plex Mono",monospace;font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
@@ -273,7 +283,10 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
           <div class="card-b scrollx"><svg id="alProf" viewBox="0 0 520 300" width="520" height="300" style="margin:0 auto" role="img" aria-label="Analyte concentration against distance from the electrode, evolving in time, with the diffusion-only layer and the steady-state layer marked"></svg></div>
           <div class="card-b scrollx" style="padding-top:0">
             <p class="hint" style="margin:0 0 6px">What the electrode reads, against the Cottrell curve diffusion would give on its own.</p>
-            <svg id="alCur" viewBox="0 0 520 262" width="520" height="262" style="margin:0 auto" role="img" aria-label="Current density against time, compared with the analytic Cottrell decay for diffusion alone"></svg>
+            <svg id="alCur" viewBox="0 0 520 262" width="520" height="262" style="margin:0 auto" role="img" aria-label="Current density against the square root of time, compared with the analytic Cottrell decay for diffusion alone"></svg>
+          </div>
+          <div class="card-b" style="padding-top:0">
+            <div id="alWhy" class="verdict flat"><span id="alWhyT">&mdash;</span><span id="alWhyR"></span></div>
           </div>
         </div>
 
@@ -371,7 +384,15 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
           </div>
           <p class="hint" style="margin:0">A <b>snapshot</b>: it converts a slope into a current. Drag the probe and read the tangent &mdash; that slope, times &minus;D, is the flux.</p>
         </div>
-        <div class="card-b scrollx"><svg id="fkprof" viewBox="0 0 520 290" width="520" height="290" style="margin:0 auto" role="img" aria-label="Concentration profile against distance from the electrode, with the tangent at the probe"></svg></div>
+        <div class="card-b scrollx"><svg id="fkprof" viewBox="0 0 520 404" width="520" height="404" style="margin:0 auto" role="img" aria-label="The solution in front of the electrode, shaded by concentration, above the concentration profile that describes it, both on the same distance axis, with the tangent at the probe"></svg></div>
+        <div class="card-b" style="padding-top:0">
+          <div class="fkkey">
+            <span class="ramp">0 <i></i> C*</span>
+            <span><b>white</b> &mdash; depleted: the analyte has been used up at the electrode</span>
+            <span><b class="blue">blue</b> &mdash; analyte still there; full colour is the bulk, C*</span>
+          </div>
+          <p class="hint" style="margin:8px 0 0">The strip on top is the solution itself, seen from the side; the <span style="color:var(--red-);font-weight:600">blue curve</span> below it is the same colour read off as a number, C/C*. Where the strip fades to white, the curve drops to zero &mdash; and as the clock runs, the white region spreads out from the electrode as far as &radic;(2Dt).</p>
+        </div>
       </div>
 
       <div class="card">
@@ -688,9 +709,12 @@ dlBtn.addEventListener("click",function(){
    mol cm-2 s-1 and can be turned into a current density with one factor of F.
    Sliders are labelled in the units a student would actually quote (mM, um,
    V cm-1), and are converted on the way in.                                */
-var F_C = 96485, R_G = 8.314, T_K = 298.15, FRT = F_C / (R_G * T_K);
-/* small ions in water at 25 C, cm2 s-1; the Total Flux tab builds its
-   ion list from these */
+var F_C = 96485, R_G = 8.314, T_K = 298.15, FRT = F_C / (R_G * T_K);
+
+/* small ions in water at 25 C, cm2 s-1; the Total Flux tab builds its
+
+   ion list from these */
+
 var D_AN = 0.7e-5, D_CT = 2.03e-5, D_NA = 1.33e-5, D_CLO4 = 1.79e-5;
 var MONO = 'font-family="IBM Plex Mono,monospace"';
 
@@ -926,13 +950,45 @@ function fick(){
 }
 
 function fkProfPlot(D, t, x, g, C){
-  var W = 520, H = 290, L = 52, Rr = 18, T = 20, B = 44;
+  /* Two bands on one distance axis. The cell is drawn across the top,
+     shaded by C(x,t); the profile that describes it sits underneath; and
+     the electrode slab, the probe and the reach line span both, so moving
+     the clock moves one picture rather than two.                        */
+  var W = 520, H = 404, L = 52, Rr = 18, B = 44;
+  var CT = 24, CH = 88;                    /* the cell band              */
+  var T = CT + CH + 52;                    /* the profile's ceiling      */
   function X(v){ return L + v / FK_XMAX * (W - L - Rr); }
   function Y(c){ return T + (1 - c / FK_CS) * (H - T - B); }
   var s = '';
-  s += '<rect x="0" y="' + T + '" width="' + L + '" height="' + (H - T - B) + '" fill="var(--surface-2)"/>';
-  s += '<text x="3" y="' + (T + 14) + '" fill="var(--muted)" ' + MONO + ' font-size="8.5">ELECTRODE</text>';
-  /* axes */
+
+  /* the electrode, through both bands, so the shared origin is obvious */
+  s += '<rect x="0" y="' + CT + '" width="' + L + '" height="' + (H - B - CT) + '" fill="var(--surface-2)"/>';
+  s += '<line x1="' + L + '" y1="' + CT + '" x2="' + L + '" y2="' + (H - B) + '" stroke="var(--line-2)" stroke-width="1.5"/>';
+  s += '<text x="3" y="' + (CT + 14) + '" fill="var(--muted)" ' + MONO + ' font-size="8.5">ELECTRODE</text>';
+
+  /* ---- band 1: the solution, shaded by how much analyte is left ---- */
+  s += '<rect x="' + L + '" y="' + CT + '" width="' + (W - L - Rr) + '" height="' + CH
+     + '" fill="var(--surface-2)" opacity="0.5"/>';
+  var NS = 40, stops = "", i;
+  for(i = 0; i <= NS; i++){
+    var f = fkC(i / NS * FK_XMAX, D, t) / FK_CS;
+    stops += '<stop offset="' + (i / NS * 100).toFixed(2) + '%" stop-color="var(--red-)"'
+           + ' stop-opacity="' + (0.72 * f).toFixed(4) + '"/>';
+  }
+  s += '<defs><linearGradient id="fkshade" x1="0" y1="0" x2="1" y2="0">' + stops + '</linearGradient></defs>';
+  s += '<rect x="' + L + '" y="' + CT + '" width="' + (W - L - Rr) + '" height="' + CH
+     + '" fill="url(#fkshade)"/>';
+  s += '<rect x="' + L + '" y="' + CT + '" width="' + (W - L - Rr) + '" height="' + CH
+     + '" fill="none" stroke="var(--line-2)"/>';
+  /* light text: this label sits on the fully blue end of the strip */
+  s += '<text x="' + (W - Rr - 6) + '" y="' + (CT + 14) + '" text-anchor="end" fill="var(--surface)" '
+     + MONO + ' font-size="9" font-weight="600">bulk, C*</text>';
+  s += '<text x="' + (L + 8) + '" y="' + (CT + CH - 8) + '" fill="var(--ink-2)" ' + MONO
+     + ' font-size="9">depleted</text>';
+  s += '<text x="' + L + '" y="' + (CT + CH + 16) + '" fill="var(--muted)" ' + MONO
+     + ' font-size="9.5">the solution itself &mdash; colour is how much analyte is left</text>';
+
+  /* ---- band 2: the profile ---- */
   s += '<line x1="' + L + '" y1="' + (H - B) + '" x2="' + (W - Rr) + '" y2="' + (H - B) + '" stroke="var(--line-2)"/>';
   s += '<line x1="' + L + '" y1="' + T + '" x2="' + L + '" y2="' + (H - B) + '" stroke="var(--line-2)"/>';
   for(var u = 0; u <= 300; u += 50){
@@ -946,13 +1002,25 @@ function fkProfPlot(D, t, x, g, C){
   s += '<text x="' + ((L + W - Rr) / 2) + '" y="' + (H - 10) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="10">distance from the electrode / µm</text>';
   s += '<text transform="rotate(-90 13 ' + ((T + H - B) / 2) + ')" x="13" y="' + ((T + H - B) / 2) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="10">C / C*</text>';
 
-  /* the profile */
   var pts = [];
   for(var k = 0; k <= 160; k++){
     var xx = k / 160 * FK_XMAX;
     pts.push(X(xx).toFixed(1) + "," + Y(fkC(xx, D, t)).toFixed(1));
   }
   s += '<polyline points="' + pts.join(" ") + '" fill="none" stroke="var(--red-)" stroke-width="2.2"/>';
+
+  /* ---- what spans both bands ---- */
+  var rms = Math.sqrt(2 * D * t);
+  if(rms < FK_XMAX){
+    s += '<line x1="' + X(rms).toFixed(1) + '" y1="' + CT + '" x2="' + X(rms).toFixed(1) + '" y2="' + (H - B)
+       + '" stroke="var(--go)" stroke-width="1" stroke-dasharray="3 3"/>';
+    var rmsRight = X(rms) + 5 + 34 < W - Rr;
+    s += '<text x="' + (X(rms) + (rmsRight ? 5 : -5)).toFixed(1) + '" y="' + (H - B - 6)
+       + '" text-anchor="' + (rmsRight ? "start" : "end") + '" fill="var(--go)" ' + MONO
+       + ' font-size="9.5">√(2Dt)</text>';
+  }
+  s += '<line x1="' + X(x).toFixed(1) + '" y1="' + CT + '" x2="' + X(x).toFixed(1) + '" y2="' + (H - B)
+     + '" stroke="var(--ox)" stroke-width="1" stroke-dasharray="2 3" opacity="0.7"/>';
 
   /* the tangent at the probe - this IS Fick 1.  It is trimmed so that it
      stays inside the axes: extrapolated far enough it leaves the box, and
@@ -967,17 +1035,6 @@ function fkProfPlot(D, t, x, g, C){
   var lblY = Math.max(T + 12, Math.min(H - B - 8, Y(cb) - 8));
   s += '<text x="' + Math.min(W - Rr - 4, X(xb) + 60).toFixed(1) + '" y="' + lblY.toFixed(1) + '" text-anchor="end" fill="var(--ox)" ' + MONO + ' font-size="9.5">slope = ∂C/∂x</text>';
 
-  /* how far diffusion has reached */
-  var rms = Math.sqrt(2 * D * t);
-  if(rms < FK_XMAX){
-    s += '<line x1="' + X(rms).toFixed(1) + '" y1="' + T + '" x2="' + X(rms).toFixed(1) + '" y2="' + (H - B) + '" stroke="var(--go)" stroke-width="1" stroke-dasharray="3 3"/>';
-    /* at the foot of its own line: the slope label is pinned to the top of
-       the frame whenever the tangent runs high, and the two collided there */
-    var rmsRight = X(rms) + 5 + 34 < W - Rr;
-    s += '<text x="' + (X(rms) + (rmsRight ? 5 : -5)).toFixed(1) + '" y="' + (H - B - 6)
-       + '" text-anchor="' + (rmsRight ? "start" : "end") + '" fill="var(--go)" ' + MONO
-       + ' font-size="9.5">√(2Dt)</text>';
-  }
   document.getElementById("fkprof").innerHTML = s;
 }
 
@@ -1068,14 +1125,25 @@ fick();
    delta = D/|u|, with the steady profile C = C*(1 - exp(-|u|x/D)).        */
 
 var AL = {
-  L:    300e-4,        /* cm, 300 um of solution                           */
-  NX:   300,           /* cells, so dx = 1 um                              */
+  Ld:   300e-4,        /* cm, 300 um of solution DRAWN                     */
+  L:    600e-4,        /* cm, 600 um SIMULATED - see the note below        */
+  NX:   600,           /* cells, so dx = 1 um                              */
   DT:   2.5e-4,        /* s, lambda = D dt / dx2 = 0.175 at D = 0.7e-5     */
-  SUB:  80,            /* substeps per animation frame: 0.02 s of physics  */
-  TMAX: 24,            /* s, the width of the current plot                 */
+  SUB:  136,          /* substeps per frame: 0.034 s of physics           */
   Cb:   1e-6           /* mol cm-3, 1 mM bulk analyte                      */
 };
 AL.dx = AL.L / AL.NX;
+AL.NXd = Math.round(AL.Ld / AL.dx);   /* the last cell that is drawn */
+
+/* Both plots move together.  The front of the depletion layer, sqrt(pi D t),
+   grows as sqrt(t), so the current plot runs on a sqrt(t) axis, and the clock
+   stops when that front reaches the end of the drawn cell: TMAX = Ld^2/(pi D).
+   The front on top and the trace below are then at the same fraction of their
+   widths at every instant.  The far wall is held at C*, and at 300 um it would
+   lift the current ~9 % above Cottrell by then; simulated to 600 um the error is
+   a few ppm.  SUB is raised in proportion, so a run takes about as long as it
+   did.  A function, not a constant, so it cannot depend on where D_AN is set. */
+function alTmax(){ return AL.Ld * AL.Ld / (Math.PI * D_AN); }
 
 var alZv = 1, alOn = {dif:true, mig:true, con:false};
 var alC = null, alT = 0, alHist = [], alRaf = 0, alRun = true, alLast = 0;
@@ -1213,7 +1281,7 @@ function alRead(){
   document.getElementById("alU").textContent  = (-p.u * 1e4).toPrecision(3) + " µm s⁻¹";
 
   var dss = (p.u < 0 && p.D > 0) ? p.D / Math.abs(p.u) : 0;
-  var dssIn = dss > 0 && dss < AL.L;
+  var dssIn = dss > 0 && dss < AL.Ld;
   document.getElementById("alD").textContent = !dss ? (p.D > 0 ? "none — it keeps growing" : "—")
       : dssIn ? (dss * 1e4).toPrecision(3) + " µm"
               : "≫ 300 µm — off the end of the cell";
@@ -1247,6 +1315,71 @@ function alRead(){
       + (Math.abs(p.vMig) * 1e4).toPrecision(2) + " µm s⁻¹ — nothing, next to diffusion. The layer thickens "
       + "as √(πDt) and the current falls as t<sup>−½</sup>. This is the regime every equation in the course assumes.";
   }
+
+  /* ---- why the current sits where it does against the dashed line --------
+     In this model migration and convection are the SAME kind of term - a drift
+     toward the wall - so both hold the layer thin.  What differs is what makes
+     the drift: the field pulling on the ion's charge, or the solvent moving.
+     The reason text only changes with the mechanism; the ratio has its own
+     span, so the paragraph is not rebuilt on every frame.                 */
+  var whyT = document.getElementById("alWhyT"), whyR = document.getElementById("alWhyR");
+  if(whyT){
+    var migOn = alOn.mig && Math.abs(p.vMig) * 1e4 > 3;
+    var conOn = alOn.con && p.u < 0 && dssIn;
+    var cls, html;
+    if(!alOn.dif){
+      cls = "verdict stop";
+      html = "<b>Diffusion is off</b>, so there is no gradient at the wall and nothing to compare with the dashed line.";
+    }else if(conOn && migOn){
+      cls = "verdict go";
+      html = "<b>Two different things are pushing the current up at once.</b> The stirring carries fresh "
+        + "solution in, and with little supporting salt the electric field also pulls the charged analyte "
+        + "toward the electrode. Turn one off at a time to see each on its own.";
+    }else if(conOn){
+      cls = "verdict go";
+      html = "<b>Why it is higher: the solution itself is moving.</b> Stirring carries fresh analyte right up "
+        + "to the edge of the depleted zone, so the layer stops spreading as √(πDt) and holds at "
+        + "δ = D/|v|. The gradient at the wall stays steep, and the current levels off instead of "
+        + "decaying — so the gap above the dashed line keeps widening. The cause is <b>flow</b>, not "
+        + "charge: every molecule is carried in, charged or neutral, and adding supporting salt does not "
+        + "stop it.";
+    }else if(migOn){
+      var toward = p.vMig < 0;
+      cls = toward ? "verdict go" : "verdict stop";
+      html = toward
+        ? "<b>Why it is higher: the electric field is pulling the ion.</b> With no supporting salt the "
+          + "solution conducts poorly, so the cell needs a strong field (E = i/κ) to pass its current. "
+          + "That field pulls the charged analyte toward the electrode, on top of diffusion, so more of it "
+          + "arrives each second than diffusion alone could bring. Like stirring, this keeps the layer thin "
+          + "— but the cause is different: here it is the ion’s <b>charge</b> being pulled, not "
+          + "the solution flowing. Set z to −1 and the same field pushes the analyte away and the "
+          + "current falls <i>below</i> the line; make it neutral, or add supporting salt, and the effect "
+          + "disappears."
+        : "<b>Why it is lower: the electric field is pushing the ion away.</b> With no supporting salt the "
+          + "cell needs a strong field to pass its current, and for an analyte of this charge that field "
+          + "points the wrong way. Less arrives each second than diffusion alone would bring, so the "
+          + "current sits below the dashed line. Flip the charge and it rises above; add supporting salt "
+          + "and the effect disappears.";
+    }else if(alOn.mig && alZv === 0 && +alEl.alS.value === 0){
+      cls = "verdict flat";
+      html = "<b>No salt, but no change either.</b> The field is strong, but a neutral analyte has no "
+        + "charge for it to pull on, so the current stays on the dashed Cottrell line. Give the analyte "
+        + "a charge and watch it move off.";
+    }else{
+      cls = "verdict flat";
+      html = "<b>This is the baseline.</b> Only diffusion brings the analyte in, so the current follows "
+        + "the dashed Cottrell line and falls as t<sup>−½</sup>. Press <b>No supporting salt</b> or "
+        + "<b>Stir it</b> to see the two different ways the current can be pushed off it.";
+    }
+    var box = whyT.parentNode;
+    if(box.className !== cls) box.className = cls;
+    if(whyT.__h !== html){ whyT.innerHTML = html; whyT.__h = html; }
+
+    var cot = (alOn.dif && alT > 0.3) ? F_C * AL.Cb * Math.sqrt(D_AN / (Math.PI * alT)) * 1e3 : 0;
+    whyR.textContent = cot > 0
+      ? "  Right now: " + (alFlux(p) * F_C * 1e3 / cot).toFixed(2) + "× the dashed line."
+      : "";
+  }
   return p;
 }
 
@@ -1256,7 +1389,7 @@ function alPaint(){
 
   /* --- concentration profile --- */
   var W = 520, H = 300, l = 56, r = 14, t = 18, b = 44;
-  var X = function(xcm){ return l + (xcm / AL.L) * (W - l - r); };
+  var X = function(xcm){ return l + (xcm / AL.Ld) * (W - l - r); };
   var Y = function(c){ return t + (1 - c / AL.Cb) * (H - t - b); };
   var s = '<rect x="0" y="0" width="' + W + '" height="' + H + '" fill="none"/>';
 
@@ -1288,14 +1421,14 @@ function alPaint(){
 
   /* the layer markers, drawn under the curve */
   var dCot = Math.sqrt(Math.PI * D_AN * alT);
-  if(alOn.dif && alT > 0 && dCot < AL.L){
+  if(alOn.dif && alT > 0 && dCot <= AL.Ld){
     s += '<line x1="' + X(dCot) + '" y1="' + t + '" x2="' + X(dCot) + '" y2="' + (H - b)
        + '" stroke="var(--red-)" stroke-width="1" stroke-dasharray="2 3" opacity="0.75"/>';
     s += '<text x="' + (X(dCot) + 5) + '" y="' + (t + 12) + '" ' + MONO
        + ' font-size="10" fill="var(--red-)">√(πDt)</text>';
   }
   var dss = (p.u < 0 && p.D > 0) ? p.D / Math.abs(p.u) : 0;
-  if(dss > 0 && dss < AL.L){
+  if(dss > 0 && dss < AL.Ld){
     s += '<line x1="' + X(dss) + '" y1="' + t + '" x2="' + X(dss) + '" y2="' + (H - b)
        + '" stroke="var(--go)" stroke-width="1.5" stroke-dasharray="5 3"/>';
     s += '<text x="' + (X(dss) + 5) + '" y="' + (t + 26) + '" ' + MONO
@@ -1304,8 +1437,8 @@ function alPaint(){
 
   /* the profile itself */
   var pts = [], i;
-  for(i = 0; i <= AL.NX; i++) pts.push(X(i * AL.dx).toFixed(1) + "," + Y(alC[i]).toFixed(1));
-  s += '<polygon points="' + X(0) + ',' + (H - b) + ' ' + pts.join(" ") + ' ' + X(AL.L) + ',' + (H - b)
+  for(i = 0; i <= AL.NXd; i++) pts.push(X(i * AL.dx).toFixed(1) + "," + Y(alC[i]).toFixed(1));
+  s += '<polygon points="' + X(0) + ',' + (H - b) + ' ' + pts.join(" ") + ' ' + X(AL.Ld) + ',' + (H - b)
      + '" fill="var(--ox)" opacity="0.10"/>';
   s += '<polyline points="' + pts.join(" ") + '" fill="none" stroke="var(--ox)" stroke-width="2.2"/>';
 
@@ -1316,9 +1449,9 @@ function alPaint(){
   var gr = (ipx === 0) ? (-3 * alC[0] + 4 * alC[1] - alC[2]) / (2 * AL.dx)
          : (ipx === AL.NX) ? (3 * alC[ipx] - 4 * alC[ipx-1] + alC[ipx-2]) / (2 * AL.dx)
          : (alC[ipx+1] - alC[ipx-1]) / (2 * AL.dx);
-  var run = 34 / (W - l - r) * AL.L;                    /* cm per 34 px    */
+  var run = 34 / (W - l - r) * AL.Ld;                    /* cm per 34 px    */
   s += '<line x1="' + X(Math.max(0, ipx * AL.dx - run)) + '" y1="' + Y(alC[ipx] - gr * run)
-     + '" x2="' + X(Math.min(AL.L, ipx * AL.dx + run)) + '" y2="' + Y(alC[ipx] + gr * run)
+     + '" x2="' + X(Math.min(AL.Ld, ipx * AL.dx + run)) + '" y2="' + Y(alC[ipx] + gr * run)
      + '" stroke="var(--red-)" stroke-width="1.6"/>';
   s += '<line x1="' + gx + '" y1="' + gy + '" x2="' + gx + '" y2="' + (H - b)
      + '" stroke="var(--ink-2)" stroke-width="1" stroke-dasharray="2 3" opacity="0.6"/>';
@@ -1333,17 +1466,21 @@ function alPaint(){
   var imax = 0.6;
   for(i = 0; i < alHist.length; i++) if(alHist[i][1] > imax) imax = alHist[i][1];
   imax *= 1.15;
-  var X2 = function(tt){ return l2 + (tt / AL.TMAX) * (W2 - l2 - r2); };
+  var TM = alTmax();
+  var X2 = function(tt){ return l2 + Math.sqrt(Math.max(0, tt) / TM) * (W2 - l2 - r2); };
   var Y2 = function(ii){ return t2 + (1 - ii / imax) * (H2 - t2 - b2); };
   var q = '<line x1="' + l2 + '" y1="' + (H2 - b2) + '" x2="' + (W2 - r2) + '" y2="' + (H2 - b2)
         + '" stroke="var(--line-2)"/>';
   q += '<line x1="' + l2 + '" y1="' + t2 + '" x2="' + l2 + '" y2="' + (H2 - b2) + '" stroke="var(--line-2)"/>';
-  for(g = 0; g <= AL.TMAX; g += 4){
-    q += '<text x="' + X2(g) + '" y="' + (H2 - b2 + 17) + '" text-anchor="middle" ' + MONO
-       + ' font-size="10" fill="var(--muted)">' + g + '</text>';
+  /* perfect squares land evenly on a sqrt(t) axis */
+  for(var n = 0; n * n <= TM; n++){
+    q += '<line x1="' + X2(n * n) + '" y1="' + (H2 - b2) + '" x2="' + X2(n * n) + '" y2="' + (H2 - b2 + 4)
+       + '" stroke="var(--line-2)"/>';
+    q += '<text x="' + X2(n * n) + '" y="' + (H2 - b2 + 17) + '" text-anchor="middle" ' + MONO
+       + ' font-size="10" fill="var(--muted)">' + (n * n) + '</text>';
   }
   q += '<text x="' + ((l2 + W2 - r2) / 2) + '" y="' + (H2 - 6) + '" text-anchor="middle" ' + MONO
-     + ' font-size="10.5" fill="var(--muted)">time / s</text>';
+     + ' font-size="10.5" fill="var(--muted)">time / s  —  √t scale, so it keeps pace with the front above</text>';
   [0, 0.5, 1].forEach(function(f){
     var gy = Y2(f * imax);
     q += '<line x1="' + (l2 - 4) + '" y1="' + gy + '" x2="' + l2 + '" y2="' + gy + '" stroke="var(--line-2)"/>';
@@ -1356,7 +1493,7 @@ function alPaint(){
 
   /* Cottrell, as the benchmark the numerics are answerable to */
   var cot = [];
-  for(var tt = 0.25; tt <= AL.TMAX; tt += 0.25){
+  for(var tt = 0.05; tt <= TM; tt += (tt < 2 ? 0.05 : 0.25)){
     var ic = F_C * AL.Cb * Math.sqrt(D_AN / (Math.PI * tt)) * 1e3;
     if(ic <= imax * 1.02) cot.push(X2(tt).toFixed(1) + "," + Y2(ic).toFixed(1));
   }
@@ -1369,6 +1506,11 @@ function alPaint(){
     var hp = alHist.map(function(h){ return X2(h[0]).toFixed(1) + "," + Y2(h[1]).toFixed(1); });
     q += '<polyline points="' + hp.join(" ") + '" fill="none" stroke="var(--ox)" stroke-width="2.2"/>';
   }
+  /* the clock, drawn where the front is drawn on the plot above */
+  if(alT > 0){
+    q += '<line x1="' + X2(alT).toFixed(1) + '" y1="' + t2 + '" x2="' + X2(alT).toFixed(1) + '" y2="' + (H2 - b2)
+       + '" stroke="var(--red-)" stroke-width="1" stroke-dasharray="2 3" opacity="0.75"/>';
+  }
   document.getElementById("alCur").innerHTML = q;
 
   document.getElementById("alClock").textContent = "t = " + alT.toFixed(1) + " s";
@@ -1376,7 +1518,7 @@ function alPaint(){
 }
 
 function alTick(now){
-  if(alRun && alT < AL.TMAX){
+  if(alRun && alT < alTmax()){
     var p = alPhys();
     alStep(p, AL.SUB);
     var j = alFlux(p) * F_C * 1e3;                 /* mA cm-2 */
