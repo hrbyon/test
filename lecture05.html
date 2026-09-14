@@ -1475,9 +1475,15 @@ function alPaint(){
   var gr = (ipx === 0) ? (-3 * alC[0] + 4 * alC[1] - alC[2]) / (2 * AL.dx)
          : (ipx === AL.NX) ? (3 * alC[ipx] - 4 * alC[ipx-1] + alC[ipx-2]) / (2 * AL.dx)
          : (alC[ipx+1] - alC[ipx-1]) / (2 * AL.dx);
+  /* Clamp the reach FIRST, then take both ends from the clamped reach. The old
+     line clamped x at the wall but still set y from the full reach, so within
+     one reach of either end the two ends lay on different slopes and the line
+     missed the probe - visible below about 20 um.                            */
   var run = 34 / (W - l - r) * AL.Ld;                    /* cm per 34 px    */
-  s += '<line x1="' + X(Math.max(0, ipx * AL.dx - run)) + '" y1="' + Y(alC[ipx] - gr * run)
-     + '" x2="' + X(Math.min(AL.Ld, ipx * AL.dx + run)) + '" y2="' + Y(alC[ipx] + gr * run)
+  var x0p = ipx * AL.dx;
+  var lo  = Math.min(run, x0p), hi = Math.min(run, AL.Ld - x0p);
+  s += '<line x1="' + X(x0p - lo) + '" y1="' + Y(alC[ipx] - gr * lo)
+     + '" x2="' + X(x0p + hi) + '" y2="' + Y(alC[ipx] + gr * hi)
      + '" stroke="var(--red-)" stroke-width="1.6"/>';
   s += '<line x1="' + gx + '" y1="' + gy + '" x2="' + gx + '" y2="' + (H - b)
      + '" stroke="var(--ink-2)" stroke-width="1" stroke-dasharray="2 3" opacity="0.6"/>';
