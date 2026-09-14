@@ -190,18 +190,19 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
   <section class="panel" id="p-np" role="tabpanel" aria-labelledby="t-np">
 
     <div class="card" style="margin-bottom:16px">
-      <div class="card-h"><h2>The Nernst&ndash;Planck equation</h2><span class="note">deck p.8 &mdash; diffusion and migration, in one line</span></div>
+      <div class="card-h"><h2>The Nernst&ndash;Planck equation</h2><span class="note">deck p.8 &mdash; every reason an ion moves, in one line</span></div>
       <div class="card-b stack" style="gap:12px">
         <div class="eqbig">
           <b>J</b><sub>i</sub>(x) &nbsp;=&nbsp;
           <span class="dif">&minus; D<sub>i</sub> &part;C<sub>i</sub>(x)/&part;x</span> &nbsp;
-          <span class="mig">&minus; (z<sub>i</sub>F/RT) D<sub>i</sub> C<sub>i</sub> &part;&phi;(x)/&part;x</span><br>
-          <small>total flux&nbsp;&nbsp;=&nbsp;&nbsp;<span class="dif">DIFFUSION</span>&nbsp;&nbsp;+&nbsp;&nbsp;<span class="mig">MIGRATION</span>&nbsp;&nbsp;&middot;&nbsp;&nbsp;mol cm<sup>&minus;2</sup> s<sup>&minus;1</sup></small>
+          <span class="mig">&minus; (z<sub>i</sub>F/RT) D<sub>i</sub> C<sub>i</sub> &part;&phi;(x)/&part;x</span> &nbsp;
+          <span class="con">+ C<sub>i</sub> v(x)</span><br>
+          <small>total flux&nbsp;&nbsp;=&nbsp;&nbsp;<span class="dif">DIFFUSION</span>&nbsp;&nbsp;+&nbsp;&nbsp;<span class="mig">MIGRATION</span>&nbsp;&nbsp;+&nbsp;&nbsp;<span class="con">CONVECTION</span>&nbsp;&nbsp;&middot;&nbsp;&nbsp;mol cm<sup>&minus;2</sup> s<sup>&minus;1</sup></small>
         </div>
-        <p class="hint" style="margin:0">Two independent reasons an ion arrives somewhere: because there is more of it elsewhere, and because a field is pulling it. They add. Move the sliders and watch which one actually decides the answer.
+        <p class="hint" style="margin:0">Three independent reasons an ion arrives somewhere: because there is more of it elsewhere, because a field is pulling it, and because the solvent is carrying it. They add. Move the sliders and watch which one actually decides the answer.
         <br><b>Sign convention:</b> x runs from the electrode surface into the solution, so a <b>negative</b> flux points <b>toward the electrode</b>.</p>
 
-        <p class="hint" style="margin:0"><b>The cell being solved.</b> The electrode at x = 0 is held at the diffusion limit, so every analyte ion reaching it reacts and <b>C(0) = 0</b>; three hundred micrometres away the solution is still bulk.</p>
+        <p class="hint" style="margin:0"><b>The cell being solved.</b> The electrode at x = 0 is held at the diffusion limit, so every analyte ion reaching it reacts and <b>C(0) = 0</b>; three hundred micrometres away the solution is still bulk. The stirring is taken as a uniform velocity normal to the surface &mdash; the <b>stagnant-film</b> idealisation, not a real rotating disk. It is the simplest geometry in which convection does what convection does, and it sets a diffusion layer that stops growing.</p>
 
       </div>
     </div>
@@ -289,7 +290,6 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
             <div class="readout"><span class="k"><span class="con">convective drift</span>, v<sub>conv</sub></span><span class="v" id="alVc">&mdash;</span></div>
             <div class="readout"><span class="k">net drift toward the electrode</span><span class="v" id="alU">&mdash;</span></div>
             <div class="readout"><span class="k">steady layer, &delta; = D/|v|</span><span class="v" id="alD">&mdash;</span></div>
-          <div class="readout"><span class="k">a disk giving that same &delta;</span><span class="v" id="alRpm">&mdash;</span></div>
             <div class="readout"><span class="k">analyte arriving, as a current</span><span class="v" id="alJ">&mdash;</span></div>
             <div id="alVerdict" class="verdict flat" style="margin-top:14px">&mdash;</div>
           </div>
@@ -1073,8 +1073,7 @@ var AL = {
   DT:   2.5e-4,        /* s, lambda = D dt / dx2 = 0.175 at D = 0.7e-5     */
   SUB:  80,            /* substeps per animation frame: 0.02 s of physics  */
   TMAX: 24,            /* s, the width of the current plot                 */
-  Cb:   1e-6,          /* mol cm-3, 1 mM bulk analyte                      */
-  nu:   0.010          /* cm2 s-1, kinematic viscosity of water at 25 C    */
+  Cb:   1e-6           /* mol cm-3, 1 mM bulk analyte                      */
 };
 AL.dx = AL.L / AL.NX;
 
@@ -1184,16 +1183,6 @@ function alStep(p, n){
   }
 }
 
-/* The rotation rate of a disk whose Levich layer matches this film's.
-   delta_film = D/|v| and delta_RDE = 1.61 D^(1/3) nu^(1/6) omega^(-1/2)
-   are equal when omega = [1.61 nu^(1/6) |v| / D^(2/3)]^2.  Returned in rpm,
-   because that is the number written on the instrument.                   */
-function alRPM(v, D){
-  if(!(Math.abs(v) > 0) || !(D > 0)) return 0;
-  var w = Math.pow(1.61 * Math.pow(AL.nu, 1/6) * Math.abs(v) / Math.pow(D, 2/3), 2);
-  return w * 60 / (2 * Math.PI);
-}
-
 /* At a depleted wall C(0) = 0, so the drift term carries nothing there and
    the whole flux arrives as a gradient - whatever set that gradient.      */
 function alFlux(p){
@@ -1228,10 +1217,6 @@ function alRead(){
   document.getElementById("alD").textContent = !dss ? (p.D > 0 ? "none — it keeps growing" : "—")
       : dssIn ? (dss * 1e4).toPrecision(3) + " µm"
               : "≫ 300 µm — off the end of the cell";
-
-  var rpm = alOn.con ? alRPM(p.vCon, D_AN) : 0;
-  document.getElementById("alRpm").textContent =
-    rpm > 0 ? Math.round(rpm).toLocaleString() + " rpm" : "\u2014";
 
   var j = alFlux(p);
   document.getElementById("alJ").textContent = (j * F_C * 1e3).toPrecision(3) + " mA cm⁻²";
