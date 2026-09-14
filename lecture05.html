@@ -244,7 +244,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
             </div>
 
             <div>
-              <div class="slider-row"><span class="fld" style="margin:0">Cell current, i<sub>cell</sub> <small>(this is what makes the field)</small></span><span class="val" id="alIv"></span></div>
+              <div class="slider-row"><span class="fld" style="margin:0">Cell current density, i<sub>cell</sub> <small>(sets the field)</small></span><span class="val" id="alIv"></span></div>
               <input type="range" id="alI" min="0" max="5" step="0.05" value="1">
             </div>
 
@@ -303,7 +303,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
             <div class="readout"><span class="k"><span class="con">convective drift</span>, v<sub>conv</sub></span><span class="v" id="alVc">&mdash;</span></div>
             <div class="readout"><span class="k">net drift toward the electrode</span><span class="v" id="alU">&mdash;</span></div>
             <div class="readout"><span class="k">steady layer, &delta; = D/|v|</span><span class="v" id="alD">&mdash;</span></div>
-            <div class="readout"><span class="k">analyte arriving, as a current</span><span class="v" id="alJ">&mdash;</span></div>
+            <div class="readout"><span class="k">analyte arriving, as a current density</span><span class="v" id="alJ">&mdash;</span></div>
             <div id="alVerdict" class="verdict flat" style="margin-top:14px">&mdash;</div>
           </div>
         </div>
@@ -336,8 +336,8 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
     <div class="card" style="margin-top:16px">
       <div class="card-h"><h2>From flux to current</h2><span class="note">deck p.6</span></div>
       <div class="card-b stack" style="gap:12px">
-        <div class="eqbig">&minus;j<sub>i</sub>(0,t) = i / (zFA) &nbsp;&nbsp;&rarr;&nbsp;&nbsp; i = nFA j &nbsp;&nbsp;&nbsp;&nbsp; i<sub>tot</sub> = <span class="dif">i<sub>d</sub></span> + <span class="mig">i<sub>m</sub></span> + <span class="con">i<sub>c</sub></span></div>
-        <p class="hint" style="margin:0">The current is not a separate quantity from the flux &mdash; it <em>is</em> the flux at x = 0, counted in electrons. So the three terms of <b>J</b> are the three terms of i<sub>tot</sub>, and everything on this page is a statement about the current you measure.</p>
+        <div class="eqbig">&minus;J<sub>O</sub>(0,t) = i / (nFA) &nbsp;&nbsp;&rarr;&nbsp;&nbsp; i = &minus;nFA&thinsp;J<sub>O</sub>(0,t) &nbsp;&nbsp;&nbsp;&nbsp; i<sub>tot</sub> = <span class="dif">i<sub>d</sub></span> + <span class="mig">i<sub>m</sub></span> + <span class="con">i<sub>c</sub></span></div>
+        <p class="hint" style="margin:0">The current is not a separate quantity from the flux &mdash; it <em>is</em> the flux of O at x = 0, counted in electrons. That is why the factor is <b>n</b>, the number of electrons each O takes up in O + ne&#8315; &rarr; R, and <b>not z</b>, the charge on the ion. z belongs to migration, and to the ionic current carried through the solution, i = F&thinsp;&Sigma;&thinsp;z<sub>i</sub>J<sub>i</sub>. So the three terms of <b>J</b> are the three terms of i<sub>tot</sub>, and everything on this page is a statement about the current you measure.</p>
       </div>
     </div>
 
@@ -800,7 +800,7 @@ function np(){
   h += '<tr class="tot"><td>total, J<sub>i</sub></td><td style="color:var(--muted)"></td>'
      + '<td class="num">' + (J * 1e9).toFixed(3) + '</td>'
      + '<td class="dir">' + dirTxt(J) + '</td></tr>';
-  h += '<tr class="tot" style="border-top:0"><td>as a current, i = nFJ &nbsp;<small style="color:var(--muted)">n = 1, A = 1 cm&#178;</small></td>'
+  h += '<tr class="tot" style="border-top:0"><td>as a current density, i = nF|J| &nbsp;<small style="color:var(--muted)">n = 1</small></td>'
      + '<td></td><td class="num">' + (Math.abs(J) * F_C * 1e6).toFixed(1) + '</td>'
      + '<td class="dir">µA cm⁻²</td></tr>';
   document.getElementById("npTbl").innerHTML = h;
@@ -1203,6 +1203,11 @@ function alPhys(){
   var iDens = +alEl.alI.value * 1e-3;                      /* A cm-2      */
   var sum = alIons().reduce(function(a, io){ return a + io.z * io.z * io.D * io.c; }, 0);
   var kappa = F_C * F_C / (R_G * T_K) * sum;               /* S cm-1      */
+  /* No ion at all (a neutral analyte and no salt): nothing can carry the cell
+     current. E stays 0 so the march is not poisoned by 0 x NaN - a neutral
+     analyte feels no field anyway - and the flag makes the readouts say the
+     setting is impossible instead of printing E = 0 beside a real current. */
+  var noCarrier = !(sum > 0) && iDens > 0;
   var E = sum > 0 ? iDens / kappa : 0;                     /* V cm-1      */
 
   /* The field is oriented so that a cation is pulled toward the electrode,
@@ -1210,7 +1215,7 @@ function alPhys(){
   var vMig = alOn.mig ? alZv * FRT * D_AN * (-E) : 0;
   var vCon = alOn.con ? -(+alEl.alV.value) * 1e-4 : 0;     /* cm s-1, in  */
   var D    = alOn.dif ? D_AN : 0;
-  return {kappa:kappa, E:E, vMig:vMig, vCon:vCon, u:vMig + vCon, D:D, i:iDens};
+  return {kappa:kappa, E:E, vMig:vMig, vCon:vCon, u:vMig + vCon, D:D, i:iDens, noCarrier:noCarrier};
 }
 
 /* ---- the march ---------------------------------------------------------- */
@@ -1270,9 +1275,10 @@ function alRead(){
   document.getElementById("alIv").textContent = (+alEl.alI.value).toFixed(2) + " mA cm⁻²";
   document.getElementById("alVv").textContent = (+alEl.alV.value).toFixed(0) + " µm s⁻¹";
 
-  document.getElementById("alK").textContent  = p.kappa > 0 ? p.kappa.toPrecision(3) + " S cm⁻¹" : "0";
-  document.getElementById("alE").textContent  = p.E.toPrecision(3) + " V cm⁻¹";
-  document.getElementById("alVm").textContent = alOn.mig
+  document.getElementById("alK").textContent  = p.kappa > 0 ? p.kappa.toPrecision(3) + " S cm⁻¹" : "0 — no ions";
+  document.getElementById("alE").textContent  = p.noCarrier ? "undefined — nothing carries the current"
+                                                            : p.E.toPrecision(3) + " V cm⁻¹";
+  document.getElementById("alVm").textContent = p.noCarrier ? "—" : alOn.mig
       ? (Math.abs(p.vMig) * 1e4).toPrecision(3) + " µm s⁻¹ " + (p.vMig === 0 ? "" : (p.vMig < 0 ? "←" : "→"))
       : "off";
   document.getElementById("alVc").textContent = alOn.con
@@ -1290,7 +1296,15 @@ function alRead(){
   document.getElementById("alJ").textContent = (j * F_C * 1e3).toPrecision(3) + " mA cm⁻²";
 
   var v = document.getElementById("alVerdict");
-  if(!alOn.dif){
+  if(p.noCarrier){
+    v.className = "verdict stop";
+    v.innerHTML = "<b>This setting is impossible: nothing in the solution can carry the current.</b> "
+      + "A neutral analyte with no supporting electrolyte leaves no ions at all, so the conductivity is zero "
+      + "and no field, however large, could push " + (+alEl.alI.value).toFixed(2) + " mA cm⁻² through it. "
+      + "Add supporting electrolyte, give the analyte a charge, or set the cell current density to zero. "
+      + "The profile is still right — a neutral analyte simply diffuses — but the field and migration "
+      + "readouts mean nothing here.";
+  }else if(!alOn.dif){
     v.className = "verdict stop";
     v.innerHTML = "<b>Diffusion off — and the layer never appears.</b> Drift alone cannot build a depletion "
       + "layer: with the flow running toward the electrode, the C = 0 at the wall sits downstream of every "
@@ -1308,6 +1322,14 @@ function alRead(){
       + p.E.toPrecision(2) + " V cm⁻¹ to pass the current, and that field drags the analyte at "
       + (Math.abs(p.vMig) * 1e4).toPrecision(2) + " µm s⁻¹. The profile is no longer the one Fick's laws "
       + "predict, so any D you extract from it is wrong. Put the supporting electrolyte back.";
+  }else if(!(p.kappa > 0)){
+    /* no ions and (since noCarrier was false) no current either: the last
+       branch would credit a supporting electrolyte that is not there   */
+    v.className = "verdict flat";
+    v.innerHTML = "<b>No ions and no current, so no field.</b> Nothing is being driven through the "
+      + "solution, so there is no field to drag anything, and a neutral analyte would not feel one "
+      + "anyway. It arrives by diffusion alone: the layer thickens as √(πDt) and the current "
+      + "falls as t<sup>−½</sup>.";
   }else{
     v.className = "verdict flat";
     v.innerHTML = "<b>Diffusion alone, to within a per cent.</b> The supporting electrolyte carries the "
@@ -1327,7 +1349,12 @@ function alRead(){
     var migOn = alOn.mig && Math.abs(p.vMig) * 1e4 > 3;
     var conOn = alOn.con && p.u < 0 && dssIn;
     var cls, html;
-    if(!alOn.dif){
+    if(p.noCarrier){
+      cls = "verdict stop";
+      html = "<b>No ions, so no cell current is possible.</b> A neutral analyte with no supporting salt "
+        + "leaves nothing to carry the current, so this setting cannot exist in a real cell. Add salt, give "
+        + "the analyte a charge, or set the cell current density to zero.";
+    }else if(!alOn.dif){
       cls = "verdict stop";
       html = "<b>Diffusion is off</b>, so there is no gradient at the wall and nothing to compare with the dashed line.";
     }else if(conOn && migOn){
@@ -1360,11 +1387,10 @@ function alRead(){
           + "points the wrong way. Less arrives each second than diffusion alone would bring, so the "
           + "current sits below the dashed line. Flip the charge and it rises above; add supporting salt "
           + "and the effect disappears.";
-    }else if(alOn.mig && alZv === 0 && +alEl.alS.value === 0){
+    }else if(alZv === 0 && +alEl.alS.value === 0){
       cls = "verdict flat";
-      html = "<b>No salt, but no change either.</b> The field is strong, but a neutral analyte has no "
-        + "charge for it to pull on, so the current stays on the dashed Cottrell line. Give the analyte "
-        + "a charge and watch it move off.";
+      html = "<b>No salt and no current, so no field.</b> With nothing driving a field, a neutral analyte "
+        + "arrives by diffusion alone, and the trace follows the dashed Cottrell line.";
     }else{
       cls = "verdict flat";
       html = "<b>This is the baseline.</b> Only diffusion brings the analyte in, so the current follows "
@@ -1489,7 +1515,7 @@ function alPaint(){
   });
   q += '<text x="14" y="' + ((t2 + H2 - b2) / 2) + '" text-anchor="middle" ' + MONO
      + ' font-size="10.5" fill="var(--muted)" transform="rotate(-90 14 ' + ((t2 + H2 - b2) / 2)
-     + ')">i / mA cm⁻²</text>';
+     + ')">current density / mA cm⁻²</text>';
 
   /* Cottrell, as the benchmark the numerics are answerable to */
   var cot = [];
@@ -1518,7 +1544,9 @@ function alPaint(){
 }
 
 function alTick(now){
-  if(alRun && alT < alTmax()){
+  /* the clock only runs while its tab is on screen - otherwise it would run
+     to the end unseen behind whichever tab the page opens on */
+  if(alRun && alT < alTmax() && !document.getElementById("p-np").hidden){
     var p = alPhys();
     alStep(p, AL.SUB);
     var j = alFlux(p) * F_C * 1e3;                 /* mA cm-2 */
@@ -1531,6 +1559,7 @@ function alTick(now){
 
 alReset();
 alRaf = requestAnimationFrame(alTick);
+
 
 
 /* ---- submit straight to the course sheet ----------------------------------
