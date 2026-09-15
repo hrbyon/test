@@ -168,8 +168,15 @@ tr.analyte td{color:var(--ox);font-weight:500}
 .trio3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;align-items:stretch}
 .trio3>.card{display:flex;flex-direction:column}
 .trio3>.card>.card-b:last-child{flex:1 1 auto}
+/* the Fick cards sit three abreast: a formula still never breaks, but the
+   caption on its own line under it may */
+#p-fick .trio3 .eqbig small{white-space:normal;display:inline-block}
+#p-fick .trio3 .readout{flex-wrap:wrap;row-gap:2px}
 @media(max-width:1000px){.trio3{grid-template-columns:1fr 1fr}}
 @media(max-width:720px){.trio3{grid-template-columns:1fr}}
+/* a trio row with two cards: .trio3.duo outranks the .trio3 width rules, so it needs its own */
+.trio3.duo{grid-template-columns:1fr 1fr}
+@media(max-width:720px){.trio3.duo{grid-template-columns:1fr}}
 .two.eq{align-items:stretch}
 .two.eq>.card{display:flex;flex-direction:column}
 .two.eq>.card>.card-b:last-child{flex:1 1 auto}
@@ -212,7 +219,9 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
         <p class="hint" style="margin:0">Three independent reasons an ion arrives somewhere: because there is more of it elsewhere, because a field is pulling it, and because the solvent is carrying it. They add. Move the sliders and watch which one actually decides the answer.
         <br><b>Sign convention:</b> x runs from the electrode surface into the solution, so a <b>negative</b> flux points <b>toward the electrode</b>.</p>
 
-        <p class="hint" style="margin:0"><b>The cell being solved.</b> The electrode at x = 0 is held at the diffusion limit, so every analyte ion reaching it reacts and <b>C(0) = 0</b>; three hundred micrometres away the solution is still bulk. The stirring is taken as a uniform velocity normal to the surface &mdash; the <b>stagnant-film</b> idealisation, not a real rotating disk. It is the simplest geometry in which convection does what convection does, and it sets a diffusion layer that stops growing.</p>
+        <p class="hint" style="margin:0"><b>The cell being solved.</b> The electrode at x = 0 is held at the diffusion limit, so every analyte ion reaching it reacts and <b>C(0) = 0</b>; three hundred micrometres away the solution is still bulk.</p>
+
+        <p class="hint" style="margin:0"><b>The stirring.</b> It is taken as a uniform velocity normal to the surface &mdash; the <b>stagnant-film</b> idealisation, not a real rotating disk. It is the simplest geometry in which convection does what convection does, and it sets a diffusion layer that stops growing.</p>
 
       </div>
     </div>
@@ -346,7 +355,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
   <!-- ============== FICK'S LAWS ============== -->
   <section class="panel" id="p-fick" role="tabpanel" aria-labelledby="t-fick" hidden>
 
-    <div class="two eq">
+    <div class="trio3">
 
       <div class="card">
         <div class="card-h"><h2>The experiment</h2><span class="note">a potential step at t = 0</span></div>
@@ -373,6 +382,14 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
           </div>
           <p class="hint" style="margin:0">At t = 0 the potential is stepped far enough that every O reaching the surface reacts instantly, so C(0,t) = 0. The solution is otherwise untouched and infinitely deep: C(x,0) = C* = 1 mM. That is the one boundary problem the whole of the next lecture is built on.</p>
         </div>
+        <div class="card-h" style="border-top:1px solid var(--line)"><h2>At the probe</h2><span class="note" id="fkProbeNote"></span></div>
+        <div class="card-b">
+          <div class="readout"><span class="k">C(x,t)</span><span class="v" id="fkC">&mdash;</span></div>
+          <div class="readout"><span class="k">&part;C/&part;x &mdash; the slope</span><span class="v" id="fkG">&mdash;</span></div>
+          <div class="readout"><span class="k"><span class="dif">Fick 1:</span> j = &minus;D &part;C/&part;x</span><span class="v" id="fkJ">&mdash;</span></div>
+          <div class="readout"><span class="k">&part;<sup>2</sup>C/&part;x<sup>2</sup> &mdash; the curvature</span><span class="v" id="fkG2">&mdash;</span></div>
+          <div class="readout"><span class="k"><span class="mig">Fick 2:</span> &part;C/&part;t = D &part;<sup>2</sup>C/&part;x<sup>2</sup></span><span class="v" id="fkdCdt">&mdash;</span></div>
+        </div>
       </div>
 
       <div class="card">
@@ -384,59 +401,40 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
           </div>
           <p class="hint" style="margin:0">A <b>snapshot</b>: it converts a slope into a current. Drag the probe and read the tangent &mdash; that slope, times &minus;D, is the flux.</p>
         </div>
-        <div class="card-b scrollx"><svg id="fkprof" viewBox="0 0 520 404" width="520" height="404" style="margin:0 auto" role="img" aria-label="The solution in front of the electrode, shaded by concentration, above the concentration profile that describes it, both on the same distance axis, with the tangent at the probe"></svg></div>
+        <div class="card-b scrollx"><svg id="fkprof" viewBox="0 0 400 404" style="display:block;width:100%;height:auto;max-width:400px;margin:0 auto" role="img" aria-label="The solution in front of the electrode, shaded by concentration, above the concentration profile that describes it, both on the same distance axis, with the tangent at the probe"></svg></div>
         <div class="card-b" style="padding-top:0">
           <div class="fkkey">
             <span class="ramp">0 <i></i> C*</span>
             <span><b>white</b> &mdash; depleted: the analyte has been used up at the electrode</span>
             <span><b class="blue">blue</b> &mdash; analyte still there; full colour is the bulk, C*</span>
           </div>
-          <p class="hint" style="margin:8px 0 0">The strip on top is the solution itself, seen from the side; the <span style="color:var(--red-);font-weight:600">blue curve</span> below it is the same colour read off as a number, C/C*. Where the strip fades to white, the curve drops to zero &mdash; and as the clock runs, the white region spreads out from the electrode as far as &radic;(2Dt).</p>
+          <p class="hint" style="margin:1.65em 0 0">The strip on top is the solution itself, seen from the side; the <span style="color:var(--red-);font-weight:600">blue curve</span> below it is the same colour read off as a number, C/C*. Where the strip fades to white, the curve drops to zero &mdash; and as the clock runs, the white region spreads out from the electrode as far as &radic;(2Dt).</p>
         </div>
       </div>
 
       <div class="card">
-        <div class="card-h"><h2>At the probe</h2><span class="note" id="fkProbeNote"></span></div>
-        <div class="card-b">
-          <div class="readout"><span class="k">C(x,t)</span><span class="v" id="fkC">&mdash;</span></div>
-          <div class="readout"><span class="k">&part;C/&part;x &mdash; the slope</span><span class="v" id="fkG">&mdash;</span></div>
-          <div class="readout"><span class="k"><span class="dif">Fick 1:</span> j = &minus;D &part;C/&part;x</span><span class="v" id="fkJ">&mdash;</span></div>
-          <div class="readout"><span class="k">&part;<sup>2</sup>C/&part;x<sup>2</sup> &mdash; the curvature</span><span class="v" id="fkG2">&mdash;</span></div>
-          <div class="readout"><span class="k"><span class="mig">Fick 2:</span> &part;C/&part;t = D &part;<sup>2</sup>C/&part;x<sup>2</sup></span><span class="v" id="fkdCdt">&mdash;</span></div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-h"><h2>Fick 2 &mdash; the flux and how fast it changes</h2><span class="note">j(x,t), with the slab shaded</span></div>
+        <div class="card-h"><h2>Fick 2 &mdash; the flux and how fast it changes</h2><span class="note">j(x,t) and &minus;&part;C/&part;t, with the slab shaded</span></div>
         <div class="card-b stack" style="gap:10px;padding-bottom:6px">
           <div class="eqbig">
             <span class="mig">FICK 2</span> &nbsp; &part;C<sub>i</sub>(x,t)/&part;t = D<sub>i</sub> &part;<sup>2</sup>C<sub>i</sub>(x,t)/&part;x<sup>2</sup><br>
             <small>how the concentration at a point changes as time passes</small>
           </div>
-          <p class="hint" style="margin:0">A <b>film</b>: it says how that slope evolves. It is not an independent fact &mdash; it follows from the first law plus the requirement that molecules are not created or destroyed, which the cards further down take step by step, with numbers.</p>
+          <p class="hint" style="margin:0"><b>Where Fick 2 comes from.</b> Count the molecules in the shaded slab. What enters at x+dx, minus what leaves at x, is what stays behind, so &part;C/&part;t = &minus;&part;j/&part;x; put Fick 1 in for j and that is D&thinsp;&part;<sup>2</sup>C/&part;x<sup>2</sup>. The <b style="color:var(--go)">green curve</b> is therefore the <b>slope of the blue one</b>: where the blue curve is flat, at the electrode, the green is zero; where the blue falls fastest, at x = &radic;(2Dt), the green peaks. Where the flux drops off fastest is where the solution empties fastest. The bookkeeping card below does the same count with numbers.</p>
         </div>
-        <div class="card-b scrollx"><svg id="fkflux" viewBox="0 0 520 250" width="520" height="250" style="margin:0 auto" role="img" aria-label="Diffusional flux against distance from the electrode, with the slab between x and x plus dx shaded"></svg></div>
+        <div class="card-b scrollx"><svg id="fkflux" viewBox="0 0 400 270" style="display:block;width:100%;height:auto;max-width:400px;margin:0 auto" role="img" aria-label="Diffusional flux magnitude and the local depletion rate against distance from the electrode, the depletion rate peaking where the flux falls most steeply, with the slab between x and x plus dx shaded"></svg></div>
+        <div class="card-b" style="padding-top:0">
+          <div class="fkkey">
+            <span><b class="blue">blue</b> &mdash; |j|, the flux: Fick 1 applied to the profile (left axis)</span>
+            <span><b style="color:var(--go)">green</b> &mdash; &minus;&part;C/&part;t, the slope of the blue curve, drawn upward because it is a loss: every slab here is losing analyte (right axis)</span>
+            <span>every flux points at the electrode; only the size differs</span>
+          </div>
+          <p class="hint" style="margin:1.65em 0 0"><b>Where the blue curve comes from.</b> Take the profile from the Fick 1 card, C = C*&middot;erf[x / 2&radic;(Dt)], and apply <b>Fick 1</b> to it: j = &minus;D&thinsp;&part;C/&part;x = &minus;C*&radic;(D/&pi;t)&middot;e<sup>&minus;x&sup2;/4Dt</sup>. Every flux points at the electrode, so only its size |j| is drawn &mdash; largest at the surface, where it is the Cottrell current.</p>
+        </div>
       </div>
 
     </div>
 
-    <div class="trio3" style="margin-top:16px">
-
-      <div class="card">
-        <div class="card-h"><h2>Why the second law follows from the first</h2></div>
-        <div class="card-b scrollx" style="padding-bottom:6px"><svg id="fkbox" viewBox="0 0 300 170" width="300" height="170" style="margin:0 auto" role="img" aria-label="A slab of solution between x and x plus dx, with flux entering on one face and leaving on the other"></svg></div>
-        <div class="card-b" style="padding-top:0">
-          <div class="eqbig" style="font-size:12.5px;line-height:1.9">
-            what stays in the slab in time dt<br>
-            &nbsp;= [ j(x,t) &minus; j(x+dx,t) ] A dt<br><br>
-            and that raises the concentration by<br>
-            &nbsp;dC = &minus;[&part;j/&part;x] dt<br><br>
-            put Fick 1 in for j:<br>
-            &nbsp;<b>&part;C/&part;t = D &part;<sup>2</sup>C/&part;x<sup>2</sup></b>
-          </div>
-          <p class="hint">No new physics is added here &mdash; only bookkeeping. Fick 2 is Fick 1 with the molecules counted.</p>
-        </div>
-      </div>
+    <div class="trio3 duo" style="margin-top:16px">
 
       <div class="card">
         <div class="card-h"><h2>The bookkeeping, in numbers</h2><span class="note">for the shaded slab</span></div>
@@ -946,7 +944,6 @@ function fick(){
 
   fkProfPlot(D, t, x, g, C);
   fkFluxPlot(D, t, x, dx);
-  fkBoxPlot();
 }
 
 function fkProfPlot(D, t, x, g, C){
@@ -954,7 +951,7 @@ function fkProfPlot(D, t, x, g, C){
      shaded by C(x,t); the profile that describes it sits underneath; and
      the electrode slab, the probe and the reach line span both, so moving
      the clock moves one picture rather than two.                        */
-  var W = 520, H = 404, L = 52, Rr = 18, B = 44;
+  var W = 400, H = 404, L = 52, Rr = 18, B = 44;
   var CT = 24, CH = 88;                    /* the cell band              */
   var T = CT + CH + 52;                    /* the profile's ceiling      */
   function X(v){ return L + v / FK_XMAX * (W - L - Rr); }
@@ -1039,69 +1036,145 @@ function fkProfPlot(D, t, x, g, C){
 }
 
 function fkFluxPlot(D, t, x, dx){
-  var W = 520, H = 250, L = 52, Rr = 18, T = 22, B = 44;
+  /* Two curves on one distance axis. Blue: |j|, Fick 1 applied to the erf
+     profile. Green: -dC/dt, which the slab balance makes equal to -dj/dx -
+     the slope of the blue curve. They get separate vertical axes because
+     their units differ; the point is where each changes, and that is read
+     off the shared horizontal axis. -dC/dt is drawn positive: dC/dt is
+     negative everywhere here, since every slab is losing analyte.       */
+  var W = 400, H = 270, L = 52, Rr = 62, T = 22, B = 44;
   var j0 = Math.abs(fkJ(0, D, t));
-  var top = Math.max(j0, 1e-30) * 1.1;
+  /* fixed over the time slider: the surface flux at its earliest time, 0.1 s,
+     for this D. Rescaling to j0 on every draw pinned the tick in place and
+     hid the t^-1/2 decay the lower cards describe.                       */
+  var jMax = Math.abs(fkJ(0, D, 0.1));
+  var top = Math.max(jMax, 1e-30) * 1.1;
+  var rms = Math.sqrt(2 * D * t);
+  function dep(xx){ return -D * fkLap(xx, D, t) * 1e6; }   /* mM s-1, >= 0 */
+  var dPeak = dep(rms);                   /* the analytic maximum sits at sqrt(2Dt) */
+  /* the right axis is held the same way: its peak at 0.1 s, for this D */
+  var dMax = -D * fkLap(Math.sqrt(2 * D * 0.1), D, 0.1) * 1e6;
+  var topR = Math.max(dMax, 1e-30) * 1.1;
   function X(v){ return L + v / FK_XMAX * (W - L - Rr); }
   function Y(v){ return T + (1 - v / top) * (H - T - B); }
+  function Y2(v){ return T + (1 - v / topR) * (H - T - B); }
   var s = '';
   s += '<rect x="0" y="' + T + '" width="' + L + '" height="' + (H - T - B) + '" fill="var(--surface-2)"/>';
+
+  /* axes: distance along the bottom, flux on the left, depletion on the right */
   s += '<line x1="' + L + '" y1="' + (H - B) + '" x2="' + (W - Rr) + '" y2="' + (H - B) + '" stroke="var(--line-2)"/>';
   s += '<line x1="' + L + '" y1="' + T + '" x2="' + L + '" y2="' + (H - B) + '" stroke="var(--line-2)"/>';
+  s += '<line x1="' + (W - Rr) + '" y1="' + T + '" x2="' + (W - Rr) + '" y2="' + (H - B) + '" stroke="var(--line-2)"/>';
   for(var u = 0; u <= 300; u += 50){
     s += '<text x="' + X(u * 1e-4) + '" y="' + (H - B + 16) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="9">' + u + '</text>';
   }
   s += '<text x="' + ((L + W - Rr) / 2) + '" y="' + (H - 10) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="10">distance from the electrode / µm</text>';
-  s += '<text transform="rotate(-90 13 ' + ((T + H - B) / 2) + ')" x="13" y="' + ((T + H - B) / 2) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="10">|j| / nmol cm⁻² s⁻¹</text>';
-  s += '<text x="' + (L + 6) + '" y="' + (T + 12) + '" fill="var(--muted)" ' + MONO + ' font-size="9">' + (top * 1e9).toFixed(2) + '</text>';
+  s += '<text transform="rotate(-90 13 ' + ((T + H - B) / 2) + ')" x="13" y="' + ((T + H - B) / 2) + '" text-anchor="middle" fill="var(--red-)" ' + MONO + ' font-size="10">|j| / nmol cm⁻² s⁻¹</text>';
+  s += '<text transform="rotate(90 ' + (W - 12) + ' ' + ((T + H - B) / 2) + ')" x="' + (W - 12) + '" y="' + ((T + H - B) / 2) + '" text-anchor="middle" fill="var(--go)" ' + MONO + ' font-size="10">−∂C/∂t / mM s⁻¹</text>';
 
-  /* the shaded slab, drawn under the curve so the curve stays readable */
+  /* ticks at the real maxima, not at the frame top: the frame is 10 % taller */
+  s += '<line x1="' + (L - 4) + '" y1="' + Y(j0).toFixed(1) + '" x2="' + L + '" y2="' + Y(j0).toFixed(1) + '" stroke="var(--red-)"/>';
+  s += '<text x="' + (L - 6) + '" y="' + (Y(j0) + 3).toFixed(1) + '" text-anchor="end" fill="var(--red-)" ' + MONO + ' font-size="9">' + (j0 * 1e9).toFixed(2) + '</text>';
+  /* the floor label gives way when the sinking surface-flux tick reaches it */
+  if(Y(0) - Y(j0) > 13){
+    s += '<text x="' + (L - 6) + '" y="' + (Y(0) + 3).toFixed(1) + '" text-anchor="end" fill="var(--muted)" ' + MONO + ' font-size="9">0</text>';
+  }
+  /* a fixed reference at the frame top, so the moving tick can be read against it */
+  if(Y(j0) - T > 13){
+    s += '<line x1="' + (L - 4) + '" y1="' + T + '" x2="' + L + '" y2="' + T + '" stroke="var(--line-2)"/>';
+    s += '<text x="' + (L - 6) + '" y="' + (T + 3) + '" text-anchor="end" fill="var(--muted)" ' + MONO + ' font-size="9">' + (top * 1e9).toFixed(2) + '</text>';
+  }
+  s += '<line x1="' + (W - Rr) + '" y1="' + Y2(dPeak).toFixed(1) + '" x2="' + (W - Rr + 4) + '" y2="' + Y2(dPeak).toFixed(1) + '" stroke="var(--go)"/>';
+  s += '<text x="' + (W - Rr + 6) + '" y="' + (Y2(dPeak) + 3).toFixed(1) + '" fill="var(--go)" ' + MONO + ' font-size="9">' + dPeak.toPrecision(2) + '</text>';
+  if(Y2(0) - Y2(dPeak) > 13){
+    s += '<text x="' + (W - Rr + 6) + '" y="' + (Y2(0) + 3).toFixed(1) + '" fill="var(--muted)" ' + MONO + ' font-size="9">0</text>';
+  }
+  if(Y2(dPeak) - T > 13){
+    s += '<line x1="' + (W - Rr) + '" y1="' + T + '" x2="' + (W - Rr + 4) + '" y2="' + T + '" stroke="var(--line-2)"/>';
+    s += '<text x="' + (W - Rr + 6) + '" y="' + (T + 3) + '" fill="var(--muted)" ' + MONO + ' font-size="9">' + topR.toPrecision(2) + '</text>';
+  }
+
+  /* the shaded slab, drawn under the curves so they stay readable */
   var sx = X(x), sxb = X(Math.min(FK_XMAX, x + dx));
+  /* Where the slab caption goes is settled first, so the sqrt(2Dt) label can
+     keep clear of it. The caption flips to the other side of the slab once the
+     slab is far enough right, and drops below its marker when the curve runs
+     high. Box sizes are the mono widths at 9.5 px, padded by 6 px: the root
+     sign renders wider than a mono cell, and unpadded they touched at 0.1 s. */
+  var yB = Y(Math.abs(fkJ(Math.min(FK_XMAX, x + dx), D, t)));
+  var capR = (sxb + 8 + 104) < (W - Rr);
+  var capY = (yB - 8 < T + 14) ? (yB + 17) : (yB - 8);
+  var capX = capR ? (sxb + 8) : Math.max(L + 104, sx - 8);
+  var capBox = {x0: (capR ? capX : capX - 104) - 6, x1: (capR ? capX + 104 : capX) + 6, y0: capY - 12, y1: capY + 4};
+  function clashes(bx){
+    return bx.x0 < capBox.x1 && capBox.x0 < bx.x1 && bx.y0 < capBox.y1 && capBox.y0 < bx.y1;
+  }
   s += '<rect x="' + sx.toFixed(1) + '" y="' + T + '" width="' + Math.max(1.2, sxb - sx).toFixed(1) + '" height="' + (H - T - B)
      + '" fill="var(--ox)" opacity="0.16"/>';
 
-  var pts = [];
-  for(var k = 0; k <= 160; k++){
-    var xx = k / 160 * FK_XMAX;
-    pts.push(X(xx).toFixed(1) + "," + Y(Math.abs(fkJ(xx, D, t))).toFixed(1));
+  /* where the two curves meet their turning point: steepest blue, green peak */
+  if(rms < FK_XMAX){
+    s += '<line x1="' + X(rms).toFixed(1) + '" y1="' + T + '" x2="' + X(rms).toFixed(1) + '" y2="' + (H - B)
+       + '" stroke="var(--go)" stroke-width="1" stroke-dasharray="3 3"/>';
+    /* The label tries the foot of the line, then the top, then heights in
+       between, on its own side before the other, and takes the first spot
+       that touches neither curve nor the slab caption. With both axes fixed
+       the curves crowd the top early on and lie along the floor late, so no
+       single spot serves the whole slider.                                 */
+    function labelBox(right, y){
+      var x0 = right ? X(rms) + 5 : X(rms) - 39;
+      return {x0: x0 - 6, x1: x0 + 40, y0: y - 12, y1: y + 4};
+    }
+    function onCurve(bx){
+      var a = Math.max(L, bx.x0), b = Math.min(W - Rr, bx.x1), pb = null, pg = null;
+      for(var px = a; px <= b + 0.01; px += 1.5){
+        var xv = (px - L) / (W - L - Rr) * FK_XMAX;
+        var yb = Y(Math.abs(fkJ(xv, D, t))), yg = Y2(dep(xv));
+        if(pb !== null && ((Math.min(pb, yb) <= bx.y1 && Math.max(pb, yb) >= bx.y0)
+                        || (Math.min(pg, yg) <= bx.y1 && Math.max(pg, yg) >= bx.y0))) return true;
+        pb = yb; pg = yg;
+      }
+      return false;
+    }
+    var sideFirst = X(rms) + 5 + 34 < W - Rr;
+    var heights = [H - B - 6, T + 12];
+    for(var hy = T + 30; hy < H - B - 20; hy += 18) heights.push(hy);
+    var rmsRight = sideFirst, rmsY = H - B - 6, placed = false;
+    [sideFirst, !sideFirst].forEach(function(side){
+      heights.forEach(function(yy){
+        if(placed) return;
+        var bx = labelBox(side, yy);
+        if(bx.x0 < L - 4 || bx.x1 > W - Rr + 4) return;
+        if(!clashes(bx) && !onCurve(bx)){ rmsRight = side; rmsY = yy; placed = true; }
+      });
+    });
+    s += '<text x="' + (X(rms) + (rmsRight ? 5 : -5)).toFixed(1) + '" y="' + rmsY
+       + '" text-anchor="' + (rmsRight ? "start" : "end") + '" fill="var(--go)" ' + MONO
+       + ' font-size="9.5">√(2Dt)</text>';
   }
+
+  var pts = [], pts2 = [];
+  for(var k = 0; k <= 200; k++){
+    var xx = k / 200 * FK_XMAX;
+    pts.push(X(xx).toFixed(1) + "," + Y(Math.abs(fkJ(xx, D, t))).toFixed(1));
+    pts2.push(X(xx).toFixed(1) + "," + Y2(dep(xx)).toFixed(1));
+  }
+  s += '<polyline points="' + pts2.join(" ") + '" fill="none" stroke="var(--go)" stroke-width="2"/>';
   s += '<polyline points="' + pts.join(" ") + '" fill="none" stroke="var(--red-)" stroke-width="2.2"/>';
 
-  var yA = Y(Math.abs(fkJ(x, D, t))), yB = Y(Math.abs(fkJ(Math.min(FK_XMAX, x + dx), D, t)));
+  var yA = Y(Math.abs(fkJ(x, D, t)));
   s += '<circle cx="' + sx.toFixed(1) + '" cy="' + yA.toFixed(1) + '" r="4" fill="var(--ox)"/>';
   s += '<circle cx="' + sxb.toFixed(1) + '" cy="' + yB.toFixed(1) + '" r="4" fill="var(--ox)"/>';
+  /* and the depletion rate at the middle of the slab, which the readout reports */
+  var xm = Math.min(FK_XMAX, x + dx / 2);
+  s += '<circle cx="' + X(xm).toFixed(1) + '" cy="' + Y2(dep(xm)).toFixed(1) + '" r="3.5" fill="var(--surface)" stroke="var(--go)" stroke-width="2"/>';
+
   /* the caption flips to the other side of the slab once the slab is far
-     enough right that it would otherwise run off the plot                  */
-  var capR = (sxb + 8 + 104) < (W - Rr);
-  /* and it drops below the marker when the curve is running high, rather
-     than climbing into the standing caption along the top of the frame */
-  var capY = (yB - 8 < T + 26) ? (yB + 17) : (yB - 8);
-  var capX = capR ? (sxb + 8) : Math.max(L + 104, sx - 8);
+     enough right that it would otherwise run off the plot, and drops below
+     the marker when the curve is running high                            */
   s += '<text x="' + capX.toFixed(1) + '" y="' + capY.toFixed(1) + '" text-anchor="'
      + (capR ? "start" : "end") + '" fill="var(--ox)" ' + MONO + ' font-size="9.5">the slab, x → x+dx</text>';
-  s += '<text x="' + (W - Rr) + '" y="' + (T + 12) + '" text-anchor="end" fill="var(--muted)" ' + MONO + ' font-size="9.5">every arrow points at the electrode; only the size differs</text>';
   document.getElementById("fkflux").innerHTML = s;
-}
-
-function fkBoxPlot(){
-  var W = 300, H = 170;
-  var bx = 90, bw = 110, by = 40, bh = 78;
-  var s = '';
-  s += '<rect x="' + bx + '" y="' + by + '" width="' + bw + '" height="' + bh + '" fill="var(--ox-soft)" stroke="var(--ox)" stroke-width="1.4"/>';
-  s += '<text x="' + (bx + bw / 2) + '" y="' + (by + bh / 2 + 4) + '" text-anchor="middle" fill="var(--ox)" ' + MONO + ' font-size="11">A · dx</text>';
-  s += '<text x="' + bx + '" y="' + (by + bh + 16) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="10">x</text>';
-  s += '<text x="' + (bx + bw) + '" y="' + (by + bh + 16) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="10">x+dx</text>';
-  /* flux arrives from the bulk side and leaves toward the electrode */
-  var y1 = by + 22, y2 = by + bh - 22;
-  s += '<line x1="' + (bx + bw + 62) + '" y1="' + y1 + '" x2="' + (bx + bw + 10) + '" y2="' + y1 + '" stroke="var(--red-)" stroke-width="2"/>';
-  s += arrowHead(bx + bw + 4, y1, -1, 'var(--red-)', 1.1);
-  s += '<text x="' + (bx + bw + 36) + '" y="' + (y1 - 7) + '" text-anchor="middle" fill="var(--red-)" ' + MONO + ' font-size="9.5">j(x+dx) in</text>';
-  s += '<line x1="' + (bx - 10) + '" y1="' + y2 + '" x2="' + (bx - 62) + '" y2="' + y2 + '" stroke="var(--red-)" stroke-width="2"/>';
-  s += arrowHead(bx - 68, y2, -1, 'var(--red-)', 1.1);
-  s += '<text x="' + (bx - 36) + '" y="' + (y2 - 7) + '" text-anchor="middle" fill="var(--red-)" ' + MONO + ' font-size="9.5">j(x) out</text>';
-  s += '<text x="' + (W / 2) + '" y="18" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="9.5" letter-spacing="0.08em">ONE SLAB OF SOLUTION</text>';
-  s += '<text x="' + (W / 2) + '" y="' + (H - 10) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="9">what does not leave, stays</text>';
-  document.getElementById("fkbox").innerHTML = s;
 }
 
 fick();
