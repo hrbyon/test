@@ -300,11 +300,15 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
         <div class="card-b stack">
           <svg id="gsplot" viewBox="0 0 360 250" style="display:block;width:100%;height:auto;max-width:330px;margin:0 auto" role="img" aria-label="Net charge enclosed by a sphere around the ion against its radius, falling from the full ion charge to zero over a few Debye lengths, with the bare ion's constant charge for comparison"></svg>
           <div class="glegend">
-            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><path d="M1 13 Q8 1 25 12 L25 13 Z" fill="var(--red-)" opacity="0.25"/><circle cx="8" cy="5" r="2.5" fill="var(--red-)"/></svg><span><b>shaded hump</b>: how much counter-charge sits in a thin shell at each r. Only its shape matters, it is not read on the axis. Its <b>peak (dot) is at r = 1/&kappa;</b> from the centre &mdash; or at the ion&rsquo;s surface when 1/&kappa; &lt; a</span></span>
-            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="13" y1="0" x2="13" y2="14" stroke="var(--red-)" stroke-width="1.4" stroke-dasharray="2 2"/></svg><span><b>blue dotted line, a + 1/&kappa;</b>: where a single thin shell of &minus;z&epsilon; would have to sit to give the ion the same potential its atmosphere does &mdash; the orange marker in the potential graph above</span></span>
-            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><rect x="1" y="1" width="10" height="12" fill="var(--line-2)" opacity="0.5"/><line x1="12" y1="4" x2="25" y2="4" stroke="var(--line-2)" stroke-width="1.6" stroke-dasharray="3 2"/></svg><span><b>grey</b>: the band on the left is inside the ion (r &lt; a); the dashed line at 1 is the bare ion, with no atmosphere to enclose</span></span>
-            <span style="display:block;color:var(--ink-2)"><b>How the curve and the hump fit together.</b>&nbsp;The curve is 1 minus the hump&rsquo;s area to the left of r (the hump&rsquo;s total area is exactly the ion&rsquo;s charge), so <b>the curve falls fastest where the hump is tallest</b>.</span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><path d="M1 13 Q8 1 25 12 L25 13 Z" fill="var(--red-)" opacity="0.25"/><circle cx="8" cy="5" r="2.5" fill="var(--red-)"/></svg><span><b>shaded hump</b>: how much counter-charge sits in a thin shell at each r. Its <b>peak (dot) is at r = 1/&kappa;</b> from the centre.</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="13" y1="0" x2="13" y2="14" stroke="var(--ox)" stroke-width="1.5"/></svg><span><b>orange line, a + 1/&kappa;</b></span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><rect x="1" y="1" width="10" height="12" fill="var(--line-2)" opacity="0.5"/></svg><span><b>grey</b>: the band on the left is inside the ion (r &lt; a).</span></span>
             <span style="display:block;color:var(--ink-2)"><b>&#9312; &#9313; &#9314; on the curve.</b>&nbsp;&#9312; r = a: all 24 lines cross, Q<sub>enc</sub> = z&epsilon;. &#9313; the hump&rsquo;s peak, r = 1/&kappa; (r = a when 1/&kappa; &lt; a): the steepest fall. &#9314; the right edge, r = a + 6/&kappa;: Q<sub>enc</sub> &asymp; 0 and no line crosses.</span>
+            <span style="display:block;color:var(--ink-2)"><b>What Q<sub>enc</sub> is.</b>&nbsp;The net charge inside the sphere: the ion&rsquo;s own charge plus the counter-charge of the atmosphere that lies within r.</span>
+            <span style="display:block;color:var(--ink-2);padding-left:12px">&bull; <b>r = a:</b> only the ion is inside, so Q<sub>enc</sub> = z&epsilon; &mdash; all 24 lines cross.</span>
+            <span style="display:block;color:var(--ink-2);padding-left:12px">&bull; <b>r grows:</b> more and more counter-charge of the opposite sign comes inside, so Q<sub>enc</sub> falls.</span>
+            <span style="display:block;color:var(--ink-2);padding-left:12px">&bull; <b>r &rarr; &infin;:</b> the whole atmosphere carries exactly &minus;z&epsilon;, so Q<sub>enc</sub> &rarr; 0 &mdash; ion and atmosphere together are neutral.</span>
+            <span style="display:block;color:var(--ink-2)"><b>How the curve and the hump fit together.</b>&nbsp;The curve falls fastest where the hump is tallest.</span>
           </div>
           <div>
             <div class="readout"><span class="k">sphere radius, r</span><span class="v" id="gsRr">&mdash;</span></div>
@@ -383,13 +387,16 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
           <div class="readout"><span class="k">ionic strength, I</span><span class="v" id="atI">&mdash;</span></div>
           <div class="readout"><span class="k"><span class="mig">Debye length</span>, 1/&kappa;</span><span class="v" id="atL">&mdash;</span></div>
           <div class="readout"><span class="k">effective ion size, a</span><span class="v" id="atA2">&mdash;</span></div>
-          <div id="atRead" class="verdict flat" style="margin-top:14px">&mdash;</div>
+          <div class="readout"><span class="k" style="color:var(--ox)">orange line, r = a + 1/&kappa;</span><span class="v" id="atRk">&mdash;</span></div>
+          <div class="readout"><span class="k"><span style="color:var(--muted)">ion alone</span> there, &psi;/&psi;(a)</span><span class="v" id="atPb">&mdash;</span></div>
+          <div class="readout"><span class="k"><span class="mig">with its atmosphere</span> there, &psi;/&psi;(a)</span><span class="v" id="atPs">&mdash;</span></div>
         </div>
       </div>
 
       <div class="card">
-        <div class="card-h"><h2>How far the charge is felt</h2><span class="note" id="atNote">screened against bare Coulomb</span></div>
+        <div class="card-h"><h2>How far the charge is felt</h2></div>
         <div class="card-b"><svg id="atplot" viewBox="0 0 400 340" style="display:block;width:100%;height:auto;max-width:420px;margin:0 auto" role="img" aria-label="The screened potential around a central ion against distance, with the bare Coulomb potential for comparison and the Debye length marked"></svg>
+          <div id="atRead" class="verdict flat" style="margin-top:12px">&mdash;</div>
         </div>
       </div>
 
@@ -399,7 +406,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
       <div class="card-h"><h2>How to read the graph</h2><span class="note">what &psi;(r)/&psi;(a) against r is showing</span></div>
       <div class="card-b stack" style="gap:12px">
         <div class="eqbig" style="white-space:normal;font-size:14px;line-height:1.7">
-          <small style="display:block;margin-bottom:4px">y-axis: the <b>potential</b> &psi;(r), not the field, divided by its value at r = a</small>
+          <small style="display:block;margin-bottom:4px">y-axis: the <b>potential</b> &psi;(r) at distance r from the central ion, made by the ion and its atmosphere together, divided by its value at r = a</small>
           &psi;(r) = (ze / 4&pi;&epsilon;<sub>0</sub>&epsilon;<sub>r</sub>) &middot; e<sup>&kappa;a</sup>/(1 + &kappa;a) &middot; e<sup>&minus;&kappa;r</sup>/r<br>
           <span class="mig">with its atmosphere:&nbsp; &psi;(r)/&psi;(a) = (a/r)&middot;e<sup>&minus;&kappa;(r&minus;a)</sup></span><br>
           <span style="color:var(--muted)">ion alone:&nbsp; &psi;(r) = ze / 4&pi;&epsilon;<sub>0</sub>&epsilon;<sub>r</sub>r &nbsp;&rarr;&nbsp; &psi;(r)/&psi;(a) = a/r</span>
@@ -784,17 +791,14 @@ function atDraw(){
        + ' font-size="13" paint-order="stroke" stroke="var(--surface)" stroke-width="4" stroke-linejoin="round" fill="var(--red-)">with its atmosphere</text>';
   document.getElementById("atplot").innerHTML = str;
 
-  document.getElementById("atNote").textContent =
-    "1/κ = " + (lam * 1e9).toPrecision(3) + " nm at I = " + I.toPrecision(2) + " mol kg⁻¹";
-
   /* the graph, in a sentence, for whatever is set */
   var fBare = a / rk, fScr = fBare * Math.exp(-1);
-  document.getElementById("atRead").innerHTML = "<b>Right now:</b> closest approach a = " + (a * 1e9).toFixed(2) + " nm, with "
-    + "1/κ = " + (lam * 1e9).toPrecision(2) + " nm — the atmosphere is "
-    + (lam > a ? (lam / a).toFixed(lam / a >= 10 ? 0 : 1) + " times wider than the ion" : "thinner than the ion itself")
-    + ". At r = a + 1/κ = " + (rk * 1e9).toPrecision(2) + " nm the bare potential would still be " + fBare.toFixed(2)
-    + " of its surface value; screened, it is " + fScr.toFixed(2) + "."
-    + (rk >= rmax ? " (That distance is past the right-hand edge of the plot.)" : "");
+  /* the orange line in numbers: the same scaled values the graph plots */
+  document.getElementById("atRk").textContent = (rk * 1e9).toPrecision(3) + " nm";
+  document.getElementById("atPb").textContent = fBare.toFixed(3);
+  document.getElementById("atPs").textContent = fScr.toFixed(3) + "  (37 % of ion alone)";
+  document.getElementById("atRead").innerHTML = "At r = " + (rk * 1e9).toPrecision(2) + " nm the bare potential would still be "
+    + fBare.toFixed(2) + " of its surface value; screened, it is " + fScr.toFixed(2) + ".";
 
   gsDraw(performance.now());
 }
@@ -984,11 +988,11 @@ function gsDraw(ts){
     }
     p += '<polyline points="' + qp.join(" ") + '" fill="none" stroke="var(--sph)" stroke-width="2.4"/>';
     var xs = X(GS_A + lam);
-    p += '<line x1="' + xs.toFixed(1) + '" y1="' + T + '" x2="' + xs.toFixed(1) + '" y2="' + (H - B) + '" stroke="var(--red-)" stroke-dasharray="2 3"/>';
+    p += '<line x1="' + xs.toFixed(1) + '" y1="' + T + '" x2="' + xs.toFixed(1) + '" y2="' + (H - B) + '" stroke="var(--ox)" stroke-width="1.5"/>';
     /* near the right edge the label goes on the line's left instead */
     var xsEnd = xs + 50 > W - Rr;
     p += '<text x="' + (xsEnd ? xs - 4 : xs + 4).toFixed(1) + '" y="' + (H - B - 6) + '"' + (xsEnd ? ' text-anchor="end"' : '')
-       + ' fill="var(--red-)" ' + MONO + ' font-size="9.5">a + 1/κ</text>';
+       + ' fill="var(--ox)" ' + MONO + ' font-size="9.5" font-weight="600">a + 1/κ</text>';
     /* the three moments of step 3, marked on the curve itself:
        1 r = a, all lines cross; 2 the hump's peak, steepest fall; 3 the edge, none cross */
     p += '<line x1="' + X(rPk).toFixed(1) + '" y1="' + Y(0.55 * gPk / peak).toFixed(1) + '" x2="' + X(rPk).toFixed(1)
