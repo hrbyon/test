@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Ion Interactions Bench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+:root{
+  --ground:#F1F3F2; --surface:#FFFFFF; --surface-2:#E9EDEB;
+  --ink:#14191B; --ink-2:#3E4A4D; --muted:#68767A; --line:#D6DDDA; --line-2:#C3CCC8;
+  --ox:#A85B33; --ox-soft:#F3E4DA;
+  --red-:#15618E; --red-soft:#DDE9F2;
+  --go:#2C7355; --go-soft:#DCEBE3;
+  --stop:#8A5F0C; --stop-soft:#F3E9D3;
+  --elec:#3E4A4D;
+  --shadow:0 1px 2px rgba(20,25,27,.05),0 8px 24px -12px rgba(20,25,27,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+    --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+    --ox:#D08551; --ox-soft:#33231A;
+    --red-:#5AA6D4; --red-soft:#152833;
+    --go:#5DBB8D; --go-soft:#152A21;
+    --stop:#D6A33F; --stop-soft:#2B2415;
+    --elec:#AEBBBE;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+  --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+  --ox:#D08551; --ox-soft:#33231A;
+  --red-:#5AA6D4; --red-soft:#152833;
+  --go:#5DBB8D; --go-soft:#152A21;
+  --stop:#D6A33F; --stop-soft:#2B2415;
+  --elec:#AEBBBE;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:32px 20px 72px}
+.masthead{display:flex;flex-wrap:wrap;align-items:flex-end;gap:20px 32px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.eyebrow a{color:inherit}
+h1{font-family:"IBM Plex Serif",Georgia,serif;font-weight:600;font-size:clamp(28px,4.2vw,42px);line-height:1.12;margin:0;text-wrap:balance;letter-spacing:-.015em}
+.sub{margin:8px 0 0;color:var(--ink-2);font-size:15px;max-width:62ch}
+.tabs{display:flex;gap:2px;margin:24px 0 22px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{appearance:none;background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);
+  font-family:inherit;font-size:14.5px;font-weight:500;padding:11px 16px;cursor:pointer;white-space:nowrap;margin-bottom:-1px}
+.tab:hover{color:var(--ink-2)}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ox)}
+.tab:focus-visible{outline:2px solid var(--red-);outline-offset:-2px;border-radius:4px 4px 0 0}
+.panel[hidden]{display:none}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow)}
+.card-h{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.card-h h2{font-size:15px;font-weight:600;margin:0;letter-spacing:-.01em}
+.card-h .note{font-size:12.5px;color:var(--muted)}
+.card-b{padding:18px}
+.stack{display:flex;flex-direction:column;gap:16px}
+.two{display:grid;grid-template-columns:minmax(270px,1fr) minmax(330px,1.45fr);gap:16px;align-items:start}
+@media(max-width:900px){.two{grid-template-columns:1fr}}
+label.fld,span.fld{display:block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+select,input[type=text],input[type=number]{width:100%;font-family:inherit;font-size:14px;color:var(--ink);
+  background:var(--surface-2);border:1px solid var(--line-2);border-radius:7px;padding:9px 10px}
+input:read-only{background:var(--surface);color:var(--muted);cursor:not-allowed}
+select:focus-visible,input:focus-visible{outline:2px solid var(--red-);outline-offset:1px}
+input[type=range]{width:100%;accent-color:var(--ox)}
+input[type=range]:focus-visible{outline:2px solid var(--red-);outline-offset:3px}
+.slider-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;gap:10px}
+.slider-row .val{font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+.readout{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px dotted var(--line)}
+.readout:last-child{border-bottom:0}
+.readout .k{font-size:13px;color:var(--muted)}
+.readout .v{font-family:"IBM Plex Mono",monospace;font-size:16px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--ink)}
+.verdict{padding:12px 14px;border-radius:8px;font-size:13.5px;line-height:1.55}
+.verdict.go{background:var(--go-soft);color:var(--go)}
+.verdict.stop{background:var(--stop-soft);color:var(--stop)}
+.verdict.flat{background:var(--surface-2);color:var(--ink-2)}
+.eqline{font-family:"IBM Plex Mono",monospace;font-size:13px;line-height:1.9;color:var(--ink-2);
+  background:var(--surface-2);border-radius:7px;padding:11px 13px}
+.eqline b{color:var(--ox);font-weight:600}
+svg{display:block;max-width:100%}
+.scrollx{overflow-x:auto}
+.solid{appearance:none;background:var(--ox);border:1px solid var(--ox);color:#fff;font-family:inherit;
+  font-size:13.5px;font-weight:500;padding:10px 16px;border-radius:7px;cursor:pointer}
+.solid:hover{filter:brightness(1.08)}
+.solid:disabled{background:var(--line-2);border-color:var(--line-2);color:var(--muted);cursor:not-allowed}
+.ghost{appearance:none;background:var(--surface-2);border:1px solid var(--line-2);color:var(--ink-2);
+  font-family:inherit;font-size:12.5px;padding:8px 12px;border-radius:7px;cursor:pointer;text-align:left}
+.ghost:hover{border-color:var(--ox);color:var(--ox)}
+table.ions{border-collapse:collapse;width:100%;font-size:13px}
+table.ions th,table.ions td{text-align:left;padding:8px 9px;border-bottom:1px solid var(--line);white-space:nowrap}
+table.ions th{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500}
+table.ions td.num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;text-align:right}
+tr.support td{color:var(--red-)}
+tr.analyte td{color:var(--ox);font-weight:500}
+.bar{display:grid;grid-template-columns:1fr;gap:0;margin-top:4px}
+.tstrip{display:flex;height:22px;border-radius:4px;overflow:hidden;background:var(--surface-2)}
+.tstrip i{display:block;height:100%}
+.tlegend{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted)}
+.tlegend span b{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px}
+.idgrid{display:grid;grid-template-columns:1fr;gap:14px;max-width:340px}
+.scorebar{display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;padding:14px 18px;border-top:1px solid var(--line)}
+.scorenum{font-family:"IBM Plex Mono",monospace;font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+.scorenum small{font-size:14px;font-weight:400;color:var(--muted)}
+.vcode{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted)}
+.vcode b{color:var(--ink);font-weight:600;letter-spacing:.08em}
+.quiz{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:16px}
+.q .stem{font-size:14.5px;line-height:1.6;margin:0 0 12px}
+.q .stem code{font-family:"IBM Plex Mono",monospace;font-size:13px;background:var(--surface-2);padding:1px 5px;border-radius:4px}
+.opts{display:flex;flex-direction:column;gap:7px}
+.opt{appearance:none;text-align:left;font-family:inherit;font-size:13.5px;line-height:1.45;color:var(--ink);
+  background:var(--surface-2);border:1px solid transparent;border-radius:7px;padding:9px 12px;cursor:pointer;display:flex;gap:9px}
+.opt .ltr{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);flex:0 0 auto;padding-top:1px}
+.opt:hover:not(:disabled){border-color:var(--line-2)}
+.opt.right{background:var(--go-soft);color:var(--go);border-color:var(--go);font-weight:500}
+.opt.right .ltr{color:var(--go)}
+.opt.wrong{background:var(--stop-soft);color:var(--stop);border-color:var(--stop)}
+.opt.wrong .ltr{color:var(--stop)}
+.opt:disabled{cursor:default}
+.why{margin:12px 0 0;font-size:13px;line-height:1.65;color:var(--ink-2);border-left:2px solid var(--line-2);padding-left:12px}
+.misc{display:block;margin-top:10px;padding:9px 12px;border-radius:7px;background:var(--stop-soft);color:var(--stop);font-size:12.5px;line-height:1.6}
+.misc a{color:inherit;font-weight:600;white-space:nowrap}
+.why[hidden]{display:none}
+.tally{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.hint{font-size:12.5px;color:var(--muted);line-height:1.65;margin:10px 0 0}
+.locked{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;background:var(--go-soft);color:var(--go);padding:2px 7px;border-radius:4px;margin-left:8px}
+/* ---- flux / Fick / migration panels ------------------------------------- */
+.pill-row{display:flex;gap:3px;background:var(--surface-2);border-radius:8px;padding:3px}
+.pill{flex:1;appearance:none;border:0;background:none;font-family:"IBM Plex Mono",monospace;font-size:12.5px;
+  font-weight:500;color:var(--muted);padding:7px 2px;border-radius:6px;cursor:pointer}
+.pill[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.pill:focus-visible{outline:2px solid var(--red-);outline-offset:1px}
+/* nowrap + scroll: a formula broken across lines mid-term is harder to read
+   than one the reader has to nudge sideways.  Explicit <br> still breaks. */
+.eqbig{font-family:"IBM Plex Mono",monospace;font-size:13.5px;line-height:2.05;color:var(--ink);
+  background:var(--surface-2);border-radius:8px;padding:14px 15px;overflow-x:auto;white-space:nowrap}
+.eqbig small{color:var(--muted);font-size:11.5px;letter-spacing:.04em}
+.dif{color:var(--red-);font-weight:600}
+.mig{color:var(--ox);font-weight:600}
+.con{color:var(--go);font-weight:600}
+.termtbl{border-collapse:collapse;width:100%;font-size:13px}
+.termtbl td,.termtbl th{padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+.termtbl th{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);font-weight:500;text-align:left}
+.termtbl td.num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;text-align:right}
+.termtbl tr.tot td{border-bottom:0;border-top:2px solid var(--line-2);font-weight:600}
+.termtbl td.dir{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--muted);text-align:right}
+.swatch{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px}
+.trio3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;align-items:stretch}
+.trio3>.card{display:flex;flex-direction:column}
+.trio3>.card>.card-b:last-child{flex:1 1 auto}
+@media(max-width:1000px){.trio3{grid-template-columns:1fr 1fr}}
+@media(max-width:720px){.trio3{grid-template-columns:1fr}}
+.two.eq{align-items:stretch}
+.two.eq>.card{display:flex;flex-direction:column}
+.two.eq>.card>.card-b:last-child{flex:1 1 auto}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap}
+.btnrow .ghost{flex:1 1 auto;text-align:center}
+footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;line-height:1.8}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+.glegend{display:flex;flex-direction:column;gap:5px;font-size:12.5px;line-height:1.45;color:var(--ink-2)}
+.glegend > span{display:flex;align-items:flex-start;gap:8px}
+.glegend > span > svg{flex:0 0 26px;margin-top:3px}
+.atmfig{display:grid;grid-template-columns:minmax(240px,320px) minmax(0,1fr);gap:10px 22px;align-items:center}
+@media(max-width:720px){.atmfig{grid-template-columns:1fr}}
+.atmdefs{grid-column:1 / -1;display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:6px 22px;
+  font-size:12.5px;line-height:1.45;color:var(--ink-2);border-top:1px solid var(--line);padding-top:10px}
+.atmdefs > div{display:grid;grid-template-columns:3.2em 1fr;gap:8px}
+.atmdefs .sym{font-family:"IBM Plex Mono",monospace;font-weight:700;text-align:right;color:var(--ink)}
+#p-atm .trio3 .atmfig{grid-template-columns:1fr}
+#p-atm .trio3 .atmdefs{grid-template-columns:1fr}
+#p-atm .trio3 .atmmodel svg{max-width:300px}
+#p-atm .trio3 .eqbig{white-space:normal}
+</style>
+</head>
+<body>
+  <header class="masthead">
+    <div style="flex:1 1 380px">
+      <p class="eyebrow"><a href="index.html">CH40051 Electroanalytical Chemistry</a> · Lecture 6 · Ion interactions</p>
+      <h1>Ion Interactions Bench</h1>
+      <p class="sub">No ion in a real solution is alone. Watch the atmosphere of counter-charge that every ion carries thin out as you dilute, count what a Gaussian sphere around it encloses, and follow the same physics to a charged electrode, where Poisson&ndash;Boltzmann gives the double layer and its capacitance.</p>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true"  aria-controls="p-atm"  id="t-atm">Ion Atmosphere</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-pb"   id="t-pb">Poisson&ndash;Boltzmann</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-quiz" id="t-quiz">Concept Check</button>
+  </div>
+
+  <!-- ============== ION ATMOSPHERE AND SCREENING ============== -->
+  <section class="panel" id="p-atm" role="tabpanel" aria-labelledby="t-atm">
+
+    <div class="trio3">
+
+      <div class="card">
+        <div class="card-h"><h2>The ion atmosphere</h2><span class="note">deck p.2&ndash;3 &mdash; no ion is ever alone</span></div>
+        <div class="card-b stack" style="gap:12px">
+          <div class="eqbig">
+            I = &frac12; &Sigma; c<sub>i</sub> z<sub>i</sub><sup>2</sup>
+            &nbsp;&nbsp;&nbsp;&middot;&nbsp;&nbsp;&nbsp;
+            <span class="mig">1/&kappa; = &radic;( &epsilon;<sub>0</sub>&epsilon;<sub>r</sub> k<sub>B</sub>T / 2N<sub>A</sub>e<sup>2</sup>I )</span><br>
+            <small>ionic strength &nbsp;&middot;&nbsp; Debye length, the thickness of the atmosphere</small>
+          </div>
+          <div class="atmfig">
+            <div class="atmmodel"><svg viewBox="0 0 360 300" style="display:block;width:100%;height:auto;max-width:320px;margin:0 auto" role="img" aria-label="Model of the ion atmosphere: a central ion, a counter-ion at the distance of closest approach a, the atmosphere extending one Debye length beyond a, and a point P at distance r where the potential psi(r) is read"><circle cx="150.0" cy="150.0" r="228.0" fill="var(--red-)" opacity="0.030"/><circle cx="150.0" cy="150.0" r="207.0" fill="var(--red-)" opacity="0.042"/><circle cx="150.0" cy="150.0" r="186.0" fill="var(--red-)" opacity="0.054"/><circle cx="150.0" cy="150.0" r="165.0" fill="var(--red-)" opacity="0.066"/><circle cx="150.0" cy="150.0" r="144.0" fill="var(--red-)" opacity="0.078"/><circle cx="150.0" cy="150.0" r="123.0" fill="var(--red-)" opacity="0.090"/><circle cx="150.0" cy="150.0" r="102.0" fill="var(--red-)" opacity="0.102"/><circle cx="150.0" cy="150.0" r="81.0" fill="var(--red-)" opacity="0.114"/><circle cx="150.0" cy="150.0" r="60.0" fill="var(--surface)" opacity="0.92"/><circle cx="150.0" cy="150.0" r="60.0" fill="var(--line-2)" opacity="0.35" stroke="var(--muted)" stroke-dasharray="3 3"/><circle cx="150.0" cy="150.0" r="140.0" fill="none" stroke="var(--red-)" stroke-width="1.4" stroke-dasharray="6 4"/><circle cx="55.4" cy="112.7" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="58.1" cy="93.8" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="70.8" cy="144.1" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="183.0" cy="30.8" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="125.8" cy="219.4" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="176.8" cy="81.8" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="279.6" cy="184.9" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="54.7" cy="65.4" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="252.5" cy="190.2" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="154.0" cy="229.7" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="82.1" cy="165.7" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="205.2" cy="66.0" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="80.7" cy="65.9" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="94.2" cy="59.0" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="132.0" cy="250.6" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="161.4" cy="238.5" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="28.9" cy="237.5" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="19.2" cy="263.2" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="323.2" cy="150.6" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="218.6" cy="106.6" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="172.0" cy="28.4" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="258.8" cy="249.6" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="76.5" cy="121.3" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="186.9" cy="244.3" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="246.4" cy="253.9" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="243.6" cy="234.1" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="172.8" cy="245.9" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="251.4" cy="224.0" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="78.1" cy="282.8" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="86.4" cy="113.6" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="82.8" cy="100.3" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="60.0" cy="177.2" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="144.7" cy="70.4" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="228.4" cy="209.9" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="218.3" cy="133.7" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="126.6" cy="70.1" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="187.8" cy="74.3" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="118.0" cy="264.4" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="135.4" cy="72.6" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="159.7" cy="221.3" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="218.3" cy="58.9" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="127.1" cy="269.2" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="141.7" cy="218.4" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="243.8" cy="187.5" r="3" fill="var(--red-)" opacity="0.7"/><circle cx="35.5" cy="273.8" r="2.6" fill="var(--ox)" opacity="0.55"/><circle cx="291.0" cy="34.8" r="2.6" fill="var(--ox)" opacity="0.55"/><circle cx="312.1" cy="186.3" r="2.6" fill="var(--ox)" opacity="0.55"/><circle cx="282.9" cy="65.9" r="2.6" fill="var(--ox)" opacity="0.55"/><circle cx="350.8" cy="102.1" r="2.6" fill="var(--ox)" opacity="0.55"/><circle cx="46.7" cy="31.1" r="2.6" fill="var(--ox)" opacity="0.55"/><circle cx="319.3" cy="27.3" r="2.6" fill="var(--ox)" opacity="0.55"/><circle cx="333.4" cy="41.5" r="2.6" fill="var(--ox)" opacity="0.55"/><circle cx="150.0" cy="150.0" r="29" fill="none" stroke="var(--go)" stroke-width="1.2" stroke-dasharray="2 3"/><circle cx="150.0" cy="150.0" r="19" fill="var(--ox)" stroke="var(--surface)" stroke-width="2"/><text x="150.0" y="154.0" text-anchor="middle" fill="#fff" font-family="IBM Plex Mono,monospace" font-size="12" font-weight="700">+z</text><circle cx="107.6" cy="107.6" r="13" fill="var(--red-)" stroke="var(--surface)" stroke-width="2"/><text x="107.6" y="111.6" text-anchor="middle" fill="#fff" font-family="IBM Plex Mono,monospace" font-size="12" font-weight="700">&#8722;</text><line x1="150.0" y1="150.0" x2="107.6" y2="107.6" stroke="var(--ink)" stroke-width="2"/><text x="112.0" y="146.0" text-anchor="middle" fill="var(--ink)" font-family="IBM Plex Mono,monospace" font-size="16" font-weight="700" paint-order="stroke" stroke="var(--surface)" stroke-width="4" stroke-linejoin="round">a</text><line x1="210.0" y1="150.0" x2="290.0" y2="150.0" stroke="var(--red-)" stroke-width="2"/><line x1="210.0" y1="144.0" x2="210.0" y2="156.0" stroke="var(--red-)" stroke-width="2"/><line x1="290.0" y1="144.0" x2="290.0" y2="156.0" stroke="var(--red-)" stroke-width="2"/><text x="250.0" y="141.0" text-anchor="middle" fill="var(--red-)" font-family="IBM Plex Mono,monospace" font-size="15" font-weight="700" paint-order="stroke" stroke="var(--surface)" stroke-width="4" stroke-linejoin="round">1/&#954;</text><text x="256.0" y="52.0" text-anchor="start" fill="var(--red-)" font-family="IBM Plex Mono,monospace" font-size="13" font-weight="700" paint-order="stroke" stroke="var(--surface)" stroke-width="4" stroke-linejoin="round">a + 1/&#954;</text><line x1="150.0" y1="150.0" x2="252.2" y2="209.0" stroke="var(--ink-2)" stroke-width="1.6" stroke-dasharray="5 3"/><text x="190.0" y="199.0" text-anchor="middle" fill="var(--ink)" font-family="IBM Plex Mono,monospace" font-size="16" font-weight="700" paint-order="stroke" stroke="var(--surface)" stroke-width="4" stroke-linejoin="round">r</text><circle cx="252.2" cy="209.0" r="5" fill="var(--ink)"/><text x="261.2" y="214.0" text-anchor="start" fill="var(--ink)" font-family="IBM Plex Mono,monospace" font-size="15" font-weight="700" paint-order="stroke" stroke="var(--surface)" stroke-width="4" stroke-linejoin="round">P: &#968;(r)</text></svg></div>
+            <p class="hint" style="margin:0">Coulomb&rsquo;s law does not switch off because a solution is stirred. Every cation drags a
+            time-averaged excess of anions around with it, and every anion an excess of cations &mdash; the <b>ion atmosphere</b>.
+            It is not a shell of particular ions; it is a statistical bias, rebuilt continuously as the central ion moves, which
+            is why the atmosphere always lags behind and drags: the <b>relaxation</b> or <b>asymmetry effect</b>.<br><br>
+            Its thickness is the <b>Debye length</b> 1/&kappa;. Note what is in it and what is not: concentration and charge
+            through I, the solvent through &epsilon;<sub>r</sub>, temperature &mdash; but nothing about which salt. Two solutions of
+            equal ionic strength screen equally. Why the atmosphere has exactly this thickness is Gauss&rsquo;s law &mdash; the two cards beside this one, and the card below.</p>
+            <div class="atmdefs">
+              <div><span class="sym" style="color:var(--ox)">+z</span><span>the <b>central ion</b>, charge ze; green dots, its hydration shell</span></div>
+              <div><span class="sym">a</span><span><b>closest approach</b>: the nearest another ion&rsquo;s centre can come. No atmosphere inside it (grey).</span></div>
+              <div><span class="sym">r</span><span>distance from the ion&rsquo;s centre to a point <b>P</b></span></div>
+              <div><span class="sym">&#968;(r)</span><span><b>potential at P</b>, from ion and atmosphere together: &#968; = (ze/4&pi;&epsilon;<sub>0</sub>&epsilon;<sub>r</sub>)&middot;e<sup>&#954;a</sup>/(1+&#954;a)&middot;e<sup>&minus;&#954;r</sup>/r, for r &ge; a</span></div>
+              <div><span class="sym" style="color:var(--red-)">1/&#954;</span><span><b>Debye length</b>: how far beyond a the excess counter-charge reaches. At a + 1/&#954;, &#968; is 1/e of the bare ion&rsquo;s.</span></div>
+              <div><span class="sym" style="color:var(--red-)">&#954;</span><span>&#954;<sup>2</sup> = 2N<sub>A</sub>e<sup>2</sup>I / &#949;<sub>0</sub>&#949;<sub>r</sub>k<sub>B</sub>T &mdash; large &#954;, thin atmosphere</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2>The Gaussian sphere</h2><span class="note" id="gsNote">&mdash;</span></div>
+        <div class="card-b stack">
+          <svg id="gspic" viewBox="0 0 400 400" style="display:block;width:100%;height:auto;max-width:400px;margin:0 auto" role="img" aria-label="A central ion with its ion atmosphere drawn as a cloud of counter-charge, a dashed Gaussian sphere around it, and field lines crossing the sphere in proportion to the charge it encloses"></svg>
+          <div class="glegend">
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><circle cx="13" cy="7" r="6" fill="var(--ox)"/></svg>the central ion, drawn to its radius a</span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><circle cx="13" cy="7" r="3.3" fill="var(--red-)"/></svg>counter-charge: the ion atmosphere &mdash; the blue haze shows how dense it is</span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="1" y1="7" x2="25" y2="7" stroke="var(--ox)" stroke-width="1.8" stroke-dasharray="5 4"/></svg>a field line leaving the ion &mdash; 24 are drawn, one for each 1/24 of its charge</span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="1" y1="7" x2="17" y2="7" stroke="var(--ox)" stroke-width="1.8" stroke-dasharray="5 4" opacity="0.35"/><circle cx="20" cy="7" r="2.2" fill="var(--red-)"/></svg>a faint line: it ended on counter-charge before reaching the sphere</span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><circle cx="13" cy="7" r="5.5" fill="none" stroke="var(--go)" stroke-width="2" stroke-dasharray="4 3"/></svg>the Gaussian sphere, radius r &mdash; the slider sets it, &#9654; grows it from the ion outward</span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="1" y1="7" x2="25" y2="7" stroke="var(--go)" stroke-width="1.5" stroke-dasharray="4 3"/><circle cx="13" cy="7" r="3" fill="var(--ox)"/></svg>an orange dot on the circle: a line that crosses the sphere</span>
+            <span style="display:block;color:var(--muted)">The dots drift and the dashes flow only to show a living solution; nothing is computed from that motion.</span>
+          </div>
+          <div>
+            <span class="fld">What is around the ion</span>
+            <div class="pill-row" id="gsMode">
+              <button class="pill" data-m="bare" aria-pressed="false" type="button">bare ion, vacuum-like</button>
+              <button class="pill" data-m="atm"  aria-pressed="true"  type="button">ion + atmosphere</button>
+            </div>
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">Sphere radius, r</span><span class="val" id="gsRv"></span></div>
+            <input type="range" id="gsR" min="0" max="1000" step="1" value="300">
+          </div>
+          <p class="hint" style="margin:0">Salt, concentration, solvent and temperature come from <b>The solution</b>, further down this tab.</p>
+          <div class="btnrow">
+            <button class="ghost" id="gsPlay" type="button">&#9654; Grow the sphere</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2>What the sphere encloses</h2><span class="note">and so how strong the field is on it</span></div>
+        <div class="card-b stack">
+          <svg id="gsplot" viewBox="0 0 520 290" style="display:block;width:100%;height:auto;max-width:520px;margin:0 auto" role="img" aria-label="Net charge enclosed by a sphere around the ion against its radius, falling from the full ion charge to zero over a few Debye lengths, with the bare ion's constant charge for comparison"></svg>
+          <div class="glegend">
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="1" y1="7" x2="25" y2="7" stroke="var(--go)" stroke-width="2.4"/></svg><span><b>green curve, Q<sub>enc</sub>/z&epsilon;</b>: the net charge inside a sphere of radius r &mdash; read it on the left axis</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="13" y1="0" x2="13" y2="14" stroke="var(--go)" stroke-width="1.6" stroke-dasharray="3 2"/><circle cx="13" cy="7" r="3.5" fill="var(--go)"/></svg><span><b>green dashed line</b>: the sphere you have set &mdash; the same green circle as in the picture</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><path d="M1 13 Q8 1 25 12 L25 13 Z" fill="var(--red-)" opacity="0.25"/><circle cx="8" cy="5" r="2.5" fill="var(--red-)"/></svg><span><b>shaded hump</b>: how much counter-charge sits in a thin shell at each r. Only its shape matters, it is not read on the axis. Its <b>peak (dot) is at r = 1/&kappa;</b> from the centre &mdash; or at the ion&rsquo;s surface when 1/&kappa; &lt; a</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="13" y1="0" x2="13" y2="14" stroke="var(--red-)" stroke-width="1.4" stroke-dasharray="2 2"/></svg><span><b>blue dotted line, a + 1/&kappa;</b>: where a single thin shell of &minus;z&epsilon; would have to sit to give the ion the same potential its atmosphere does &mdash; the orange marker in the potential graph above</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><rect x="1" y="1" width="10" height="12" fill="var(--line-2)" opacity="0.5"/><line x1="12" y1="4" x2="25" y2="4" stroke="var(--line-2)" stroke-width="1.6" stroke-dasharray="3 2"/></svg><span><b>grey</b>: the band on the left is inside the ion (r &lt; a); the dashed line at 1 is the bare ion, with no atmosphere to enclose</span></span>
+            <span style="display:block;color:var(--ink-2)"><b>How the curve and the hump fit together.</b>&nbsp;The curve is 1 minus the hump&rsquo;s area to the left of r (the hump&rsquo;s total area is exactly the ion&rsquo;s charge), so <b>the curve falls fastest where the hump is tallest</b>.</span>
+          </div>
+          <div>
+            <div class="readout"><span class="k">sphere radius, r</span><span class="v" id="gsRr">&mdash;</span></div>
+            <div class="readout"><span class="k"><span class="con">net charge inside</span>, Q<sub>enc</sub> / z&epsilon;</span><span class="v" id="gsQ">&mdash;</span></div>
+            <div class="readout"><span class="k"><span class="mig">field on the sphere</span>, E = Q<sub>enc</sub>/4&pi;&epsilon;<sub>0</sub>&epsilon;<sub>r</sub>r<sup>2</sup></span><span class="v" id="gsE">&mdash;</span></div>
+            <div class="readout"><span class="k">the bare ion would give</span><span class="v" id="gsEb">&mdash;</span></div>
+          </div>
+          <div id="gsVerdict" class="verdict flat">&mdash;</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="card-h"><h2>Where 1/&kappa; comes from: Gauss&rsquo;s law, read off the two figures</h2><span class="note">deck p.11</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig" style="white-space:normal">
+          <span class="mig">&oint; E&middot;dA = Q<sub>enc</sub> / &epsilon;<sub>0</sub>&epsilon;<sub>r</sub></span>
+          &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          &nabla;&middot;E = &rho; / &epsilon;<sub>0</sub>&epsilon;<sub>r</sub> = &kappa;<sup>2</sup>&phi;
+          &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="con">Q<sub>enc</sub>(r) = z&epsilon; (1 + &kappa;r) e<sup>&minus;&kappa;(r&minus;a)</sup> / (1 + &kappa;a)</span><br>
+          <small>the field through a closed surface counts the charge inside &nbsp;&middot;&nbsp; the same law at a point, with Boltzmann&rsquo;s charge &nbsp;&middot;&nbsp; what a sphere around one ion encloses</small>
+        </div>
+        <div class="trio3">
+          <p class="hint" style="margin:0"><b>1. The law.</b> The total field passing out through any closed surface depends
+            only on the charge inside it. For a sphere of radius r around the ion the field is the same all over it, so
+            E&middot;4&pi;r<sup>2</sup> = Q<sub>enc</sub>/&epsilon;<sub>0</sub>&epsilon;<sub>r</sub>. A bare ion keeps
+            Q<sub>enc</sub> constant, and the field falls as 1/r<sup>2</sup> for ever.</p>
+          <p class="hint" style="margin:0"><b>2. Read it off the figures.</b> The green circle in <b>The Gaussian sphere</b> and
+            the green dashed line in <b>What the sphere encloses</b> are the same sphere. The 24 field lines stand for the
+            ion&rsquo;s charge; a line that meets counter-charge inside the sphere ends there (the faint ones), and the rest
+            cross it (orange dots). So <b>lines crossing &divide; 24 = Q<sub>enc</sub>/z&epsilon;</b>, the height of the green
+            curve at r.</p>
+          <p class="hint" style="margin:0"><b>3. Why the answer is 1/&kappa;.</b> Grow the sphere with &#9654;. At r = a all 24
+            cross; as the sphere swallows the atmosphere the curve falls, fastest at the shaded hump&rsquo;s peak, r = 1/&kappa;;
+            a few Debye lengths out, ion and atmosphere cancel and nothing crosses. Put Boltzmann&rsquo;s charge into Gauss&rsquo;s
+            law at every point and it becomes &nabla;&middot;E = &kappa;<sup>2</sup>&phi; &mdash; the distance over which the
+            field dies is 1/&kappa;, set by I, &epsilon;<sub>r</sub> and T.</p>
+        </div>
+        <div id="gsRead" class="verdict flat">&mdash;</div>
+      </div>
+    </div>
+
+    <div class="trio3" style="margin-top:16px">
+
+      <div class="card">
+        <div class="card-h"><h2>The solution</h2><span class="note">what sets the screening</span></div>
+        <div class="card-b stack">
+          <div>
+            <span class="fld">Salt</span>
+            <div class="pill-row" id="atSalt">
+              <button class="pill" data-s="NaCl"  aria-pressed="true"  type="button">NaCl 1:1</button>
+              <button class="pill" data-s="CaCl2" aria-pressed="false" type="button">CaCl₂ 2:1</button>
+              <button class="pill" data-s="MgSO4" aria-pressed="false" type="button">MgSO₄ 2:2</button>
+              <button class="pill" data-s="LaCl3" aria-pressed="false" type="button">LaCl₃ 3:1</button>
+            </div>
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">Concentration</span><span class="val" id="atCv"></span></div>
+            <input type="range" id="atC" min="-4" max="0.3" step="0.02" value="-2">
+          </div>
+          <div>
+            <span class="fld">Solvent</span>
+            <div class="pill-row" id="atSolv">
+              <button class="pill" data-e="78.4" aria-pressed="true"  type="button">water 78</button>
+              <button class="pill" data-e="32.7" aria-pressed="false" type="button">MeOH 33</button>
+              <button class="pill" data-e="7.58" aria-pressed="false" type="button">THF 7.6</button>
+            </div>
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">Temperature</span><span class="val" id="atTv"></span></div>
+            <input type="range" id="atT" min="273" max="353" step="1" value="298">
+          </div>
+          <div class="btnrow">
+            <button class="ghost" id="atA" type="button">Analytical, 0.1 M</button>
+            <button class="ghost" id="atB" type="button">Very dilute, 0.1 mM</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2>The numbers</h2></div>
+        <div class="card-b">
+          <div class="readout"><span class="k">ionic strength, I</span><span class="v" id="atI">&mdash;</span></div>
+          <div class="readout"><span class="k"><span class="mig">Debye length</span>, 1/&kappa;</span><span class="v" id="atL">&mdash;</span></div>
+          <div class="readout"><span class="k">effective ion size, a</span><span class="v" id="atA2">&mdash;</span></div>
+          <div class="readout"><span class="k">&kappa;a &mdash; is the ion a point charge?</span><span class="v" id="atKa">&mdash;</span></div>
+          <div class="readout"><span class="k">ions inside one Debye sphere</span><span class="v" id="atN">&mdash;</span></div>
+          <div id="atVerdict" class="verdict flat" style="margin-top:14px">&mdash;</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2>How far the charge is felt</h2><span class="note" id="atNote">screened against bare Coulomb</span></div>
+        <div class="card-b"><svg id="atplot" viewBox="0 0 400 340" style="display:block;width:100%;height:auto;max-width:420px;margin:0 auto" role="img" aria-label="The screened potential around a central ion against distance, with the bare Coulomb potential for comparison and the Debye length marked"></svg></div>
+      </div>
+
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="card-h"><h2>How to read the graph</h2><span class="note">what &psi;(r)/&psi;(a) against r is showing</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="trio3">
+          <p class="hint" style="margin:0"><b>What is plotted.</b> The electric potential &psi; around one ion, against the
+            distance r from its centre. The vertical axis is that potential <b>divided by its value at r = a</b>, so both
+            curves start at 1.0 and the graph compares <b>how quickly</b> the potential dies away, not how big it is. The
+            <b>grey strip, r &lt; a</b>, is the region no other ion can enter: a is the distance of closest approach &mdash;
+            the hydrated ion plus the ion coming up to it &mdash; so the atmosphere, and both curves, begin only at a.</p>
+          <p class="hint" style="margin:0"><b>The two curves.</b> <span style="color:var(--muted)">Grey dashed</span> is the
+            ion alone in the solvent, Coulomb's &psi; &prop; 1/r: it only halves each time the distance doubles, and never
+            really goes away. <span style="color:var(--red-)">Blue</span> is the same ion inside its atmosphere. The
+            counter-charge gathered around it cancels the field further out, which multiplies the potential by
+            e<sup>&minus;&kappa;(r&minus;a)</sup>. <b>The gap between the curves is the screening.</b></p>
+          <p class="hint" style="margin:0"><b>The marker.</b> The orange line stands at <b>r = a + 1/&kappa;</b>, one Debye
+            length beyond the closest-approach distance. There the atmosphere has cut the potential to 1/e &mdash; <b>37 %</b> of what
+            the bare ion would give &mdash; and that distance is what &ldquo;the thickness of the atmosphere&rdquo; means.
+            Further out the blue curve falls to nothing while the grey one is still large.</p>
+        </div>
+        <p class="hint" style="margin:0"><b>An example.</b> Take an ion 0.5 nm across in a solution concentrated enough that
+          1/&kappa; = 0.28 nm. The Debye length is <em>shorter than the ion</em>, so the atmosphere is packed against its
+          surface: by r = 0.8 nm the bare potential is still at 0.63 of its surface value, but the screened one has fallen to
+          0.21. Beyond about 1.2 nm the ion can hardly be felt at all. Now dilute to 1 mM: 1/&kappa; becomes 9.6 nm, far past the
+          right-hand edge, and the two curves lie almost on top of each other &mdash; on the scale of a few ion diameters the
+          atmosphere is too far away to matter, and the ion behaves as if it were alone.</p>
+        <div id="atRead" class="verdict flat">&mdash;</div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ============== POISSON-BOLTZMANN AND THE DOUBLE LAYER ============== -->
+  <section class="panel" id="p-pb" role="tabpanel" aria-labelledby="t-pb" hidden>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>The same law at a flat electrode</h2><span class="note">PB_EDL deck, p.1&ndash;3</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig">
+          &nabla;&middot;(&epsilon;E) = &rho; &nbsp;&rarr;&nbsp; <span class="dif">&nabla;<sup>2</sup>&phi; = &minus;&rho;/&epsilon;<sub>0</sub>&epsilon;<sub>r</sub></span>
+          &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="mig">n<sub>&plusmn;</sub> = n<sup>0</sup> e<sup>&#8723;ze&phi;/k<sub>B</sub>T</sup></span>
+          &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="con">d<sup>2</sup>&phi;/dx<sup>2</sup> = (2n<sup>0</sup>ze/&epsilon;<sub>0</sub>&epsilon;<sub>r</sub>) sinh(ze&phi;/k<sub>B</sub>T)</span><br>
+          <small>Gauss, then Poisson &nbsp;&middot;&nbsp; Boltzmann closes it &nbsp;&middot;&nbsp; the Poisson&ndash;Boltzmann equation for a z:z salt</small>
+        </div>
+        <p class="hint" style="margin:0">Gauss's law gives the potential from the charge. The trouble is that in an electrolyte the
+          charge is not given: the ions arrange themselves according to the very potential you are trying to find. <b>&phi; needs
+          &rho;, and &rho; depends on &phi;</b> &mdash; the problem is self-consistent, and it has to be closed before it can be
+          solved.<br><br>
+          Boltzmann closes it. At equilibrium the electrochemical potential is flat, so an ion's concentration follows
+          e<sup>&minus;ze&phi;/k<sub>B</sub>T</sup> &mdash; counter-ions pile up where the potential attracts them, co-ions thin out.
+          Putting that into Poisson gives one nonlinear equation for &phi;, and everything on this tab is either a solution of it or
+          an admission about what it left out: <b>point ions, a mean field with no ion&ndash;ion correlation, a uniform
+          &epsilon;<sub>r</sub>, an ideal solution and no specific adsorption</b>.</p>
+      </div>
+    </div>
+
+    <div class="two eq">
+
+      <div class="card">
+        <div class="card-h"><h2>The electrode</h2><span class="note">what you set at the surface</span></div>
+        <div class="card-b stack">
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">Surface potential, &phi;<sub>0</sub></span><span class="val" id="pbPv"></span></div>
+            <input type="range" id="pbP" min="-300" max="300" step="2" value="100">
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">Salt concentration</span><span class="val" id="pbCv"></span></div>
+            <input type="range" id="pbC" min="-4" max="0" step="0.02" value="-2">
+          </div>
+          <div>
+            <span class="fld">Charge type, z:z</span>
+            <div class="pill-row" id="pbZ">
+              <button class="pill" data-z="1" aria-pressed="true"  type="button">1:1</button>
+              <button class="pill" data-z="2" aria-pressed="false" type="button">2:2</button>
+              <button class="pill" data-z="3" aria-pressed="false" type="button">3:3</button>
+            </div>
+          </div>
+          <div>
+            <span class="fld">Solvent</span>
+            <div class="pill-row" id="pbSolv">
+              <button class="pill" data-e="78.4" aria-pressed="true"  type="button">water 78</button>
+              <button class="pill" data-e="46.7" aria-pressed="false" type="button">DMSO 47</button>
+              <button class="pill" data-e="7.9"  aria-pressed="false" type="button">glyme 7.9</button>
+            </div>
+          </div>
+          <div class="btnrow">
+            <button class="ghost" id="pbLin" type="button">Stay linear: 25 mV</button>
+            <button class="ghost" id="pbBig" type="button">Push it: 250 mV</button>
+          </div>
+          <p class="hint" style="margin:0">The linear approximation needs |ze&phi;| &lt;&lt; k<sub>B</sub>T, and k<sub>B</sub>T/e is
+            25.7 mV at 25 °C. Everything past that is where Gouy&ndash;Chapman and Debye&ndash;Hückel part company.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2>The potential through the diffuse layer</h2><span class="note" id="pbNote">&mdash;</span></div>
+        <div class="card-b"><svg id="pbplot" viewBox="0 0 520 400" style="display:block;width:100%;height:auto;max-width:520px;margin:0 auto" role="img" aria-label="The solution in front of a charged electrode with its diffuse layer of counter-charge, above the potential against distance for the exact Gouy-Chapman solution and the linearised Debye-Huckel exponential, with the Debye length marked"></svg></div>
+      </div>
+
+    </div>
+
+    <div class="two eq" style="margin-top:16px">
+
+      <div class="card">
+        <div class="card-h"><h2>The numbers</h2><span class="note">Gouy&ndash;Chapman and Grahame</span></div>
+        <div class="card-b">
+          <div class="readout"><span class="k">reduced potential, y<sub>0</sub> = ze&phi;<sub>0</sub>/k<sub>B</sub>T</span><span class="v" id="pbY">&mdash;</span></div>
+          <div class="readout"><span class="k"><span class="mig">Debye length</span>, &lambda;<sub>D</sub></span><span class="v" id="pbL">&mdash;</span></div>
+          <div class="readout"><span class="k"><span class="dif">surface charge</span>, &sigma; (Grahame)</span><span class="v" id="pbS">&mdash;</span></div>
+          <div class="readout"><span class="k">counter-ion concentration at the surface</span><span class="v" id="pbN">&mdash;</span></div>
+          <div class="readout"><span class="k">linear law reads &phi;(&lambda;<sub>D</sub>) as</span><span class="v" id="pbD">&mdash;</span></div>
+          <div id="pbVerdict" class="verdict flat" style="margin-top:14px">&mdash;</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2>Solving it, in two integrations</h2><span class="note">deck p.4&ndash;5</span></div>
+        <div class="card-b stack" style="gap:12px">
+          <div class="eqbig">
+            <span class="dif">linear</span> &nbsp; &phi; = &phi;<sub>0</sub> e<sup>&minus;x/&lambda;<sub>D</sub></sup>, &nbsp; &lambda;<sub>D</sub> = &radic;(&epsilon;<sub>0</sub>&epsilon;<sub>r</sub>k<sub>B</sub>T / 2n<sup>0</sup>z<sup>2</sup>e<sup>2</sup>)<br>
+            <span class="con">exact</span> &nbsp; tanh(ze&phi;/4k<sub>B</sub>T) = tanh(ze&phi;<sub>0</sub>/4k<sub>B</sub>T) e<sup>&minus;x/&lambda;<sub>D</sub></sup><br>
+            <span class="mig">Grahame</span> &nbsp; &sigma; = &radic;(8&epsilon;<sub>0</sub>&epsilon;<sub>r</sub>k<sub>B</sub>Tn<sup>0</sup>) sinh(ze&phi;<sub>0</sub>/2k<sub>B</sub>T)
+          </div>
+          <p class="hint" style="margin:0">Multiply the PB equation by 2d&phi;/dx and it integrates once, with &phi; and &phi;&prime;
+            both going to zero far away; that first integral is Grahame's equation in disguise, since Gauss's law at the surface says
+            &sigma; = &minus;&epsilon;<sub>0</sub>&epsilon;<sub>r</sub>&phi;&prime;(0). Integrate again and you have the exact profile
+            above.<br><br>
+            At small &phi;<sub>0</sub> the tanh cancels and the exact solution <em>is</em> the exponential &mdash; and
+            &lambda;<sub>D</sub> here is the same &kappa;<sup>&minus;1</sup> as the thickness of the ion atmosphere on the previous tab. At large
+            &phi;<sub>0</sub> the potential falls far faster than any exponential near the wall: the counter-ions crowd in and screen
+            more efficiently than a linear theory can.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="card-h"><h2>Where it stops working</h2><span class="note">deck p.8&ndash;9 &mdash; and why modern electrolytes need more</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="trio3">
+          <div>
+            <p class="hint" style="margin:0"><b style="color:var(--stop)">Concentrated.</b> At 1 M &lambda;<sub>D</sub> is 0.30 nm in
+              water, about one hydrated ion across, so the layer is thinner than the particles it is made of. Above roughly 1 M the
+              measured screening length is reported to <em>grow</em> again &mdash; underscreening, still argued over.</p>
+          </div>
+          <div>
+            <p class="hint" style="margin:0"><b style="color:var(--stop)">Crowded.</b> Point ions can be packed without limit; real
+              ones saturate. The Bikerman and Kornyshev modified PB adds lattice-gas entropy with &nu; = 2a<sup>3</sup>n<sup>0</sup>,
+              which caps the surface concentration and turns C into camel- and bell-shaped curves, as seen in ionic liquids.</p>
+          </div>
+          <div>
+            <p class="hint" style="margin:0"><b style="color:var(--stop)">Correlated, and not uniform.</b> Multivalent ions and ionic
+              liquids overscreen: the charge oscillates in layers rather than decaying smoothly. And near the electrode the field is
+              strong enough to saturate the solvent, so &epsilon;<sub>r</sub> is far below its bulk value right where the
+              potential changes fastest.</p>
+          </div>
+        </div>
+        <p class="hint" style="margin:0">A poor solvent makes all of this worse at once: &lambda;<sub>D</sub> goes as
+          &radic;&epsilon;<sub>r</sub>, so 1 M salt in a glyme has a nominal &lambda;<sub>D</sub> near 0.1 nm &mdash; and by then the
+          salt is ion-paired anyway, so the ionic strength that goes into the formula is not the concentration you weighed out. Read
+          PB in that regime as a qualitative guide, not a calculation.</p>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ============== CONCEPT CHECK ============== -->
+  <section class="panel" id="p-quiz" role="tabpanel" aria-labelledby="t-quiz" hidden>
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h">
+        <h2>Concept check</h2>
+        <span class="note">Answer once per question — the reasoning appears immediately</span>
+        <span class="tally" style="margin-left:auto" id="tally"></span>
+      </div>
+      <div class="card-b">
+        <div class="idgrid">
+          <div>
+            <label class="fld" for="sId">Student ID</label>
+            <input type="text" id="sId" inputmode="numeric" placeholder="e.g. 20261234">
+          </div>
+        </div>
+        <p class="hint" id="idHint"></p>
+      </div>
+      <div class="scorebar" id="scorebar" hidden>
+        <div>
+          <div class="scorenum" id="scoreNum">—</div>
+          <div class="vcode" style="margin-top:4px" id="whoLine">—</div>
+        </div>
+        <div style="flex:1 1 300px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="solid" id="sendBtn" type="button" hidden>Submit to the course</button>
+            <button class="ghost" id="dlBtn" type="button">Download my result</button>
+          </div>
+          <p class="hint" id="dlHint" style="margin-top:8px">Download the file and hand it in as your instructor directs.</p>
+        </div>
+      </div>
+    </div>
+    <div class="quiz" id="quiz"></div>
+  </section>
+
+  <footer>
+    Debye lengths, surface charges and capacitances are derived from the physical constants rather than quoted · water at 25 °C unless another solvent is chosen · relative permittivities at room temperature<br>
+    CH40051 Electroanalytical Chemistry · Fall 2026 — companion to Lecture 6
+  </footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function sig(x,d){
+  if(x===0) return "0";
+  var e=Math.floor(Math.log10(Math.abs(x)));
+  if(e>=5||e<=-3) return x.toExponential(d-1);
+  return (+x.toPrecision(d)).toString();
+}
+
+/* ---------------- tabs ---------------- */
+var tabs=[].slice.call(document.querySelectorAll(".tab"));
+tabs.forEach(function(t){
+  t.addEventListener("click",function(){
+    tabs.forEach(function(o){
+      var on=(o===t);
+      o.setAttribute("aria-selected",on?"true":"false");
+      document.getElementById(o.getAttribute("aria-controls")).hidden=!on;
+    });
+  });
+});
+
+/* ================= CONCEPT CHECK ================= */
+var QZ=[
+ {q:"Two solutions are made up: 0.10 m NaCl and 0.10 m MgSO₄. Which has the thicker ion atmosphere?",
+  o:["NaCl — its ionic strength is 0.10 m against 0.40 m for MgSO₄, and 1/κ goes as 1/√I",
+     "MgSO₄ — the doubly charged ions attract more counter-charge",
+     "They are the same — both are 0.10 m",
+     "MgSO₄ — sulfate is the larger ion"],
+  a:0,
+  w:"Ionic strength is I = ½Σcz², so charge enters <b>squared</b>. NaCl gives ½(0.1·1 + 0.1·1) = 0.10 m; MgSO₄ gives ½(0.1·4 + 0.1·4) = 0.40 m. The Debye length goes as I<sup>−½</sup>, so MgSO₄ screens twice as tightly at the same molality. This is why ionic strength, not concentration, is the variable in every equation on this page."},
+
+ {q:"Debye–Hückel limiting law predicts γ± = 0.89 for a solution where the measured value is 0.76. What is the single most likely reason?",
+  o:["The temperature was wrong",
+     "The solution is too concentrated for point charges — the ions have a size the law ignores",
+     "The law only works for salts of unequal charge",
+     "The measurement is wrong; the limiting law is exact"],
+  a:1,
+  w:"The limiting law is exact only as I → 0, where the atmosphere stands many ionic radii away. As concentration rises the atmosphere closes in until it is comparable with the ion itself, and a point-charge treatment reads high. Giving the ion a finite size a — the extended law — is the first correction, and it always makes γ± larger than the limiting law, not smaller."},
+
+ {q:"For NaCl, γ± falls to a minimum near 1 m and then <b>rises</b>, passing 1.0 by about 6 m. Can electrostatics alone explain the rise?",
+  o:["Yes — the atmosphere eventually repels",
+     "Yes — at high concentration the ions screen each other completely",
+     "No — screening can only lower γ±; the rise comes from hydration taking water out of circulation",
+     "No — the measurement drifts at high concentration"],
+  a:2,
+  w:"Every electrostatic term is negative: an atmosphere stabilises the ion and drives log γ± down. The upturn is the <b>solvent</b> running out. Each ion holds several water molecules, so at high molality the free water that acts as solvent is much less than the total, the effective concentration is higher than the nominal one, and γ± climbs. That is what the +cI term of Robinson–Stokes is, and why it is linear in I rather than in √I."},
+
+ {q:"Li⁺ has the smallest crystal radius of Li⁺, Na⁺ and K⁺ but the largest hydrated radius. Why?",
+  o:["Lithium's atomic mass is lowest, so it moves faster",
+     "Its charge is spread over the smallest surface, so it binds and carries the most water",
+     "Lithium ions form covalent bonds with water",
+     "The crystal measurement is unreliable for light ions"],
+  a:1,
+  w:"Charge density, not charge, decides how strongly an ion holds solvent. Li⁺ concentrates its single charge into the smallest volume of the three, so it binds the most water and moves as the bulkiest object — which is why it also diffuses the most slowly. The a that makes the extended law fit activity data is this hydrated size, which is why it is fitted rather than looked up."},
+
+ {q:"The Bjerrum length in water at 25 °C is 0.71 nm, so a 1:1 salt pairs below q = 0.36 nm. What happens to q in tetrahydrofuran, εr = 7.6?",
+  o:["It falls, because the solvent is less polar",
+     "It is unchanged — q depends only on the ions",
+     "It rises about tenfold, to roughly 3.7 nm, so almost every pair counts as associated",
+     "It becomes undefined below εr = 10"],
+  a:2,
+  w:"q goes as 1/εr, so dropping from 78 to 7.6 multiplies it by about ten. Almost no pair of ions can stay further apart than 3.7 nm at any reasonable concentration, so a salt that is fully dissociated in water is largely ion-paired in THF. This is why non-aqueous electrochemistry needs its own supporting electrolytes, chosen for large, weakly coordinating ions that cannot approach closely."},
+
+ {q:"You measure a redox potential in 0.5 M KCl and again in 0.005 M KCl, and the two disagree by tens of millivolts. What is the most likely cause?",
+  o:["The reference electrode has failed",
+     "Activity coefficients differ between the two ionic strengths, and the Nernst equation runs on activity",
+     "Temperature drifted between the measurements",
+     "The analyte decomposed at the higher concentration"],
+  a:1,
+  w:"The Nernst equation is written in <b>activities</b>. Using concentrations is an approximation that is only safe when γ is the same in both cases, and γ± for KCl is about 0.65 at 0.5 M against 0.93 at 0.005 M. That is why potentials are quoted with the supporting electrolyte specified, and why a fixed ionic strength is held across a series of measurements: it does not make γ equal 1, but it makes it the same throughout, so the error becomes a constant offset rather than a drift."}
+];
+
+var LETTERS="ABCD", STORE="ch40051-l6-check-v1";
+var picks=new Array(QZ.length).fill(-1);
+var sId=document.getElementById("sId"), elTally=document.getElementById("tally"),
+    elBar=document.getElementById("scorebar"), elScore=document.getElementById("scoreNum"),
+    elWho=document.getElementById("whoLine"), elIdHint=document.getElementById("idHint"),
+    dlBtn=document.getElementById("dlBtn"), dlHint=document.getElementById("dlHint");
+var startedAt=null, finishedAt=null;
+
+function save(){
+  try{ localStorage.setItem(STORE,JSON.stringify({i:sId.value,p:picks,s:startedAt,t:finishedAt})); }catch(e){}
+}
+function loadState(){
+  try{
+    var d=JSON.parse(localStorage.getItem(STORE)||"null");
+    if(d){ sId.value=d.i||""; if(Array.isArray(d.p)&&d.p.length===QZ.length) picks=d.p.slice();
+           startedAt=d.s||null; finishedAt=d.t||null; }
+  }catch(e){}
+}
+function started(){ return picks.some(function(p){return p>=0;}); }
+function code(str){
+  var h=0x811c9dc5;
+  for(var i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=(h+((h<<1)+(h<<4)+(h<<7)+(h<<8)+(h<<24)))>>>0; }
+  return ("0000000"+h.toString(16).toUpperCase()).slice(-8);
+}
+function scoreOf(){ var s=0; for(var i=0;i<QZ.length;i++) if(picks[i]===QZ[i].a) s++; return s; }
+function answered(){ return picks.filter(function(p){return p>=0;}).length; }
+
+function receipt(){
+  var s=scoreOf(), pct=Math.round(s/QZ.length*100), id=(sId.value||"").trim();
+  var stamp=finishedAt||new Date().toISOString();
+  var vc=code(id+"|"+stamp+"|"+picks.join(""));
+  var head=["lecture","student_id","completed_utc","score","total","percent","verification"];
+  var row=["L5",id,stamp,s,QZ.length,pct,vc];
+  for(var i=0;i<QZ.length;i++){ head.push("a"+(i+1)); row.push(picks[i]>=0?LETTERS[picks[i]]:"-"); }
+  for(var j=0;j<QZ.length;j++){ head.push("ok"+(j+1)); row.push(picks[j]===QZ[j].a?1:0); }
+  function cell(v){ v=String(v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
+  return {csv:head.join(",")+"\n"+row.map(cell).join(",")+"\n", vcode:vc, score:s, pct:pct, id:id};
+}
+
+function render(){
+  var done=answered(), all=(done===QZ.length);
+  elTally.textContent=done+" / "+QZ.length+" answered";
+  elBar.hidden=!all;
+  sId.readOnly=started();
+  elIdHint.innerHTML = all
+    ? "<strong>Attempt complete.</strong> Your answers are final. Every question now shows the correct answer and why — read them before you close this page."
+    : started() ? "<strong>Attempt in progress.</strong><span class=\"locked\">ID locked</span><br>Each answer is final."
+                : "<strong>One attempt.</strong> Enter your student ID before you begin — it locks once you answer the first question.";
+  if(all){
+    if(!finishedAt){ finishedAt=new Date().toISOString(); save(); }
+    var r=receipt();
+    elScore.innerHTML=r.score+' <small>/ '+QZ.length+'  ·  '+r.pct+' %</small>';
+    elWho.innerHTML="Student ID <b>"+esc(r.id||"—")+"</b> &nbsp;·&nbsp; Verification <b>"+r.vcode+"</b>";
+  }
+  for(var i=0;i<QZ.length;i++){
+    var box=document.querySelector('.opts[data-q="'+i+'"]');
+    var kids=[].slice.call(box.children), why=box.parentNode.querySelector(".why");
+    if(picks[i]<0){ kids.forEach(function(o){o.disabled=false;o.className="opt";}); why.hidden=true; }
+    else{
+      (function(qi){ kids.forEach(function(o,j){
+        o.disabled=true;
+        o.className="opt"+(j===QZ[qi].a?" right":(j===picks[qi]?" wrong":""));
+      }); })(i);
+      var _note=(picks[i]!==QZ[i].a)
+        ? '<span class="misc">You chose <b>'+LETTERS[picks[i]]+'</b>. '
+          + 'The correct answer is <b>'+LETTERS[QZ[i].a]+'</b>.</span>'
+        : "";
+      why.innerHTML=_note+QZ[i].w; why.hidden=false;
+    }
+  }
+}
+
+document.getElementById("quiz").innerHTML=QZ.map(function(item,i){
+  return '<div class="card q"><div class="card-b">'
+    +'<p class="stem"><b style="font-family:IBM Plex Mono,monospace;color:var(--muted);font-size:12px">Q'+(i+1)+'</b>  '+item.q+'</p>'
+    +'<div class="opts" data-q="'+i+'">'+item.o.map(function(o,j){
+        return '<button class="opt" data-i="'+j+'"><span class="ltr">'+LETTERS[j]+'</span><span>'+o+'</span></button>';
+      }).join("")+'</div><p class="why" hidden></p></div></div>';
+}).join("");
+
+[].slice.call(document.querySelectorAll(".opts")).forEach(function(box){
+  box.addEventListener("click",function(ev){
+    var b=ev.target.closest(".opt");
+    if(!b||b.disabled) return;
+    var qi=+box.getAttribute("data-q");
+    if(picks[qi]>=0) return;
+    if(!(sId.value||"").trim()){
+      elIdHint.innerHTML="<strong style=\"color:var(--stop)\">Enter your student ID first.</strong> It is written into the result file you submit.";
+      sId.focus(); return;
+    }
+    if(!startedAt) startedAt=new Date().toISOString();
+    picks[qi]=+b.getAttribute("data-i");
+    save(); render();
+  });
+});
+sId.addEventListener("input",save);
+
+dlBtn.addEventListener("click",function(){
+  var id=(sId.value||"").trim();
+  if(!id){ dlHint.textContent="Enter your student ID first — it goes into the file."; return; }
+  var r=receipt();
+  try{
+    var blob=new Blob([r.csv],{type:"text/csv;charset=utf-8"});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement("a");
+    a.href=url; a.download="CH40051-L5-check_"+id.replace(/[^A-Za-z0-9_-]/g,"")+".csv";
+    a.style.display="none";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(url);},1000);
+    dlHint.textContent="Saved. Hand it in as your instructor directs.";
+  }catch(e){
+    dlHint.textContent="Your browser blocked the download. Screenshot this panel and submit that instead.";
+  }
+});
+
+/* ================= SHARED CONSTANTS AND HELPERS =========================
+   SI throughout, converted on the way in and out. Lengths are shown in nm
+   or Angstrom, concentrations in mol/kg, energies in units of kT.        */
+var E0 = 8.8541878e-12;        /* F/m                                     */
+var QE = 1.602176634e-19;      /* C                                       */
+var KB = 1.380649e-23;         /* J/K                                     */
+var NA = 6.02214076e23;        /* /mol                                    */
+var RHOW = 997.0;              /* kg/m3, water at 25 C                    */
+var MONO = 'font-family="IBM Plex Mono,monospace"';
+
+function pillGroup(id, cb){
+  var wrap = document.getElementById(id);
+  wrap.addEventListener("click", function(e){
+    var b = e.target.closest("button.pill");
+    if(!b) return;
+    [].slice.call(wrap.querySelectorAll("button.pill")).forEach(function(o){
+      o.setAttribute("aria-pressed", o === b ? "true" : "false");
+    });
+    cb(b);
+  });
+}
+
+/* Debye length, m. I in mol/kg, turned into mol/m3 with the solvent
+   density -- which is why B below carries a density too.                */
+function debyeLen(I, er, T){
+  if(I <= 0) return Infinity;
+  return Math.sqrt(E0 * er * KB * T / (2 * NA * QE * QE * I * RHOW));
+}
+
+/* ================= 1 - THE ION ATMOSPHERE =============================== */
+var SALTS = {
+  NaCl:  {nm:"NaCl",  zp: 1, zm:-1, np:1, nm_:1, a:4.0},
+  CaCl2: {nm:"CaCl₂", zp: 2, zm:-1, np:1, nm_:2, a:5.0},
+  MgSO4: {nm:"MgSO₄", zp: 2, zm:-2, np:1, nm_:1, a:5.5},
+  LaCl3: {nm:"LaCl₃", zp: 3, zm:-1, np:1, nm_:3, a:6.0}
+};
+/* ionic strength of a fully dissociated salt at molality m, mol/kg */
+function ionicStrength(s, m){
+  return 0.5 * (s.np * s.zp * s.zp + s.nm_ * s.zm * s.zm) * m;
+}
+
+var atSalt = "NaCl", atEr = 78.4;
+["atC", "atT"].forEach(function(id){
+  document.getElementById(id).addEventListener("input", atDraw);
+});
+pillGroup("atSalt", function(b){ atSalt = b.getAttribute("data-s"); atDraw(); });
+pillGroup("atSolv", function(b){ atEr = +b.getAttribute("data-e"); atDraw(); });
+document.getElementById("atA").addEventListener("click", function(){
+  document.getElementById("atC").value = -1; atDraw();
+});
+document.getElementById("atB").addEventListener("click", function(){
+  document.getElementById("atC").value = -4; atDraw();
+});
+
+function atDraw(){
+  var s = SALTS[atSalt];
+  var m = Math.pow(10, +document.getElementById("atC").value);   /* mol/kg  */
+  var T = +document.getElementById("atT").value;
+  var I = ionicStrength(s, m);
+  var lam = debyeLen(I, atEr, T);                                /* m       */
+  var a = s.a * 1e-10;                                           /* m       */
+
+  /* molality, spelled out - "10 mm" reads as millimetres */
+  document.getElementById("atCv").textContent =
+    (m >= 0.1 ? m.toFixed(2) + " mol kg⁻¹" : m >= 1e-3 ? (m * 1e3).toFixed(1) + " mmol kg⁻¹"
+                                                     : (m * 1e6).toFixed(0) + " µmol kg⁻¹");
+  document.getElementById("atTv").textContent = T + " K  (" + (T - 273.15).toFixed(0) + " °C)";
+  document.getElementById("atI").textContent  = I.toPrecision(3) + " mol kg⁻¹";
+  document.getElementById("atL").textContent  = (lam * 1e9).toPrecision(3) + " nm";
+  document.getElementById("atA2").textContent = s.a.toFixed(1) + " Å";
+  var ka = a / lam;
+  document.getElementById("atKa").textContent = ka.toPrecision(2)
+    + (ka < 0.1 ? "  — yes, nearly" : ka < 1 ? "  — not really" : "  — no");
+
+  /* how many ions share one Debye sphere: below about one, the mean-field
+     picture the whole theory rests on has nothing to average over */
+  var nIon = (4 / 3) * Math.PI * Math.pow(lam, 3) * NA * (s.np + s.nm_) * m * RHOW;
+  document.getElementById("atN").textContent = nIon >= 100 ? Math.round(nIon).toLocaleString()
+                                             : nIon.toPrecision(2);
+
+  /* --- the screened potential, against the bare one ---
+     Both are scaled to 1 at the ion's surface, r = a, so the figure compares
+     how fast they fall. The marker sits at a + 1/kappa, one Debye length out
+     from the surface, where the screened curve is 1/e of the bare one.    */
+  var W = 400, H = 340, L = 50, R = 12, Tp = 20, B = 44;
+  var rmax = Math.max(a + 3.5 * lam, 2.6 * a);
+  var X = function(r){ return L + (r / rmax) * (W - L - R); };
+  var Y = function(p){ return Tp + (1 - p) * (H - Tp - B); };
+  var str = "", g, i;
+  /* r < a: a is the distance of closest approach - no other ion's centre
+     can come nearer - so the atmosphere, and both curves, start at a      */
+  str += '<rect x="' + L + '" y="' + Tp + '" width="' + (X(a) - L).toFixed(1) + '" height="' + (H - Tp - B)
+       + '" fill="var(--line-2)" opacity="0.28"/>';
+  if(X(a) - L > 14){
+    var bx = (L + X(a)) / 2 + 3, by = (Tp + H - B) / 2;
+    str += '<text x="' + bx.toFixed(1) + '" y="' + by.toFixed(1) + '" text-anchor="middle" ' + MONO
+         + ' font-size="9" fill="var(--ink-2)" transform="rotate(-90 ' + bx.toFixed(1) + ' ' + by.toFixed(1) + ')">'
+         + 'r &lt; a: no other ion gets this close</text>';
+  }
+  str += '<line x1="' + L + '" y1="' + (H - B) + '" x2="' + (W - R) + '" y2="' + (H - B) + '" stroke="var(--line-2)"/>';
+  str += '<line x1="' + L + '" y1="' + Tp + '" x2="' + L + '" y2="' + (H - B) + '" stroke="var(--line-2)"/>';
+  var nd = rmax * 1e9;
+  for(g = 0; g <= 4; g++){
+    var rv = rmax * g / 4;
+    str += '<line x1="' + X(rv).toFixed(1) + '" y1="' + (H - B) + '" x2="' + X(rv).toFixed(1) + '" y2="' + (H - B + 4) + '" stroke="var(--line-2)"/>';
+    str += '<text x="' + X(rv).toFixed(1) + '" y="' + (H - B + 16) + '" text-anchor="middle" ' + MONO
+         + ' font-size="10" fill="var(--muted)">' + (rv * 1e9).toFixed(nd < 5 ? 1 : 0) + '</text>';
+  }
+  str += '<text x="' + ((L + W - R) / 2) + '" y="' + (H - 8) + '" text-anchor="middle" ' + MONO
+       + ' font-size="10" fill="var(--muted)">distance from the ion’s centre / nm</text>';
+  [0.5, 1].forEach(function(f){
+    str += '<line x1="' + (L - 4) + '" y1="' + Y(f) + '" x2="' + L + '" y2="' + Y(f) + '" stroke="var(--line-2)"/>';
+    str += '<text x="' + (L - 7) + '" y="' + (Y(f) + 3.5) + '" text-anchor="end" ' + MONO
+         + ' font-size="10" fill="var(--muted)">' + f.toFixed(1) + '</text>';
+  });
+  str += '<text x="13" y="' + ((Tp + H - B) / 2) + '" text-anchor="middle" ' + MONO
+       + ' font-size="10" fill="var(--muted)" transform="rotate(-90 13 ' + ((Tp + H - B) / 2) + ')">potential ψ(r) ÷ ψ at r = a</text>';
+
+  var bare = [], scr = [];
+  for(i = 0; i <= 200; i++){
+    var r = a + (rmax - a) * i / 200;
+    bare.push(X(r).toFixed(1) + "," + Y(a / r).toFixed(1));
+    scr.push(X(r).toFixed(1) + "," + Y((a / r) * Math.exp(-(r - a) / lam)).toFixed(1));
+  }
+  str += '<polyline points="' + bare.join(" ") + '" fill="none" stroke="var(--muted)" stroke-width="1.6" stroke-dasharray="4 3"/>';
+  str += '<polyline points="' + scr.join(" ") + '" fill="none" stroke="var(--red-)" stroke-width="2.4"/>';
+
+  /* one Debye length out from the surface: 1/e of the bare potential */
+  var rk = a + lam;
+  if(rk < rmax){
+    var yb = Y(a / rk), ys = Y((a / rk) * Math.exp(-1));
+    str += '<line x1="' + X(rk).toFixed(1) + '" y1="' + Tp + '" x2="' + X(rk).toFixed(1) + '" y2="' + (H - B)
+         + '" stroke="var(--ox)" stroke-width="1.4" stroke-dasharray="5 3"/>';
+    str += '<text x="' + (X(rk) + 5).toFixed(1) + '" y="' + (Tp + 40) + '" ' + MONO + ' font-size="10" fill="var(--ox)">a + 1/κ</text>';
+    str += '<circle cx="' + X(rk).toFixed(1) + '" cy="' + yb.toFixed(1) + '" r="3.5" fill="var(--surface)" stroke="var(--muted)" stroke-width="1.6"/>';
+    str += '<circle cx="' + X(rk).toFixed(1) + '" cy="' + ys.toFixed(1) + '" r="4" fill="var(--red-)"/>';
+    str += '<text x="' + (X(rk) + 7).toFixed(1) + '" y="' + (ys + 4).toFixed(1) + '" ' + MONO
+         + ' font-size="9.5" fill="var(--red-)">37 % of bare</text>';
+  }
+  str += '<text x="' + (W - R - 4) + '" y="' + (Tp + 12) + '" text-anchor="end" ' + MONO
+       + ' font-size="9.5" fill="var(--muted)">ion alone: a/r</text>';
+  str += '<text x="' + (W - R - 4) + '" y="' + (Tp + 25) + '" text-anchor="end" ' + MONO
+       + ' font-size="9.5" fill="var(--red-)">with its atmosphere</text>';
+  document.getElementById("atplot").innerHTML = str;
+
+  document.getElementById("atNote").textContent =
+    "1/κ = " + (lam * 1e9).toPrecision(3) + " nm at I = " + I.toPrecision(2) + " mol kg⁻¹";
+
+  /* the graph, in a sentence, for whatever is set */
+  var fBare = a / rk, fScr = fBare * Math.exp(-1);
+  document.getElementById("atRead").innerHTML = "<b>Right now:</b> closest approach a = " + (a * 1e9).toFixed(2) + " nm, with "
+    + "1/κ = " + (lam * 1e9).toPrecision(2) + " nm — the atmosphere is "
+    + (lam > a ? (lam / a).toFixed(lam / a >= 10 ? 0 : 1) + " times wider than the ion" : "thinner than the ion itself")
+    + ". At r = a + 1/κ = " + (rk * 1e9).toPrecision(2) + " nm the bare potential would still be " + fBare.toFixed(2)
+    + " of its surface value; screened, it is " + fScr.toFixed(2) + "."
+    + (rk >= rmax ? " (That distance is past the right-hand edge of the plot.)" : "");
+
+  var v = document.getElementById("atVerdict");
+  if(nIon < 1){
+    v.className = "verdict stop";
+    v.innerHTML = "<b>Fewer than one ion inside the Debye sphere.</b> The count goes as I<sup>&minus;&frac12;</sup> — "
+      + "the sphere shrinks faster than the solution fills up — so it is <b>concentration</b> that empties it. The "
+      + "atmosphere is supposed to be a smooth cloud of charge, and a mean-field theory has run out of things to take "
+      + "a mean over. Dilute until this number is comfortably above one before trusting the Debye–Hückel picture at all.";
+  }else if(ka < 0.1){
+    v.className = "verdict go";
+    v.innerHTML = "<b>κa = " + ka.toPrecision(2) + ", so the ion really is a point.</b> The atmosphere stands off at "
+      + (lam * 1e9).toPrecision(2) + " nm, many times the " + s.a.toFixed(1) + " Å of the ion itself, and the limiting "
+      + "law needs no correction for size. This is the regime Debye and Hückel solved exactly.";
+  }else{
+    v.className = "verdict stop";
+    v.innerHTML = "<b>κa = " + ka.toPrecision(2) + " — the atmosphere is closing on the ion.</b> The screening length is "
+      + (lam * 1e9).toPrecision(2) + " nm against an ion " + s.a.toFixed(1) + " Å across, so treating the ion as a point "
+      + "is no longer honest and the limiting law will read low. This is exactly what the a in the extended law is for.";
+  }
+  gsDraw(performance.now());
+}
+
+/* ================= SHARED ANIMATION LOOP ================================
+   One requestAnimationFrame loop for every animated picture on the page.
+   A picture only redraws while its tab is showing, at about 30 frames a
+   second, and with reduced motion asked for the thermal jiggling stops. */
+var REDUCED = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+var ANIM = [], animLast = 0;
+function animLoop(ts){
+  if(ts - animLast > 32){
+    animLast = ts;
+    ANIM.forEach(function(a){ if(!document.getElementById(a.panel).hidden) a.tick(ts); });
+  }
+  window.requestAnimationFrame(animLoop);
+}
+/* x as "1.84 × 10<sup>7</sup>" */
+function sciH(x, d){
+  if(x === 0) return "0";
+  var e = Math.floor(Math.log10(Math.abs(x))), m = x / Math.pow(10, e);
+  if(Math.abs(+m.toFixed(d - 1)) >= 10){ m /= 10; e++; }
+  return m.toFixed(d - 1) + " × 10<sup>" + e + "</sup>";
+}
+var T25 = 298.15;
+
+/* ================= 2b - GAUSS'S LAW AROUND ONE ION ====================== */
+/* The solution set at the top of the Ion Atmosphere tab, the central ion
+   the salt's size a. The enclosed charge is the Debye-Huckel one, Q(r) = z e (1 + k r) e^-k(r-a) / (1 + k a): all of
+   the ion at r = a, none of it once the sphere has taken in the atmosphere. */
+var GS_A = 0.3e-9, GS_NL = 24;
+var gsMode = "atm", gsPlay = false, gsT0 = 0;
+/* the order in which the field lines end on the atmosphere, scattered round the ion */
+var GS_ORDER = [0, 13, 6, 19, 3, 16, 9, 22, 1, 14, 7, 20, 4, 17, 10, 23, 2, 15, 8, 21, 5, 18, 11, 12];
+/* counter-charge sites in units of 1/kappa, drawn from r e^-kr, with their own drift */
+var GS_DOTS = (function(){
+  var out = [], seed = 5;
+  function rnd(){ seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+  for(var i = 0; i < 56; i++){
+    out.push({u: -Math.log(rnd() + 1e-9) - Math.log(rnd() + 1e-9), th: rnd() * 6.283, ph: rnd() * 6.283, w: 0.4 + rnd()});
+  }
+  return out;
+})();
+function gsQ(r, kap){
+  if(r <= GS_A) return 1;
+  return (1 + kap * r) * Math.exp(-kap * (r - GS_A)) / (1 + kap * GS_A);
+}
+
+pillGroup("gsMode", function(b){ gsMode = b.getAttribute("data-m"); gsDraw(performance.now()); });
+function gsStop(){ gsPlay = false; document.getElementById("gsPlay").innerHTML = "&#9654; Grow the sphere"; }
+document.getElementById("gsR").addEventListener("input", function(){ gsStop(); gsDraw(performance.now()); });
+document.getElementById("gsPlay").addEventListener("click", function(){
+  if(gsPlay){ gsStop(); return; }
+  gsPlay = true; gsT0 = performance.now(); this.innerHTML = "&#10074;&#10074; Stop";
+});
+ANIM.push({panel:"p-atm", tick:function(ts){
+  if(gsPlay){
+    var ph = ((ts - gsT0) / 7000) * 2 * Math.PI;
+    document.getElementById("gsR").value = Math.round(1000 * (0.5 - 0.5 * Math.cos(ph)));
+  }
+  if(gsPlay || !REDUCED) gsDraw(ts);
+}});
+
+function gsDraw(ts){
+  var sl = SALTS[atSalt], Tk = +document.getElementById("atT").value;
+  var I = ionicStrength(sl, Math.pow(10, +document.getElementById("atC").value));
+  GS_A = sl.a * 1e-10;
+  var lam = debyeLen(I, atEr, Tk), kap = 1 / lam, atm = gsMode === "atm";
+  var rView = GS_A + 4 * lam;
+  var R = GS_A + (rView - GS_A) * (+document.getElementById("gsR").value) / 1000;
+  var Q = atm ? gsQ(R, kap) : 1;
+  var K = 1 / (4 * Math.PI * E0 * atEr);
+  var Eb = K * sl.zp * QE / (R * R), E = Eb * Q;
+
+  document.getElementById("gsRv").textContent = (R * 1e9).toFixed(2) + " nm";
+  document.getElementById("gsRr").textContent = (R * 1e9).toFixed(2) + " nm  = " + ((R - GS_A) / lam).toFixed(2) + " × 1/κ beyond the ion";
+  document.getElementById("gsQ").textContent = Q.toFixed(3);
+  document.getElementById("gsE").innerHTML = sciH(E, 3) + " V/m";
+  document.getElementById("gsEb").innerHTML = sciH(Eb, 3) + " V/m";
+  document.getElementById("gsNote").textContent = "around the cation of " + sl.nm + ", a = " + sl.a.toFixed(1) + " Å, 1/κ = " + (lam * 1e9).toPrecision(2) + " nm";
+
+  /* ---- the picture ---- */
+  var cx = 200, cy = 196, PR = 172;
+  function P(r){ return r / rView * PR; }
+  var s = "", tt = REDUCED ? 0 : ts / 1000, i;
+  if(atm){
+    /* the atmosphere: a haze as dense as the counter-charge, and dots that drift in it */
+    for(i = 24; i >= 1; i--){
+      var rr = GS_A + (rView - GS_A) * i / 24;
+      var dens = Math.exp(-kap * (rr - GS_A)) * GS_A / rr;
+      s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + P(rr).toFixed(1) + '" fill="var(--red-)" opacity="' + (0.05 + 0.10 * dens).toFixed(3) + '"/>';
+    }
+    GS_DOTS.forEach(function(d){
+      var rr = GS_A + (d.u + 0.15 * Math.sin(d.ph + tt * d.w)) * lam;
+      if(rr > rView || rr < GS_A * 1.6) return;
+      var th = d.th + 0.25 * Math.sin(d.ph * 1.7 + tt * d.w * 0.6);
+      s += '<circle cx="' + (cx + P(rr) * Math.cos(th)).toFixed(1) + '" cy="' + (cy + P(rr) * Math.sin(th)).toFixed(1) + '" r="3.2" fill="var(--red-)" opacity="0.85"/>';
+    });
+  }
+  /* field lines: each runs out until the charge left inside has fallen below its share */
+  var crossing = 0;
+  for(i = 0; i < GS_NL; i++){
+    var th2 = i / GS_NL * 2 * Math.PI, frac = (GS_ORDER[i] + 0.5) / GS_NL, end = rView;
+    if(atm){
+      var lo = GS_A, hi = GS_A + 40 * lam;
+      for(var it = 0; it < 40; it++){ var mid = (lo + hi) / 2; if(gsQ(mid, kap) > frac) lo = mid; else hi = mid; }
+      end = Math.min(rView, lo);
+    }
+    var r0 = Math.max(P(GS_A), 9) + 2, r1 = P(end), crosses = end > R;
+    if(crosses) crossing++;
+    s += '<line x1="' + (cx + r0 * Math.cos(th2)).toFixed(1) + '" y1="' + (cy + r0 * Math.sin(th2)).toFixed(1)
+       + '" x2="' + (cx + r1 * Math.cos(th2)).toFixed(1) + '" y2="' + (cy + r1 * Math.sin(th2)).toFixed(1)
+       + '" stroke="var(--ox)" stroke-width="1.6" stroke-dasharray="5 4" stroke-dashoffset="' + (-tt * 18).toFixed(1)
+       + '" opacity="' + (crosses ? 0.95 : 0.35) + '"/>';
+    if(crosses){
+      s += '<circle cx="' + (cx + P(R) * Math.cos(th2)).toFixed(1) + '" cy="' + (cy + P(R) * Math.sin(th2)).toFixed(1) + '" r="3" fill="var(--ox)"/>';
+    }else if(end < rView){
+      s += '<circle cx="' + (cx + r1 * Math.cos(th2)).toFixed(1) + '" cy="' + (cy + r1 * Math.sin(th2)).toFixed(1) + '" r="2" fill="var(--red-)"/>';
+    }
+  }
+  s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + Math.max(P(R), 1).toFixed(1) + '" fill="none" stroke="var(--go)" stroke-width="2.2" stroke-dasharray="7 4"/>';
+  s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + Math.max(P(GS_A), 9).toFixed(1) + '" fill="var(--ox)" stroke="var(--surface)" stroke-width="2"/>';
+  s += '<text x="' + cx + '" y="' + (cy + 4) + '" text-anchor="middle" fill="#fff" ' + MONO + ' font-size="11" font-weight="600">+' + (sl.zp > 1 ? sl.zp : "") + '</text>';
+  s += '<text x="10" y="18" fill="var(--go)" ' + MONO + ' font-size="10.5">' + crossing + ' of ' + GS_NL + ' lines cross the sphere</text>';
+  s += '<text x="10" y="32" fill="var(--muted)" ' + MONO + ' font-size="10">' + (atm ? '→ it holds ' + (crossing / GS_NL).toFixed(2) + ' of the ion’s charge' : 'no atmosphere: every line escapes') + '</text>';
+  var bar = P(lam);
+  s += '<line x1="12" y1="388" x2="' + (12 + bar).toFixed(1) + '" y2="388" stroke="var(--ink-2)" stroke-width="2"/>';
+  s += '<text x="' + (16 + bar).toFixed(1) + '" y="391" fill="var(--ink-2)" ' + MONO + ' font-size="10">1/κ = ' + (lam * 1e9).toPrecision(2) + ' nm</text>';
+  document.getElementById("gspic").innerHTML = s;
+
+  /* the two figures, in words, for whatever is set */
+  var beyond = (R - GS_A) / lam;
+  document.getElementById("gsRead").innerHTML = atm
+    ? "<b>Right now:</b> the sphere has radius r = " + (R * 1e9).toFixed(2) + " nm, " + beyond.toFixed(1)
+      + " Debye lengths beyond the ion's surface. <b>" + crossing + " of " + GS_NL + "</b> field lines cross it, so it holds about "
+      + crossing + "/" + GS_NL + " = " + (crossing / GS_NL).toFixed(2) + " of the ion's charge; the plot, computed exactly, reads "
+      + "Q<sub>enc</sub>/zε = " + Q.toFixed(3) + ". The other " + (GS_NL - crossing) + " lines ended on counter-charge inside the sphere."
+    : "<b>Right now:</b> no atmosphere, so all " + GS_NL + " lines cross the sphere at any radius and the plot stays at 1 — the field "
+      + "falls only as 1/r², and the ion is felt everywhere.";
+
+  /* ---- the plot ---- */
+  var W = 520, H = 290, L = 52, Rr = 16, T = 18, B = 42;
+  function X(r){ return L + r / rView * (W - L - Rr); }
+  function Y(q){ return T + (1 - q / 1.1) * (H - T - B); }
+  var p = "";
+  p += '<rect x="' + L + '" y="' + T + '" width="' + (X(GS_A) - L).toFixed(1) + '" height="' + (H - T - B) + '" fill="var(--line-2)" opacity="0.3"/>';
+  p += '<line x1="' + L + '" y1="' + (H - B) + '" x2="' + (W - Rr) + '" y2="' + (H - B) + '" stroke="var(--line-2)"/>';
+  p += '<line x1="' + L + '" y1="' + T + '" x2="' + L + '" y2="' + (H - B) + '" stroke="var(--line-2)"/>';
+  /* round steps - 0.5, 1, 2, 5 nm - rather than fifths of whatever the range is */
+  var span = rView * 1e9, stepNm = [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50].filter(function(st){ return span / st <= 6; })[0] || 100;
+  for(i = 0; i * stepNm <= span + 1e-9; i++){
+    var xv = i * stepNm * 1e-9;
+    p += '<line x1="' + X(xv).toFixed(1) + '" y1="' + (H - B) + '" x2="' + X(xv).toFixed(1) + '" y2="' + (H - B + 4) + '" stroke="var(--line-2)"/>';
+    p += '<text x="' + X(xv).toFixed(1) + '" y="' + (H - B + 16) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="9.5">' + +(i * stepNm).toFixed(1) + '</text>';
+  }
+  p += '<text x="' + ((L + W - Rr) / 2) + '" y="' + (H - 8) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="10">sphere radius, r / nm</text>';
+  /* no 0.0 on this axis: the distance axis already labels the corner */
+  [0.5, 1].forEach(function(q){
+    p += '<text x="' + (L - 6) + '" y="' + (Y(q) + 3).toFixed(1) + '" text-anchor="end" fill="var(--muted)" ' + MONO + ' font-size="9.5">' + q.toFixed(1) + '</text>';
+  });
+  p += '<text transform="rotate(-90 12 ' + ((T + H - B) / 2) + ')" x="12" y="' + ((T + H - B) / 2) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="10">Q_enc / zε</text>';
+  p += '<line x1="' + L + '" y1="' + Y(1).toFixed(1) + '" x2="' + (W - Rr) + '" y2="' + Y(1).toFixed(1) + '" stroke="var(--line-2)" stroke-width="1.6" stroke-dasharray="4 3"/>';
+  p += '<text x="' + (W - Rr - 4) + '" y="' + (Y(1) - 5).toFixed(1) + '" text-anchor="end" fill="var(--muted)" ' + MONO + ' font-size="9.5">bare ion</text>';
+  if(atm){
+    /* where the atmosphere's charge sits: -dQ/dr, scaled to its own peak */
+    var dist = [], peak = 0, qp = [], k2;
+    for(k2 = 0; k2 <= 200; k2++){
+      var r2 = GS_A + (rView - GS_A) * k2 / 200;
+      var g = kap * kap * r2 * Math.exp(-kap * (r2 - GS_A)) / (1 + kap * GS_A);
+      dist.push([r2, g]); if(g > peak) peak = g;
+      qp.push(X(r2).toFixed(1) + "," + Y(gsQ(r2, kap)).toFixed(1));
+    }
+    p += '<polygon points="' + X(GS_A).toFixed(1) + ',' + Y(0) + ' ' + dist.map(function(d){ return X(d[0]).toFixed(1) + "," + Y(0.55 * d[1] / peak).toFixed(1); }).join(" ")
+       + ' ' + X(rView).toFixed(1) + ',' + Y(0) + '" fill="var(--red-)" opacity="0.14"/>';
+    /* its peak: r = 1/kappa from the centre, or the ion's surface if 1/kappa < a */
+    var rPk = Math.max(GS_A, lam), gPk = kap * kap * rPk * Math.exp(-kap * (rPk - GS_A)) / (1 + kap * GS_A);
+    if(rPk <= rView){
+      p += '<circle cx="' + X(rPk).toFixed(1) + '" cy="' + Y(0.55 * gPk / peak).toFixed(1) + '" r="4" fill="var(--red-)" stroke="var(--surface)" stroke-width="1.5"/>';
+    }
+    p += '<polyline points="' + qp.join(" ") + '" fill="none" stroke="var(--go)" stroke-width="2.4"/>';
+    var xs = X(GS_A + lam);
+    p += '<line x1="' + xs.toFixed(1) + '" y1="' + T + '" x2="' + xs.toFixed(1) + '" y2="' + (H - B) + '" stroke="var(--red-)" stroke-dasharray="2 3"/>';
+    p += '<text x="' + (xs + 4).toFixed(1) + '" y="' + (H - B - 6) + '" fill="var(--red-)" ' + MONO + ' font-size="9.5">a + 1/κ</text>';
+  }
+  var xr = X(R);
+  p += '<line x1="' + xr.toFixed(1) + '" y1="' + T + '" x2="' + xr.toFixed(1) + '" y2="' + (H - B) + '" stroke="var(--go)" stroke-width="1.4" stroke-dasharray="6 3"/>';
+  p += '<circle cx="' + xr.toFixed(1) + '" cy="' + Y(Q).toFixed(1) + '" r="5" fill="var(--go)" stroke="var(--surface)" stroke-width="2"/>';
+  /* the count at the sphere goes wherever it is clear of the two fixed labels */
+  var qtxt = Q.toFixed(2) + ' zε inside', qw = qtxt.length * 6.3;
+  var busy = [{x0: W - Rr - 56, x1: W - Rr - 2, y0: Y(1) - 16, y1: Y(1) - 1}];
+  if(atm){
+    busy.push({x0: xs + 2, x1: xs + 50, y0: H - B - 17, y1: H - B - 2});      /* the a + 1/kappa label */
+  }
+  function free(bx){
+    return bx.x0 >= L && bx.x1 <= W - Rr && bx.y0 >= T - 2 && bx.y1 <= H - B
+      && busy.every(function(o){ return bx.x1 < o.x0 || o.x1 < bx.x0 || bx.y1 < o.y0 || o.y1 < bx.y0; });
+  }
+  var yQ = Y(Q), pick = null;
+  /* on the floor, with the sphere at the frame's edge, the spots beside the dot
+     are the frame and the a + 1/kappa label; the curve is flat there, so the
+     last spots stand further up                                           */
+  [[1, yQ - 9], [-1, yQ - 9], [1, yQ + 18], [-1, yQ + 18],
+   [-1, yQ - 24], [1, yQ - 24], [-1, yQ - 39], [1, yQ - 39]].some(function(c){
+    var x0 = c[0] > 0 ? xr + 8 : xr - 8 - qw;
+    if(free({x0: x0, x1: x0 + qw, y0: c[1] - 11, y1: c[1] + 3})){ pick = c; return true; }
+    return false;
+  });
+  if(!pick) pick = [xr < W - Rr - 90 ? 1 : -1, Math.max(T + 12, yQ - 9)];
+  p += '<text x="' + (xr + 8 * pick[0]).toFixed(1) + '" y="' + pick[1].toFixed(1) + '" text-anchor="' + (pick[0] > 0 ? "start" : "end")
+     + '" fill="var(--go)" ' + MONO + ' font-size="10" font-weight="600">' + qtxt + '</text>';
+  document.getElementById("gsplot").innerHTML = p;
+
+  var v = document.getElementById("gsVerdict");
+  if(!atm){
+    v.className = "verdict flat";
+    v.innerHTML = "<b>No atmosphere, so every sphere encloses the same charge.</b> E·4πr² never changes: all " + GS_NL
+      + " lines cross however large the sphere, and the field falls as 1/r² for ever. Switch the atmosphere on to see what a solution does to that.";
+  }else if(Q > 0.8){
+    v.className = "verdict go";
+    v.innerHTML = "<b>Inside most of the atmosphere: " + Q.toFixed(2) + " zε enclosed.</b> The sphere has taken in little counter-charge, so the field "
+      + "on it is still almost the bare Coulomb value. Grow it past a + 1/κ and watch the count fall.";
+  }else if(Q > 0.1){
+    v.className = "verdict stop";
+    v.innerHTML = "<b>Partly screened: " + Q.toFixed(2) + " zε enclosed.</b> The sphere now holds " + ((1 - Q) * 100).toFixed(0)
+      + " % of the atmosphere, and the field on it is that fraction weaker than Coulomb’s law says. Nothing about the ion has changed — only what else the sphere contains.";
+  }else{
+    v.className = "verdict flat";
+    v.innerHTML = "<b>Screened out: " + Q.toFixed(3) + " zε enclosed.</b> Ion and atmosphere together are almost neutral, so almost no field "
+      + "leaves the sphere. This is why ions further than a few Debye lengths apart barely notice each other.";
+  }
+}
+
+/* ================= 2a - POISSON-BOLTZMANN AT AN ELECTRODE ==============
+   The planar double layer, from the PB_EDL deck. Everything is SI inside:
+   n0 is ions per cubic metre of each sign, sigma in C/m2, capacitance in
+   F/m2, and only the readouts convert to nm, uC/cm2 and uF/cm2.
+     exact     tanh(ze phi/4kT) = tanh(ze phi0/4kT) exp(-x/lambdaD)
+     linear    phi = phi0 exp(-x/lambdaD)
+     Grahame   sigma = sqrt(8 eps kT n0) sinh(ze phi0 / 2kT)              */
+var PB_z = 1, PB_er = 78.4;
+function atanh(t){ return 0.5 * Math.log((1 + t) / (1 - t)); }
+
+pillGroup("pbZ", function(b){ PB_z = +b.getAttribute("data-z"); pbDraw(performance.now()); });
+pillGroup("pbSolv", function(b){ PB_er = +b.getAttribute("data-e"); pbDraw(performance.now()); });
+["pbP", "pbC"].forEach(function(id){
+  document.getElementById(id).addEventListener("input", function(){ pbDraw(performance.now()); });
+});
+document.getElementById("pbLin").addEventListener("click", function(){
+  document.getElementById("pbP").value = 25; pbDraw(performance.now());
+});
+document.getElementById("pbBig").addEventListener("click", function(){
+  document.getElementById("pbP").value = 250; pbDraw(performance.now());
+});
+ANIM.push({panel:"p-pb", tick:function(ts){ if(!REDUCED) pbDraw(ts); }});
+
+/* the state both figures share */
+function pbState(phi0){
+  var c = Math.pow(10, +document.getElementById("pbC").value);     /* mol/L */
+  if(phi0 === undefined) phi0 = +document.getElementById("pbP").value / 1000;
+  var n0 = c * 1000 * NA;                                          /* per m3 */
+  var kt = KB * T25;
+  var lam = Math.sqrt(E0 * PB_er * kt / (2 * n0 * PB_z * PB_z * QE * QE));
+  var y0 = PB_z * QE * phi0 / kt;
+  return {c: c, phi0: phi0, n0: n0, kt: kt, lam: lam, y0: y0,
+          sigma: Math.sqrt(8 * E0 * PB_er * kt * n0) * Math.sinh(y0 / 2),
+          cgc: (E0 * PB_er / lam) * Math.cosh(y0 / 2)};
+}
+function pbPhi(x, st){                        /* the exact Gouy-Chapman profile */
+  var t = Math.tanh(st.y0 / 4) * Math.exp(-x / st.lam);
+  return 4 * st.kt / (PB_z * QE) * atanh(t);
+}
+
+function pbDraw(ts){
+  var st = pbState(), lam = st.lam, phi0 = st.phi0;
+  var xmax = Math.max(5 * lam, 1.2e-9);
+  document.getElementById("pbPv").textContent = (phi0 * 1000).toFixed(0) + " mV";
+  document.getElementById("pbCv").textContent = st.c >= 0.1 ? st.c.toFixed(2) + " M" : (st.c * 1e3).toPrecision(2) + " mM";
+  document.getElementById("pbY").textContent = st.y0.toFixed(2) + (Math.abs(st.y0) < 1 ? "  — small" : "");
+  document.getElementById("pbL").textContent = (lam * 1e9).toPrecision(3) + " nm";
+  document.getElementById("pbS").textContent = (st.sigma * 100).toPrecision(3) + " µC cm⁻²";
+  var surf = st.c * Math.exp(Math.abs(st.y0));
+  document.getElementById("pbN").textContent = surf > 1e4 ? surf.toExponential(1) + " M — impossible"
+                                             : surf.toPrecision(3) + " M" + (surf > 20 ? "  — already absurd" : "");
+  var exactAtLam = pbPhi(lam, st), linAtLam = phi0 * Math.exp(-1);
+  document.getElementById("pbD").textContent = (linAtLam * 1000).toFixed(1) + " mV, against " + (exactAtLam * 1000).toFixed(1) + " mV exact";
+  document.getElementById("pbNote").textContent = "λD = " + (lam * 1e9).toPrecision(2) + " nm · y₀ = " + st.y0.toFixed(1);
+
+  var W = 520, H = 400, L = 56, R = 16, CT = 16, CH2 = 132, T2 = 196, B = 46;
+  function X(x){ return L + x / xmax * (W - L - R); }
+  var s = "", i, tt = REDUCED ? 0 : ts / 1000;
+
+  /* ---- the solution in front of the electrode ---- */
+  s += '<rect x="' + L + '" y="' + CT + '" width="' + (W - L - R) + '" height="' + CH2 + '" fill="var(--surface-2)" opacity="0.55" stroke="var(--line-2)"/>';
+  s += '<rect x="' + (L - 16) + '" y="' + CT + '" width="16" height="' + CH2 + '" fill="var(--elec)"/>';
+  for(i = 0; i < 7; i++){
+    s += '<text x="' + (L - 8) + '" y="' + (CT + 18 + i * (CH2 - 26) / 6) + '" text-anchor="middle" fill="var(--surface)" ' + MONO
+       + ' font-size="10" font-weight="700">' + (phi0 >= 0 ? "+" : "−") + '</text>';
+  }
+  /* counter-ions and co-ions, at the density the Boltzmann factor gives */
+  var seed = 9;
+  function rnd(){ seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+  for(i = 0; i < 150; i++){
+    var u = rnd(), xv = -lam * Math.log(1 - u * 0.985);                /* more of them near the wall */
+    if(xv > xmax) continue;
+    var y = CT + 8 + rnd() * (CH2 - 16) + (REDUCED ? 0 : 1.6 * Math.sin(tt * 1.3 + i));
+    var ratio = Math.exp(Math.abs(PB_z * QE * pbPhi(xv, st) / st.kt));   /* counter-ion enrichment */
+    var counter = rnd() < ratio / (ratio + 1 / ratio);
+    var col = counter === (phi0 < 0) ? "var(--ox)" : "var(--red-)";
+    s += '<circle cx="' + X(xv).toFixed(1) + '" cy="' + y.toFixed(1) + '" r="2.7" fill="' + col + '" opacity="0.8"/>';
+  }
+  s += '<text x="' + (W - R - 6) + '" y="' + (CT + 14) + '" text-anchor="end" fill="var(--muted)" ' + MONO + ' font-size="9.5">bulk: equal numbers</text>';
+  s += '<text x="' + (L + 6) + '" y="' + (CT + CH2 - 8) + '" fill="var(--ink-2)" ' + MONO + ' font-size="9.5">diffuse layer</text>';
+
+  /* ---- the potential ---- */
+  var top = Math.abs(phi0) * 1.08 || 1e-3, sgn = phi0 >= 0 ? 1 : -1;
+  function Y(v){ return T2 + (1 - sgn * v / top) * (H - B - T2); }
+  s += '<line x1="' + L + '" y1="' + Y(0).toFixed(1) + '" x2="' + (W - R) + '" y2="' + Y(0).toFixed(1) + '" stroke="var(--line-2)"/>';
+  s += '<line x1="' + L + '" y1="' + T2 + '" x2="' + L + '" y2="' + (H - B) + '" stroke="var(--line-2)"/>';
+  for(i = 0; i <= 5; i++){
+    var xv2 = xmax * i / 5;
+    s += '<line x1="' + X(xv2).toFixed(1) + '" y1="' + (H - B) + '" x2="' + X(xv2).toFixed(1) + '" y2="' + (H - B + 4) + '" stroke="var(--line-2)"/>';
+    s += '<text x="' + X(xv2).toFixed(1) + '" y="' + (H - B + 16) + '" text-anchor="middle" fill="var(--muted)" ' + MONO
+       + ' font-size="9.5">' + (xv2 * 1e9).toFixed(xmax < 4e-9 ? 1 : 0) + '</text>';
+  }
+  s += '<text x="' + ((L + W - R) / 2) + '" y="' + (H - 10) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="10">distance from the electrode / nm</text>';
+  (Math.abs(phi0) < 1e-4 ? [] : [0.5, 1]).forEach(function(f){
+    var v = f * phi0;
+    s += '<text x="' + (L - 6) + '" y="' + (Y(v) + 3.5).toFixed(1) + '" text-anchor="end" fill="var(--muted)" ' + MONO
+       + ' font-size="9.5">' + (v * 1000).toFixed(0) + '</text>';
+  });
+  s += '<text transform="rotate(-90 13 ' + ((T2 + H - B) / 2) + ')" x="13" y="' + ((T2 + H - B) / 2) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="10">φ / mV</text>';
+  /* kT/e, the line the linear approximation has to stay under */
+  var ktLine = sgn * st.kt / (PB_z * QE);
+  if(Math.abs(ktLine) < Math.abs(phi0)){
+    s += '<line x1="' + L + '" y1="' + Y(ktLine).toFixed(1) + '" x2="' + (W - R) + '" y2="' + Y(ktLine).toFixed(1) + '" stroke="var(--stop)" stroke-dasharray="2 4"/>';
+    var ktLow = Y(ktLine) < T2 + 40;          /* close to the legend: go under the line */
+    s += '<text x="' + (L + 6) + '" y="' + (Y(ktLine) + (ktLow ? 13 : -5)).toFixed(1) + '" fill="var(--stop)" '
+       + MONO + ' font-size="9.5">kBT/ze = ' + Math.abs(ktLine * 1000).toFixed(1) + ' mV</text>';
+  }
+  var ex = [], li = [];
+  for(i = 0; i <= 160; i++){
+    var x2 = xmax * i / 160;
+    ex.push(X(x2).toFixed(1) + "," + Y(pbPhi(x2, st)).toFixed(1));
+    li.push(X(x2).toFixed(1) + "," + Y(phi0 * Math.exp(-x2 / lam)).toFixed(1));
+  }
+  s += '<polyline points="' + li.join(" ") + '" fill="none" stroke="var(--red-)" stroke-width="1.8" stroke-dasharray="5 4"/>';
+  s += '<polyline points="' + ex.join(" ") + '" fill="none" stroke="var(--go)" stroke-width="2.6"/>';
+  /* the Debye length, through both bands */
+  if(lam < xmax){
+    s += '<line x1="' + X(lam).toFixed(1) + '" y1="' + CT + '" x2="' + X(lam).toFixed(1) + '" y2="' + (H - B) + '" stroke="var(--ox)" stroke-width="1.4" stroke-dasharray="6 3"/>';
+    /* up in the cell band, where its own dashed line already is and nothing
+       else competes for the space                                        */
+    var lamEnd = X(lam) > W - R - 130;
+    s += '<text x="' + (X(lam) + (lamEnd ? -5 : 5)).toFixed(1) + '" y="' + (CT + 30) + '"'
+       + (lamEnd ? ' text-anchor="end"' : '') + ' fill="var(--ox)" ' + MONO + ' font-size="9.5">λD</text>';
+  }
+  s += '<text x="' + (W - R - 6) + '" y="' + (T2 + 12) + '" text-anchor="end" fill="var(--go)" ' + MONO + ' font-size="9.5">exact (Gouy–Chapman)</text>';
+  s += '<text x="' + (W - R - 6) + '" y="' + (T2 + 25) + '" text-anchor="end" fill="var(--red-)" ' + MONO + ' font-size="9.5">linear (Debye–Hückel)</text>';
+  document.getElementById("pbplot").innerHTML = s;
+
+  var v3 = document.getElementById("pbVerdict"), ay = Math.abs(st.y0);
+  var err = Math.abs(phi0 ? (linAtLam - exactAtLam) / phi0 * 100 : 0);
+  if(ay < 1){
+    v3.className = "verdict go";
+    v3.innerHTML = "<b>Linear regime: y₀ = " + st.y0.toFixed(2) + ".</b> sinh y ≈ y, the two curves lie on top of each other "
+      + "(" + err.toFixed(1) + " % apart at λD), and the double layer is a parallel-plate capacitor of thickness λD. This is the same "
+      + "approximation Debye and Hückel make around an ion.";
+  }else if(ay < 4){
+    v3.className = "verdict flat";
+    v3.innerHTML = "<b>Leaving the linear regime: y₀ = " + st.y0.toFixed(1) + ".</b> The exact profile already falls faster than the "
+      + "exponential near the wall — " + err.toFixed(0) + " % apart at λD — because counter-ions pile up and screen more efficiently "
+      + "than a linear theory allows.";
+  }else{
+    v3.className = "verdict stop";
+    v3.innerHTML = "<b>Strongly nonlinear: y₀ = " + st.y0.toFixed(1) + ".</b> Grahame's σ grows as sinh(y₀/2) and the counter-ion "
+      + "concentration at the surface reads " + (surf > 1e4 ? surf.toExponential(1) : surf.toPrecision(3)) + " M — which is where the "
+      + "point-ion assumption fails outright: real ions have a size, and they cannot be packed that densely.";
+  }
+}
+
+atDraw();
+gsDraw(0);
+pbDraw(0);
+window.requestAnimationFrame(animLoop);
+
+/* ---- submit straight to the course sheet ----------------------------------
+   Paste the Apps Script /exec URL between the quotes to switch this on.
+   Left empty, the button stays hidden and only the download exists.        */
+var SUBMIT_URL = "https://script.google.com/macros/s/AKfycbxPm7WrbttFu6-gnTi__IcUPt-816GthK0eI8TPuwOZyYlcRW3RAWJlmsr791moxBc5GA/exec";
+
+var sendBtn=document.getElementById("sendBtn");
+if(SUBMIT_URL){
+  sendBtn.hidden=false;
+  dlHint.textContent="Press Submit to send your result to the course. The download is a backup.";
+}
+
+sendBtn.addEventListener("click",function(){
+  var id=(sId.value||"").trim();
+  if(!id){ dlHint.textContent="Enter your student ID first."; return; }
+  var r=receipt();
+  var payload={
+    lecture:"L5", student_id:id, completed_utc:finishedAt||new Date().toISOString(),
+    score:r.score, total:QZ.length, percent:r.pct, verification:r.vcode,
+    answers:picks.map(function(p){ return p>=0?LETTERS[p]:"-"; }),
+    ok:picks.map(function(p,i){ return p===QZ[i].a?1:0; })
+  };
+  sendBtn.disabled=true;
+  dlHint.textContent="Sending...";
+
+  /* text/plain keeps this a simple request, so the browser sends it without
+     a preflight the Apps Script endpoint cannot answer */
+  fetch(SUBMIT_URL,{
+    method:"POST",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify(payload)
+  })
+  .then(function(res){ return res.json(); })
+  .then(function(j){
+    if(j && j.ok){
+      sendBtn.textContent="Submitted ✓";
+      dlHint.textContent="Recorded for student ID "+id+". You can close this page.";
+    }else{
+      throw new Error((j && j.error) || "rejected");
+    }
+  })
+  .catch(function(){
+    /* the response could not be read - resend blind so the record still lands,
+       then tell the student to keep the file as proof */
+    fetch(SUBMIT_URL,{method:"POST",mode:"no-cors",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(payload)}).catch(function(){});
+    sendBtn.disabled=false;
+    sendBtn.textContent="Submit to the course";
+    dlHint.textContent="Sent, but the confirmation did not come back. "
+      + "Download the file as well and keep it - it is your proof of submission.";
+  });
+});
+
+loadState();
+render();
+
+})();
+</script>
+</body>
+</html>
