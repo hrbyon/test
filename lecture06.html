@@ -796,7 +796,7 @@ function atDraw(){
   /* the orange line in numbers: the same scaled values the graph plots */
   document.getElementById("atRk").textContent = (rk * 1e9).toPrecision(3) + " nm";
   document.getElementById("atPb").textContent = fBare.toFixed(3);
-  document.getElementById("atPs").textContent = fScr.toFixed(3) + "  (37 % of ion alone)";
+  document.getElementById("atPs").textContent = fScr.toFixed(3);
   document.getElementById("atRead").innerHTML = "At r = " + (rk * 1e9).toPrecision(2) + " nm the bare potential would still be "
     + fBare.toFixed(2) + " of its surface value; screened, it is " + fScr.toFixed(2) + ".";
 
