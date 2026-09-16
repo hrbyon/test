@@ -383,16 +383,13 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
           <div class="readout"><span class="k">ionic strength, I</span><span class="v" id="atI">&mdash;</span></div>
           <div class="readout"><span class="k"><span class="mig">Debye length</span>, 1/&kappa;</span><span class="v" id="atL">&mdash;</span></div>
           <div class="readout"><span class="k">effective ion size, a</span><span class="v" id="atA2">&mdash;</span></div>
-          <div class="readout"><span class="k">&kappa;a &mdash; is the ion a point charge?</span><span class="v" id="atKa">&mdash;</span></div>
-          <div class="readout"><span class="k">ions inside one Debye sphere</span><span class="v" id="atN">&mdash;</span></div>
-          <div id="atVerdict" class="verdict flat" style="margin-top:14px">&mdash;</div>
+          <div id="atRead" class="verdict flat" style="margin-top:14px">&mdash;</div>
         </div>
       </div>
 
       <div class="card">
         <div class="card-h"><h2>How far the charge is felt</h2><span class="note" id="atNote">screened against bare Coulomb</span></div>
         <div class="card-b"><svg id="atplot" viewBox="0 0 400 340" style="display:block;width:100%;height:auto;max-width:420px;margin:0 auto" role="img" aria-label="The screened potential around a central ion against distance, with the bare Coulomb potential for comparison and the Debye length marked"></svg>
-          <div id="atRead" class="verdict flat" style="margin-top:12px">&mdash;</div>
         </div>
       </div>
 
@@ -401,6 +398,12 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
     <div class="card" style="margin-top:16px">
       <div class="card-h"><h2>How to read the graph</h2><span class="note">what &psi;(r)/&psi;(a) against r is showing</span></div>
       <div class="card-b stack" style="gap:12px">
+        <div class="eqbig" style="white-space:normal;font-size:14px;line-height:1.7">
+          <small style="display:block;margin-bottom:4px">y-axis: the <b>potential</b> &psi;(r), not the field, divided by its value at r = a</small>
+          &psi;(r) = (ze / 4&pi;&epsilon;<sub>0</sub>&epsilon;<sub>r</sub>) &middot; e<sup>&kappa;a</sup>/(1 + &kappa;a) &middot; e<sup>&minus;&kappa;r</sup>/r<br>
+          <span class="mig">with its atmosphere:&nbsp; &psi;(r)/&psi;(a) = (a/r)&middot;e<sup>&minus;&kappa;(r&minus;a)</sup></span><br>
+          <span style="color:var(--muted)">ion alone:&nbsp; &psi;(r) = ze / 4&pi;&epsilon;<sub>0</sub>&epsilon;<sub>r</sub>r &nbsp;&rarr;&nbsp; &psi;(r)/&psi;(a) = a/r</span>
+        </div>
         <div class="trio3">
           <p class="hint" style="margin:0"><b>What is plotted.</b> The potential &psi; around one ion against the distance r
             from its centre, scaled so both curves start at 1 at r = a. <b>Grey strip (r &lt; a):</b> no other ion can get this close.</p>
@@ -715,15 +718,6 @@ function atDraw(){
   document.getElementById("atI").textContent  = I.toPrecision(3) + " mol kg⁻¹";
   document.getElementById("atL").textContent  = (lam * 1e9).toPrecision(3) + " nm";
   document.getElementById("atA2").textContent = s.a.toFixed(1) + " Å";
-  var ka = a / lam;
-  document.getElementById("atKa").textContent = ka.toPrecision(2)
-    + (ka < 0.1 ? "  — yes, nearly" : ka < 1 ? "  — not really" : "  — no");
-
-  /* how many ions share one Debye sphere: below about one, the mean-field
-     picture the whole theory rests on has nothing to average over */
-  var nIon = (4 / 3) * Math.PI * Math.pow(lam, 3) * NA * (s.np + s.nm_) * m * RHOW;
-  document.getElementById("atN").textContent = nIon >= 100 ? Math.round(nIon).toLocaleString()
-                                             : nIon.toPrecision(2);
 
   /* --- the screened potential, against the bare one ---
      Both are scaled to 1 at the ion's surface, r = a, so the figure compares
@@ -802,24 +796,6 @@ function atDraw(){
     + " of its surface value; screened, it is " + fScr.toFixed(2) + "."
     + (rk >= rmax ? " (That distance is past the right-hand edge of the plot.)" : "");
 
-  var v = document.getElementById("atVerdict");
-  if(nIon < 1){
-    v.className = "verdict stop";
-    v.innerHTML = "<b>Fewer than one ion inside the Debye sphere.</b> The count goes as I<sup>&minus;&frac12;</sup> — "
-      + "the sphere shrinks faster than the solution fills up — so it is <b>concentration</b> that empties it. The "
-      + "atmosphere is supposed to be a smooth cloud of charge, and a mean-field theory has run out of things to take "
-      + "a mean over. Dilute until this number is comfortably above one before trusting the Debye–Hückel picture at all.";
-  }else if(ka < 0.1){
-    v.className = "verdict go";
-    v.innerHTML = "<b>κa = " + ka.toPrecision(2) + ", so the ion really is a point.</b> The atmosphere stands off at "
-      + (lam * 1e9).toPrecision(2) + " nm, many times the " + s.a.toFixed(1) + " Å of the ion itself, and the limiting "
-      + "law needs no correction for size. This is the regime Debye and Hückel solved exactly.";
-  }else{
-    v.className = "verdict stop";
-    v.innerHTML = "<b>κa = " + ka.toPrecision(2) + " — the atmosphere is closing on the ion.</b> The screening length is "
-      + (lam * 1e9).toPrecision(2) + " nm against an ion " + s.a.toFixed(1) + " Å across, so treating the ion as a point "
-      + "is no longer honest and the limiting law will read low. This is exactly what the a in the extended law is for.";
-  }
   gsDraw(performance.now());
 }
 
