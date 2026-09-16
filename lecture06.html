@@ -176,10 +176,25 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
   font-size:12.5px;line-height:1.45;color:var(--ink-2);border-top:1px solid var(--line);padding-top:10px}
 .atmdefs > div{display:grid;grid-template-columns:3.2em 1fr;gap:8px}
 .atmdefs .sym{font-family:"IBM Plex Mono",monospace;font-weight:700;text-align:right;color:var(--ink)}
-#p-atm .trio3 .atmfig{grid-template-columns:1fr}
-#p-atm .trio3 .atmdefs{grid-template-columns:1fr}
-#p-atm .trio3 .atmmodel svg{max-width:300px}
-#p-atm .trio3 .eqbig{white-space:normal}
+#p-atm .g-atm .atmfig{grid-template-columns:1fr}
+#p-atm .g-atm .atmdefs{grid-template-columns:1fr}
+#p-atm .g-atm .atmmodel svg{max-width:300px}
+#p-atm .g-atm .eqbig{white-space:normal}
+.atmgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:auto 1fr;gap:16px;align-items:stretch}
+.atmgrid>.card{display:flex;flex-direction:column}
+.atmgrid>.card>.card-b:last-child{flex:1 1 auto}
+.g-atm{grid-column:1;grid-row:1 / span 2}
+.g-gauss{grid-column:2 / span 2;grid-row:1}
+.g-sph{grid-column:2;grid-row:2}
+.g-enc{grid-column:3;grid-row:2}
+@media(max-width:1000px){.atmgrid{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:auto}
+  .g-atm,.g-gauss{grid-column:1 / -1;grid-row:auto}.g-sph{grid-column:1;grid-row:auto}.g-enc{grid-column:2;grid-row:auto}}
+@media(max-width:720px){.atmgrid{grid-template-columns:1fr}.g-sph,.g-enc{grid-column:1}}
+/* the two sphere cards: tighter legends and readouts so their column is not the tallest thing on the page */
+.g-sph .glegend,.g-enc .glegend{font-size:11.5px;line-height:1.35;gap:3px}
+.g-sph .card-b.stack,.g-enc .card-b.stack{gap:10px}
+.g-enc .readout{padding:5px 0}
+.g-enc .readout .v{font-size:14px}
 </style>
 </head>
 <body>
@@ -200,9 +215,9 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
   <!-- ============== ION ATMOSPHERE AND SCREENING ============== -->
   <section class="panel" id="p-atm" role="tabpanel" aria-labelledby="t-atm">
 
-    <div class="trio3">
+    <div class="atmgrid">
 
-      <div class="card">
+      <div class="card g-atm">
         <div class="card-h"><h2>The ion atmosphere</h2><span class="note">deck p.2&ndash;3 &mdash; no ion is ever alone</span></div>
         <div class="card-b stack" style="gap:12px">
           <div class="eqbig">
@@ -232,10 +247,41 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
         </div>
       </div>
 
-      <div class="card">
+      <div class="card g-gauss">
+        <div class="card-h"><h2>Where 1/&kappa; comes from: Gauss&rsquo;s law, read off the two figures</h2><span class="note">deck p.11</span></div>
+        <div class="card-b stack" style="gap:12px">
+          <div class="eqbig" style="white-space:normal">
+            <span class="mig">&oint; E&middot;dA = Q<sub>enc</sub> / &epsilon;<sub>0</sub>&epsilon;<sub>r</sub></span>
+            &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+            &nabla;&middot;E = &rho; / &epsilon;<sub>0</sub>&epsilon;<sub>r</sub> = &kappa;<sup>2</sup>&phi;
+            &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+            <span class="con">Q<sub>enc</sub>(r) = z&epsilon; (1 + &kappa;r) e<sup>&minus;&kappa;(r&minus;a)</sup> / (1 + &kappa;a)</span><br>
+            <small>the field through a closed surface counts the charge inside &nbsp;&middot;&nbsp; the same law at a point, with Boltzmann&rsquo;s charge &nbsp;&middot;&nbsp; what a sphere around one ion encloses</small>
+          </div>
+          <div class="trio3">
+            <p class="hint" style="margin:0"><b>1. The law.</b> The total field passing out through any closed surface depends
+              only on the charge inside it. For a sphere of radius r around the ion the field is the same all over it, so
+              E&middot;4&pi;r<sup>2</sup> = Q<sub>enc</sub>/&epsilon;<sub>0</sub>&epsilon;<sub>r</sub>. A bare ion keeps
+              Q<sub>enc</sub> constant, and the field falls as 1/r<sup>2</sup> for ever.</p>
+            <p class="hint" style="margin:0"><b>2. Read it off the figures.</b> The green circle in <b>The Gaussian sphere</b> and
+              the green dashed line in <b>What the sphere encloses</b> are the same sphere. The 24 field lines stand for the
+              ion&rsquo;s charge; a line that meets counter-charge inside the sphere ends there (the faint ones), and the rest
+              cross it (orange dots). So <b>lines crossing &divide; 24 = Q<sub>enc</sub>/z&epsilon;</b>, the height of the green
+              curve at r.</p>
+            <p class="hint" style="margin:0"><b>3. Why the answer is 1/&kappa;.</b> Grow the sphere with &#9654;. At r = a all 24
+              cross; as the sphere swallows the atmosphere the curve falls, fastest at the shaded hump&rsquo;s peak, r = 1/&kappa;;
+              a few Debye lengths out, ion and atmosphere cancel and nothing crosses. Put Boltzmann&rsquo;s charge into Gauss&rsquo;s
+              law at every point and it becomes &nabla;&middot;E = &kappa;<sup>2</sup>&phi; &mdash; the distance over which the
+              field dies is 1/&kappa;, set by I, &epsilon;<sub>r</sub> and T.</p>
+          </div>
+          <div id="gsRead" class="verdict flat">&mdash;</div>
+        </div>
+      </div>
+
+      <div class="card g-sph">
         <div class="card-h"><h2>The Gaussian sphere</h2><span class="note" id="gsNote">&mdash;</span></div>
         <div class="card-b stack">
-          <svg id="gspic" viewBox="0 0 400 400" style="display:block;width:100%;height:auto;max-width:400px;margin:0 auto" role="img" aria-label="A central ion with its ion atmosphere drawn as a cloud of counter-charge, a dashed Gaussian sphere around it, and field lines crossing the sphere in proportion to the charge it encloses"></svg>
+          <svg id="gspic" viewBox="0 0 400 400" style="display:block;width:100%;height:auto;max-width:250px;margin:0 auto" role="img" aria-label="A central ion with its ion atmosphere drawn as a cloud of counter-charge, a dashed Gaussian sphere around it, and field lines crossing the sphere in proportion to the charge it encloses"></svg>
           <div class="glegend">
             <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><circle cx="13" cy="7" r="6" fill="var(--ox)"/></svg>the central ion, drawn to its radius a</span>
             <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><circle cx="13" cy="7" r="3.3" fill="var(--red-)"/></svg>counter-charge: the ion atmosphere &mdash; the blue haze shows how dense it is</span>
@@ -263,10 +309,10 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
         </div>
       </div>
 
-      <div class="card">
+      <div class="card g-enc">
         <div class="card-h"><h2>What the sphere encloses</h2><span class="note">and so how strong the field is on it</span></div>
         <div class="card-b stack">
-          <svg id="gsplot" viewBox="0 0 520 290" style="display:block;width:100%;height:auto;max-width:520px;margin:0 auto" role="img" aria-label="Net charge enclosed by a sphere around the ion against its radius, falling from the full ion charge to zero over a few Debye lengths, with the bare ion's constant charge for comparison"></svg>
+          <svg id="gsplot" viewBox="0 0 520 290" style="display:block;width:100%;height:auto;max-width:330px;margin:0 auto" role="img" aria-label="Net charge enclosed by a sphere around the ion against its radius, falling from the full ion charge to zero over a few Debye lengths, with the bare ion's constant charge for comparison"></svg>
           <div class="glegend">
             <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="1" y1="7" x2="25" y2="7" stroke="var(--go)" stroke-width="2.4"/></svg><span><b>green curve, Q<sub>enc</sub>/z&epsilon;</b>: the net charge inside a sphere of radius r &mdash; read it on the left axis</span></span>
             <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="13" y1="0" x2="13" y2="14" stroke="var(--go)" stroke-width="1.6" stroke-dasharray="3 2"/><circle cx="13" cy="7" r="3.5" fill="var(--go)"/></svg><span><b>green dashed line</b>: the sphere you have set &mdash; the same green circle as in the picture</span></span>
@@ -285,37 +331,6 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
         </div>
       </div>
 
-    </div>
-
-    <div class="card" style="margin-top:16px">
-      <div class="card-h"><h2>Where 1/&kappa; comes from: Gauss&rsquo;s law, read off the two figures</h2><span class="note">deck p.11</span></div>
-      <div class="card-b stack" style="gap:12px">
-        <div class="eqbig" style="white-space:normal">
-          <span class="mig">&oint; E&middot;dA = Q<sub>enc</sub> / &epsilon;<sub>0</sub>&epsilon;<sub>r</sub></span>
-          &nbsp;&nbsp;&middot;&nbsp;&nbsp;
-          &nabla;&middot;E = &rho; / &epsilon;<sub>0</sub>&epsilon;<sub>r</sub> = &kappa;<sup>2</sup>&phi;
-          &nbsp;&nbsp;&middot;&nbsp;&nbsp;
-          <span class="con">Q<sub>enc</sub>(r) = z&epsilon; (1 + &kappa;r) e<sup>&minus;&kappa;(r&minus;a)</sup> / (1 + &kappa;a)</span><br>
-          <small>the field through a closed surface counts the charge inside &nbsp;&middot;&nbsp; the same law at a point, with Boltzmann&rsquo;s charge &nbsp;&middot;&nbsp; what a sphere around one ion encloses</small>
-        </div>
-        <div class="trio3">
-          <p class="hint" style="margin:0"><b>1. The law.</b> The total field passing out through any closed surface depends
-            only on the charge inside it. For a sphere of radius r around the ion the field is the same all over it, so
-            E&middot;4&pi;r<sup>2</sup> = Q<sub>enc</sub>/&epsilon;<sub>0</sub>&epsilon;<sub>r</sub>. A bare ion keeps
-            Q<sub>enc</sub> constant, and the field falls as 1/r<sup>2</sup> for ever.</p>
-          <p class="hint" style="margin:0"><b>2. Read it off the figures.</b> The green circle in <b>The Gaussian sphere</b> and
-            the green dashed line in <b>What the sphere encloses</b> are the same sphere. The 24 field lines stand for the
-            ion&rsquo;s charge; a line that meets counter-charge inside the sphere ends there (the faint ones), and the rest
-            cross it (orange dots). So <b>lines crossing &divide; 24 = Q<sub>enc</sub>/z&epsilon;</b>, the height of the green
-            curve at r.</p>
-          <p class="hint" style="margin:0"><b>3. Why the answer is 1/&kappa;.</b> Grow the sphere with &#9654;. At r = a all 24
-            cross; as the sphere swallows the atmosphere the curve falls, fastest at the shaded hump&rsquo;s peak, r = 1/&kappa;;
-            a few Debye lengths out, ion and atmosphere cancel and nothing crosses. Put Boltzmann&rsquo;s charge into Gauss&rsquo;s
-            law at every point and it becomes &nabla;&middot;E = &kappa;<sup>2</sup>&phi; &mdash; the distance over which the
-            field dies is 1/&kappa;, set by I, &epsilon;<sub>r</sub> and T.</p>
-        </div>
-        <div id="gsRead" class="verdict flat">&mdash;</div>
-      </div>
     </div>
 
     <div class="trio3" style="margin-top:16px">
@@ -431,7 +446,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
       </div>
     </div>
 
-    <div class="two eq">
+    <div class="trio3">
 
       <div class="card">
         <div class="card-h"><h2>The electrode</h2><span class="note">what you set at the surface</span></div>
@@ -470,15 +485,6 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
       </div>
 
       <div class="card">
-        <div class="card-h"><h2>The potential through the diffuse layer</h2><span class="note" id="pbNote">&mdash;</span></div>
-        <div class="card-b"><svg id="pbplot" viewBox="0 0 520 400" style="display:block;width:100%;height:auto;max-width:520px;margin:0 auto" role="img" aria-label="The solution in front of a charged electrode with its diffuse layer of counter-charge, above the potential against distance for the exact Gouy-Chapman solution and the linearised Debye-Huckel exponential, with the Debye length marked"></svg></div>
-      </div>
-
-    </div>
-
-    <div class="two eq" style="margin-top:16px">
-
-      <div class="card">
         <div class="card-h"><h2>The numbers</h2><span class="note">Gouy&ndash;Chapman and Grahame</span></div>
         <div class="card-b">
           <div class="readout"><span class="k">reduced potential, y<sub>0</sub> = ze&phi;<sub>0</sub>/k<sub>B</sub>T</span><span class="v" id="pbY">&mdash;</span></div>
@@ -491,24 +497,29 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
       </div>
 
       <div class="card">
-        <div class="card-h"><h2>Solving it, in two integrations</h2><span class="note">deck p.4&ndash;5</span></div>
-        <div class="card-b stack" style="gap:12px">
-          <div class="eqbig">
-            <span class="dif">linear</span> &nbsp; &phi; = &phi;<sub>0</sub> e<sup>&minus;x/&lambda;<sub>D</sub></sup>, &nbsp; &lambda;<sub>D</sub> = &radic;(&epsilon;<sub>0</sub>&epsilon;<sub>r</sub>k<sub>B</sub>T / 2n<sup>0</sup>z<sup>2</sup>e<sup>2</sup>)<br>
-            <span class="con">exact</span> &nbsp; tanh(ze&phi;/4k<sub>B</sub>T) = tanh(ze&phi;<sub>0</sub>/4k<sub>B</sub>T) e<sup>&minus;x/&lambda;<sub>D</sub></sup><br>
-            <span class="mig">Grahame</span> &nbsp; &sigma; = &radic;(8&epsilon;<sub>0</sub>&epsilon;<sub>r</sub>k<sub>B</sub>Tn<sup>0</sup>) sinh(ze&phi;<sub>0</sub>/2k<sub>B</sub>T)
-          </div>
-          <p class="hint" style="margin:0">Multiply the PB equation by 2d&phi;/dx and it integrates once, with &phi; and &phi;&prime;
-            both going to zero far away; that first integral is Grahame's equation in disguise, since Gauss's law at the surface says
-            &sigma; = &minus;&epsilon;<sub>0</sub>&epsilon;<sub>r</sub>&phi;&prime;(0). Integrate again and you have the exact profile
-            above.<br><br>
-            At small &phi;<sub>0</sub> the tanh cancels and the exact solution <em>is</em> the exponential &mdash; and
-            &lambda;<sub>D</sub> here is the same &kappa;<sup>&minus;1</sup> as the thickness of the ion atmosphere on the previous tab. At large
-            &phi;<sub>0</sub> the potential falls far faster than any exponential near the wall: the counter-ions crowd in and screen
-            more efficiently than a linear theory can.</p>
-        </div>
+        <div class="card-h"><h2>The potential through the diffuse layer</h2><span class="note" id="pbNote">&mdash;</span></div>
+        <div class="card-b"><svg id="pbplot" viewBox="0 0 400 400" style="display:block;width:100%;height:auto;max-width:420px;margin:0 auto" role="img" aria-label="The solution in front of a charged electrode with its diffuse layer of counter-charge, above the potential against distance for the exact Gouy-Chapman solution and the linearised Debye-Huckel exponential, with the Debye length marked"></svg></div>
       </div>
 
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="card-h"><h2>Solving it, in two integrations</h2><span class="note">deck p.4&ndash;5</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig">
+          <span class="dif">linear</span> &nbsp; &phi; = &phi;<sub>0</sub> e<sup>&minus;x/&lambda;<sub>D</sub></sup>, &nbsp; &lambda;<sub>D</sub> = &radic;(&epsilon;<sub>0</sub>&epsilon;<sub>r</sub>k<sub>B</sub>T / 2n<sup>0</sup>z<sup>2</sup>e<sup>2</sup>)<br>
+          <span class="con">exact</span> &nbsp; tanh(ze&phi;/4k<sub>B</sub>T) = tanh(ze&phi;<sub>0</sub>/4k<sub>B</sub>T) e<sup>&minus;x/&lambda;<sub>D</sub></sup><br>
+          <span class="mig">Grahame</span> &nbsp; &sigma; = &radic;(8&epsilon;<sub>0</sub>&epsilon;<sub>r</sub>k<sub>B</sub>Tn<sup>0</sup>) sinh(ze&phi;<sub>0</sub>/2k<sub>B</sub>T)
+        </div>
+        <p class="hint" style="margin:0">Multiply the PB equation by 2d&phi;/dx and it integrates once, with &phi; and &phi;&prime;
+          both going to zero far away; that first integral is Grahame's equation in disguise, since Gauss's law at the surface says
+          &sigma; = &minus;&epsilon;<sub>0</sub>&epsilon;<sub>r</sub>&phi;&prime;(0). Integrate again and you have the exact profile
+          above.<br><br>
+          At small &phi;<sub>0</sub> the tanh cancels and the exact solution <em>is</em> the exponential &mdash; and
+          &lambda;<sub>D</sub> here is the same &kappa;<sup>&minus;1</sup> as the thickness of the ion atmosphere on the previous tab. At large
+          &phi;<sub>0</sub> the potential falls far faster than any exponential near the wall: the counter-ions crowd in and screen
+          more efficiently than a linear theory can.</p>
+      </div>
     </div>
 
     <div class="card" style="margin-top:16px">
@@ -1232,7 +1243,7 @@ function pbDraw(ts){
   document.getElementById("pbD").textContent = (linAtLam * 1000).toFixed(1) + " mV, against " + (exactAtLam * 1000).toFixed(1) + " mV exact";
   document.getElementById("pbNote").textContent = "λD = " + (lam * 1e9).toPrecision(2) + " nm · y₀ = " + st.y0.toFixed(1);
 
-  var W = 520, H = 400, L = 56, R = 16, CT = 16, CH2 = 132, T2 = 196, B = 46;
+  var W = 400, H = 400, L = 52, R = 12, CT = 16, CH2 = 132, T2 = 196, B = 46;
   function X(x){ return L + x / xmax * (W - L - R); }
   var s = "", i, tt = REDUCED ? 0 : ts / 1000;
 
