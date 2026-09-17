@@ -186,6 +186,14 @@ tr.analyte td{color:var(--ox);font-weight:500}
 .two.eq>.card>.card-b:last-child{flex:1 1 auto}
 .btnrow{display:flex;gap:8px;flex-wrap:wrap}
 .btnrow .ghost{flex:1 1 auto;text-align:center}
+.fpgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:stretch}
+.fpgrid>.card{display:flex;flex-direction:column}
+.fpgrid>.card>.card-b{flex:1 1 auto}
+.fpctl{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:end;min-height:58px}
+.fpbody .fpread{margin-top:auto}
+.fplegend{display:grid;grid-template-columns:1fr 1fr;gap:6px 24px}
+@media(max-width:900px){.fpgrid{grid-template-columns:1fr}.fplegend{grid-template-columns:1fr}}
+@media(max-width:520px){.fpctl{grid-template-columns:1fr}}
 footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;line-height:1.8}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 .glegend{display:flex;flex-direction:column;gap:5px;font-size:12.5px;line-height:1.45;color:var(--ink-2)}
@@ -231,6 +239,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
 
   <div class="tabs" role="tablist">
     <button class="tab" role="tab" aria-selected="true"  aria-controls="p-atm"  id="t-atm">Ion Atmosphere</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-fp"   id="t-fp">Field &amp; Potential</button>
     <button class="tab" role="tab" aria-selected="false" aria-controls="p-quiz" id="t-quiz">Concept Check</button>
   </div>
 
@@ -448,10 +457,147 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
       </div>
     </div>
 
+  </section>
+
+  <!-- ============== FIELD AND POTENTIAL ============== -->
+  <section class="panel" id="p-fp" role="tabpanel" aria-labelledby="t-fp" hidden>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>Potential and field, defined</h2><span class="note">what a charge sets up, and what another charge actually feels</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig">
+          <span class="dif">&psi; = U / q</span> <small>(J/C = V)</small>
+          &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="mig">E = F / q</span> <small>(N/C = V/m)</small>
+          &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="con">E = &minus;d&psi;/dx</span><br>
+          <small>potential: energy per unit charge &nbsp;&middot;&nbsp; field: force per unit charge &nbsp;&middot;&nbsp; the field is the downhill slope of the potential</small>
+        </div>
+        <p class="hint" style="margin:0">The <b>potential</b> &psi; is a scalar: one number at each point, like a height on a map.
+          The <b>field</b> E is how steeply that potential changes through space &mdash; its slope &mdash; and it points downhill.
+          <b>It is the field that pushes on a charge</b>, with force F = qE; the potential tells you the charge&rsquo;s energy, U = q&psi;.
+          The same two ideas hold around <b>one ion</b>, where both fall off with distance, and between <b>two electrodes</b>, where
+          you set a voltage but every ion in between answers to the field, E = &Delta;V/d.</p>
+      </div>
+    </div>
+
+    <div class="fpgrid">
+
+      <div class="card">
+        <div class="card-h"><h2>One ion</h2><span class="note" id="fpiNote">&mdash;</span></div>
+        <div class="card-b stack fpbody">
+          <div class="fpctl">
+            <div>
+              <span class="fld">Around the ion</span>
+              <div class="pill-row" id="fpiAtm">
+                <button class="pill" data-a="0" aria-pressed="true"  type="button">alone</button>
+                <button class="pill" data-a="1" aria-pressed="false" type="button">+ atmosphere</button>
+              </div>
+            </div>
+            <p class="hint" style="margin:0">a cation, +e, in water; atmosphere at 0.1 M; closest approach a = 0.4 nm</p>
+          </div>
+          <div class="fpctl">
+            <div>
+              <span class="fld">Test charge</span>
+              <div class="pill-row" id="fpiSign">
+                <button class="pill" data-q="1"  aria-pressed="true"  type="button">+e</button>
+                <button class="pill" data-q="-1" aria-pressed="false" type="button">&minus;e</button>
+              </div>
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">Where it starts</span><span class="val" id="fpiXv"></span></div>
+              <input type="range" id="fpiX" min="0" max="1000" step="1" value="100">
+            </div>
+          </div>
+          <div class="btnrow">
+            <button class="ghost" id="fpiPlay" type="button">&#9654; Let it go</button>
+            <button class="ghost" id="fpiReset" type="button">Put it back</button>
+          </div>
+          <svg id="fpipic" viewBox="0 0 520 430" style="display:block;width:100%;height:auto;max-width:520px;margin:0 auto" role="img" aria-label="Above, the space around a cation with equipotential circles, radial field arrows and a test charge; below, the potential and the field against distance, with the tangent at the charge"></svg>
+          <div>
+            <div class="readout"><span class="k"><span class="dif">potential there</span>, &psi;</span><span class="v" id="fpiPsi">&mdash;</span></div>
+            <div class="readout"><span class="k"><span class="mig">field there</span>, E = &minus;d&psi;/dx</span><span class="v" id="fpiE">&mdash;</span></div>
+            <div class="readout"><span class="k"><span class="con">force on it</span>, F = qE</span><span class="v" id="fpiF">&mdash;</span></div>
+            <div class="readout"><span class="k">its energy, U = q&psi;</span><span class="v" id="fpiU">&mdash;</span></div>
+            <div class="readout"><span class="k">work done by the field since it was let go</span><span class="v" id="fpiW">&mdash;</span></div>
+          </div>
+          <div id="fpiRead" class="verdict flat fpread">&mdash;</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2>Two electrodes</h2><span class="note" id="fppNote">&mdash;</span></div>
+        <div class="card-b stack fpbody">
+          <div class="fpctl">
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">Voltage, &Delta;V</span><span class="val" id="fppVv"></span></div>
+              <input type="range" id="fppV" min="0.2" max="2" step="0.05" value="1">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">Gap, d</span><span class="val" id="fppDv"></span></div>
+              <input type="range" id="fppD" min="1" max="10" step="0.5" value="5">
+            </div>
+          </div>
+          <div class="fpctl">
+            <div>
+              <span class="fld">Test charge</span>
+              <div class="pill-row" id="fppSign">
+                <button class="pill" data-q="1"  aria-pressed="true"  type="button">+e</button>
+                <button class="pill" data-q="-1" aria-pressed="false" type="button">&minus;e</button>
+              </div>
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">Where it starts</span><span class="val" id="fppXv"></span></div>
+              <input type="range" id="fppX" min="0" max="1000" step="1" value="100">
+            </div>
+          </div>
+          <div class="btnrow">
+            <button class="ghost" id="fppPlay" type="button">&#9654; Let it go</button>
+            <button class="ghost" id="fppReset" type="button">Put it back</button>
+          </div>
+          <svg id="fpppic" viewBox="0 0 520 430" style="display:block;width:100%;height:auto;max-width:520px;margin:0 auto" role="img" aria-label="Above, the space between two electrodes with equipotential lines, field arrows and a test charge; below, the potential and the field across the gap, with the tangent at the charge"></svg>
+          <div>
+            <div class="readout"><span class="k"><span class="dif">potential there</span>, &psi;</span><span class="v" id="fppPsi">&mdash;</span></div>
+            <div class="readout"><span class="k"><span class="mig">field there</span>, E = &minus;d&psi;/dx</span><span class="v" id="fppE">&mdash;</span></div>
+            <div class="readout"><span class="k"><span class="con">force on it</span>, F = qE</span><span class="v" id="fppF">&mdash;</span></div>
+            <div class="readout"><span class="k">its energy, U = q&psi;</span><span class="v" id="fppU">&mdash;</span></div>
+            <div class="readout"><span class="k">work done by the field since it was let go</span><span class="v" id="fppW">&mdash;</span></div>
+          </div>
+          <div id="fppRead" class="verdict flat fpread">&mdash;</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="card-h"><h2>How to read the two pictures</h2><span class="note">height, slope, push</span></div>
+      <div class="card-b stack" style="gap:14px">
+        <div class="glegend fplegend">
+          <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><rect x="1" y="1" width="24" height="12" fill="var(--red-)" opacity="0.22"/><line x1="13" y1="0" x2="13" y2="14" stroke="var(--red-)" stroke-width="1.4"/></svg><span><b>blue shading and lines: the potential</b> &psi;. Darker is higher. Each line joins points of <b>equal</b> &psi; (an equipotential), labelled with its value.</span></span>
+          <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="2" y1="7" x2="19" y2="7" stroke="var(--ox)" stroke-width="2.2"/><polygon points="25,7 18,3 18,11" fill="var(--ox)"/></svg><span><b>orange arrows: the field</b> E. They point downhill in &psi;, across the equipotentials, and are longer where the lines crowd together.</span></span>
+          <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><circle cx="7" cy="7" r="5.5" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.6"/><line x1="13" y1="7" x2="20" y2="7" stroke="var(--go)" stroke-width="2.2"/><polygon points="25,7 19,3.5 19,10.5" fill="var(--go)"/></svg><span><b>test charge and green arrow</b>: the force on it, F = qE.</span></span>
+          <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="1" y1="3" x2="25" y2="11" stroke="var(--red-)" stroke-width="2.2"/><line x1="1" y1="9" x2="25" y2="9" stroke="var(--ox)" stroke-width="1.6"/></svg><span><b>the graph</b>: &psi; along the charge&rsquo;s path (blue, left axis) and E (orange, right axis). The <b>black tangent</b> at the charge has slope d&psi;/dx = &minus;E.</span></span>
+          <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="8" y1="0" x2="8" y2="14" stroke="var(--red-)" stroke-width="1.2" stroke-dasharray="2 2" opacity="0.6"/><line x1="18" y1="0" x2="18" y2="14" stroke="var(--red-)" stroke-width="1.2" stroke-dasharray="2 2" opacity="0.6"/></svg><span><b>dotted drops</b>: each equipotential carried down to the graph. They are equal steps in &psi;, so where they bunch up the slope, and the field, is large.</span></span>
+        </div>
+        <div class="trio3">
+          <p class="hint" style="margin:0"><b>1. Potential is a height.</b> &psi; is one number at each place, so it can be drawn as
+            shading and joined up into equipotentials, like contour lines. Only differences in &psi; matter: moving a charge q from one
+            line to another changes its energy by q&Delta;&psi;, whatever path it takes.</p>
+          <p class="hint" style="margin:0"><b>2. Field is the slope.</b> E = &minus;d&psi;/dx: steep where the equipotentials crowd,
+            gentle where they spread. Around one ion &psi; &prop; 1/r but E &prop; 1/r<sup>2</sup>, so the field dies away faster than
+            the potential; switch the atmosphere on and both are cut off beyond about 1/&kappa;. Between two electrodes &psi; falls in a
+            straight line, so E = &Delta;V/d is the same everywhere &mdash; halve the gap and the field doubles.</p>
+          <p class="hint" style="margin:0"><b>3. The field pushes.</b> F = qE. A positive charge is pushed down the slope, toward
+            lower &psi;; a negative one is pushed <em>up</em> it. Both lose energy, because U = q&psi; falls either way. In solution an ion
+            does not accelerate for long: friction sets a drift speed proportional to E &mdash; the start of ionic conductivity in Lecture 8.</p>
+        </div>
+      </div>
+    </div>
+
     <div class="rowhead rowsep">
       <span class="tag">Summary</span>
       <h3>Field vs. Potential</h3>
-      <span class="note">E and &psi; side by side, and the definitions used on this tab</span>
+      <span class="note">E and &psi; side by side, and the definitions used in Lecture 6</span>
     </div>
 
     <div class="card">
@@ -483,9 +629,9 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
             <tr><th scope="row"><span style="color:var(--red-)">With its atmosphere</span></th>
               <td><span class="fx">E = Q<sub>enc</sub>(r) / 4&pi;&epsilon;<sub>0</sub>&epsilon;<sub>r</sub> r<sup>2</sup></span>, with <span class="fx">Q<sub>enc</sub> = ze(1 + &kappa;r)e<sup>&minus;&kappa;(r&minus;a)</sup>/(1 + &kappa;a)</span> &mdash; dies away as e<sup>&minus;&kappa;r</sup></td>
               <td><span class="fx">&psi; = (ze / 4&pi;&epsilon;<sub>0</sub>&epsilon;<sub>r</sub>) &middot; e<sup>&kappa;a</sup>/(1 + &kappa;a) &middot; e<sup>&minus;&kappa;r</sup>/r</span> &mdash; dies away as e<sup>&minus;&kappa;r</sup></td></tr>
-            <tr><th scope="row">Where it is on this tab</th>
-              <td><b>What the sphere encloses</b>: the curve Q<sub>enc</sub> and the readout &ldquo;field on the sphere&rdquo;.</td>
-              <td><b>How far the charge is felt</b>: the graph, as &psi;(r)/&psi;(a).</td></tr>
+            <tr><th scope="row">Where to see it</th>
+              <td><b>What the sphere encloses</b> (Ion Atmosphere tab): the curve Q<sub>enc</sub> and the readout &ldquo;field on the sphere&rdquo;; and the field arrows in the pictures above.</td>
+              <td><b>How far the charge is felt</b> (Ion Atmosphere tab): the graph, as &psi;(r)/&psi;(a); and the <b>One ion</b> picture above.</td></tr>
           </tbody>
         </table>
         </div>
@@ -1166,6 +1312,282 @@ function gsDraw(ts){
 
 atDraw();
 gsDraw(0);
+/* ================= 3 - FIELD AND POTENTIAL ==============================
+   Two pictures, each with its own test charge, q = +e or -e.
+     one ion          a cation, +e, in water at 25 C; closest approach a = 0.4 nm
+                        alone:       psi = K/r,  E = K/r^2
+                        atmosphere:  psi = K e^{-k(r-a)} / ((1+ka) r)
+                                     E = -dpsi/dr = K (1+kr) e^{-k(r-a)} / ((1+ka) r^2)
+                        K = e / 4 pi eps0 epsr,  1/k at 0.1 mol/kg
+     two electrodes   + electrode at x = 0 held at dV, the other at x = d, 0 V:
+                        psi = dV (1 - x/d),  E = dV/d
+   The charge drifts along x at a cartoon speed that grows with E: down the
+   potential if positive, up it if negative. Its energy is U = q psi, and the
+   work the field does is q (psi at release - psi now).                      */
+var FP_ER = 78.4, FP_A = 0.4e-9, FP_RMAX = 3.0e-9, FP_XMAX = 10e-3;
+var FP_K = QE / (4 * Math.PI * E0 * FP_ER);
+var FP_KAP = 1 / debyeLen(0.1, FP_ER, T25);
+
+function fpArrow(x1, y1, x2, y2, col, w){
+  var dx = x2 - x1, dy = y2 - y1, l = Math.sqrt(dx * dx + dy * dy) || 1, ux = dx / l, uy = dy / l, h = 4 + w * 1.6;
+  var bx = x2 - ux * h, by = y2 - uy * h;
+  return '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + bx.toFixed(1) + '" y2="' + by.toFixed(1) + '" stroke="' + col + '" stroke-width="' + w + '"/>'
+    + '<polygon points="' + x2.toFixed(1) + ',' + y2.toFixed(1) + ' ' + (bx - uy * h * 0.55).toFixed(1) + ',' + (by + ux * h * 0.55).toFixed(1) + ' '
+    + (bx + uy * h * 0.55).toFixed(1) + ',' + (by - ux * h * 0.55).toFixed(1) + '" fill="' + col + '"/>';
+}
+function fpTxt(x, y, t, col, anchor, size, weight){
+  return '<text x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" text-anchor="' + (anchor || "middle") + '" fill="' + col + '" ' + MONO
+    + ' font-size="' + (size || 10.5) + '"' + (weight ? ' font-weight="' + weight + '"' : '')
+    + ' paint-order="stroke" stroke="var(--surface)" stroke-width="3.5" stroke-linejoin="round">' + t + '</text>';
+}
+
+function fpMake(p, src){
+  var st = {src: src, atm: 0, q: 1, f: 0, f0: 0, play: false, last: 0};
+  var plates = src === "plates";
+  function el(id){ return document.getElementById(p + id); }
+  function volt(){ return +el("V").value; }
+  function gap(){ return +el("D").value * 1e-3; }
+  function range(){ return plates ? [0, gap()] : [FP_A, FP_RMAX]; }
+  function pos(f){ var r = range(); return r[0] + (f === undefined ? st.f : f) * (r[1] - r[0]); }
+  function at(x, atm){
+    if(plates){
+      var V = volt(), d = gap();
+      return x > d ? {psi: 0, E: 0} : {psi: V * (1 - x / d), E: V / d};
+    }
+    if(!(atm === undefined ? st.atm : atm)) return {psi: FP_K / x, E: FP_K / (x * x)};
+    var g = Math.exp(-FP_KAP * (x - FP_A)) / (1 + FP_KAP * FP_A);
+    return {psi: FP_K * g / x, E: FP_K * (1 + FP_KAP * x) * g / (x * x)};
+  }
+  function psiTxt(v){ return plates ? v.toFixed(3) + " V" : (v * 1e3).toFixed(1) + " mV"; }
+  function enTxt(u){
+    var sg = u < -1e-12 ? "−" : (u > 1e-12 ? "+" : "");
+    return plates ? sg + Math.abs(u).toFixed(3) + " eV" : sg + Math.abs(u * 1e3).toFixed(1) + " meV";
+  }
+  function start(){ st.f = st.f0 = st.q > 0 ? (plates ? 0.1 : 0.05) : 0.9; st.play = false; }
+
+  function draw(){
+    var W = 520, H = 430, xl = 58, xr = 456, sT = 10, sB = 180, mid = (sT + sB) / 2, pT = 236, pB = 390;
+    var ax1 = plates ? FP_XMAX : FP_RMAX;
+    var psiTop = plates ? 2.0 : 0.05, eTop = plates ? 2000 : 1.2e8;
+    function X(x){ return xl + x / ax1 * (xr - xl); }
+    function Y(v){ return pB - Math.min(v / psiTop, 1.04) * (pB - pT); }
+    function YE(e){ return pB - Math.min(e / eTop, 1.04) * (pB - pT); }
+    var rg = range(), xq = pos(), here = at(xq), q = st.q, V = plates ? volt() : 0, d = plates ? gap() : 0;
+    var s = "", j, cs = p + "ClipS", cp = p + "ClipP", gid = p + "Grad";
+
+    /* equipotentials: tenths of dV between the plates; round millivolts around the ion */
+    var levels = [];
+    if(plates){
+      for(j = 1; j < 10; j++) levels.push({v: V * j / 10, x: d * (1 - j / 10)});
+    }else{
+      var pHi = at(FP_A).psi, pLo = at(FP_RMAX).psi;
+      [40, 30, 20, 15, 10, 7].forEach(function(mv){
+        var v = mv * 1e-3, lo = FP_A, hi = FP_RMAX, it;
+        if(v >= pHi || v <= pLo) return;
+        for(it = 0; it < 50; it++){ var m = (lo + hi) / 2; if(at(m).psi > v) lo = m; else hi = m; }
+        levels.push({v: v, x: (lo + hi) / 2});
+      });
+    }
+
+    /* ---- the space ---- */
+    s += '<defs><clipPath id="' + cs + '"><rect x="' + xl + '" y="' + sT + '" width="' + (xr - xl) + '" height="' + (sB - sT) + '"/></clipPath>'
+       + '<clipPath id="' + cp + '"><rect x="' + xl + '" y="' + (pT - 8) + '" width="' + (xr - xl) + '" height="' + (pB - pT + 8) + '"/></clipPath>';
+    if(plates){
+      s += '<linearGradient id="' + gid + '" gradientUnits="userSpaceOnUse" x1="' + X(0).toFixed(1) + '" y1="0" x2="' + X(d).toFixed(1) + '" y2="0">'
+         + '<stop offset="0" stop-color="var(--red-)" stop-opacity="' + (0.05 + 0.3 * V / 2).toFixed(3) + '"/>'
+         + '<stop offset="1" stop-color="var(--red-)" stop-opacity="0"/></linearGradient>';
+    }else{
+      var Rpx = X(FP_RMAX * 1.6) - X(0), pA = at(FP_A, 0).psi;
+      s += '<radialGradient id="' + gid + '" gradientUnits="userSpaceOnUse" cx="' + X(0).toFixed(1) + '" cy="' + mid + '" r="' + Rpx.toFixed(1) + '">';
+      s += '<stop offset="0" stop-color="var(--red-)" stop-opacity="0.36"/>';
+      for(j = 0; j <= 16; j++){
+        var rr = FP_A + (FP_RMAX * 1.6 - FP_A) * j / 16;
+        s += '<stop offset="' + ((X(rr) - X(0)) / Rpx).toFixed(3) + '" stop-color="var(--red-)" stop-opacity="' + (0.36 * Math.min(1, at(rr).psi / pA)).toFixed(3) + '"/>';
+      }
+      s += '</radialGradient>';
+    }
+    s += '</defs>';
+    s += '<g clip-path="url(#' + cs + ')">';
+    s += '<rect x="' + xl + '" y="' + sT + '" width="' + (xr - xl) + '" height="' + (sB - sT) + '" fill="var(--surface)"/>';
+    if(plates){
+      s += '<rect x="' + X(0) + '" y="' + sT + '" width="' + (X(d) - X(0)).toFixed(1) + '" height="' + (sB - sT) + '" fill="url(#' + gid + ')"/>';
+      s += '<rect x="' + X(d).toFixed(1) + '" y="' + sT + '" width="' + (xr - X(d)).toFixed(1) + '" height="' + (sB - sT) + '" fill="var(--surface-2)"/>';
+    }else{
+      s += '<rect x="' + xl + '" y="' + sT + '" width="' + (xr - xl) + '" height="' + (sB - sT) + '" fill="url(#' + gid + ')"/>';
+    }
+    s += '<line x1="' + xl + '" y1="' + mid + '" x2="' + xr + '" y2="' + mid + '" stroke="var(--line-2)" stroke-dasharray="2 4"/>';
+    levels.forEach(function(l){
+      if(plates) s += '<line x1="' + X(l.x).toFixed(1) + '" y1="' + sT + '" x2="' + X(l.x).toFixed(1) + '" y2="' + sB + '" stroke="var(--red-)" stroke-width="1.3" opacity="0.85"/>';
+      else s += '<circle cx="' + X(0) + '" cy="' + mid + '" r="' + (X(l.x) - X(0)).toFixed(1) + '" fill="none" stroke="var(--red-)" stroke-width="1.3" opacity="0.85"/>';
+    });
+    /* field arrows, longer where the field is stronger */
+    if(plates){
+      var Ep = V / d, lenP = 10 + 30 * Math.sqrt(Ep / eTop), nc = Math.max(1, Math.floor((X(d) - X(0) - 16) / 62));
+      for(j = 0; j < nc; j++){
+        var cx = X(0) + (X(d) - X(0)) * (j + 0.5) / nc;
+        [sT + 24, mid - 40, mid + 40, sB - 24].forEach(function(y){ s += fpArrow(cx - lenP / 2, y, cx + lenP / 2, y, "var(--ox)", 1.8); });
+      }
+    }else{
+      s += '<circle cx="' + X(0) + '" cy="' + mid + '" r="' + (X(FP_A) - X(0)).toFixed(1) + '" fill="none" stroke="var(--muted)" stroke-width="1" stroke-dasharray="3 3"/>';
+      [0.62, 1.0, 1.5, 2.1, 2.75].forEach(function(rn){
+        var r = rn * 1e-9, Er = at(r).E, len = Math.max(6, Math.min(38, 6 + 32 * Math.sqrt(Er / eTop)));
+        [-60, -30, 30, 60].forEach(function(deg){
+          var t = deg * Math.PI / 180, x0 = X(0) + (X(r) - X(0)) * Math.cos(t), y0 = mid + (X(r) - X(0)) * Math.sin(t);
+          s += fpArrow(x0, y0, x0 + len * Math.cos(t), y0 + len * Math.sin(t), "var(--ox)", 1.6);
+        });
+      });
+    }
+    /* equipotential values, clear of each other and of the charge */
+    var lastX = -1e9;
+    levels.slice().sort(function(a, b){ return X(a.x) - X(b.x); }).forEach(function(l){
+      var lx = X(l.x);
+      if(lx - lastX < 34 || Math.abs(lx - X(xq)) < 22) return;
+      lastX = lx;
+      var t = plates ? (V < 1 ? l.v.toFixed(2) : l.v.toFixed(1)) + " V" : Math.round(l.v * 1e3) + " mV";
+      s += fpTxt(lx, plates ? sB - 7 : mid + 19, t, "var(--red-)", "middle", 10, 600);
+    });
+    s += '</g>';
+    if(plates){
+      s += '<rect x="' + (X(0) - 9) + '" y="' + sT + '" width="9" height="' + (sB - sT) + '" fill="var(--elec)"/>';
+      s += '<rect x="' + X(d).toFixed(1) + '" y="' + sT + '" width="9" height="' + (sB - sT) + '" fill="var(--elec)"/>';
+      s += fpTxt(X(0) - 9, sB + 16, "ψ = " + V.toFixed(2) + " V", "var(--red-)", "start", 10.5, 600);
+      s += fpTxt(Math.min(X(d) + 4.5, xr - 20), sB + 16, "0 V", "var(--red-)", "middle", 10.5, 600);
+    }else{
+      s += '<circle cx="' + X(0) + '" cy="' + mid + '" r="26" fill="var(--ink-2)"/>';
+      s += '<text x="' + X(0) + '" y="' + (mid + 6) + '" text-anchor="middle" fill="var(--surface)" ' + MONO + ' font-size="17" font-weight="700">+</text>';
+      s += fpTxt(X(FP_A) + 2, sB + 16, "a", "var(--muted)", "middle", 10.5);
+    }
+    s += '<rect x="' + xl + '" y="' + sT + '" width="' + (xr - xl) + '" height="' + (sB - sT) + '" fill="none" stroke="var(--line)"/>';
+
+    /* the test charge and the force on it */
+    var cxq = X(xq);
+    if(here.E > 0){
+      var lenF = 14 + 40 * Math.sqrt(Math.min(1, here.E / eTop)), x1 = cxq + q * 13, x2 = cxq + q * (13 + lenF);
+      s += fpArrow(x1, mid, x2, mid, "var(--go)", 2.6);
+      s += fpTxt((x1 + x2) / 2, mid - 15, "F = qE", "var(--go)", "middle", 10.5, 600);
+    }
+    s += '<circle cx="' + cxq.toFixed(1) + '" cy="' + mid + '" r="11" fill="var(--surface)" stroke="var(--ink)" stroke-width="2"/>';
+    s += '<text x="' + cxq.toFixed(1) + '" y="' + (mid + 5) + '" text-anchor="middle" fill="var(--ink)" ' + MONO + ' font-size="15" font-weight="700">' + (q > 0 ? "+" : "−") + '</text>';
+
+    /* ---- the graph ---- */
+    s += '<line x1="' + xl + '" y1="' + pB + '" x2="' + xr + '" y2="' + pB + '" stroke="var(--line-2)"/>';
+    s += '<line x1="' + xl + '" y1="' + pT + '" x2="' + xl + '" y2="' + pB + '" stroke="var(--line-2)"/>';
+    s += '<line x1="' + xr + '" y1="' + pT + '" x2="' + xr + '" y2="' + pB + '" stroke="var(--line-2)"/>';
+    (plates ? [0, 2, 4, 6, 8, 10] : [0, 0.5, 1, 1.5, 2, 2.5, 3]).forEach(function(v){
+      var xv = X(plates ? v * 1e-3 : v * 1e-9);
+      s += '<line x1="' + xv.toFixed(1) + '" y1="' + pB + '" x2="' + xv.toFixed(1) + '" y2="' + (pB + 4) + '" stroke="var(--line-2)"/>';
+      s += '<text x="' + xv.toFixed(1) + '" y="' + (pB + 16) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="10">' + v + '</text>';
+    });
+    s += '<text x="' + ((xl + xr) / 2) + '" y="' + (H - 4) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="10.5">'
+       + (plates ? "distance from the + electrode, x / mm" : "distance from the ion’s centre, r / nm") + '</text>';
+    (plates ? [0, 0.5, 1, 1.5, 2] : [0, 10, 20, 30, 40, 50]).forEach(function(v){
+      var yv = Y(plates ? v : v * 1e-3);
+      s += '<text x="' + (xl - 6) + '" y="' + (yv + 3.5).toFixed(1) + '" text-anchor="end" fill="var(--red-)" ' + MONO + ' font-size="10">' + v + '</text>';
+    });
+    (plates ? [0, 500, 1000, 1500, 2000] : [0, 0.4, 0.8, 1.2]).forEach(function(v){
+      var yv = YE(plates ? v : v * 1e8);
+      s += '<text x="' + (xr + 6) + '" y="' + (yv + 3.5).toFixed(1) + '" text-anchor="start" fill="var(--ox)" ' + MONO + ' font-size="10">' + v + '</text>';
+    });
+    var yc = (pT + pB) / 2;
+    s += '<text transform="rotate(-90 14 ' + yc + ')" x="14" y="' + yc + '" text-anchor="middle" fill="var(--red-)" ' + MONO + ' font-size="10.5">'
+       + (plates ? "potential ψ / V" : "potential ψ / mV") + '</text>';
+    s += '<text transform="rotate(-90 ' + (W - 8) + ' ' + yc + ')" x="' + (W - 8) + '" y="' + yc + '" text-anchor="middle" fill="var(--ox)" ' + MONO + ' font-size="10.5">'
+       + (plates ? "field E / V m⁻¹" : "field E / 10⁸ V m⁻¹") + '</text>';
+
+    s += '<g clip-path="url(#' + cp + ')">';
+    if(plates) s += '<rect x="' + X(d).toFixed(1) + '" y="' + pT + '" width="' + (xr - X(d)).toFixed(1) + '" height="' + (pB - pT) + '" fill="var(--surface-2)"/>';
+    else s += '<rect x="' + xl + '" y="' + pT + '" width="' + (X(FP_A) - xl).toFixed(1) + '" height="' + (pB - pT) + '" fill="var(--line-2)" opacity="0.3"/>';
+    var N = 220, pp = [], ep = [], pp0 = [], ep0 = [];
+    for(j = 0; j <= N; j++){
+      var xs = rg[0] + (rg[1] - rg[0]) * j / N, vs = at(xs);
+      pp.push(X(xs).toFixed(1) + "," + Y(vs.psi).toFixed(1));
+      ep.push(X(xs).toFixed(1) + "," + YE(vs.E).toFixed(1));
+      if(!plates && st.atm){ var v0 = at(xs, 0); pp0.push(X(xs).toFixed(1) + "," + Y(v0.psi).toFixed(1)); ep0.push(X(xs).toFixed(1) + "," + YE(v0.E).toFixed(1)); }
+    }
+    if(pp0.length){
+      s += '<polyline points="' + pp0.join(" ") + '" fill="none" stroke="var(--red-)" stroke-width="1.3" stroke-dasharray="4 3" opacity="0.5"/>';
+      s += '<polyline points="' + ep0.join(" ") + '" fill="none" stroke="var(--ox)" stroke-width="1.2" stroke-dasharray="4 3" opacity="0.5"/>';
+    }
+    /* each equipotential dropped onto the graph */
+    levels.forEach(function(l){
+      s += '<line x1="' + X(l.x).toFixed(1) + '" y1="' + (pT - 8) + '" x2="' + X(l.x).toFixed(1) + '" y2="' + Y(l.v).toFixed(1) + '" stroke="var(--red-)" stroke-width="1" stroke-dasharray="2 3" opacity="0.45"/>';
+      s += '<circle cx="' + X(l.x).toFixed(1) + '" cy="' + Y(l.v).toFixed(1) + '" r="2.2" fill="var(--red-)"/>';
+    });
+    s += '<polyline points="' + ep.join(" ") + '" fill="none" stroke="var(--ox)" stroke-width="1.8"/>';
+    s += '<polyline points="' + pp.join(" ") + '" fill="none" stroke="var(--red-)" stroke-width="2.6"/>';
+    /* the tangent at the charge: slope dpsi/dx = -E */
+    var py = Y(here.psi), m = (pB - pT) / psiTop * here.E / ((xr - xl) / ax1), ul = 1 / Math.sqrt(1 + m * m), half = 48;
+    var tx0 = cxq - half * ul, ty0 = py - half * ul * m, tx1 = cxq + half * ul, ty1 = py + half * ul * m;
+    s += '<line x1="' + tx0.toFixed(1) + '" y1="' + ty0.toFixed(1) + '" x2="' + tx1.toFixed(1) + '" y2="' + ty1.toFixed(1) + '" stroke="var(--ink)" stroke-width="1.6"/>';
+    s += '</g>';
+    s += '<line x1="' + cxq.toFixed(1) + '" y1="' + (mid + 12) + '" x2="' + cxq.toFixed(1) + '" y2="' + pB + '" stroke="var(--ink)" stroke-width="1" stroke-dasharray="3 3" opacity="0.35"/>';
+    s += '<circle cx="' + cxq.toFixed(1) + '" cy="' + YE(here.E).toFixed(1) + '" r="4" fill="var(--ox)" stroke="var(--surface)" stroke-width="1.5"/>';
+    s += '<circle cx="' + cxq.toFixed(1) + '" cy="' + py.toFixed(1) + '" r="5" fill="var(--red-)" stroke="var(--surface)" stroke-width="1.5"/>';
+    /* above the line past its lower end, or under it before its upper end: clear of the curve either way */
+    var lblRight = tx1 + 80 < xr;
+    s += fpTxt(lblRight ? tx1 + 4 : tx0 - 6, lblRight ? ty1 - 8 : ty0 + 15, "slope = −E", "var(--ink)", lblRight ? "start" : "end", 10.5, 600);
+    /* each curve named at one end, unless the charge is standing there */
+    var pS = at(rg[0]), eS = at(rg[1]);
+    if(Math.abs(cxq - X(rg[0])) > 40) s += fpTxt(X(rg[0]) + 8, Math.max(pT + 10, Y(pS.psi) - 8), "ψ", "var(--red-)", "start", 12, 700);
+    if(Math.abs(cxq - X(rg[1])) > 40) s += fpTxt(X(rg[1]) - 6, YE(eS.E) - 7, "E", "var(--ox)", "end", 12, 700);
+    if(pp0.length) s += fpTxt(xr - 6, pT + 12, "dashed: ion alone", "var(--muted)", "end", 10);
+    el("pic").innerHTML = s;
+
+    /* ---- words and numbers ---- */
+    if(plates){
+      el("Vv").textContent = V.toFixed(2) + " V";
+      el("Dv").textContent = (d * 1e3).toFixed(1) + " mm";
+    }
+    el("X").value = Math.round(st.f0 * 1000);
+    el("Xv").textContent = plates ? "x = " + (pos(st.f0) * 1e3).toFixed(2) + " mm" : "r = " + (pos(st.f0) * 1e9).toFixed(2) + " nm";
+    el("Play").innerHTML = st.play ? "&#10074;&#10074; Pause" : "&#9654; Let it go";
+    el("Note").textContent = plates
+      ? "E = ΔV/d = " + (V / d).toFixed(0) + " V/m everywhere between them"
+      : (st.atm ? "with its atmosphere, 1/κ = " + (1e9 / FP_KAP).toFixed(2) + " nm: both cut off faster" : "alone: ψ ∝ 1/r, E ∝ 1/r²");
+    el("Psi").textContent = psiTxt(here.psi);
+    el("E").innerHTML = (plates ? here.E.toFixed(0) : sciH(here.E, 3)) + " V/m";
+    el("F").innerHTML = sciH(QE * here.E, 3) + " N " + (q > 0 ? "&rarr;" : "&larr;");
+    var p0 = at(pos(st.f0)).psi, work = q * (p0 - here.psi);
+    el("U").textContent = enTxt(q * here.psi);
+    el("W").textContent = enTxt(work);
+    var moved = Math.abs(st.f - st.f0) > 1e-3;
+    el("Read").innerHTML = (q > 0
+        ? "<b>A positive charge is pushed down the slope</b>, toward lower ψ — the way the field points. "
+        : "<b>A negative charge is pushed up the slope</b>, toward higher ψ — against the field, because F = qE with q &lt; 0. ")
+      + (moved
+        ? "So far the field has done <b>" + enTxt(work) + "</b> of work on it, and its energy qψ has fallen by exactly that: "
+          + enTxt(q * p0) + " &rarr; " + enTxt(q * here.psi) + "."
+        : "Let it go: the field does work q × (ψ where it started − ψ where it is), and its energy qψ falls by the same amount.");
+  }
+
+  if(!plates) pillGroup(p + "Atm", function(b){ st.atm = +b.getAttribute("data-a"); draw(); });
+  else ["V", "D"].forEach(function(id){ el(id).addEventListener("input", draw); });
+  pillGroup(p + "Sign", function(b){ st.q = +b.getAttribute("data-q"); start(); draw(); });
+  el("X").addEventListener("input", function(){ st.f = st.f0 = +this.value / 1000; st.play = false; draw(); });
+  el("Play").addEventListener("click", function(){
+    if((st.q > 0 && st.f >= 1) || (st.q < 0 && st.f <= 0)) st.f = st.f0;
+    st.play = !st.play; st.last = 0; draw();
+  });
+  el("Reset").addEventListener("click", function(){ st.play = false; st.f = st.f0; draw(); });
+  ANIM.push({panel: "p-fp", tick: function(ts){
+    if(!st.play) return;
+    var dt = st.last ? Math.min(0.1, (ts - st.last) / 1000) : 0;
+    st.last = ts;
+    var eTop = plates ? 2000 : 1.2e8, rg = range(), ax1 = plates ? FP_XMAX : FP_RMAX, E = at(pos()).E;
+    /* axis-lengths per second, with a floor so a weak field still shows motion */
+    var v = (0.03 + 0.45 * Math.min(1, E / eTop)) * st.q;
+    var nf = st.f + v * dt * ax1 / (rg[1] - rg[0]);
+    if(nf <= 0 || nf >= 1){ nf = Math.max(0, Math.min(1, nf)); st.play = false; }
+    st.f = nf;
+    draw();
+  }});
+  start();
+  draw();
+  return st;
+}
+
+fpMake("fpi", "ion");
+fpMake("fpp", "plates");
 window.requestAnimationFrame(animLoop);
 
 /* ---- submit straight to the course sheet ----------------------------------
