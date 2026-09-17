@@ -191,8 +191,7 @@ tr.analyte td{color:var(--ox);font-weight:500}
 .fpgrid>.card>.card-b{flex:1 1 auto}
 .fpctl{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:end;min-height:58px}
 .fpbody .fpread{margin-top:auto}
-.fplegend{display:grid;grid-template-columns:1fr 1fr;gap:6px 24px}
-@media(max-width:900px){.fpgrid{grid-template-columns:1fr}.fplegend{grid-template-columns:1fr}}
+@media(max-width:900px){.fpgrid{grid-template-columns:1fr}}
 @media(max-width:520px){.fpctl{grid-template-columns:1fr}}
 footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;line-height:1.8}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
@@ -238,13 +237,267 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
   </header>
 
   <div class="tabs" role="tablist">
-    <button class="tab" role="tab" aria-selected="true"  aria-controls="p-atm"  id="t-atm">Ion Atmosphere</button>
-    <button class="tab" role="tab" aria-selected="false" aria-controls="p-fp"   id="t-fp">Field &amp; Potential</button>
+    <button class="tab" role="tab" aria-selected="true"  aria-controls="p-fp"   id="t-fp">Field &amp; Potential</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-atm"  id="t-atm">Ion Atmosphere</button>
     <button class="tab" role="tab" aria-selected="false" aria-controls="p-quiz" id="t-quiz">Concept Check</button>
   </div>
 
+  <!-- ============== FIELD AND POTENTIAL ============== -->
+  <section class="panel" id="p-fp" role="tabpanel" aria-labelledby="t-fp">
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>Potential and field, defined</h2><span class="note">E and &psi; side by side: what each one is, and how they differ</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig" style="white-space:normal">
+          <span class="dif">&psi; = U / q</span>
+          &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="mig">E = F / q</span>
+          &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="con">E = &minus;d&psi;/dx &nbsp;&hArr;&nbsp; &psi;(x) = &int;<sub>x</sub><sup>&infin;</sup> E dx</span>
+        </div>
+        <p class="hint" style="margin:0;font-size:14px">The <b>potential</b> &psi; is a scalar: one number at each point, like a height on a map.
+          The <b>field</b> E is how steeply that potential changes through space &mdash; its slope &mdash; and it points downhill.
+          <b>It is the field that pushes on a charge</b>; the potential gives the charge&rsquo;s energy.
+          Around <b>one ion</b> both fall off with distance; between <b>two electrodes</b> you set a voltage, but every ion in between
+          answers to the field, E = &Delta;V/d.</p>
+        <div style="overflow-x:auto">
+        <table class="ions fptab">
+          <thead><tr><th></th><th>Electric field, E</th><th>Electric potential, &psi;</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">What it is</th>
+              <td>The <b>force per unit charge</b> a small positive test charge would feel at that point.</td>
+              <td>The <b>work per unit charge</b> to bring a small positive test charge in from far away (where &psi; = 0) to that point: an energy per charge.</td></tr>
+            <tr><th scope="row">Kind and units</th>
+              <td>A <b>vector</b>, with a direction: outward from a cation. <span class="fx">V/m = N/C</span></td>
+              <td>A <b>scalar</b>, a single number at each point. <span class="fx">V = J/C</span></td></tr>
+            <tr><th scope="row">For a second ion, charge z<sub>j</sub>e, at r</th>
+              <td>the <b>force</b> on it: <span class="fx">F = z<sub>j</sub>e&middot;E</span></td>
+              <td>its <b>energy</b>: <span class="fx">U = z<sub>j</sub>e&middot;&psi;</span></td></tr>
+            <tr><th scope="row">What sets it</th>
+              <td><b>Gauss&rsquo;s law</b>: only the charge <b>inside</b> a sphere of radius r counts. <span class="fx">E&middot;4&pi;r<sup>2</sup> = Q<sub>enc</sub>/&epsilon;<sub>0</sub>&epsilon;<sub>r</sub></span></td>
+              <td><b>All</b> the charge, inside and outside r, since it sums the field all the way out. For the atmosphere this is the Poisson&ndash;Boltzmann equation.</td></tr>
+            <tr><th scope="row"><span style="color:var(--muted)">Ion alone</span></th>
+              <td><span class="fx">E = ze / 4&pi;&epsilon;<sub>0</sub>&epsilon;<sub>r</sub> r<sup>2</sup></span> &mdash; falls as 1/r<sup>2</sup></td>
+              <td><span class="fx">&psi; = ze / 4&pi;&epsilon;<sub>0</sub>&epsilon;<sub>r</sub> r</span> &mdash; falls as 1/r</td></tr>
+            <tr><th scope="row"><span style="color:var(--red-)">With its atmosphere</span></th>
+              <td><span class="fx">E = Q<sub>enc</sub>(r) / 4&pi;&epsilon;<sub>0</sub>&epsilon;<sub>r</sub> r<sup>2</sup></span>, with <span class="fx">Q<sub>enc</sub> = ze(1 + &kappa;r)e<sup>&minus;&kappa;(r&minus;a)</sup>/(1 + &kappa;a)</span> &mdash; dies away as e<sup>&minus;&kappa;r</sup></td>
+              <td><span class="fx">&psi; = (ze / 4&pi;&epsilon;<sub>0</sub>&epsilon;<sub>r</sub>) &middot; e<sup>&kappa;a</sup>/(1 + &kappa;a) &middot; e<sup>&minus;&kappa;r</sup>/r</span> &mdash; dies away as e<sup>&minus;&kappa;r</sup></td></tr>
+            <tr><th scope="row">Where to see it</th>
+              <td><b>What the sphere encloses</b> (Ion Atmosphere tab): the curve Q<sub>enc</sub> and the readout &ldquo;field on the sphere&rdquo;; and the field arrows in the pictures below.</td>
+              <td><b>How far the charge is felt</b> (Ion Atmosphere tab): the graph, as &psi;(r)/&psi;(a); and the <b>One ion</b> picture below.</td></tr>
+          </tbody>
+        </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="fpgrid">
+
+      <div class="card">
+        <div class="card-h"><h2>One ion</h2><span class="note" id="fpiNote">&mdash;</span></div>
+        <div class="card-b stack fpbody">
+          <div class="fpctl">
+            <div>
+              <span class="fld">Around the ion</span>
+              <div class="pill-row" id="fpiAtm">
+                <button class="pill" data-a="0" aria-pressed="true"  type="button">alone</button>
+                <button class="pill" data-a="1" aria-pressed="false" type="button">+ atmosphere</button>
+              </div>
+            </div>
+            <p class="hint" style="margin:0">a cation, +e, in water; atmosphere at 0.1 M; closest approach a = 0.4 nm</p>
+          </div>
+          <div class="fpctl">
+            <div>
+              <span class="fld">Test charge</span>
+              <div class="pill-row" id="fpiSign">
+                <button class="pill" data-q="1"  aria-pressed="true"  type="button">+e</button>
+                <button class="pill" data-q="-1" aria-pressed="false" type="button">&minus;e</button>
+              </div>
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">Where it starts</span><span class="val" id="fpiXv"></span></div>
+              <input type="range" id="fpiX" min="0" max="1000" step="1" value="100">
+            </div>
+          </div>
+          <div class="btnrow">
+            <button class="ghost" id="fpiPlay" type="button">&#9654; Let it go</button>
+            <button class="ghost" id="fpiReset" type="button">Put it back</button>
+          </div>
+          <svg id="fpipic" viewBox="0 0 520 430" style="display:block;width:100%;height:auto;max-width:520px;margin:0 auto" role="img" aria-label="Above, the space around a cation with equipotential circles, radial field arrows and a test charge; below, the potential and the field against distance, with the tangent at the charge"></svg>
+          <div>
+            <div class="readout"><span class="k"><span class="dif">potential there</span>, &psi;</span><span class="v" id="fpiPsi">&mdash;</span></div>
+            <div class="readout"><span class="k"><span class="mig">field there</span>, E = &minus;d&psi;/dx</span><span class="v" id="fpiE">&mdash;</span></div>
+            <div class="readout"><span class="k"><span class="con">force on it</span>, F = qE</span><span class="v" id="fpiF">&mdash;</span></div>
+            <div class="readout"><span class="k">its energy, U = q&psi;</span><span class="v" id="fpiU">&mdash;</span></div>
+            <div class="readout"><span class="k">work done by the field since it was let go</span><span class="v" id="fpiW">&mdash;</span></div>
+          </div>
+          <div id="fpiRead" class="verdict flat fpread">&mdash;</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2>Two electrodes, an insulator between</h2><span class="note" id="fppNote">&mdash;</span></div>
+        <div class="card-b stack fpbody">
+          <div class="fpctl">
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">Voltage, &Delta;V</span><span class="val" id="fppVv"></span></div>
+              <input type="range" id="fppV" min="0.2" max="2" step="0.05" value="1">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">Gap, d</span><span class="val" id="fppDv"></span></div>
+              <input type="range" id="fppD" min="1" max="10" step="0.5" value="5">
+            </div>
+          </div>
+          <div class="fpctl">
+            <div>
+              <span class="fld">Test charge</span>
+              <div class="pill-row" id="fppSign">
+                <button class="pill" data-q="1"  aria-pressed="true"  type="button">+e</button>
+                <button class="pill" data-q="-1" aria-pressed="false" type="button">&minus;e</button>
+              </div>
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">Where it starts</span><span class="val" id="fppXv"></span></div>
+              <input type="range" id="fppX" min="0" max="1000" step="1" value="100">
+            </div>
+          </div>
+          <div class="btnrow">
+            <button class="ghost" id="fppPlay" type="button">&#9654; Let it go</button>
+            <button class="ghost" id="fppReset" type="button">Put it back</button>
+          </div>
+          <svg id="fpppic" viewBox="0 0 520 430" style="display:block;width:100%;height:auto;max-width:520px;margin:0 auto" role="img" aria-label="Above, the space between two electrodes with equipotential lines, field arrows and a test charge; below, the potential and the field across the gap, with the tangent at the charge"></svg>
+          <div>
+            <div class="readout"><span class="k"><span class="dif">potential there</span>, &psi;</span><span class="v" id="fppPsi">&mdash;</span></div>
+            <div class="readout"><span class="k"><span class="mig">field there</span>, E = &minus;d&psi;/dx</span><span class="v" id="fppE">&mdash;</span></div>
+            <div class="readout"><span class="k"><span class="con">force on it</span>, F = qE</span><span class="v" id="fppF">&mdash;</span></div>
+            <div class="readout"><span class="k">its energy, U = q&psi;</span><span class="v" id="fppU">&mdash;</span></div>
+            <div class="readout"><span class="k">work done by the field since it was let go</span><span class="v" id="fppW">&mdash;</span></div>
+          </div>
+          <div id="fppRead" class="verdict flat fpread">&mdash;</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="card-h"><h2>How to read the two pictures</h2><span class="note">height, slope, push</span></div>
+      <div class="card-b stack" style="gap:14px">
+        <div class="trio3">
+          <p class="hint" style="margin:0"><b>1. Potential is a height.</b> &psi; is one number at each place, so it can be drawn as
+            shading and joined up into equipotentials, like contour lines. Only differences in &psi; matter: moving a charge q from one
+            line to another changes its energy by q&Delta;&psi;, whatever path it takes.</p>
+          <p class="hint" style="margin:0"><b>2. Field is the slope.</b> E = &minus;d&psi;/dx: steep where the equipotentials crowd,
+            gentle where they spread. Around one ion &psi; &prop; 1/r but E &prop; 1/r<sup>2</sup>, so the field dies away faster than
+            the potential; switch the atmosphere on and both are cut off beyond about 1/&kappa;. Between two electrodes &psi; falls in a
+            straight line, so E = &Delta;V/d is the same everywhere &mdash; halve the gap and the field doubles. Fill the gap with an electrolyte and that stops being true: see <b>Electrochemical cell</b> below.</p>
+          <p class="hint" style="margin:0"><b>3. The field pushes.</b> F = qE. A positive charge is pushed down the slope, toward
+            lower &psi;; a negative one is pushed <em>up</em> it. Both lose energy, because U = q&psi; falls either way. In solution an ion
+            does not accelerate for long: friction sets a drift speed proportional to E &mdash; the start of ionic conductivity in Lecture 8.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="rowhead rowsep">
+      <span class="tag">Electrochemical cell</span>
+      <h3>Two electrodes with an electrolyte between them</h3>
+      <span class="note">the ions move until the field sits in the double layers &mdash; KCl in water, electrodes 5 mm apart, 25 &deg;C</span>
+    </div>
+
+    <div class="two eq">
+
+      <div class="card">
+        <div class="card-h"><h2>The cell</h2><span class="note">switch on a voltage and watch where it goes</span></div>
+        <div class="card-b stack">
+          <div>
+            <span class="fld">What happens at the electrodes</span>
+            <div class="pill-row" id="ecCase">
+              <button class="pill" data-k="block" aria-pressed="true"  type="button">non-Faradaic</button>
+              <button class="pill" data-k="far"   aria-pressed="false" type="button">Faradaic reaction</button>
+              <button class="pill" data-k="ac"    aria-pressed="false" type="button">AC, 1 kHz</button>
+            </div>
+          </div>
+          <div>
+            <span class="fld">KCl concentration</span>
+            <div class="pill-row" id="ecC">
+              <button class="pill" data-c="1"   aria-pressed="false" type="button">1 mM</button>
+              <button class="pill" data-c="10"  aria-pressed="true"  type="button">10 mM</button>
+              <button class="pill" data-c="100" aria-pressed="false" type="button">100 mM</button>
+            </div>
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">Voltage, &Delta;V</span><span class="val" id="ecVv"></span></div>
+            <input type="range" id="ecV" min="0.1" max="1" step="0.05" value="1">
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0" id="ecTf">Time since switching on</span><span class="val" id="ecTv"></span></div>
+            <input type="range" id="ecT" min="-10" max="-1" step="0.02" value="-10">
+          </div>
+          <div class="btnrow">
+            <button class="ghost" id="ecPlay" type="button">&#9654; Switch the voltage on</button>
+          </div>
+          <div>
+            <div class="readout"><span class="k">Debye length, 1/&kappa;</span><span class="v" id="ecL">&mdash;</span></div>
+            <div class="readout"><span class="k">conductivity, &sigma;</span><span class="v" id="ecS">&mdash;</span></div>
+            <div class="readout"><span class="k">bulk turns from insulator to conductor, &epsilon;/&sigma;</span><span class="v" id="ecTe">&mdash;</span></div>
+            <div class="readout"><span class="k">double layers charge, &tau; = R<sub>s</sub>C<sub>dl</sub></span><span class="v" id="ecTau">&mdash;</span></div>
+            <div class="readout"><span class="k"><span class="mig">field in the bulk</span> now</span><span class="v" id="ecEb">&mdash;</span></div>
+            <div class="readout"><span class="k"><span class="dif">voltage across each double layer</span> now</span><span class="v" id="ecVi">&mdash;</span></div>
+            <div class="readout"><span class="k"><span class="mig">field in the compact layer</span> now</span><span class="v" id="ecEh">&mdash;</span></div>
+            <div class="readout"><span class="k">current density now, j = &sigma;E<sub>bulk</sub></span><span class="v" id="ecJ">&mdash;</span></div>
+            <div class="readout"><span class="k"><span class="con">K<sup>+</sup> migration speed</span> in the bulk, v = uE</span><span class="v" id="ecU">&mdash;</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2>Where the voltage goes</h2><span class="note" id="ecNote">&mdash;</span></div>
+        <div class="card-b stack">
+          <svg id="ecpic" viewBox="0 0 520 450" style="display:block;width:100%;height:auto;max-width:560px;margin:0 auto" role="img" aria-label="Across an electrochemical cell: the ions, the potential and the field strength on a log scale, with the double layers at each electrode magnified and the bulk squeezed between them"></svg>
+          <div class="glegend">
+          <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><rect x="0" y="0" width="4" height="14" fill="var(--elec)"/><circle cx="10" cy="5" r="3" fill="var(--ink-2)"/><circle cx="19" cy="9" r="2.6" fill="none" stroke="var(--ink-2)" stroke-width="1.3"/></svg><span><b>strip on top</b>: the electrodes (dark bars), cations (filled) and anions (open). The crowd of one kind at each electrode is the diffuse layer&rsquo;s excess counter-charge; the small arrows in the bulk are migration.</span></span>
+          <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><rect x="1" y="1" width="6" height="12" fill="var(--line-2)" opacity="0.6"/></svg><span><b>grey band</b>: the compact (Helmholtz) layer, 0.45 nm of oriented water, &epsilon;<sub>r</sub> &asymp; 10, with no ions in it.</span></span>
+          <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="7" y1="2" x2="3" y2="12" stroke="var(--muted)" stroke-width="1.4"/><line x1="12" y1="2" x2="8" y2="12" stroke="var(--muted)" stroke-width="1.4"/></svg><span><b>broken axis</b>: the first and last few nanometres are magnified; the 5 mm of bulk between them is squeezed into the middle, and its field has its own scale (0&ndash;210 V/m, written inside it). Every field curve is the slope of the potential directly above it.</span></span>
+          </div>
+          <div id="ecRead" class="verdict flat">&mdash;</div>
+          <p class="hint" style="margin:0">Linear double layers (Debye&ndash;Hückel), so the numbers are sizes rather than predictions above a few tenths of a volt.
+            The Faradaic reaction is a fast couple at both electrodes, j<sub>0</sub> = 1 mA/cm<sup>2</sup>, with no mass-transport limit.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="card-h"><h2>Migration: the field is the driving force</h2><span class="note">why ions move through the bulk, and why they stop</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig" style="white-space:normal">
+          <span class="con">F = z<sub>i</sub>eE</span>
+          &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="mig">v<sub>i</sub> = u<sub>i</sub>E</span>
+          &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="dif">J<sub>mig,i</sub> = &minus;(z<sub>i</sub>F/RT) D<sub>i</sub>c<sub>i</sub> d&psi;/dx = (z<sub>i</sub>F/RT) D<sub>i</sub>c<sub>i</sub>E</span><br>
+          <small>the force on an ion &nbsp;&middot;&nbsp; its drift speed, with mobility u<sub>i</sub> = |z<sub>i</sub>|eD<sub>i</sub>/k<sub>B</sub>T &nbsp;&middot;&nbsp; the migration term of the Nernst&ndash;Planck flux</small>
+        </div>
+        <div class="trio3">
+          <p class="hint" style="margin:0"><b>1. The push is the field.</b> An ion of charge z<sub>i</sub>e feels F = z<sub>i</sub>eE. In water,
+            friction balances that force within picoseconds, so the ion does not keep accelerating: it drifts at v = u<sub>i</sub>E,
+            cations along E and anions against it. The migration flux is proportional to &minus;d&psi;/dx &mdash; the <b>slope</b> of
+            the potential, not the potential itself.</p>
+          <p class="hint" style="margin:0"><b>2. No slope, no migration.</b> With only non-Faradaic processes, ions migrate only until the double layers are
+            charged. Then the whole voltage sits across a few nanometres at each electrode, the bulk is flat, E = 0 there, and
+            migration through the bulk stops &mdash; although the electrodes are still &Delta;V apart. The same field, concentrated
+            in the double layer, is what holds the counter-ions against diffusion there.</p>
+          <p class="hint" style="margin:0"><b>3. Keep a current, keep a field.</b> A Faradaic reaction at the electrodes, or AC too fast for the
+            double layers to finish charging, keeps a field E = j/&sigma; in the bulk, and migration carries the current. That is the
+            field conductivity is measured in: j = &sigma;E with &sigma; = &Sigma;|z<sub>i</sub>|Fu<sub>i</sub>c<sub>i</sub> is Ohm&rsquo;s law,
+            migration summed over every ion &mdash; the subject of Lecture 8.</p>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
   <!-- ============== ION ATMOSPHERE AND SCREENING ============== -->
-  <section class="panel" id="p-atm" role="tabpanel" aria-labelledby="t-atm">
+  <section class="panel" id="p-atm" role="tabpanel" aria-labelledby="t-atm" hidden>
 
     <div class="rowhead">
       <span class="tag">Atmosphere</span>
@@ -453,187 +706,6 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
             atmosphere &mdash; it fades much faster. <b>The gap between them is the screening.</b></p>
           <p class="hint" style="margin:0"><b>The orange line, r = a + 1/&kappa;</b> (the thickness of the atmosphere). Here the blue curve is only
             <b>37 %</b> (1/e) of the grey one, and <b>63 %</b> is screened.</p>
-        </div>
-      </div>
-    </div>
-
-  </section>
-
-  <!-- ============== FIELD AND POTENTIAL ============== -->
-  <section class="panel" id="p-fp" role="tabpanel" aria-labelledby="t-fp" hidden>
-
-    <div class="card" style="margin-bottom:16px">
-      <div class="card-h"><h2>Potential and field, defined</h2><span class="note">what a charge sets up, and what another charge actually feels</span></div>
-      <div class="card-b stack" style="gap:12px">
-        <div class="eqbig">
-          <span class="dif">&psi; = U / q</span> <small>(J/C = V)</small>
-          &nbsp;&nbsp;&middot;&nbsp;&nbsp;
-          <span class="mig">E = F / q</span> <small>(N/C = V/m)</small>
-          &nbsp;&nbsp;&middot;&nbsp;&nbsp;
-          <span class="con">E = &minus;d&psi;/dx</span><br>
-          <small>potential: energy per unit charge &nbsp;&middot;&nbsp; field: force per unit charge &nbsp;&middot;&nbsp; the field is the downhill slope of the potential</small>
-        </div>
-        <p class="hint" style="margin:0">The <b>potential</b> &psi; is a scalar: one number at each point, like a height on a map.
-          The <b>field</b> E is how steeply that potential changes through space &mdash; its slope &mdash; and it points downhill.
-          <b>It is the field that pushes on a charge</b>, with force F = qE; the potential tells you the charge&rsquo;s energy, U = q&psi;.
-          The same two ideas hold around <b>one ion</b>, where both fall off with distance, and between <b>two electrodes</b>, where
-          you set a voltage but every ion in between answers to the field, E = &Delta;V/d.</p>
-      </div>
-    </div>
-
-    <div class="fpgrid">
-
-      <div class="card">
-        <div class="card-h"><h2>One ion</h2><span class="note" id="fpiNote">&mdash;</span></div>
-        <div class="card-b stack fpbody">
-          <div class="fpctl">
-            <div>
-              <span class="fld">Around the ion</span>
-              <div class="pill-row" id="fpiAtm">
-                <button class="pill" data-a="0" aria-pressed="true"  type="button">alone</button>
-                <button class="pill" data-a="1" aria-pressed="false" type="button">+ atmosphere</button>
-              </div>
-            </div>
-            <p class="hint" style="margin:0">a cation, +e, in water; atmosphere at 0.1 M; closest approach a = 0.4 nm</p>
-          </div>
-          <div class="fpctl">
-            <div>
-              <span class="fld">Test charge</span>
-              <div class="pill-row" id="fpiSign">
-                <button class="pill" data-q="1"  aria-pressed="true"  type="button">+e</button>
-                <button class="pill" data-q="-1" aria-pressed="false" type="button">&minus;e</button>
-              </div>
-            </div>
-            <div>
-              <div class="slider-row"><span class="fld" style="margin:0">Where it starts</span><span class="val" id="fpiXv"></span></div>
-              <input type="range" id="fpiX" min="0" max="1000" step="1" value="100">
-            </div>
-          </div>
-          <div class="btnrow">
-            <button class="ghost" id="fpiPlay" type="button">&#9654; Let it go</button>
-            <button class="ghost" id="fpiReset" type="button">Put it back</button>
-          </div>
-          <svg id="fpipic" viewBox="0 0 520 430" style="display:block;width:100%;height:auto;max-width:520px;margin:0 auto" role="img" aria-label="Above, the space around a cation with equipotential circles, radial field arrows and a test charge; below, the potential and the field against distance, with the tangent at the charge"></svg>
-          <div>
-            <div class="readout"><span class="k"><span class="dif">potential there</span>, &psi;</span><span class="v" id="fpiPsi">&mdash;</span></div>
-            <div class="readout"><span class="k"><span class="mig">field there</span>, E = &minus;d&psi;/dx</span><span class="v" id="fpiE">&mdash;</span></div>
-            <div class="readout"><span class="k"><span class="con">force on it</span>, F = qE</span><span class="v" id="fpiF">&mdash;</span></div>
-            <div class="readout"><span class="k">its energy, U = q&psi;</span><span class="v" id="fpiU">&mdash;</span></div>
-            <div class="readout"><span class="k">work done by the field since it was let go</span><span class="v" id="fpiW">&mdash;</span></div>
-          </div>
-          <div id="fpiRead" class="verdict flat fpread">&mdash;</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-h"><h2>Two electrodes</h2><span class="note" id="fppNote">&mdash;</span></div>
-        <div class="card-b stack fpbody">
-          <div class="fpctl">
-            <div>
-              <div class="slider-row"><span class="fld" style="margin:0">Voltage, &Delta;V</span><span class="val" id="fppVv"></span></div>
-              <input type="range" id="fppV" min="0.2" max="2" step="0.05" value="1">
-            </div>
-            <div>
-              <div class="slider-row"><span class="fld" style="margin:0">Gap, d</span><span class="val" id="fppDv"></span></div>
-              <input type="range" id="fppD" min="1" max="10" step="0.5" value="5">
-            </div>
-          </div>
-          <div class="fpctl">
-            <div>
-              <span class="fld">Test charge</span>
-              <div class="pill-row" id="fppSign">
-                <button class="pill" data-q="1"  aria-pressed="true"  type="button">+e</button>
-                <button class="pill" data-q="-1" aria-pressed="false" type="button">&minus;e</button>
-              </div>
-            </div>
-            <div>
-              <div class="slider-row"><span class="fld" style="margin:0">Where it starts</span><span class="val" id="fppXv"></span></div>
-              <input type="range" id="fppX" min="0" max="1000" step="1" value="100">
-            </div>
-          </div>
-          <div class="btnrow">
-            <button class="ghost" id="fppPlay" type="button">&#9654; Let it go</button>
-            <button class="ghost" id="fppReset" type="button">Put it back</button>
-          </div>
-          <svg id="fpppic" viewBox="0 0 520 430" style="display:block;width:100%;height:auto;max-width:520px;margin:0 auto" role="img" aria-label="Above, the space between two electrodes with equipotential lines, field arrows and a test charge; below, the potential and the field across the gap, with the tangent at the charge"></svg>
-          <div>
-            <div class="readout"><span class="k"><span class="dif">potential there</span>, &psi;</span><span class="v" id="fppPsi">&mdash;</span></div>
-            <div class="readout"><span class="k"><span class="mig">field there</span>, E = &minus;d&psi;/dx</span><span class="v" id="fppE">&mdash;</span></div>
-            <div class="readout"><span class="k"><span class="con">force on it</span>, F = qE</span><span class="v" id="fppF">&mdash;</span></div>
-            <div class="readout"><span class="k">its energy, U = q&psi;</span><span class="v" id="fppU">&mdash;</span></div>
-            <div class="readout"><span class="k">work done by the field since it was let go</span><span class="v" id="fppW">&mdash;</span></div>
-          </div>
-          <div id="fppRead" class="verdict flat fpread">&mdash;</div>
-        </div>
-      </div>
-
-    </div>
-
-    <div class="card" style="margin-top:16px">
-      <div class="card-h"><h2>How to read the two pictures</h2><span class="note">height, slope, push</span></div>
-      <div class="card-b stack" style="gap:14px">
-        <div class="glegend fplegend">
-          <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><rect x="1" y="1" width="24" height="12" fill="var(--red-)" opacity="0.22"/><line x1="13" y1="0" x2="13" y2="14" stroke="var(--red-)" stroke-width="1.4"/></svg><span><b>blue shading and lines: the potential</b> &psi;. Darker is higher. Each line joins points of <b>equal</b> &psi; (an equipotential), labelled with its value.</span></span>
-          <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="2" y1="7" x2="19" y2="7" stroke="var(--ox)" stroke-width="2.2"/><polygon points="25,7 18,3 18,11" fill="var(--ox)"/></svg><span><b>orange arrows: the field</b> E. They point downhill in &psi;, across the equipotentials, and are longer where the lines crowd together.</span></span>
-          <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><circle cx="7" cy="7" r="5.5" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.6"/><line x1="13" y1="7" x2="20" y2="7" stroke="var(--go)" stroke-width="2.2"/><polygon points="25,7 19,3.5 19,10.5" fill="var(--go)"/></svg><span><b>test charge and green arrow</b>: the force on it, F = qE.</span></span>
-          <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="1" y1="3" x2="25" y2="11" stroke="var(--red-)" stroke-width="2.2"/><line x1="1" y1="9" x2="25" y2="9" stroke="var(--ox)" stroke-width="1.6"/></svg><span><b>the graph</b>: &psi; along the charge&rsquo;s path (blue, left axis) and E (orange, right axis). The <b>black tangent</b> at the charge has slope d&psi;/dx = &minus;E.</span></span>
-          <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="8" y1="0" x2="8" y2="14" stroke="var(--red-)" stroke-width="1.2" stroke-dasharray="2 2" opacity="0.6"/><line x1="18" y1="0" x2="18" y2="14" stroke="var(--red-)" stroke-width="1.2" stroke-dasharray="2 2" opacity="0.6"/></svg><span><b>dotted drops</b>: each equipotential carried down to the graph. They are equal steps in &psi;, so where they bunch up the slope, and the field, is large.</span></span>
-        </div>
-        <div class="trio3">
-          <p class="hint" style="margin:0"><b>1. Potential is a height.</b> &psi; is one number at each place, so it can be drawn as
-            shading and joined up into equipotentials, like contour lines. Only differences in &psi; matter: moving a charge q from one
-            line to another changes its energy by q&Delta;&psi;, whatever path it takes.</p>
-          <p class="hint" style="margin:0"><b>2. Field is the slope.</b> E = &minus;d&psi;/dx: steep where the equipotentials crowd,
-            gentle where they spread. Around one ion &psi; &prop; 1/r but E &prop; 1/r<sup>2</sup>, so the field dies away faster than
-            the potential; switch the atmosphere on and both are cut off beyond about 1/&kappa;. Between two electrodes &psi; falls in a
-            straight line, so E = &Delta;V/d is the same everywhere &mdash; halve the gap and the field doubles.</p>
-          <p class="hint" style="margin:0"><b>3. The field pushes.</b> F = qE. A positive charge is pushed down the slope, toward
-            lower &psi;; a negative one is pushed <em>up</em> it. Both lose energy, because U = q&psi; falls either way. In solution an ion
-            does not accelerate for long: friction sets a drift speed proportional to E &mdash; the start of ionic conductivity in Lecture 8.</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="rowhead rowsep">
-      <span class="tag">Summary</span>
-      <h3>Field vs. Potential</h3>
-      <span class="note">E and &psi; side by side, and the definitions used in Lecture 6</span>
-    </div>
-
-    <div class="card">
-      <div class="card-h"><h2>Field and potential in the ion atmosphere</h2><span class="note">E and &psi;: what each one is, and how they differ</span></div>
-      <div class="card-b stack" style="gap:14px">
-        <p class="hint" style="margin:0;font-size:14px">The <b>potential</b> is a scalar, one number at each point. The <b>field</b> is how steeply that potential changes through space, its slope: E = &minus;d&psi;/dr. <b>It is the field that pushes on a charge.</b></p>
-        <div style="overflow-x:auto">
-        <table class="ions fptab">
-          <thead><tr><th></th><th>Electric field, E</th><th>Electric potential, &psi;</th></tr></thead>
-          <tbody>
-            <tr><th scope="row">What it is</th>
-              <td>The <b>force per unit charge</b> a small positive test charge would feel at that point.</td>
-              <td>The <b>work per unit charge</b> to bring a small positive test charge in from far away (where &psi; = 0) to that point: an energy per charge.</td></tr>
-            <tr><th scope="row">Kind and units</th>
-              <td>A <b>vector</b>, with a direction: outward from a cation. <span class="fx">V/m = N/C</span></td>
-              <td>A <b>scalar</b>, a single number at each point. <span class="fx">V = J/C</span></td></tr>
-            <tr><th scope="row">For a second ion, charge z<sub>j</sub>e, at r</th>
-              <td>the <b>force</b> on it: <span class="fx">F = z<sub>j</sub>e&middot;E</span></td>
-              <td>its <b>energy</b>: <span class="fx">U = z<sub>j</sub>e&middot;&psi;</span></td></tr>
-            <tr><th scope="row">How one follows from the other</th>
-              <td>the downhill slope of the potential: <span class="fx">E = &minus;d&psi;/dr</span></td>
-              <td>the field added up from r out to infinity: <span class="fx">&psi;(r) = &int;<sub>r</sub><sup>&infin;</sup> E dr</span></td></tr>
-            <tr><th scope="row">What sets it</th>
-              <td><b>Gauss&rsquo;s law</b>: only the charge <b>inside</b> a sphere of radius r counts. <span class="fx">E&middot;4&pi;r<sup>2</sup> = Q<sub>enc</sub>/&epsilon;<sub>0</sub>&epsilon;<sub>r</sub></span></td>
-              <td><b>All</b> the charge, inside and outside r, since it sums the field all the way out. For the atmosphere this is the Poisson&ndash;Boltzmann equation.</td></tr>
-            <tr><th scope="row"><span style="color:var(--muted)">Ion alone</span></th>
-              <td><span class="fx">E = ze / 4&pi;&epsilon;<sub>0</sub>&epsilon;<sub>r</sub> r<sup>2</sup></span> &mdash; falls as 1/r<sup>2</sup></td>
-              <td><span class="fx">&psi; = ze / 4&pi;&epsilon;<sub>0</sub>&epsilon;<sub>r</sub> r</span> &mdash; falls as 1/r</td></tr>
-            <tr><th scope="row"><span style="color:var(--red-)">With its atmosphere</span></th>
-              <td><span class="fx">E = Q<sub>enc</sub>(r) / 4&pi;&epsilon;<sub>0</sub>&epsilon;<sub>r</sub> r<sup>2</sup></span>, with <span class="fx">Q<sub>enc</sub> = ze(1 + &kappa;r)e<sup>&minus;&kappa;(r&minus;a)</sup>/(1 + &kappa;a)</span> &mdash; dies away as e<sup>&minus;&kappa;r</sup></td>
-              <td><span class="fx">&psi; = (ze / 4&pi;&epsilon;<sub>0</sub>&epsilon;<sub>r</sub>) &middot; e<sup>&kappa;a</sup>/(1 + &kappa;a) &middot; e<sup>&minus;&kappa;r</sup>/r</span> &mdash; dies away as e<sup>&minus;&kappa;r</sup></td></tr>
-            <tr><th scope="row">Where to see it</th>
-              <td><b>What the sphere encloses</b> (Ion Atmosphere tab): the curve Q<sub>enc</sub> and the readout &ldquo;field on the sphere&rdquo;; and the field arrows in the pictures above.</td>
-              <td><b>How far the charge is felt</b> (Ion Atmosphere tab): the graph, as &psi;(r)/&psi;(a); and the <b>One ion</b> picture above.</td></tr>
-          </tbody>
-        </table>
         </div>
       </div>
     </div>
@@ -1588,6 +1660,256 @@ function fpMake(p, src){
 
 fpMake("fpi", "ion");
 fpMake("fpp", "plates");
+/* ================= 3b - AN ELECTROCHEMICAL CELL =========================
+   KCl between two identical electrodes L = 5 mm apart; dV switched on at t = 0.
+   One linear (Debye-Huckel) double layer at each electrode:
+     compact  C_H = 10 eps0 / 0.45 nm        diffuse  C_D = epsr eps0 kappa
+     C_i = (1/C_H + 1/C_D)^-1, and the charge q = C_i V_i splits V_H : V_D = C_D : C_H
+   Bulk resistance per area R = L/sigma, sigma = Lambda_m c (KCl, 25 C).
+     non-Faradaic  V_i(t) = dV/2 (1 - e^{-t/tau}),  tau = R C_i / 2
+     Faradaic      each electrode also passes j = 2 j0 sinh(eta/b), b = 2RT/F, j0 = 1 mA/cm2,
+                   no mass-transport limit; steady j from j R + 2 eta = dV;
+                   V_i(t) = eta (1 - e^{-t/tau_f}),  tau_f = (C_i/2) (R || 2 R_ct)
+     AC, 1 kHz     phasors: Z = R + 2/(i w C_i), drawn at phase w t
+   psi(x): +V/2 at the left electrode, linear through the compact layer, e^{-kappa s}
+   through the diffuse layer, linear through the bulk; mirrored at the right.
+   E = -dpsi/dx. K+ mobility u = lambda(K+)/F.                                   */
+var EC = {k: "block", c: 10, play: false, ph: 0, last: 0};
+var EC_L = 5e-3, EC_EH = 10, EC_DH = 0.45e-9, EC_J0 = 10, EC_W = 2 * Math.PI * 1000;
+var EC_LAM = {1: 146.95, 10: 141.27, 100: 128.96};   /* KCl, S cm2 mol-1, 25 C */
+var EC_UK = 73.48e-4 / (QE * NA);                    /* K+, m2 V-1 s-1         */
+
+function ecTime(t){
+  if(t < 1e-6) return +(t * 1e9).toPrecision(2) + " ns";
+  if(t < 1e-3) return +(t * 1e6).toPrecision(2) + " µs";
+  if(t < 1) return +(t * 1e3).toPrecision(2) + " ms";
+  return +t.toPrecision(2) + " s";
+}
+function ecModel(){
+  var V = +document.getElementById("ecV").value, c = EC.c;
+  var lam = debyeLen(c * 1e-3, FP_ER, T25), kap = 1 / lam;
+  var CH = EC_EH * E0 / EC_DH, CD = FP_ER * E0 * kap, Ci = 1 / (1 / CH + 1 / CD);
+  var sig = EC_LAM[c] * 1e-4 * c, R = EC_L / sig;
+  var m = {V: V, lam: lam, kap: kap, CH: CH, CD: CD, Ci: Ci, sig: sig, R: R, tau: R * Ci / 2, teps: FP_ER * E0 / sig,
+           t: Math.pow(10, +document.getElementById("ecT").value), Vt: V};
+  var b = 2 * KB * T25 / QE;
+  if(EC.k === "block"){
+    m.Vi = V / 2 * (1 - Math.exp(-m.t / m.tau));
+  }else if(EC.k === "far"){
+    var lo = 0, hi = V / R, it;
+    for(it = 0; it < 60; it++){ var jm = (lo + hi) / 2; if(jm * R + 2 * b * Math.asinh(jm / (2 * EC_J0)) > V) hi = jm; else lo = jm; }
+    m.jss = (lo + hi) / 2;
+    m.eta = b * Math.asinh(m.jss / (2 * EC_J0));
+    var Rct = b / Math.sqrt(4 * EC_J0 * EC_J0 + m.jss * m.jss);
+    m.tauf = Ci / 2 * (R * 2 * Rct) / (R + 2 * Rct);
+    m.Vi = m.eta * (1 - Math.exp(-m.t / m.tauf));
+  }else{
+    var kz = 1 / (EC_W * Ci), zi = -2 * kz, den = R * R + zi * zi;
+    var Ire = V * R / den, Iim = -V * zi / den;
+    var Vbre = Ire * R, Vbim = Iim * R, Vire = Iim * kz, Viim = -Ire * kz;
+    var cp = Math.cos(EC.ph), sp = Math.sin(EC.ph);
+    m.Vt = V * cp;
+    m.Vi = Vire * cp - Viim * sp;
+    m.bulkAmp = Math.sqrt(Vbre * Vbre + Vbim * Vbim);
+    m.dlAmp = Math.sqrt(Vire * Vire + Viim * Viim);
+  }
+  m.Vb = m.Vt - 2 * m.Vi;
+  m.VH = m.Vi * CD / (CH + CD);
+  m.VD = m.Vi - m.VH;
+  m.Eb = m.Vb / EC_L;
+  m.EH = m.VH / EC_DH;
+  m.j = m.Vb / R;
+  return m;
+}
+
+function ecDraw(){
+  var m = ecModel(), W = 520, H = 450, sT = 14, sB = 72, pT = 104, pB = 232, eT = 266, eB = 390;
+  var A0 = 62, A1 = 206, B0 = 222, B1 = 344, C0 = 360, C1 = 504;
+  var Z = EC_DH + 4 * m.lam, s = "", j, k;
+  function XA(d){ return A0 + d / Z * (A1 - A0); }
+  function XC(d){ return C1 - d / Z * (C1 - C0); }
+  function XB(x){ return B0 + x / EC_L * (B1 - B0); }
+  function Yp(v){ return (pT + pB) / 2 - Math.max(-1.05, Math.min(1.05, v / 0.55)) * (pB - pT) / 2; }
+  /* the field on linear scales, so that it reads as the slope of the curve above it: one scale for the
+     double layers (their largest field at 1 V, at steady state, for this salt) and one for the bulk (1 V over 5 mm) */
+  var EZ = 0.5 * m.CD / (m.CH + m.CD) / EC_DH * 1.05, EBK = 1 / EC_L * 1.05;
+  function Yz(e){ return eB - Math.min(1.02, Math.abs(e) / EZ) * (eB - eT); }
+  function Yb(e){ return eB - Math.min(1.02, Math.abs(e) / EBK) * (eB - eT); }
+  function sci(x){
+    var e = Math.floor(Math.log10(x)), mm = +(x / Math.pow(10, e)).toFixed(1), sup = "⁰¹²³⁴⁵⁶⁷⁸⁹";
+    return mm + "×10" + String(e).split("").map(function(ch){ return sup[+ch]; }).join("");
+  }
+  /* one interface, s from its electrode: potential drop from the electrode, and field strength */
+  function drop(d){ return d < EC_DH ? m.VH * d / EC_DH : m.VH + m.VD * (1 - Math.exp(-m.kap * (d - EC_DH))); }
+  function field(d){ return d < EC_DH ? m.EH : m.kap * m.VD * Math.exp(-m.kap * (d - EC_DH)) + m.Eb; }
+
+  /* frames, compact bands, gridlines */
+  [[pT, pB], [eT, eB]].forEach(function(r){
+    [[A0, A1], [B0, B1], [C0, C1]].forEach(function(g){
+      s += '<rect x="' + g[0] + '" y="' + r[0] + '" width="' + (g[1] - g[0]) + '" height="' + (r[1] - r[0]) + '" fill="var(--surface)" stroke="var(--line)"/>';
+    });
+    s += '<rect x="' + A0 + '" y="' + r[0] + '" width="' + Math.max(1.5, XA(EC_DH) - A0).toFixed(1) + '" height="' + (r[1] - r[0]) + '" fill="var(--line-2)" opacity="0.6"/>';
+    s += '<rect x="' + Math.min(C1 - 1.5, XC(EC_DH)).toFixed(1) + '" y="' + r[0] + '" width="' + Math.max(1.5, C1 - XC(EC_DH)).toFixed(1) + '" height="' + (r[1] - r[0]) + '" fill="var(--line-2)" opacity="0.6"/>';
+    [214, 352].forEach(function(xb){
+      s += '<line x1="' + (xb - 4) + '" y1="' + (r[1] + 5) + '" x2="' + (xb - 1) + '" y2="' + (r[1] - 5) + '" stroke="var(--muted)" stroke-width="1.3"/>';
+      s += '<line x1="' + (xb + 1) + '" y1="' + (r[1] + 5) + '" x2="' + (xb + 4) + '" y2="' + (r[1] - 5) + '" stroke="var(--muted)" stroke-width="1.3"/>';
+    });
+  });
+  s += '<line x1="' + A0 + '" y1="' + Yp(0) + '" x2="' + C1 + '" y2="' + Yp(0) + '" stroke="var(--line-2)" stroke-dasharray="2 3"/>';
+  [[A0, A1], [B0, B1], [C0, C1]].forEach(function(g){
+    s += '<line x1="' + g[0] + '" y1="' + ((eT + eB) / 2) + '" x2="' + g[1] + '" y2="' + ((eT + eB) / 2) + '" stroke="var(--line)" stroke-dasharray="2 3"/>';
+  });
+  [0.5, 0, -0.5].forEach(function(v){
+    s += '<text x="' + (A0 - 11) + '" y="' + (Yp(v) + 3.5).toFixed(1) + '" text-anchor="end" fill="var(--red-)" ' + MONO + ' font-size="10">' + (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v) + '</text>';
+  });
+  [[0, "0"], [0.5, sci(EZ / 2)], [1, sci(EZ)]].forEach(function(t){
+    s += '<text x="' + (A0 - 11) + '" y="' + (eB - t[0] * (eB - eT) + 3.5).toFixed(1) + '" text-anchor="end" fill="var(--ox)" ' + MONO + ' font-size="9.5">' + t[1] + '</text>';
+  });
+  /* the bulk keeps its own scale, written inside its frame */
+  s += '<text x="' + (B0 + 3) + '" y="' + (eT + 10) + '" fill="var(--muted)" ' + MONO + ' font-size="9">' + Math.round(EBK) + '</text>';
+  s += '<text x="' + (B0 + 3) + '" y="' + (eB - 3) + '" fill="var(--muted)" ' + MONO + ' font-size="9">0</text>';
+  s += '<text x="' + A0 + '" y="' + (pT - 7) + '" fill="var(--red-)" ' + MONO + ' font-size="10.5" font-weight="600">potential ψ / V</text>';
+  s += '<text x="' + A0 + '" y="' + (eT - 7) + '" fill="var(--ox)" ' + MONO + ' font-size="10.5" font-weight="600">field strength |E| / V m⁻¹</text>';
+
+  /* the ions: a thin background of both, plus each electrode's excess counter-charge */
+  s += '<rect x="' + A0 + '" y="' + sT + '" width="' + (C1 - A0) + '" height="' + (sB - sT) + '" fill="var(--surface-2)" opacity="0.6"/>';
+  s += '<rect x="' + (A0 - 7) + '" y="' + sT + '" width="7" height="' + (eB - sT) + '" fill="var(--elec)"/>';
+  s += '<rect x="' + C1 + '" y="' + sT + '" width="7" height="' + (eB - sT) + '" fill="var(--elec)"/>';
+  var seed = 11;
+  function rnd(){ seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+  function ion(x, y, cat){
+    return cat ? '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="2.8" fill="var(--ink-2)"/>'
+               : '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="2.5" fill="none" stroke="var(--ink-2)" stroke-width="1.2"/>';
+  }
+  [[A0 + 3, A1 - 3], [B0 + 3, B1 - 3], [C0 + 3, C1 - 3]].forEach(function(g){
+    for(k = 0; k < 7; k++){ s += ion(g[0] + rnd() * (g[1] - g[0]), sT + 6 + rnd() * (sB - sT - 12), k % 2 === 0); }
+  });
+  var nEx = Math.round(16 * Math.min(1, Math.abs(m.Vi) / 0.5)), leftCat = m.Vi < 0;
+  for(k = 0; k < nEx; k++){
+    var dd = EC_DH + m.lam * -Math.log(1 - (k + 0.5) / (nEx + 1) * 0.95);
+    if(dd < Z){
+      s += ion(XA(dd) + 2, sT + 6 + rnd() * (sB - sT - 12), leftCat);
+      s += ion(XC(dd) - 2, sT + 6 + rnd() * (sB - sT - 12), !leftCat);
+    }
+  }
+  if(Math.abs(m.Eb) > 1){
+    var la = 6 + 22 * Math.min(1, Math.abs(m.Eb) / 200), dir = m.Eb > 0 ? 1 : -1, xm = (B0 + B1) / 2;
+    s += fpArrow(xm - dir * la / 2, sT + 16, xm + dir * la / 2, sT + 16, "var(--go)", 1.6);
+    s += fpArrow(xm + dir * la / 2, sB - 14, xm - dir * la / 2, sB - 14, "var(--go)", 1.6);
+  }
+  s += '<text x="' + (A0 - 3) + '" y="' + (sT - 3) + '" fill="var(--muted)" ' + MONO + ' font-size="10">' + (m.Vt >= 0 ? "+" : "−") + ' electrode</text>';
+  s += '<text x="' + (C1 + 7) + '" y="' + (sT - 3) + '" text-anchor="end" fill="var(--muted)" ' + MONO + ' font-size="10">' + (m.Vt >= 0 ? "−" : "+") + ' electrode</text>';
+
+  /* the potential */
+  var pa = [], pc = [], ea = [], ec = [], N = 90;
+  for(j = 0; j <= N; j++){
+    var d = Z * j / N;
+    pa.push(XA(d).toFixed(1) + "," + Yp(m.Vt / 2 - drop(d)).toFixed(1));
+    pc.push(XC(d).toFixed(1) + "," + Yp(-m.Vt / 2 + drop(d)).toFixed(1));
+    ea.push(XA(d).toFixed(1) + "," + Yz(field(d)).toFixed(1));
+    ec.push(XC(d).toFixed(1) + "," + Yz(field(d)).toFixed(1));
+  }
+  var psL = m.Vt / 2 - m.Vi, psR = -m.Vt / 2 + m.Vi;
+  s += '<line x1="' + A1 + '" y1="' + Yp(psL).toFixed(1) + '" x2="' + B0 + '" y2="' + Yp(psL).toFixed(1) + '" stroke="var(--red-)" stroke-width="1.4" stroke-dasharray="2 3"/>';
+  s += '<line x1="' + B1 + '" y1="' + Yp(psR).toFixed(1) + '" x2="' + C0 + '" y2="' + Yp(psR).toFixed(1) + '" stroke="var(--red-)" stroke-width="1.4" stroke-dasharray="2 3"/>';
+  s += '<polyline points="' + pa.join(" ") + '" fill="none" stroke="var(--red-)" stroke-width="2.4"/>';
+  s += '<polyline points="' + pc.join(" ") + '" fill="none" stroke="var(--red-)" stroke-width="2.4"/>';
+  s += '<line x1="' + B0 + '" y1="' + Yp(psL).toFixed(1) + '" x2="' + B1 + '" y2="' + Yp(psR).toFixed(1) + '" stroke="var(--red-)" stroke-width="2.4"/>';
+  /* the field */
+  var yb = Yb(m.Eb);
+  s += '<polyline points="' + ea.join(" ") + '" fill="none" stroke="var(--ox)" stroke-width="2.2"/>';
+  s += '<polyline points="' + ec.join(" ") + '" fill="none" stroke="var(--ox)" stroke-width="2.2"/>';
+  s += '<line x1="' + B0 + '" y1="' + yb.toFixed(1) + '" x2="' + B1 + '" y2="' + yb.toFixed(1) + '" stroke="var(--ox)" stroke-width="2.2"/>';
+  /* the two numbers that matter, in the bulk */
+  var ebTxt = Math.abs(m.Eb) < 1 ? "E ≈ 0" : "E = " + Math.abs(m.Eb).toPrecision(3) + " V/m";
+  s += fpTxt((B0 + B1) / 2 + 8, Math.max(eT + 12, Math.min(yb - 8, eB - 10)), ebTxt, "var(--ox)", "middle", 10.5, 600);
+  /* flat or sloped, said in words over the bulk */
+  var flat = Math.abs(m.Eb) < 1;
+  s += fpTxt((B0 + B1) / 2, pT - 7, flat ? "flat: no current" : "slope = j/σ: current flowing", flat ? "var(--muted)" : "var(--go)", "middle", 10.5, 600);
+  s += fpTxt((B0 + B1) / 2, Math.max(pT + 12, Math.min(pB - 6, Yp((psL + psR) / 2) - 10)), "bulk: " + Math.abs(m.Vb).toFixed(2) + " V", "var(--red-)", "middle", 10.5, 600);
+  /* each layer's drop, on the side of the curve away from where it runs */
+  var up = m.Vt >= 0 ? 1 : -1;
+  s += fpTxt(A1 - 4, Math.max(pT + 12, Math.min(pB - 6, Yp(m.Vt / 2 - m.Vi) + 16 * up)), Math.abs(m.Vi).toFixed(2) + " V across it", "var(--red-)", "end", 10.5, 600);
+  s += fpTxt(C0 + 4, Math.max(pT + 12, Math.min(pB - 6, Yp(-m.Vt / 2 + m.Vi) - 9 * up)), Math.abs(m.Vi).toFixed(2) + " V across it", "var(--red-)", "start", 10.5, 600);
+
+  /* distances */
+  var zt = +(Z * 1e9).toPrecision(2);
+  s += '<text x="' + A0 + '" y="' + (eB + 14) + '" text-anchor="start" fill="var(--muted)" ' + MONO + ' font-size="10">0</text>';
+  s += '<text x="' + A1 + '" y="' + (eB + 14) + '" text-anchor="end" fill="var(--muted)" ' + MONO + ' font-size="10">' + zt + ' nm</text>';
+  s += '<text x="' + ((B0 + B1) / 2) + '" y="' + (eB + 14) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="10">5 mm of bulk</text>';
+  s += '<text x="' + C0 + '" y="' + (eB + 14) + '" text-anchor="start" fill="var(--muted)" ' + MONO + ' font-size="10">' + zt + ' nm</text>';
+  s += '<text x="' + C1 + '" y="' + (eB + 14) + '" text-anchor="end" fill="var(--muted)" ' + MONO + ' font-size="10">0</text>';
+  s += '<text x="' + ((A0 + A1) / 2) + '" y="' + (eB + 30) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="10">from the left electrode</text>';
+  s += '<text x="' + ((C0 + C1) / 2) + '" y="' + (eB + 30) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="10">from the right electrode</text>';
+  s += '<text x="' + ((A0 + A1) / 2) + '" y="' + (eB + 44) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="9.5">grey: compact layer · 1/κ = ' + (m.lam * 1e9).toFixed(2) + ' nm</text>';
+  document.getElementById("ecpic").innerHTML = s;
+
+  /* numbers */
+  var ac = EC.k === "ac";
+  document.getElementById("ecVv").textContent = m.V.toFixed(2) + " V";
+  document.getElementById("ecTv").textContent = ac ? "phase " + Math.round(((EC.ph % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI) * 180 / Math.PI) + "°" : ecTime(m.t);
+  document.getElementById("ecTf").textContent = ac ? "AC: steady, the slider is not used" : "Time since switching on";
+  document.getElementById("ecT").disabled = ac;
+  document.getElementById("ecPlay").innerHTML = EC.play ? "&#10074;&#10074; Pause" : (ac ? "&#9654; Run the AC" : "&#9654; Switch the voltage on");
+  document.getElementById("ecL").textContent = (m.lam * 1e9).toFixed(2) + " nm";
+  document.getElementById("ecS").textContent = m.sig.toPrecision(3) + " S/m";
+  document.getElementById("ecTe").textContent = ecTime(m.teps);
+  document.getElementById("ecTau").textContent = ecTime(EC.k === "far" ? m.tauf : m.tau) + (EC.k === "far" ? " (with the Faradaic reaction)" : "");
+  document.getElementById("ecEb").textContent = Math.abs(m.Eb) < 1 ? "≈ 0 V/m" : m.Eb.toPrecision(3) + " V/m";
+  document.getElementById("ecVi").textContent = m.Vi.toFixed(3) + " V";
+  document.getElementById("ecEh").innerHTML = sciH(m.EH, 2) + " V/m";
+  document.getElementById("ecJ").textContent = Math.abs(m.j) / 10 < 1e-3 ? "≈ 0" : (m.j / 10).toPrecision(3) + " mA/cm²";
+  document.getElementById("ecU").textContent = Math.abs(m.Eb) < 1 ? "≈ 0" : (EC_UK * m.Eb * 1e6).toPrecision(3) + " µm/s";
+  document.getElementById("ecNote").textContent = ac ? "1 kHz, drawn at the instant shown" : "t = " + ecTime(m.t) + " after switching on";
+
+  var r, frac = Math.abs(2 * m.Vi) / Math.max(1e-9, Math.abs(m.Vt));
+  if(EC.k === "block"){
+    if(m.t < m.teps) r = "<b>Just switched on.</b> In the first " + ecTime(m.teps) + " (ε/σ) the ions have barely started to move, so the electrolyte acts like the insulator above: "
+      + "a uniform field ΔV/d = " + (m.V / EC_L).toFixed(0) + " V/m fills the whole gap.";
+    else if(m.t < 0.05 * m.tau) r = "<b>The bulk conducts.</b> A current of " + (m.j / 10).toPrecision(2) + " mA/cm² flows, carried by <b>migration</b> in the bulk field: "
+      + "cations drift toward the − electrode, anions toward the +. Where they arrive they pile up, and the double layers start to charge.";
+    else if(m.t < 5 * m.tau) r = "<b>The double layers are charging.</b> " + Math.round(frac * 100) + " % of the voltage now sits across the two layers, "
+      + "and the bulk field has fallen to " + Math.abs(m.Eb).toPrecision(2) + " V/m. The time constant is τ = R<sub>s</sub>C<sub>dl</sub> = " + ecTime(m.tau) + ".";
+    else r = "<b>Steady state: the bulk is field-free.</b> The whole voltage sits across two layers a few nanometres thick, where the field reaches "
+      + sciH(m.EH, 1) + " V/m. In the bulk ψ is flat, E ≈ 0, so there is no migration and no current — although the electrodes are still " + m.V.toFixed(2) + " V apart.";
+  }else if(EC.k === "far"){
+    if(m.t < m.teps) r = "<b>Just switched on.</b> The ions have not moved yet: a uniform field of " + (m.V / EC_L).toFixed(0) + " V/m fills the gap.";
+    else if(m.t < 5 * m.tauf) r = "<b>Charging, while the Faradaic reaction starts.</b> The double layers take up the overpotential; the rest of the voltage stays across the bulk, "
+      + "where migration carries the current.";
+    else r = "<b>Steady state with a current.</b> The Faradaic reaction passes j = " + (m.jss / 10).toPrecision(3) + " mA/cm², so a field E = j/σ = " + m.Eb.toPrecision(3)
+      + " V/m stays in the bulk and drives <b>migration</b>. Each double layer holds only its overpotential, η = " + m.eta.toFixed(3) + " V; the bulk takes the iR drop, "
+      + m.Vb.toFixed(2) + " V.";
+  }else{
+    r = "<b>AC, 1 kHz.</b> Each half-cycle lasts 0.5 ms, too short for the double layers to charge fully (τ = " + ecTime(m.tau) + "), so "
+      + +(m.bulkAmp / m.V * 100).toPrecision(3) + " % of the voltage amplitude stays across the bulk, and E ≈ ΔV/d there again. "
+      + "That is why conductivity is measured with AC: the double layers are bypassed, and the field in the bulk is the one the ions migrate in.";
+  }
+  document.getElementById("ecRead").innerHTML = r;
+}
+
+pillGroup("ecCase", function(b){ EC.k = b.getAttribute("data-k"); EC.play = false; EC.ph = 0; ecDraw(); });
+pillGroup("ecC", function(b){ EC.c = +b.getAttribute("data-c"); ecDraw(); });
+["ecV", "ecT"].forEach(function(id){ document.getElementById(id).addEventListener("input", function(){ if(id === "ecT") EC.play = false; ecDraw(); }); });
+document.getElementById("ecPlay").addEventListener("click", function(){
+  var t = document.getElementById("ecT");
+  if(!EC.play && EC.k !== "ac" && +t.value >= +t.max - 0.01) t.value = t.min;
+  EC.play = !EC.play; EC.last = 0; ecDraw();
+});
+ANIM.push({panel: "p-fp", tick: function(ts){
+  if(!EC.play) return;
+  var dt = EC.last ? Math.min(0.1, (ts - EC.last) / 1000) : 0;
+  EC.last = ts;
+  if(EC.k === "ac"){
+    EC.ph += dt * 2 * Math.PI / 3;
+  }else{
+    var t = document.getElementById("ecT"), v = +t.value + dt * 9 / 7;
+    if(v >= +t.max){ v = +t.max; EC.play = false; }
+    t.value = v;
+  }
+  ecDraw();
+}});
+ecDraw();
+
 window.requestAnimationFrame(animLoop);
 
 /* ---- submit straight to the course sheet ----------------------------------
