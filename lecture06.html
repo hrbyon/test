@@ -115,6 +115,7 @@ table.psitab td{font-family:"IBM Plex Mono",monospace;font-size:13px;white-space
 table.fptab{table-layout:fixed}
 table.fptab th{text-transform:none;letter-spacing:0;font-size:12px;white-space:normal}
 table.fptab thead th:first-child{width:18%}
+table.rktab thead th:first-child{width:22%}
 table.fptab th[scope=row]{font-family:inherit;font-size:13px;font-weight:600;color:var(--ink);vertical-align:top}
 table.fptab td{white-space:normal;vertical-align:top;line-height:1.55}
 .fx{font-family:"IBM Plex Mono",monospace;font-size:12.5px;white-space:nowrap}
@@ -589,7 +590,6 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
             <span style="display:block">&bull; <b>r grows:</b> more and more counter-charge of the opposite sign comes inside, so Q<sub>enc</sub> falls.</span>
             <span style="display:block">&bull; <b>r &rarr; &infin;:</b> the whole atmosphere carries exactly &minus;ze, so Q<sub>enc</sub> &rarr; 0 &mdash; ion and atmosphere together are neutral.</span>
           </div>
-          <div id="gsRead" class="verdict flat">&mdash;</div>
         </div>
       </div>
 
@@ -606,6 +606,26 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
             <p class="hint" style="margin:0"><b>3. So what is 1/&kappa;?</b> The distance over which the atmosphere cancels the
               ion&rsquo;s charge. Beyond a few 1/&kappa; the ion is hidden. More salt packs the atmosphere closer, so
               1/&kappa; gets shorter.</p>
+          </div>
+          <p class="hint" style="margin:0;font-size:13.5px;color:var(--ink-2)"><b>What r = 1/&kappa; means (&#9313;).</b> It is a distance
+            measured from the <b>ion&rsquo;s centre</b>: the radius of the thin shell that holds the <b>most counter-charge</b>. It does not
+            ignore a. The charge in a shell from r to r + dr is &minus;dQ<sub>enc</sub>/dr = ze&middot;&kappa;<sup>2</sup>&middot;<b>r e<sup>&minus;&kappa;r</sup></b>&middot;e<sup>&kappa;a</sup>/(1 + &kappa;a),
+            for r &ge; a. The closest approach a only decides where the atmosphere starts and scales the whole curve by a constant; the
+            shape, r e<sup>&minus;&kappa;r</sup>, is a charge density that falls away from the ion multiplied by a shell area 4&pi;r<sup>2</sup>
+            that grows, and it peaks at <b>r = 1/&kappa; whatever a is</b>. (When 1/&kappa; &lt; a that peak would lie inside the closest
+            approach, so the most charge sits at r = a.) In dilute solution a &#8810; 1/&kappa;, so 1/&kappa; and a + 1/&kappa; are almost the same.</p>
+          <div style="overflow-x:auto">
+          <table class="ions fptab rktab">
+            <thead><tr><th></th><th>r = 1/&kappa; &nbsp;(&#9313;, the peak of the hump)</th><th>r = a + 1/&kappa; &nbsp;(the orange line)</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">The question it answers</th>
+                <td>At which radius does a thin shell hold the most counter-charge?</td>
+                <td>If the whole atmosphere, &minus;ze, sat on one thin shell, how far out would that shell be? <span class="fx">&psi;<sub>atm</sub> = &minus;ze / 4&pi;&epsilon;<sub>0</sub>&epsilon;<sub>r</sub>(a + 1/&kappa;)</span></td></tr>
+              <tr><th scope="row">Also</th>
+                <td>the maximum of &minus;dQ<sub>enc</sub>/dr</td>
+                <td>1/&kappa; beyond the ion&rsquo;s surface; where &psi; has fallen to 37 % (1/e) of the bare ion&rsquo;s</td></tr>
+            </tbody>
+          </table>
           </div>
         </div>
       </div>
@@ -1217,15 +1237,6 @@ function gsDraw(ts){
   s += '<text x="' + (16 + bar).toFixed(1) + '" y="393" fill="var(--ink-2)" ' + MONO + ' font-size="15">1/κ = ' + (lam * 1e9).toPrecision(2) + ' nm</text>';
   document.getElementById("gspic").innerHTML = s;
 
-  /* the two figures, in words, for whatever is set */
-  var beyond = (R - GS_A) / lam;
-  document.getElementById("gsRead").innerHTML = atm
-    ? "<b>Right now:</b> the sphere has radius r = " + (R * 1e9).toFixed(2) + " nm, " + beyond.toFixed(1)
-      + " Debye lengths beyond the ion's surface. <b>" + crossing + " of " + GS_NL + "</b> field lines cross it, so it holds about "
-      + crossing + "/" + GS_NL + " = " + (crossing / GS_NL).toFixed(2) + " of the ion's charge; the plot, computed exactly, reads "
-      + "Q<sub>enc</sub>/ze = " + Q.toFixed(3) + ". The other " + (GS_NL - crossing) + " lines ended on counter-charge inside the sphere."
-    : "<b>Right now:</b> no atmosphere, so all " + GS_NL + " lines cross the sphere at any radius and the plot stays at 1 — the field "
-      + "falls only as 1/r², and the ion is felt everywhere.";
 
   /* ---- the plot ---- */
   var W = 360, H = 250, L = 46, Rr = 36, T = 16, B = 38;
