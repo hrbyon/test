@@ -303,16 +303,16 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
             <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><path d="M1 13 Q8 1 25 12 L25 13 Z" fill="var(--red-)" opacity="0.25"/><circle cx="8" cy="5" r="2.5" fill="var(--red-)"/></svg><span><b>shaded hump</b>: how much counter-charge sits in a thin shell at each r. Its <b>peak (dot) is at r = 1/&kappa;</b> from the centre.</span></span>
             <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="13" y1="0" x2="13" y2="14" stroke="var(--ox)" stroke-width="1.5"/></svg><span><b>orange line, a + 1/&kappa;</b></span></span>
             <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><rect x="1" y="1" width="10" height="12" fill="var(--line-2)" opacity="0.5"/></svg><span><b>grey</b>: the band on the left is inside the ion (r &lt; a).</span></span>
-            <span style="display:block;color:var(--ink-2)"><b>&#9312; &#9313; &#9314; on the curve.</b>&nbsp;&#9312; r = a: all 24 lines cross, Q<sub>enc</sub> = z&epsilon;. &#9313; the hump&rsquo;s peak, r = 1/&kappa; (r = a when 1/&kappa; &lt; a): the steepest fall. &#9314; the right edge, r = a + 6/&kappa;: Q<sub>enc</sub> &asymp; 0 and no line crosses.</span>
+            <span style="display:block;color:var(--ink-2)"><b>&#9312; &#9313; &#9314; on the curve.</b>&nbsp;&#9312; r = a: all 24 lines cross, Q<sub>enc</sub> = ze. &#9313; the hump&rsquo;s peak, r = 1/&kappa; (r = a when 1/&kappa; &lt; a): the steepest fall. &#9314; the right edge, r = a + 6/&kappa;: Q<sub>enc</sub> &asymp; 0 and no line crosses.</span>
             <span style="display:block;color:var(--ink-2)"><b>What Q<sub>enc</sub> is.</b>&nbsp;The net charge inside the sphere: the ion&rsquo;s own charge plus the counter-charge of the atmosphere that lies within r.</span>
-            <span style="display:block;color:var(--ink-2);padding-left:12px">&bull; <b>r = a:</b> only the ion is inside, so Q<sub>enc</sub> = z&epsilon; &mdash; all 24 lines cross.</span>
+            <span style="display:block;color:var(--ink-2);padding-left:12px">&bull; <b>r = a:</b> only the ion is inside, so Q<sub>enc</sub> = ze &mdash; all 24 lines cross.</span>
             <span style="display:block;color:var(--ink-2);padding-left:12px">&bull; <b>r grows:</b> more and more counter-charge of the opposite sign comes inside, so Q<sub>enc</sub> falls.</span>
-            <span style="display:block;color:var(--ink-2);padding-left:12px">&bull; <b>r &rarr; &infin;:</b> the whole atmosphere carries exactly &minus;z&epsilon;, so Q<sub>enc</sub> &rarr; 0 &mdash; ion and atmosphere together are neutral.</span>
+            <span style="display:block;color:var(--ink-2);padding-left:12px">&bull; <b>r &rarr; &infin;:</b> the whole atmosphere carries exactly &minus;ze, so Q<sub>enc</sub> &rarr; 0 &mdash; ion and atmosphere together are neutral.</span>
             <span style="display:block;color:var(--ink-2)"><b>How the curve and the hump fit together.</b>&nbsp;The curve falls fastest where the hump is tallest.</span>
           </div>
           <div>
             <div class="readout"><span class="k">sphere radius, r</span><span class="v" id="gsRr">&mdash;</span></div>
-            <div class="readout"><span class="k"><span class="sph">net charge inside</span>, Q<sub>enc</sub> / z&epsilon;</span><span class="v" id="gsQ">&mdash;</span></div>
+            <div class="readout"><span class="k"><span class="sph">net charge inside</span>, Q<sub>enc</sub> / ze</span><span class="v" id="gsQ">&mdash;</span></div>
             <div class="readout"><span class="k"><span class="mig">field on the sphere</span>, E = Q<sub>enc</sub>/4&pi;&epsilon;<sub>0</sub>&epsilon;<sub>r</sub>r<sup>2</sup></span><span class="v" id="gsE">&mdash;</span></div>
           </div>
           <div id="gsVerdict" class="verdict flat">&mdash;</div>
@@ -499,13 +499,13 @@ var QZ=[
   a:0,
   w:"Ionic strength is I = ½Σcz², so charge enters <b>squared</b>. NaCl gives ½(0.1·1 + 0.1·1) = 0.10 m; MgSO₄ gives ½(0.1·4 + 0.1·4) = 0.40 m. The Debye length goes as I<sup>−½</sup>, so MgSO₄ screens twice as tightly at the same molality. This is why ionic strength, not concentration, is the variable in every equation on this page."},
 
- {q:"Debye–Hückel limiting law predicts γ± = 0.89 for a solution where the measured value is 0.76. What is the single most likely reason?",
+ {q:"For 0.10 m NaCl the Debye–Hückel limiting law predicts γ± = 0.69, but the measured value is 0.78. What is the single most likely reason?",
   o:["The temperature was wrong",
      "The solution is too concentrated for point charges — the ions have a size the law ignores",
      "The law only works for salts of unequal charge",
      "The measurement is wrong; the limiting law is exact"],
   a:1,
-  w:"The limiting law is exact only as I → 0, where the atmosphere stands many ionic radii away. As concentration rises the atmosphere closes in until it is comparable with the ion itself, and a point-charge treatment reads high. Giving the ion a finite size a — the extended law — is the first correction, and it always makes γ± larger than the limiting law, not smaller."},
+  w:"The limiting law is exact only as I → 0, where the atmosphere stands many ion diameters away. At 0.1 m the Debye length is about 1 nm, only a few times a hydrated ion, yet the law still lets the atmosphere crowd right up to a point charge — it overstates the stabilisation, so γ± reads <b>low</b>. Giving the ion a size a, the extended law, holds the atmosphere off and raises γ±: with a ≈ 4 Å it gives 0.77, close to the 0.78 measured. Mind the direction: every size correction raises γ± above the limiting law, so a measured value <em>below</em> the limiting-law prediction could not be blamed on ion size."},
 
  {q:"For NaCl, γ± falls to a minimum near 1 m and then <b>rises</b>, passing 1.0 by about 6 m. Can electrostatics alone explain the rise?",
   o:["Yes — the atmosphere eventually repels",
@@ -936,7 +936,7 @@ function gsDraw(ts){
     ? "<b>Right now:</b> the sphere has radius r = " + (R * 1e9).toFixed(2) + " nm, " + beyond.toFixed(1)
       + " Debye lengths beyond the ion's surface. <b>" + crossing + " of " + GS_NL + "</b> field lines cross it, so it holds about "
       + crossing + "/" + GS_NL + " = " + (crossing / GS_NL).toFixed(2) + " of the ion's charge; the plot, computed exactly, reads "
-      + "Q<sub>enc</sub>/zε = " + Q.toFixed(3) + ". The other " + (GS_NL - crossing) + " lines ended on counter-charge inside the sphere."
+      + "Q<sub>enc</sub>/ze = " + Q.toFixed(3) + ". The other " + (GS_NL - crossing) + " lines ended on counter-charge inside the sphere."
     : "<b>Right now:</b> no atmosphere, so all " + GS_NL + " lines cross the sphere at any radius and the plot stays at 1 — the field "
       + "falls only as 1/r², and the ion is felt everywhere.";
 
@@ -960,7 +960,7 @@ function gsDraw(ts){
   [0.5, 1].forEach(function(q){
     p += '<text x="' + (L - 6) + '" y="' + (Y(q) + 3).toFixed(1) + '" text-anchor="end" fill="var(--muted)" ' + MONO + ' font-size="9.5">' + q.toFixed(1) + '</text>';
   });
-  p += '<text transform="rotate(-90 12 ' + ((T + H - B) / 2) + ')" x="12" y="' + ((T + H - B) / 2) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="10">Q_enc / zε</text>';
+  p += '<text transform="rotate(-90 12 ' + ((T + H - B) / 2) + ')" x="12" y="' + ((T + H - B) / 2) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="10">Q_enc / ze</text>';
   /* the same scale counted in field lines, as in the picture */
   p += '<line x1="' + (W - Rr) + '" y1="' + T + '" x2="' + (W - Rr) + '" y2="' + (H - B) + '" stroke="var(--line-2)"/>';
   [0, 0.5, 1].forEach(function(q){
@@ -1010,7 +1010,7 @@ function gsDraw(ts){
   p += '<line x1="' + xr.toFixed(1) + '" y1="' + T + '" x2="' + xr.toFixed(1) + '" y2="' + (H - B) + '" stroke="var(--sph)" stroke-width="1.4" stroke-dasharray="6 3"/>';
   p += '<circle cx="' + xr.toFixed(1) + '" cy="' + Y(Q).toFixed(1) + '" r="5" fill="var(--sph)" stroke="var(--surface)" stroke-width="2"/>';
   /* the count at the sphere goes wherever it is clear of the two fixed labels */
-  var qtxt = Q.toFixed(2) + ' zε inside', qw = qtxt.length * 6.3;
+  var qtxt = Q.toFixed(2) + ' ze inside', qw = qtxt.length * 6.3;
   var busy = [{x0: W - Rr - 56, x1: W - Rr - 2, y0: Y(1) - 16, y1: Y(1) - 1}];
   if(atm){
     busy.push(xsEnd ? {x0: xs - 50, x1: xs - 2, y0: H - B - 17, y1: H - B - 2}
@@ -1043,15 +1043,15 @@ function gsDraw(ts){
       + " lines cross however large the sphere, and the field falls as 1/r² for ever. Switch the atmosphere on to see what a solution does to that.";
   }else if(Q > 0.8){
     v.className = "verdict go";
-    v.innerHTML = "<b>Inside most of the atmosphere: " + Q.toFixed(2) + " zε enclosed.</b> The sphere has taken in little counter-charge, so the field "
+    v.innerHTML = "<b>Inside most of the atmosphere: " + Q.toFixed(2) + " ze enclosed.</b> The sphere has taken in little counter-charge, so the field "
       + "on it is still almost the bare Coulomb value. Grow it past a + 1/κ and watch the count fall.";
   }else if(Q > 0.1){
     v.className = "verdict stop";
-    v.innerHTML = "<b>Partly screened: " + Q.toFixed(2) + " zε enclosed.</b> The sphere now holds " + ((1 - Q) * 100).toFixed(0)
+    v.innerHTML = "<b>Partly screened: " + Q.toFixed(2) + " ze enclosed.</b> The sphere now holds " + ((1 - Q) * 100).toFixed(0)
       + " % of the atmosphere, and the field on it is that fraction weaker than Coulomb’s law says. Nothing about the ion has changed — only what else the sphere contains.";
   }else{
     v.className = "verdict flat";
-    v.innerHTML = "<b>Screened out: " + Q.toFixed(3) + " zε enclosed.</b> Ion and atmosphere together are almost neutral, so almost no field "
+    v.innerHTML = "<b>Screened out: " + Q.toFixed(3) + " ze enclosed.</b> Ion and atmosphere together are almost neutral, so almost no field "
       + "leaves the sphere. This is why ions further than a few Debye lengths apart barely notice each other.";
   }
 }
