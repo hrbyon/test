@@ -211,54 +211,33 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
       </div>
     </div>
 
-    <div class="two eq">
-
-      <div class="card">
-        <div class="card-h"><h2>Choose</h2><span class="note">one solvent, marked on all three plots</span></div>
-        <div class="card-b stack">
-          <div>
-            <label class="fld" for="svSel">Solvent to read out</label>
-            <select id="svSel"></select>
-          </div>
-          <div>
-            <span class="fld">Families to show</span>
-            <div class="pill-row" id="svCls">
-              <button class="pill" data-c="all"     aria-pressed="true"  type="button">all</button>
-              <button class="pill" data-c="protic"  aria-pressed="false" type="button">protic</button>
-              <button class="pill" data-c="aprotic" aria-pressed="false" type="button">dipolar aprotic</button>
-              <button class="pill" data-c="apolar"  aria-pressed="false" type="button">apolar</button>
+    <div class="card">
+      <div class="card-h"><h2>The solvent you picked</h2><span class="note" id="svWho">&mdash;</span></div>
+      <div class="card-b">
+        <div class="two eq">
+          <div class="stack" style="gap:12px">
+            <div>
+              <label class="fld" for="svSel">Solvent &mdash; marked on all three plots</label>
+              <select id="svSel"></select>
+            </div>
+            <div>
+              <div class="readout"><span class="k">boiling / freezing point</span><span class="v" id="svBp">&mdash;</span></div>
+              <div class="readout"><span class="k">vapour pressure at 25 °C</span><span class="v" id="svVp">&mdash;</span></div>
+              <div class="readout"><span class="k">viscosity η</span><span class="v" id="svEta">&mdash;</span></div>
+              <div class="readout"><span class="k"><span class="mig">relative permittivity</span>, ε<sub>r</sub></span><span class="v" id="svEr">&mdash;</span></div>
+              <div class="readout"><span class="k">dipole moment, μ</span><span class="v" id="svMu">&mdash;</span></div>
+              <div class="readout"><span class="k"><span class="dif">donor number</span>, DN &nbsp;&middot;&nbsp; <span class="con">acceptor number</span>, AN</span><span class="v" id="svDnan">&mdash;</span></div>
+              <div class="readout"><span class="k">autoprotolysis, pK<sub>SH</sub></span><span class="v" id="svPk">&mdash;</span></div>
             </div>
           </div>
-          <div class="btnrow">
-            <button class="ghost" id="svBat" type="button">Battery solvents</button>
-            <button class="ghost" id="svAll" type="button">Show everything</button>
+          <div class="stack" style="gap:12px">
+            <div id="svVerdict" class="verdict flat">&mdash;</div>
+            <div id="svDaVerdict" class="verdict flat">&mdash;</div>
+            <p class="hint" style="margin:0">Colours on the plots: <b style="color:var(--red-)">protic</b> &middot; <b style="color:var(--ox)">dipolar aprotic</b>
+              &middot; <b style="color:var(--muted)">apolar</b>. Filled and labelled: the solvent you picked.</p>
           </div>
-          <div class="btnrow">
-            <button class="ghost" id="svLi" type="button">Best for Li⁺ (highest DN)</button>
-            <button class="ghost" id="svAn" type="button">Best for small anions (highest AN)</button>
-          </div>
-          <p class="hint" style="margin:0">Colours: <b style="color:var(--red-)">protic</b> &middot; <b style="color:var(--ox)">dipolar aprotic</b>
-            &middot; <b style="color:var(--muted)">apolar</b>. Filled and labelled: the solvent you picked.</p>
         </div>
       </div>
-
-      <div class="card">
-        <div class="card-h"><h2>The solvent you picked</h2><span class="note" id="svWho">&mdash;</span></div>
-        <div class="card-b stack" style="gap:12px">
-          <div>
-            <div class="readout"><span class="k">boiling / freezing point</span><span class="v" id="svBp">&mdash;</span></div>
-            <div class="readout"><span class="k">vapour pressure at 25 °C</span><span class="v" id="svVp">&mdash;</span></div>
-            <div class="readout"><span class="k">viscosity η</span><span class="v" id="svEta">&mdash;</span></div>
-            <div class="readout"><span class="k"><span class="mig">relative permittivity</span>, ε<sub>r</sub></span><span class="v" id="svEr">&mdash;</span></div>
-            <div class="readout"><span class="k">dipole moment, μ</span><span class="v" id="svMu">&mdash;</span></div>
-            <div class="readout"><span class="k"><span class="dif">donor number</span>, DN &nbsp;&middot;&nbsp; <span class="con">acceptor number</span>, AN</span><span class="v" id="svDnan">&mdash;</span></div>
-            <div class="readout"><span class="k">autoprotolysis, pK<sub>SH</sub></span><span class="v" id="svPk">&mdash;</span></div>
-          </div>
-          <div id="svVerdict" class="verdict flat">&mdash;</div>
-          <div id="svDaVerdict" class="verdict flat">&mdash;</div>
-        </div>
-      </div>
-
     </div>
 
     <div class="trio3" style="margin-top:16px">
@@ -582,31 +561,21 @@ function scatter(id, opts){
 }
 
 /* ---------------- one tab: three fixed plots, one pick ---------------- */
-var svCls = "all", svPick = "water";
+var svPick = "water";
 (function(){
   var sel = document.getElementById("svSel");
   sel.innerHTML = SOLV.map(function(s){ return '<option value="' + s.k + '">' + s.nm + ' (' + s.ab + ')</option>'; }).join("");
   sel.value = svPick;
   sel.addEventListener("change", function(){ svPick = this.value; svDraw(); });
 })();
-pillGroup("svCls", function(b){ svCls = b.getAttribute("data-c"); svDraw(); });
-function svChoose(k){ svPick = k; document.getElementById("svSel").value = k; svDraw(); }
-document.getElementById("svBat").addEventListener("click", function(){
-  svCls = "bat"; [].slice.call(document.getElementById("svCls").querySelectorAll(".pill")).forEach(function(o){ o.setAttribute("aria-pressed", "false"); });
-  svChoose("ec");
-});
-document.getElementById("svAll").addEventListener("click", function(){ svCls = "all"; pressPill("svCls", "data-c", "all"); svDraw(); });
 var DA = SOLV.filter(function(s){ return s.dn !== null && s.an !== null; });
-document.getElementById("svLi").addEventListener("click", function(){ svChoose(DA.slice().sort(function(a, b){ return b.dn - a.dn; })[0].k); });
-document.getElementById("svAn").addEventListener("click", function(){ svChoose(DA.slice().sort(function(a, b){ return b.an - a.an; })[0].k); });
 
 function svT(v, log){ return log ? Math.log10(Math.max(v, 1e-3)) : v; }
-/* one plot: the solvents of the chosen families that have both numbers, the fit in the plotted coordinates */
+/* one plot: every solvent that has both numbers, the fit in the plotted coordinates */
 function svPlot(id, xk, yk, noteId, tagOut){
   var lx = AXES[xk].log, ly = AXES[yk].log;
   var shown = SOLV.filter(function(s){
-    if(s[xk] === null || s[yk] === null) return false;
-    return svCls === "all" ? true : svCls === "bat" ? !!s.bat : s.cls === svCls;
+    return s[xk] !== null && s[yk] !== null;
   });
   var fit = pearson(shown.map(function(s){ return [svT(s[xk], lx), svT(s[yk], ly)]; }));
   var out = null;
@@ -650,14 +619,28 @@ function svDraw(){
     v.className = "verdict go";
     v.innerHTML = "<b>Polar, on a small dipole.</b> ε<sub>r</sub> = " + s0.er + " clears 15, but μ is only " + s0.mu
       + " D. Hydrogen bonding lines the molecules up, so the liquid responds far more strongly than one molecule would.";
+  }else if(s0.cls === "aprotic" && s0.dn !== null && s0.dn >= 18){
+    /* ethers and pyridine: little permittivity, but a strong lone pair on Li+ */
+    v.className = "verdict go";
+    v.innerHTML = "<b>Low ε<sub>r</sub>, but a strong donor.</b> ε<sub>r</sub> = " + s0.er + " divides Coulomb's force only weakly, so a salt "
+      + "here is largely paired: contact ion pairs and aggregates, the Bjerrum picture from lecture 6. But DN = " + s0.dn
+      + " wraps Li⁺ in lone pairs" + (s0.k === "dme" ? " (DME chelates it with both oxygens)" : "") + ", so lithium salts still dissolve at "
+      + "useful concentrations, and the low viscosity (η = " + s0.eta + " cP) keeps the ions moving. "
+      + (s0.bat ? "That is why ethers are workhorse electrolyte solvents for lithium-metal, Li–S and Li–O₂ cells, often with a "
+                  + "high-ε<sub>r</sub> co-solvent; their weak point is oxidation above about 4 V vs Li⁺/Li."
+                : "Here it is the donor strength, not ε<sub>r</sub>, that dissolves the salt.");
   }else if(dipolar){
     v.className = "verdict stop";
     v.innerHTML = "<b>A real dipole in a low-ε<sub>r</sub> liquid.</b> μ = " + s0.mu + " D but ε<sub>r</sub> = " + s0.er
       + ", under 15: it will dissolve a salt without separating the ions, so expect ion pairs — the Bjerrum picture from lecture 6.";
+  }else if(s0.cls === "protic"){
+    v.className = "verdict stop";
+    v.innerHTML = "<b>Protic, but low ε<sub>r</sub>.</b> ε<sub>r</sub> = " + s0.er + ": hydrogen bonds hold anions, yet the weak "
+      + "screening leaves most of a salt paired, so it conducts poorly for its polarity.";
   }else{
     v.className = "verdict stop";
-    v.innerHTML = "<b>Apolar.</b> ε<sub>r</sub> = " + s0.er + " and μ = " + s0.mu + " D. Coulomb's force is barely divided here, "
-      + "so salts stay associated or do not dissolve. Useful as a diluent, not as an electrolyte solvent.";
+    v.innerHTML = "<b>Apolar.</b> ε<sub>r</sub> = " + s0.er + " and μ = " + s0.mu + " D, and little donor strength to make up for it. "
+      + "Coulomb's force is barely divided, so on its own it will not carry a salt; it is used as a diluent or co-solvent.";
   }
 
   var d = document.getElementById("svDaVerdict");
@@ -910,7 +893,11 @@ sendBtn.addEventListener("click",function(){
       sendBtn.textContent="Submitted ✓";
       dlHint.textContent="Recorded for student ID "+id+". You can close this page.";
     }else{
-      throw new Error((j && j.error) || "rejected");
+      /* the sheet answered and refused (already recorded, no ID ...): say why, and do not resend */
+      sendBtn.disabled=false;
+      sendBtn.textContent="Submit to the course";
+      dlHint.textContent="Not recorded — "+((j && j.error) || "the course sheet refused it.")
+        + " Keep the downloaded file and tell your instructor if this looks wrong.";
     }
   })
   .catch(function(){
