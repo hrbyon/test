@@ -161,6 +161,7 @@ tr.analyte td{color:var(--ox);font-weight:500}
 @media(max-width:1000px){.trio3{grid-template-columns:1fr 1fr}}
 @media(max-width:720px){.trio3{grid-template-columns:1fr}}
 .two.eq{align-items:stretch}
+.two.wideL{grid-template-columns:minmax(330px,1.5fr) minmax(240px,1fr)}
 .two.eq>.card{display:flex;flex-direction:column}
 .two.eq>.card>.card-b:last-child{flex:1 1 auto}
 .btnrow{display:flex;gap:8px;flex-wrap:wrap}
@@ -239,7 +240,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
       </div>
     </div>
 
-    <div class="two eq" style="margin-bottom:16px">
+    <div class="two eq wideL" style="margin-bottom:16px">
 
       <div class="card">
       <div class="card-h"><h2>One ion, moving</h2><span class="note" id="dfNote">&mdash;</span></div>
@@ -1055,7 +1056,8 @@ var ION = [
   {k:"Br",  nm:"Br⁻",   lam:78.4,   z:-1, rc:196,  m:79.90},
   {k:"NO3", nm:"NO₃⁻",  lam:71.44,  z:-1, rc:null, m:62.00},
   {k:"OAc", nm:"OAc⁻",  lam:40.9,   z:-1, rc:null, m:59.04},
-  {k:"SO4", nm:"SO₄²⁻", lam:79.8,   z:-2, rc:null, m:96.06}
+  {k:"SO4", nm:"SO₄²⁻", lam:79.8,   z:-2, rc:null, m:96.06},
+  {k:"La",  nm:"La³⁺",  lam:69.7,   z:3,  rc:103,  m:138.91}
 ];
 function ionOf(k){ return ION.filter(function(o){ return o.k === k; })[0]; }
 function mbU(o){ return o.lam * 1e-4 / FARADAY; }                                      /* m2 V-1 s-1 */
@@ -1087,7 +1089,7 @@ document.getElementById("seplot").addEventListener("click", function(e){
 });
 
 /* the ions worth marking: spheres only, so no Grotthuss hoppers */
-var SE_IONS = ["Li", "Na", "K", "Ca", "Cl", "Br", "SO4"];
+var SE_IONS = ["Li", "Na", "K", "Ca", "Cl", "Br", "SO4", "La"];
 
 function seDraw(){
   var r = +document.getElementById("seR").value * 1e-12;          /* m   */
@@ -1175,6 +1177,9 @@ function seDraw(){
   var placed = [], marks = [];
   SE_IONS.forEach(function(k){
     var o = ionOf(k), rr = seRofIon(o);
+    /* an ion of another charge cannot be read on this plot's lambda axis, so
+       the charge buttons pick which ions belong on it                     */
+    if(Math.abs(o.z) !== z) return;
     if(rr > rMax) return;
     var d = seD(rr, T, eta);
     marks.push({k: k, nm: o.nm, z: Math.abs(o.z), on: Math.abs(o.z) === z, x: X(rr), y: Y(Math.min(d, dMax)), over: d > dMax});
