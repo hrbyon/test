@@ -217,16 +217,22 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
         <div class="eqbig">
           <span class="con">&Lambda;<sub>m</sub> = &Lambda;<sub>m</sub>&deg; &minus; (A + B&Lambda;<sub>m</sub>&deg;)&radic;c</span>
           &nbsp;&nbsp;&middot;&nbsp;&nbsp;
-          <span class="dif">A = zeF&kappa;<sub>1</sub>/3&pi;&eta;</span>
+          <span class="dif">A = zeF&kappa;<sub>D</sub><sub>,1</sub>/3&pi;&eta;</span>
           &nbsp;&nbsp;&middot;&nbsp;&nbsp;
-          <span class="mig">B = &lambda;<sub>B</sub>&kappa;<sub>1</sub>(2 &minus; &radic;2)/6</span><br>
+          <span class="mig">B = &lambda;<sub>B</sub>&kappa;<sub>D</sub><sub>,1</sub>(2 &minus; &radic;2)/6</span><br>
           <span class="con">&kappa; = (l/A)&middot;(1/R)</span> <small>S m<sup>&minus;1</sup>, from the cell</small>
           &nbsp;&nbsp;&middot;&nbsp;&nbsp;
           <span class="mig">&Lambda; = &kappa;/C</span> <small>S m<sup>2</sup> mol<sup>&minus;1</sup></small>
           &nbsp;&nbsp;&middot;&nbsp;&nbsp;
           <span class="dif">&Lambda;<sub>C</sub> = &Lambda;&deg; &minus; k&radic;C</span> <small>Kohlrausch</small><br>
-          <small>Debye&ndash;Hückel&ndash;Onsager, 1:1 salt &nbsp;&middot;&nbsp; electrophoretic term &nbsp;&middot;&nbsp; relaxation term &nbsp;&middot;&nbsp; &kappa;<sub>1</sub> is &kappa; at 1 mol/L, &lambda;<sub>B</sub> the Bjerrum length</small>
+          <small>Debye&ndash;Hückel&ndash;Onsager, 1:1 salt &nbsp;&middot;&nbsp; electrophoretic term &nbsp;&middot;&nbsp; relaxation term &nbsp;&middot;&nbsp; &kappa;<sub>D</sub><sub>,1</sub> is the Debye &kappa;<sub>D</sub> at 1 mol/L, &lambda;<sub>B</sub> the Bjerrum length</small>
         </div>
+        <div class="verdict flat" style="margin:0"><b>Two different &kappa; on this page.</b>
+          <b class="con">&kappa;</b> alone is the <b>conductivity</b> of the solution, S m<sup>&minus;1</sup>: what the cell measures, &kappa; = (l/A)(1/R).
+          <b class="mig">&kappa;<sub>D</sub></b> is the <b>Debye parameter</b>, m<sup>&minus;1</sup>: the inverse thickness of the ion atmosphere, so 1/&kappa;<sub>D</sub> is the Debye length
+          of Lecture 6. They are unrelated quantities that share a letter &mdash; one is a property of the whole solution, the other a length around one ion.
+          Both grow with concentration, which is why the confusion is easy: &kappa; roughly as c, &kappa;<sub>D</sub> as &radic;c. Lecture 6 and most textbooks write the
+          Debye one as plain &kappa;; it carries the D here only to keep the two apart.</div>
         <p class="hint" style="margin:0">The <a href="lecture06.html">Ion Atmosphere</a> of Lecture 6 is a snapshot: an ion at rest, its counter-charge spread
           symmetrically around it. Switch on a field and the ion moves &mdash; and its atmosphere cannot move with it. The cloud
           is not a shell the ion carries but a statistical excess that has to be <b>torn down behind the ion and rebuilt in front
@@ -234,7 +240,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
           has more counter-charge behind it than ahead of it, and that lopsided cloud pulls it back: the <b>relaxation</b>, or
           asymmetry, effect.<br><br>
           At the same time the counter-ions are being driven the other way. They drag their solvent with them, so the ion is
-          swimming upstream: the <b>electrophoretic</b> effect. Both grow with the density of the atmosphere, both go as &kappa;
+          swimming upstream: the <b>electrophoretic</b> effect. Both grow with the density of the atmosphere, both go as &kappa;<sub>D</sub>
           and therefore as &radic;c, and together they are why molar conductivity falls with concentration exactly as Kohlrausch
           measured &mdash; and why that fall is a <em>limiting</em> law, true only as c &rarr; 0.</p>
       </div>
@@ -277,7 +283,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
       <div class="card">
       <div class="card-h"><h2>The numbers</h2><span class="note" id="dfWho">&mdash;</span></div>
       <div class="card-b">
-        <div class="readout"><span class="k">Debye length, 1/&kappa;</span><span class="v" id="dfL">&mdash;</span></div>
+        <div class="readout"><span class="k">Debye length, 1/&kappa;<sub>D</sub></span><span class="v" id="dfL">&mdash;</span></div>
         <div class="readout"><span class="k">time to rebuild the atmosphere, &tau; = &epsilon;/&sigma;</span><span class="v" id="dfTau">&mdash;</span></div>
         <div class="readout"><span class="k">drift speed of the cation, uE</span><span class="v" id="dfV">&mdash;</span></div>
         <div class="readout"><span class="k">real lag of the atmosphere, u E &tau;</span><span class="v" id="dfLag">&mdash;</span></div>
@@ -358,7 +364,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
             ordinary field. In 10 mM salt that is about 2 %. Only at fields near 10<sup>7</sup> V/m does the lag become
             comparable with the atmosphere, and the conductivity starts to rise (the Wien effect).</p>
           <p class="hint" style="margin:0"><b>3. From one ion to the plot.</b> Both losses are set by the density of the
-            atmosphere, so both go as &kappa; &prop; &radic;c: that is why the measured circles fall on a straight line against
+            atmosphere, so both go as &kappa;<sub>D</sub> &prop; &radic;c: that is why the measured circles fall on a straight line against
             &radic;c at low concentration. The line is Onsager&rsquo;s, with no fitted parameter. Past about 10 mM the circles lift
             above it &mdash; the same failure of point charges that the extended law fixes for activity.</p>
         </div>
@@ -400,11 +406,11 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
           </div>
           <div>
             <div class="slider-row"><span class="fld" style="margin:0">Temperature, T</span><span class="val" id="seTv"></span></div>
-            <input type="range" id="seT" min="273" max="353" step="1" value="298">
+            <input type="range" id="seT" min="0" max="80" step="1" value="25">
           </div>
           <div>
-            <span class="fld">Solvent &nbsp;<small style="color:var(--muted)">&eta; at 25 °C / cP</small></span>
-            <div class="pill-row" id="seSolv"><button class="pill" data-eta="0.89" data-nm="water" aria-pressed="true" type="button">water 0.89</button><button class="pill" data-eta="0.551" data-nm="methanol" aria-pressed="false" type="button">methanol 0.551</button><button class="pill" data-eta="0.341" data-nm="acetonitrile" aria-pressed="false" type="button">acetonitrile 0.341</button><button class="pill" data-eta="1.99" data-nm="DMSO" aria-pressed="false" type="button">DMSO 1.99</button><button class="pill" data-eta="2.53" data-nm="PC" aria-pressed="false" type="button">PC 2.53</button></div>
+            <span class="fld">Solvent &nbsp;<small style="color:var(--muted);text-transform:none">&eta; at 25 °C / cP</small></span>
+            <div class="pill-row" id="seSolv"><button class="pill" data-eta="0.890" data-nm="water" aria-pressed="true" type="button">water 0.890</button><button class="pill" data-eta="0.551" data-nm="methanol" aria-pressed="false" type="button">methanol 0.551</button><button class="pill" data-eta="0.341" data-nm="acetonitrile" aria-pressed="false" type="button">acetonitrile 0.341</button><button class="pill" data-eta="1.99" data-nm="DMSO" aria-pressed="false" type="button">DMSO 1.99</button><button class="pill" data-eta="2.53" data-nm="PC" aria-pressed="false" type="button">PC 2.53</button></div>
           </div>
           <div>
             <span class="fld">Charge, |z|</span>
@@ -767,7 +773,7 @@ function dfNumbers(){
   document.getElementById("dfTau").textContent = (tau * 1e9).toPrecision(3) + " ns";
   document.getElementById("dfV").textContent = dfOn ? (v * 1e6 >= 1000 ? (v * 1e3).toPrecision(3) + " mm/s" : (v * 1e6).toPrecision(3) + " µm/s") : "0 — field off";
   var pm = lag * 1e12;
-  document.getElementById("dfLag").innerHTML = dfOn ? dfPm(pm) + " pm  (" + sciH(lag / lam, 1) + " of 1/κ)" : "0";
+  document.getElementById("dfLag").innerHTML = dfOn ? dfPm(pm) + " pm  (" + sciH(lag / lam, 1) + " of 1/κ_D)" : "0";
   document.getElementById("dfRel").textContent = (K.B * sq * 100).toFixed(2) + " % of the applied field";
   document.getElementById("dfEp").textContent = (K.A * sq).toFixed(2) + " S cm² mol⁻¹  (" + (100 * K.A * sq / s.L0).toFixed(2) + " % of Λ°)";
   document.getElementById("dfLam").textContent = Lm.toFixed(1) + "  ·  " + (meas === null ? "—" : meas.toFixed(1)) + " S cm² mol⁻¹";
@@ -1093,7 +1099,7 @@ var SE_IONS = ["Li", "Na", "K", "Ca", "Cl", "Br", "SO4", "La"];
 
 function seDraw(){
   var r = +document.getElementById("seR").value * 1e-12;          /* m   */
-  var T = +document.getElementById("seT").value;                  /* K   */
+  var T = +document.getElementById("seT").value + 273.15;         /* K, the slider is in °C */
   var eta = seEta(T), z = SE.z;
   var D = seD(r, T, eta);                                         /* m2/s */
   var u = z * QE / (6 * Math.PI * eta * r);                       /* m2 V-1 s-1 */
@@ -1102,9 +1108,10 @@ function seDraw(){
   var t10 = Math.pow(10e-6, 2) / (2 * D);                         /* s */
 
   document.getElementById("seRv").textContent = (r * 1e9).toFixed(3) + " nm";
-  document.getElementById("seTv").textContent = T + " K  (" + (T - 273.15).toFixed(0) + " °C)";
+  document.getElementById("seTv").textContent = (T - 273.15).toFixed(0) + " °C  (" + T.toFixed(2) + " K)";
   document.getElementById("seNote").textContent = SE.nm + ", " + (T - 273.15).toFixed(0) + " °C, |z| = " + z;
-  document.getElementById("seEta").textContent = (eta * 1e3).toPrecision(3) + " cP";
+  document.getElementById("seEta").textContent = (eta * 1e3).toPrecision(3) + " cP"
+    + (Math.abs(T - T25) < 0.01 ? "  (the table value)" : "");
   document.getElementById("seD").innerHTML = sciH(D * 1e4, 3) + " cm² s⁻¹";
   document.getElementById("seU").innerHTML = sciH(u * 1e4, 3) + " cm² V⁻¹ s⁻¹";
   document.getElementById("seLam").textContent = (lam * 1e4).toFixed(1) + " S cm² mol⁻¹";
