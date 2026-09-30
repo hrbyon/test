@@ -412,6 +412,9 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
               <button class="pill" data-z="2" aria-pressed="false" type="button">2</button>
               <button class="pill" data-z="3" aria-pressed="false" type="button">3</button>
             </div>
+            <p class="hint" style="margin:6px 0 0;font-size:12px;color:var(--muted)">the charge of the sphere, not a particular ion &mdash;
+              <b>1</b>: Na⁺, K⁺, Cl⁻ &nbsp;&middot;&nbsp; <b>2</b>: Ca²⁺, Mg²⁺, SO₄²⁻ &nbsp;&middot;&nbsp; <b>3</b>: La³⁺, Fe(CN)₆³⁻.
+              D does not depend on it; u goes as |z| and &lambda;&deg; as z².</p>
           </div>
           <div>
             <div class="readout"><span class="k">viscosity at T, &eta;</span><span class="v" id="seEta">&mdash;</span></div>
@@ -433,7 +436,8 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
           <div class="glegend" style="font-size:11.5px;line-height:1.35;gap:3px">
             <span><b class="dif">solid curve</b>: D = k<sub>B</sub>T/6&pi;&eta;r at the temperature and solvent you set</span>
             <span><b style="color:var(--muted)">grey dashed</b>: the same curve for water at 25 °C, for comparison</span>
-            <span><b>dots</b>: real ions, placed at the Stokes radius their measured &lambda;&deg; in water implies. <b>Click one</b> to move the slider there.</span>
+            <span><b>dots</b>: real ions, placed at the Stokes radius their measured &lambda;&deg; in water implies. The ones whose charge matches the |z| you picked are <b>filled green</b> &mdash; only those can be read on the right-hand &lambda;&deg; axis. <b>Click one</b> to move the slider there.</span>
+            <span><b style="color:var(--muted)">grey band, r &lt; 0.15 nm</b>: smaller than a water molecule. Stokes&rsquo; law treats the solvent as a continuous fluid, which it is not on that scale, so a radius in there is an effective number rather than a size.</span>
             <span><b class="con">right axis</b>: the same curve read as a conductivity, &lambda;&deg; = z<sup>2</sup>F<sup>2</sup>D/RT. <b>Charge moves this axis and nothing else</b> &mdash; D and the curve cannot depend on z, but &lambda;&deg; goes as z<sup>2</sup> and the mobility u as |z|, so the readouts change with the charge buttons while the shape does not.</span>
             <span style="display:block;color:var(--ink-2)">The dots sit on the curve in every solvent because Stokes&rsquo; law is being asked to keep r fixed &mdash; that assumption <em>is</em> Walden&rsquo;s rule.</span>
           </div>
@@ -1173,7 +1177,7 @@ function seDraw(){
     var o = ionOf(k), rr = seRofIon(o);
     if(rr > rMax) return;
     var d = seD(rr, T, eta);
-    marks.push({k: k, nm: o.nm, x: X(rr), y: Y(Math.min(d, dMax)), over: d > dMax});
+    marks.push({k: k, nm: o.nm, z: Math.abs(o.z), on: Math.abs(o.z) === z, x: X(rr), y: Y(Math.min(d, dMax)), over: d > dMax});
   });
   marks.sort(function(a, b){ return a.x - b.x; });
   marks.filter(function(m){ return m.over; }).forEach(function(m){
@@ -1199,9 +1203,10 @@ function seDraw(){
       g += '<line x1="' + m.x.toFixed(1) + '" y1="' + m.y.toFixed(1) + '" x2="' + (put.x < m.x ? put.x + w + 2 : put.x - 2).toFixed(1)
          + '" y2="' + (put.y - 4).toFixed(1) + '" stroke="var(--line-2)" stroke-width="1"/>';
     }
-    g += '<circle cx="' + m.x.toFixed(1) + '" cy="' + m.y.toFixed(1) + '" r="4.5" fill="var(--surface)" stroke="var(--ink-2)" stroke-width="1.6"'
-       + (m.over ? ' opacity="0.45"' : '') + '/>';
-    g += '<text x="' + put.x.toFixed(1) + '" y="' + put.y.toFixed(1) + '" fill="var(--ink-2)" ' + MONO + ' font-size="11">' + m.nm + '</text>';
+    g += '<circle cx="' + m.x.toFixed(1) + '" cy="' + m.y.toFixed(1) + '" r="4.5" fill="' + (m.on ? "var(--go)" : "var(--surface)")
+       + '" stroke="var(--ink-2)" stroke-width="1.6" opacity="' + (m.on ? 1 : 0.5) + '"/>';
+    g += '<text x="' + put.x.toFixed(1) + '" y="' + put.y.toFixed(1) + '" fill="' + (m.on ? "var(--ink)" : "var(--ink-2)") + '" ' + MONO
+       + ' font-size="11" opacity="' + (m.on ? 1 : 0.6) + '"' + (m.on ? ' font-weight="600"' : '') + '>' + m.nm + '</text>';
     g += '</g>';
   });
   /* where the slider is */
@@ -1214,6 +1219,8 @@ function seDraw(){
   /* the solvent-molecule floor */
   g += '<rect x="' + L + '" y="' + Tp + '" width="' + (X(0.15e-9) - L).toFixed(1) + '" height="' + (H - Tp - B) + '" fill="var(--line-2)" opacity="0.25"/>';
   g += '<text x="' + (X(0.15e-9) - 6).toFixed(1) + '" y="' + (H - B - 8) + '" text-anchor="end" fill="var(--muted)" ' + MONO + ' font-size="10">r &lt; one water molecule</text>';
+  g += '<text x="' + (X(0.15e-9) - 6).toFixed(1) + '" y="' + (H - B - 21) + '" text-anchor="end" fill="var(--muted)" ' + MONO
+     + ' font-size="10">Stokes\u2019 law assumes a continuous fluid</text>';
   document.getElementById("seplot").innerHTML = g;
 
   /* ---- what it means ---- */
