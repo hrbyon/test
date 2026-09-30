@@ -1,0 +1,1593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Ionic Conductivity Bench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+:root{
+  --ground:#F1F3F2; --surface:#FFFFFF; --surface-2:#E9EDEB;
+  --ink:#14191B; --ink-2:#3E4A4D; --muted:#68767A; --line:#D6DDDA; --line-2:#C3CCC8;
+  --ox:#A85B33; --ox-soft:#F3E4DA;
+  --red-:#15618E; --red-soft:#DDE9F2;
+  --go:#2C7355; --go-soft:#DCEBE3;
+  --stop:#8A5F0C; --stop-soft:#F3E9D3;
+  --elec:#3E4A4D;
+  --shadow:0 1px 2px rgba(20,25,27,.05),0 8px 24px -12px rgba(20,25,27,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+    --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+    --ox:#D08551; --ox-soft:#33231A;
+    --red-:#5AA6D4; --red-soft:#152833;
+    --go:#5DBB8D; --go-soft:#152A21;
+    --stop:#D6A33F; --stop-soft:#2B2415;
+    --elec:#AEBBBE;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+  --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+  --ox:#D08551; --ox-soft:#33231A;
+  --red-:#5AA6D4; --red-soft:#152833;
+  --go:#5DBB8D; --go-soft:#152A21;
+  --stop:#D6A33F; --stop-soft:#2B2415;
+  --elec:#AEBBBE;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:32px 20px 72px}
+.masthead{display:flex;flex-wrap:wrap;align-items:flex-end;gap:20px 32px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.eyebrow a{color:inherit}
+h1{font-family:"IBM Plex Serif",Georgia,serif;font-weight:600;font-size:clamp(28px,4.2vw,42px);line-height:1.12;margin:0;text-wrap:balance;letter-spacing:-.015em}
+.sub{margin:8px 0 0;color:var(--ink-2);font-size:15px;max-width:62ch}
+.tabs{display:flex;gap:2px;margin:24px 0 22px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{appearance:none;background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);
+  font-family:inherit;font-size:14.5px;font-weight:500;padding:11px 16px;cursor:pointer;white-space:nowrap;margin-bottom:-1px}
+.tab:hover{color:var(--ink-2)}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ox)}
+.tab:focus-visible{outline:2px solid var(--red-);outline-offset:-2px;border-radius:4px 4px 0 0}
+.panel[hidden]{display:none}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow)}
+.card-h{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.card-h h2{font-size:15px;font-weight:600;margin:0;letter-spacing:-.01em}
+.card-h .note{font-size:12.5px;color:var(--muted)}
+.card-b{padding:18px}
+.stack{display:flex;flex-direction:column;gap:16px}
+.two{display:grid;grid-template-columns:minmax(270px,1fr) minmax(330px,1.45fr);gap:16px;align-items:start}
+@media(max-width:900px){.two{grid-template-columns:1fr}}
+label.fld,span.fld{display:block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+select,input[type=text],input[type=number]{width:100%;font-family:inherit;font-size:14px;color:var(--ink);
+  background:var(--surface-2);border:1px solid var(--line-2);border-radius:7px;padding:9px 10px}
+input:read-only{background:var(--surface);color:var(--muted);cursor:not-allowed}
+select:focus-visible,input:focus-visible{outline:2px solid var(--red-);outline-offset:1px}
+input[type=range]{width:100%;accent-color:var(--ox)}
+input[type=range]:focus-visible{outline:2px solid var(--red-);outline-offset:3px}
+.slider-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;gap:10px}
+.slider-row .val{font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+.readout{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px dotted var(--line)}
+.readout:last-child{border-bottom:0}
+.readout .k{font-size:13px;color:var(--muted)}
+.readout .v{font-family:"IBM Plex Mono",monospace;font-size:16px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--ink)}
+.verdict{padding:12px 14px;border-radius:8px;font-size:13.5px;line-height:1.55}
+.verdict.go{background:var(--go-soft);color:var(--go)}
+.verdict.stop{background:var(--stop-soft);color:var(--stop)}
+.verdict.flat{background:var(--surface-2);color:var(--ink-2)}
+.eqline{font-family:"IBM Plex Mono",monospace;font-size:13px;line-height:1.9;color:var(--ink-2);
+  background:var(--surface-2);border-radius:7px;padding:11px 13px}
+.eqline b{color:var(--ox);font-weight:600}
+svg{display:block;max-width:100%}
+.scrollx{overflow-x:auto}
+.solid{appearance:none;background:var(--ox);border:1px solid var(--ox);color:#fff;font-family:inherit;
+  font-size:13.5px;font-weight:500;padding:10px 16px;border-radius:7px;cursor:pointer}
+.solid:hover{filter:brightness(1.08)}
+.solid:disabled{background:var(--line-2);border-color:var(--line-2);color:var(--muted);cursor:not-allowed}
+.ghost{appearance:none;background:var(--surface-2);border:1px solid var(--line-2);color:var(--ink-2);
+  font-family:inherit;font-size:12.5px;padding:8px 12px;border-radius:7px;cursor:pointer;text-align:left}
+.ghost:hover{border-color:var(--ox);color:var(--ox)}
+table.ions{border-collapse:collapse;width:100%;font-size:13px}
+table.ions th,table.ions td{text-align:left;padding:8px 9px;border-bottom:1px solid var(--line);white-space:nowrap}
+table.ions th{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500}
+table.ions td.num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;text-align:right}
+tr.support td{color:var(--red-)}
+tr.analyte td{color:var(--ox);font-weight:500}
+.bar{display:grid;grid-template-columns:1fr;gap:0;margin-top:4px}
+.tstrip{display:flex;height:22px;border-radius:4px;overflow:hidden;background:var(--surface-2)}
+.tstrip i{display:block;height:100%}
+.tlegend{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted)}
+.tlegend span b{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px}
+.idgrid{display:grid;grid-template-columns:1fr;gap:14px;max-width:340px}
+.scorebar{display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;padding:14px 18px;border-top:1px solid var(--line)}
+.scorenum{font-family:"IBM Plex Mono",monospace;font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+.scorenum small{font-size:14px;font-weight:400;color:var(--muted)}
+.vcode{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted)}
+.vcode b{color:var(--ink);font-weight:600;letter-spacing:.08em}
+.quiz{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:16px}
+.q .stem{font-size:14.5px;line-height:1.6;margin:0 0 12px}
+.q .stem code{font-family:"IBM Plex Mono",monospace;font-size:13px;background:var(--surface-2);padding:1px 5px;border-radius:4px}
+.opts{display:flex;flex-direction:column;gap:7px}
+.opt{appearance:none;text-align:left;font-family:inherit;font-size:13.5px;line-height:1.45;color:var(--ink);
+  background:var(--surface-2);border:1px solid transparent;border-radius:7px;padding:9px 12px;cursor:pointer;display:flex;gap:9px}
+.opt .ltr{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);flex:0 0 auto;padding-top:1px}
+.opt:hover:not(:disabled){border-color:var(--line-2)}
+.opt.right{background:var(--go-soft);color:var(--go);border-color:var(--go);font-weight:500}
+.opt.right .ltr{color:var(--go)}
+.opt.wrong{background:var(--stop-soft);color:var(--stop);border-color:var(--stop)}
+.opt.wrong .ltr{color:var(--stop)}
+.opt:disabled{cursor:default}
+.why{margin:12px 0 0;font-size:13px;line-height:1.65;color:var(--ink-2);border-left:2px solid var(--line-2);padding-left:12px}
+.misc{display:block;margin-top:10px;padding:9px 12px;border-radius:7px;background:var(--stop-soft);color:var(--stop);font-size:12.5px;line-height:1.6}
+.misc a{color:inherit;font-weight:600;white-space:nowrap}
+.why[hidden]{display:none}
+.tally{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.hint{font-size:12.5px;color:var(--muted);line-height:1.65;margin:10px 0 0}
+.locked{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;background:var(--go-soft);color:var(--go);padding:2px 7px;border-radius:4px;margin-left:8px}
+/* ---- flux / Fick / migration panels ------------------------------------- */
+.pill-row{display:flex;gap:3px;background:var(--surface-2);border-radius:8px;padding:3px}
+.pill{flex:1;appearance:none;border:0;background:none;font-family:"IBM Plex Mono",monospace;font-size:12.5px;
+  font-weight:500;color:var(--muted);padding:7px 2px;border-radius:6px;cursor:pointer}
+.pill[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.pill:focus-visible{outline:2px solid var(--red-);outline-offset:1px}
+/* nowrap + scroll: a formula broken across lines mid-term is harder to read
+   than one the reader has to nudge sideways.  Explicit <br> still breaks. */
+.eqbig{font-family:"IBM Plex Mono",monospace;font-size:13.5px;line-height:2.05;color:var(--ink);
+  background:var(--surface-2);border-radius:8px;padding:14px 15px;overflow-x:auto;white-space:nowrap}
+.eqbig small{color:var(--muted);font-size:11.5px;letter-spacing:.04em}
+.dif{color:var(--red-);font-weight:600}
+.mig{color:var(--ox);font-weight:600}
+.con{color:var(--go);font-weight:600}
+.termtbl{border-collapse:collapse;width:100%;font-size:13px}
+.termtbl td,.termtbl th{padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+.termtbl th{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);font-weight:500;text-align:left}
+.termtbl td.num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;text-align:right}
+.termtbl tr.tot td{border-bottom:0;border-top:2px solid var(--line-2);font-weight:600}
+.termtbl td.dir{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--muted);text-align:right}
+.swatch{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px}
+.trio3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:stretch}
+.trio3>.card{display:flex;flex-direction:column}
+.trio3>.card>.card-b:last-child{flex:1 1 auto}
+@media(max-width:1000px){.trio3{grid-template-columns:1fr 1fr}}
+@media(max-width:720px){.trio3{grid-template-columns:1fr}}
+.two.eq{align-items:stretch}
+.two.eq>.card{display:flex;flex-direction:column}
+.two.eq>.card>.card-b:last-child{flex:1 1 auto}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap}
+.btnrow .ghost{flex:1 1 auto;text-align:center}
+.dfctl{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:14px 16px;align-items:end}
+.trio3 .dfctl,#p-drift .two.eq .dfctl{grid-template-columns:1fr}
+.dfctl-wide{grid-column:1 / -1}
+@media(max-width:820px){.dfctl{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.dfctl{grid-template-columns:1fr}}
+.mbtop{display:grid;grid-template-columns:minmax(200px,280px) minmax(0,1fr);gap:8px 20px;align-items:end;margin-bottom:6px}
+@media(max-width:720px){.mbtop{grid-template-columns:1fr}}
+footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;line-height:1.8}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+.glegend{display:flex;flex-direction:column;gap:5px;font-size:12.5px;line-height:1.45;color:var(--ink-2)}
+.glegend > span{display:flex;align-items:flex-start;gap:8px}
+.glegend > span > svg{flex:0 0 26px;margin-top:3px}
+.atmfig{display:grid;grid-template-columns:minmax(240px,320px) minmax(0,1fr);gap:10px 22px;align-items:center}
+@media(max-width:720px){.atmfig{grid-template-columns:1fr}}
+.atmdefs{grid-column:1 / -1;display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:6px 22px;
+  font-size:12.5px;line-height:1.45;color:var(--ink-2);border-top:1px solid var(--line);padding-top:10px}
+.atmdefs > div{display:grid;grid-template-columns:3.2em 1fr;gap:8px}
+.atmdefs .sym{font-family:"IBM Plex Mono",monospace;font-weight:700;text-align:right;color:var(--ink)}
+#p-atm .trio3 .atmfig{grid-template-columns:1fr}
+#p-atm .trio3 .atmdefs{grid-template-columns:1fr}
+#p-atm .trio3 .atmmodel svg{max-width:300px}
+#p-atm .trio3 .eqbig{white-space:normal}
+</style>
+</head>
+<body>
+  <div class="wrap">
+  <header class="masthead">
+    <div style="flex:1 1 380px">
+      <p class="eyebrow"><a href="index.html">CH40051 Electroanalytical Chemistry</a> · Lecture 8 · Ionic conductivity</p>
+      <h1>Ionic Conductivity Bench</h1>
+      <p class="sub">How a solution carries current. Measure its conductivity and see why the molar conductivity of a strong electrolyte sags as &radic;C while a weak one collapses; watch an ion&rsquo;s atmosphere pull it back; turn an ionic conductivity into a mobility, a diffusion coefficient and a size; and count which ions carry the current.</p>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true"  aria-controls="p-drift" id="t-drift">Conductivity: drift &amp; relaxation</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-se"    id="t-se">Stokes&ndash;Einstein</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-tr"    id="t-tr">Transference</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-quiz"  id="t-quiz">Concept Check</button>
+  </div>
+
+  <!-- ============== DRIFT AND RELAXATION ============== -->
+  <section class="panel" id="p-drift" role="tabpanel" aria-labelledby="t-drift">
+
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>An ion atmosphere that has to keep up</h2><span class="note">deck p.4&ndash;5 &mdash; the relaxation and electrophoretic effects</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig">
+          <span class="con">&Lambda;<sub>m</sub> = &Lambda;<sub>m</sub>&deg; &minus; (A + B&Lambda;<sub>m</sub>&deg;)&radic;c</span>
+          &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="dif">A = zeF&kappa;<sub>1</sub>/3&pi;&eta;</span>
+          &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="mig">B = &lambda;<sub>B</sub>&kappa;<sub>1</sub>(2 &minus; &radic;2)/6</span><br>
+          <span class="con">&kappa; = (l/A)&middot;(1/R)</span> <small>S m<sup>&minus;1</sup>, from the cell</small>
+          &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="mig">&Lambda; = &kappa;/C</span> <small>S m<sup>2</sup> mol<sup>&minus;1</sup></small>
+          &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="dif">&Lambda;<sub>C</sub> = &Lambda;&deg; &minus; k&radic;C</span> <small>Kohlrausch</small><br>
+          <small>Debye&ndash;Hückel&ndash;Onsager, 1:1 salt &nbsp;&middot;&nbsp; electrophoretic term &nbsp;&middot;&nbsp; relaxation term &nbsp;&middot;&nbsp; &kappa;<sub>1</sub> is &kappa; at 1 mol/L, &lambda;<sub>B</sub> the Bjerrum length</small>
+        </div>
+        <p class="hint" style="margin:0">The <a href="lecture06.html">Ion Atmosphere</a> of Lecture 6 is a snapshot: an ion at rest, its counter-charge spread
+          symmetrically around it. Switch on a field and the ion moves &mdash; and its atmosphere cannot move with it. The cloud
+          is not a shell the ion carries but a statistical excess that has to be <b>torn down behind the ion and rebuilt in front
+          of it</b>, and that takes a time &tau; of order &epsilon;/&sigma;, a few nanoseconds in 10 mM salt. So a moving ion always
+          has more counter-charge behind it than ahead of it, and that lopsided cloud pulls it back: the <b>relaxation</b>, or
+          asymmetry, effect.<br><br>
+          At the same time the counter-ions are being driven the other way. They drag their solvent with them, so the ion is
+          swimming upstream: the <b>electrophoretic</b> effect. Both grow with the density of the atmosphere, both go as &kappa;
+          and therefore as &radic;c, and together they are why molar conductivity falls with concentration exactly as Kohlrausch
+          measured &mdash; and why that fall is a <em>limiting</em> law, true only as c &rarr; 0.</p>
+      </div>
+    </div>
+
+    <div class="two eq" style="margin-bottom:16px">
+
+      <div class="card">
+      <div class="card-h"><h2>One ion, moving</h2><span class="note" id="dfNote">&mdash;</span></div>
+        <div class="card-b stack">
+          <svg id="dfpic" viewBox="0 0 520 300" style="display:block;width:100%;height:auto;max-width:520px;margin:0 auto" role="img" aria-label="An ion drifting to the right in a field, with its cloud of counter-charge lagging behind it, a backward relaxation force, and solvent pushed the other way by the counter-ions"></svg>
+          <div class="glegend">
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><circle cx="13" cy="7" r="6" fill="var(--ox)"/></svg><span>the ion being followed, driven to the right by the field</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><circle cx="9" cy="7" r="3.2" fill="var(--red-)"/><circle cx="17" cy="5" r="2.4" fill="var(--red-)" opacity="0.6"/></svg><span><b>its atmosphere</b>: the haze and the dots are counter-ions. They <b>drift the other way</b> and stream past the ion &mdash; none of them travels with it. What travels with the ion is the <b>excess</b>, which is why a dot brightens as it enters the cloud and fades as it leaves, and why the excess sits <b>behind</b> the ion by the lag.</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="2" y1="7" x2="20" y2="7" stroke="var(--ox)" stroke-width="2.5"/><polygon points="25,7 18,3 18,11" fill="var(--ox)"/></svg><span><b>field force</b>, zeE, pushing the ion forward</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="24" y1="7" x2="6" y2="7" stroke="var(--red-)" stroke-width="2.5"/><polygon points="1,7 8,3 8,11" fill="var(--red-)"/></svg><span><b>relaxation force</b>: the lopsided atmosphere pulling the ion back</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="24" y1="7" x2="7" y2="7" stroke="var(--go)" stroke-width="1.6" stroke-dasharray="4 3"/><polygon points="2,7 8,4 8,10" fill="var(--go)"/></svg><span><b>solvent flow</b>, dragged backwards by the counter-ions: the electrophoretic effect</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><circle cx="7" cy="7" r="2" fill="var(--ox)" opacity="0.45"/><circle cx="19" cy="7" r="2" fill="var(--red-)" opacity="0.45"/></svg><span>faint dots: ions outside the atmosphere &mdash; cations drift right, anions left, and every ion jiggles whether or not the field is on</span></span>
+            <span style="display:block;color:var(--muted)">The lag, the speeds and the arrows are drawn hugely enlarged so they can be seen; the real sizes are in <b>The numbers</b> below.</span>
+          </div>
+          <div class="dfctl" style="margin-top:4px">
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">Field strength, E</span><span class="val" id="dfEv"></span></div>
+              <input type="range" id="dfE" min="1" max="6" step="0.05" value="3">
+          </div>
+            <div>
+              <span class="fld">Field</span>
+              <div class="pill-row" id="dfOn">
+                <button class="pill" data-o="1" aria-pressed="true"  type="button">on</button>
+                <button class="pill" data-o="0" aria-pressed="false" type="button">off</button>
+            </div>
+          </div>
+            <div class="btnrow">
+              <button class="ghost" id="dfPulse" type="button">Switch it off for three seconds: watch it relax</button>
+          </div>
+          </div>
+        </div>
+    </div>
+
+      <div class="card">
+      <div class="card-h"><h2>The numbers</h2><span class="note" id="dfWho">&mdash;</span></div>
+      <div class="card-b">
+        <div class="readout"><span class="k">Debye length, 1/&kappa;</span><span class="v" id="dfL">&mdash;</span></div>
+        <div class="readout"><span class="k">time to rebuild the atmosphere, &tau; = &epsilon;/&sigma;</span><span class="v" id="dfTau">&mdash;</span></div>
+        <div class="readout"><span class="k">drift speed of the cation, uE</span><span class="v" id="dfV">&mdash;</span></div>
+        <div class="readout"><span class="k">real lag of the atmosphere, u E &tau;</span><span class="v" id="dfLag">&mdash;</span></div>
+        <div class="readout"><span class="k"><span class="mig">relaxation</span>: field lost, B&radic;c</span><span class="v" id="dfRel">&mdash;</span></div>
+        <div class="readout"><span class="k"><span class="dif">electrophoresis</span>: conductivity lost, A&radic;c</span><span class="v" id="dfEp">&mdash;</span></div>
+        <div class="readout"><span class="k"><span class="con">&Lambda;<sub>m</sub></span>, Onsager against measured</span><span class="v" id="dfLam">&mdash;</span></div>
+        <div id="dfVerdict" class="verdict flat" style="margin-top:14px">&mdash;</div>
+      </div>
+    </div>
+
+    </div>
+
+    <div class="trio3">
+
+      <div class="card">
+      <div class="card-h"><h2>The solution</h2><span class="note">1:1 salts in water, 25 °C</span></div>
+      <div class="card-b">
+        <div class="dfctl">
+          <div>
+            <span class="fld">Salt</span>
+            <div class="pill-row" id="dfSalt">
+              <button class="pill" data-s="KCl"  aria-pressed="true"  type="button">KCl</button>
+              <button class="pill" data-s="NaCl" aria-pressed="false" type="button">NaCl</button>
+              <button class="pill" data-s="HCl"  aria-pressed="false" type="button">HCl</button>
+            </div>
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">Concentration</span><span class="val" id="dfCv"></span></div>
+            <input type="range" id="dfC" min="-3.3" max="-1" step="0.02" value="-2">
+          </div>
+        </div>
+      </div>
+        <p class="hint" style="margin:0 18px 16px;color:var(--muted);font-size:12.5px">The salt and its concentration set
+          <b>all three</b> pictures on this tab: the two plots here, and the thickness of the atmosphere in <b>One ion, moving</b> above.
+          The field strength lives with that picture, because neither plot depends on it &mdash; the relaxation and electrophoretic terms are
+          the same fraction of &Lambda;&deg; at any ordinary field.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2>Molar conductivity against &radic;c</h2><span class="note">Kohlrausch&rsquo;s plot, with Onsager&rsquo;s line</span></div>
+        <div class="card-b stack">
+          <svg id="dfplot" viewBox="0 0 520 300" style="display:block;width:100%;height:auto;max-width:520px;margin:0 auto" role="img" aria-label="Measured molar conductivity against the square root of concentration, with the Debye-Huckel-Onsager limiting line and the losses at the chosen concentration split into electrophoretic and relaxation parts"></svg>
+          <div class="glegend">
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><circle cx="13" cy="7" r="4" fill="none" stroke="var(--ink)" stroke-width="1.6"/></svg><span><b>circles</b>: measured &Lambda;<sub>m</sub> at 25 °C</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="1" y1="10" x2="25" y2="4" stroke="var(--go)" stroke-width="2.4"/></svg><span><b>green line</b>: the Onsager limiting law, &Lambda;<sub>m</sub>&deg; &minus; (A + B&Lambda;<sub>m</sub>&deg;)&radic;c</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="1" y1="7" x2="25" y2="7" stroke="var(--line-2)" stroke-width="1.6" stroke-dasharray="4 3"/></svg><span><b>dashed</b>: &Lambda;<sub>m</sub>&deg;, what the ions would carry if they never met each other</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><rect x="9" y="1" width="8" height="6" fill="var(--go)" opacity="0.7"/><rect x="9" y="7" width="8" height="6" fill="var(--red-)" opacity="0.7"/></svg><span><b>the bar at your concentration</b>: how far below &Lambda;<sub>m</sub>&deg; it falls, split into the electrophoretic (green) and relaxation (blue) parts</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2>&Lambda; against &radic;C: strong and weak</h2><span class="note">&alpha; = &Lambda;/&Lambda;&deg;, &nbsp;K = &alpha;<sup>2</sup>C/(1 &minus; &alpha;)</span></div>
+        <div class="card-b stack">
+          <svg id="cdplot" viewBox="0 0 520 380" style="display:block;width:100%;height:auto;max-width:540px;margin:0 auto" role="img" aria-label="Molar conductivity against the square root of concentration for KCl, HCl and acetic acid, with the chosen solution marked"></svg>
+          <div class="glegend">
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><circle cx="13" cy="7" r="4" fill="none" stroke="var(--ink-2)" stroke-width="1.6"/></svg><span><b>circles</b>: measured at 25 °C &mdash; KCl and HCl from the CRC tables, acetic acid from MacInnes &amp; Shedlovsky</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="1" y1="7" x2="25" y2="7" stroke="var(--ink-2)" stroke-width="2.2"/></svg><span><b>lines</b>: strong electrolytes interpolated through their points; acetic acid from Ostwald&rsquo;s law with K = 1.78 &times; 10<sup>&minus;5</sup> mol L<sup>&minus;1</sup></span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><circle cx="13" cy="7" r="5" fill="var(--ink)"/></svg><span><b>filled dot</b>: the salt and concentration set above</span></span>
+          </div>
+          <div id="cdRead" class="verdict flat">&mdash;</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="card-h"><h2>How to read it</h2><span class="note">the moving picture and the plot, together</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="stack" style="gap:12px">
+          <p class="hint" style="margin:0"><b>1. Why the cloud lags.</b> The atmosphere is rebuilt continuously by diffusion, and
+            that takes &tau;. In the time &tau; the ion has already moved on by uE&tau;, so the centre of its counter-charge sits that
+            far behind it. Press <b>Switch it off</b>: the ion stops, and the cloud slides forward and re-centres over about one
+            &tau; &mdash; that re-centring <em>is</em> the relaxation.</p>
+          <p class="hint" style="margin:0"><b>2. Why a tiny lag matters.</b> The real lag is a small fraction of a picometre, far
+            below the Debye length. It still matters because the field it creates is proportional to it, and the lag is itself
+            proportional to E &mdash; so the relaxation force is a <b>fixed fraction of the driving force</b>, B&radic;c, at any
+            ordinary field. In 10 mM salt that is about 2 %. Only at fields near 10<sup>7</sup> V/m does the lag become
+            comparable with the atmosphere, and the conductivity starts to rise (the Wien effect).</p>
+          <p class="hint" style="margin:0"><b>3. From one ion to the plot.</b> Both losses are set by the density of the
+            atmosphere, so both go as &kappa; &prop; &radic;c: that is why the measured circles fall on a straight line against
+            &radic;c at low concentration. The line is Onsager&rsquo;s, with no fitted parameter. Past about 10 mM the circles lift
+            above it &mdash; the same failure of point charges that the extended law fixes for activity.</p>
+        </div>
+        <div id="dfRead" class="verdict flat">&mdash;</div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ============== STOKES-EINSTEIN ============== -->
+  <section class="panel" id="p-se" role="tabpanel" aria-labelledby="t-se" hidden>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>One friction, three numbers</h2><span class="note">deck p.6&ndash;14 &mdash; Stokes&ndash;Einstein, Nernst&ndash;Einstein, Walden</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig" style="white-space:normal">
+          <span class="dif">D = k<sub>B</sub>T / 6&pi;&eta;r</span>
+          &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="mig">u = |z|e / 6&pi;&eta;r = |z|FD / RT</span>
+          &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="con">&lambda;&deg; = |z|Fu = z<sup>2</sup>F<sup>2</sup>D / RT</span><br>
+          <small>Stokes&ndash;Einstein &nbsp;&middot;&nbsp; mobility &nbsp;&middot;&nbsp; Nernst&ndash;Einstein</small>
+        </div>
+        <p class="hint" style="margin:0">Treat the moving ion as a sphere of radius r in a fluid of viscosity &eta;. Stokes&rsquo; drag
+          6&pi;&eta;r<i>v</i> is then the only thing that resists it &mdash; and it resists <b>drift and diffusion alike</b>. That single
+          friction fixes all three numbers at once: change r, &eta; or T and D, u and &lambda;&deg; all move together, in step.
+          Everything below is that one equation, read three ways.</p>
+      </div>
+    </div>
+
+    <div class="two eq">
+
+      <div class="card">
+        <div class="card-h"><h2>Set the sphere and the fluid</h2><span class="note" id="seNote">&mdash;</span></div>
+        <div class="card-b stack">
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">Hydrodynamic radius, r</span><span class="val" id="seRv"></span></div>
+            <input type="range" id="seR" min="60" max="600" step="1" value="238">
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">Temperature, T</span><span class="val" id="seTv"></span></div>
+            <input type="range" id="seT" min="273" max="353" step="1" value="298">
+          </div>
+          <div>
+            <span class="fld">Solvent &nbsp;<small style="color:var(--muted)">&eta; at 25 °C / cP</small></span>
+            <div class="pill-row" id="seSolv"><button class="pill" data-eta="0.89" data-nm="water" aria-pressed="true" type="button">water 0.89</button><button class="pill" data-eta="0.551" data-nm="methanol" aria-pressed="false" type="button">methanol 0.551</button><button class="pill" data-eta="0.341" data-nm="acetonitrile" aria-pressed="false" type="button">acetonitrile 0.341</button><button class="pill" data-eta="1.99" data-nm="DMSO" aria-pressed="false" type="button">DMSO 1.99</button><button class="pill" data-eta="2.53" data-nm="PC" aria-pressed="false" type="button">PC 2.53</button></div>
+          </div>
+          <div>
+            <span class="fld">Charge, |z|</span>
+            <div class="pill-row" id="seZ">
+              <button class="pill" data-z="1" aria-pressed="true"  type="button">1</button>
+              <button class="pill" data-z="2" aria-pressed="false" type="button">2</button>
+              <button class="pill" data-z="3" aria-pressed="false" type="button">3</button>
+            </div>
+          </div>
+          <div>
+            <div class="readout"><span class="k">viscosity at T, &eta;</span><span class="v" id="seEta">&mdash;</span></div>
+            <div class="readout"><span class="k"><span class="dif">diffusion coefficient</span>, D</span><span class="v" id="seD">&mdash;</span></div>
+            <div class="readout"><span class="k"><span class="mig">mobility</span>, u</span><span class="v" id="seU">&mdash;</span></div>
+            <div class="readout"><span class="k"><span class="con">ionic conductivity</span>, &lambda;&deg;</span><span class="v" id="seLam">&mdash;</span></div>
+            <div class="readout"><span class="k">drift speed in 1 V cm&#8315;&#185;</span><span class="v" id="seV">&mdash;</span></div>
+            <div class="readout"><span class="k">time to diffuse 10 &micro;m</span><span class="v" id="seT10">&mdash;</span></div>
+            <div class="readout"><span class="k">Walden product, &lambda;&deg;&eta;</span><span class="v" id="seW">&mdash;</span></div>
+          </div>
+          <div id="seVerdict" class="verdict flat">&mdash;</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2>D against r</h2><span class="note">the 1/r curve for the solvent you chose</span></div>
+        <div class="card-b stack">
+          <svg id="seplot" viewBox="0 0 520 360" style="display:block;width:100%;height:auto;max-width:540px;margin:0 auto" role="img" aria-label="Diffusion coefficient against hydrodynamic radius, a 1 over r curve, with real ions marked at their Stokes radii"></svg>
+          <div class="glegend" style="font-size:11.5px;line-height:1.35;gap:3px">
+            <span><b class="dif">solid curve</b>: D = k<sub>B</sub>T/6&pi;&eta;r at the temperature and solvent you set</span>
+            <span><b style="color:var(--muted)">grey dashed</b>: the same curve for water at 25 °C, for comparison</span>
+            <span><b>dots</b>: real ions, placed at the Stokes radius their measured &lambda;&deg; in water implies. <b>Click one</b> to move the slider there.</span>
+            <span><b class="con">right axis</b>: the same curve read as a conductivity, &lambda;&deg; = z<sup>2</sup>F<sup>2</sup>D/RT. <b>Charge moves this axis and nothing else</b> &mdash; D and the curve cannot depend on z, but &lambda;&deg; goes as z<sup>2</sup> and the mobility u as |z|, so the readouts change with the charge buttons while the shape does not.</span>
+            <span style="display:block;color:var(--ink-2)">The dots sit on the curve in every solvent because Stokes&rsquo; law is being asked to keep r fixed &mdash; that assumption <em>is</em> Walden&rsquo;s rule.</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="card-h"><h2>How to read it</h2><span class="note">what each knob actually changes</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="trio3">
+          <p class="hint" style="margin:0"><b>1. Radius: 1/r, and it is not the crystal.</b> Halve r and D, u and &lambda;&deg; all double.
+            But r here is the <b>moving</b> sphere: the ion plus the solvent it drags. Li⁺ has the smallest crystal radius of the alkali
+            metals (0.076 nm) and the largest hydrodynamic one (0.238 nm), because its charge sits on a small surface and holds its water
+            tightly. That is why Li⁺ is the slowest of Li⁺, Na⁺ and K⁺ &mdash; the opposite of what the crystal radii suggest.</p>
+          <p class="hint" style="margin:0"><b>2. Temperature works through &eta;.</b> D goes as T/&eta;, and of the two it is the viscosity
+            that moves. From 25 to 45 °C the absolute temperature rises 7 %, but water thins by a third, so D rises by about 60 %. Warm a
+            cell and everything speeds up &mdash; diffusion, migration and conductivity together, by the same factor.</p>
+          <p class="hint" style="margin:0"><b>3. Where it breaks.</b> Stokes&rsquo; law treats the solvent as a continuum, which it is not on
+            the scale of one ion: below about 0.15 nm &mdash; the size of a water molecule &mdash; r is only an effective number for ranking
+            ions. And H⁺ and OH⁻ ignore the law altogether: they hop along hydrogen bonds instead of pushing through the fluid, which is why
+            their &lambda;&deg; is several times larger than any sphere of their size could give.</p>
+        </div>
+        <div id="seRead" class="verdict flat">&mdash;</div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ============== TRANSFERENCE ============== -->
+  <section class="panel" id="p-tr" role="tabpanel" aria-labelledby="t-tr" hidden>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>Which ions carry the current</h2><span class="note">deck p.15</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig" style="white-space:normal">
+          <span class="con">t<sub>+</sub> = i<sub>+</sub>/(i<sub>+</sub> + i<sub>&minus;</sub>) = &lambda;<sub>+</sub>/(&lambda;<sub>+</sub> + &lambda;<sub>&minus;</sub>)</span> <small>1:1 salt</small>
+          &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="mig">t<sub>i</sub> = |z<sub>i</sub>|C<sub>i</sub>&lambda;<sub>i</sub> / &Sigma;<sub>k</sub>|z<sub>k</sub>|C<sub>k</sub>&lambda;<sub>k</sub></span> <small>any mixture</small>
+          &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="dif">&Sigma; t<sub>i</sub> = 1</span>
+        </div>
+        <p class="hint" style="margin:0">Cations and anions both carry the current, but not equally: each carries a share in proportion to
+          how many of it there are, its charge, and how fast it moves. That share is its <b>transference number</b>. In HCl the proton
+          is four and a half times as mobile as chloride and carries 82 % of the current; in LiCl the slow, well-hydrated Li⁺ carries only
+          a third. Add an inert salt in excess and it takes over the current, leaving almost none for the analyte &mdash; which is exactly
+          what a <b>supporting electrolyte</b> is for (Lecture 5).</p>
+      </div>
+    </div>
+
+    <div class="two eq">
+
+      <div class="card">
+        <div class="card-h"><h2>The solution</h2><span class="note">infinite-dilution &lambda;&deg;, 25 °C</span></div>
+        <div class="card-b stack">
+          <div>
+            <span class="fld">Salt</span>
+            <div class="pill-row" id="trSalt">
+              <button class="pill" data-s="H"  aria-pressed="true"  type="button">HCl</button>
+              <button class="pill" data-s="K"  aria-pressed="false" type="button">KCl</button>
+              <button class="pill" data-s="Na" aria-pressed="false" type="button">NaCl</button>
+              <button class="pill" data-s="Li" aria-pressed="false" type="button">LiCl</button>
+            </div>
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">Supporting electrolyte, KNO<sub>3</sub> : salt</span><span class="val" id="trRv"></span></div>
+            <input type="range" id="trR" min="0" max="5" step="1" value="0">
+          </div>
+          <div class="btnrow">
+            <button class="ghost" id="trPlay" type="button">&#10074;&#10074; Pause</button>
+            <button class="ghost" id="trReset" type="button">Count again</button>
+          </div>
+          <div>
+            <div class="readout"><span class="k"><span class="mig">t</span> of the salt&rsquo;s cation</span><span class="v" id="trTc">&mdash;</span></div>
+            <div class="readout"><span class="k"><span class="dif">t</span> of Cl⁻</span><span class="v" id="trTa">&mdash;</span></div>
+            <div class="readout"><span class="k">t of the supporting K⁺ &middot; NO₃⁻</span><span class="v" id="trTs">&mdash;</span></div>
+            <div class="readout"><span class="k">counted so far, t of the salt&rsquo;s cation</span><span class="v" id="trCnt">&mdash;</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2>Counting the charge that crosses</h2><span class="note" id="trNote">&mdash;</span></div>
+        <div class="card-b stack">
+          <svg id="trpic" viewBox="0 0 520 350" style="display:block;width:100%;height:auto;max-width:540px;margin:0 auto" role="img" aria-label="Ions drifting between two electrodes, cations to the cathode and anions to the anode, with the charge crossing a middle plane counted and compared with the transference numbers"></svg>
+          <div class="glegend">
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><circle cx="8" cy="7" r="4" fill="var(--ox)"/><circle cx="19" cy="7" r="3.6" fill="none" stroke="var(--red-)" stroke-width="1.6"/></svg><span><b>the salt</b>: its cation (filled, orange) drifts to the cathode, Cl⁻ (open, blue) to the anode, each at a speed set by its mobility</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><circle cx="8" cy="7" r="3.4" fill="var(--muted)"/><circle cx="19" cy="7" r="3.2" fill="none" stroke="var(--muted)" stroke-width="1.4"/></svg><span><b>grey</b>: the supporting K⁺ and NO₃⁻; each grey dot stands for many ions when the ratio is large</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="13" y1="0" x2="13" y2="14" stroke="var(--ink-2)" stroke-dasharray="2 2"/></svg><span><b>dashed plane</b>: every crossing is counted, with its charge; the lower bar is the tally, the upper one the prediction</span></span>
+          </div>
+          <div id="trRead" class="verdict flat">&mdash;</div>
+        </div>
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- ============== CONCEPT CHECK ============== -->
+  <section class="panel" id="p-quiz" role="tabpanel" aria-labelledby="t-quiz" hidden>
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h">
+        <h2>Concept check</h2>
+        <span class="note">Answer once per question — the reasoning appears immediately</span>
+        <span class="tally" style="margin-left:auto" id="tally"></span>
+      </div>
+      <div class="card-b">
+        <div class="idgrid">
+          <div>
+            <label class="fld" for="sId">Student ID</label>
+            <input type="text" id="sId" inputmode="numeric" placeholder="e.g. 20261234">
+          </div>
+        </div>
+        <p class="hint" id="idHint"></p>
+      </div>
+      <div class="scorebar" id="scorebar" hidden>
+        <div>
+          <div class="scorenum" id="scoreNum">—</div>
+          <div class="vcode" style="margin-top:4px" id="whoLine">—</div>
+        </div>
+        <div style="flex:1 1 300px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="solid" id="sendBtn" type="button" hidden>Submit to the course</button>
+            <button class="ghost" id="dlBtn" type="button">Download my result</button>
+          </div>
+          <p class="hint" id="dlHint" style="margin-top:8px">Download the file and hand it in as your instructor directs.</p>
+        </div>
+      </div>
+    </div>
+    <div class="quiz" id="quiz"></div>
+  </section>
+
+  <footer>
+    Ionic molar conductivities &lambda;&deg; from Bard &amp; Faulkner, Table 2.3.2 · molar conductivities of KCl, NaCl and HCl from the CRC Handbook and Robinson &amp; Stokes ·
+    acetic acid from MacInnes &amp; Shedlovsky (1932) · A and B are derived from the physical constants rather than quoted<br>
+    CH40051 Electroanalytical Chemistry · Fall 2026 — companion to Lecture 8
+  </footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function sig(x,d){
+  if(x===0) return "0";
+  var e=Math.floor(Math.log10(Math.abs(x)));
+  if(e>=5||e<=-3) return x.toExponential(d-1);
+  return (+x.toPrecision(d)).toString();
+}
+
+/* ---------------- tabs ---------------- */
+var tabs=[].slice.call(document.querySelectorAll(".tab"));
+tabs.forEach(function(t){
+  t.addEventListener("click",function(){
+    tabs.forEach(function(o){
+      var on=(o===t);
+      o.setAttribute("aria-selected",on?"true":"false");
+      document.getElementById(o.getAttribute("aria-controls")).hidden=!on;
+    });
+  });
+});
+
+/* ================= SHARED CONSTANTS AND HELPERS =========================
+   SI throughout, converted on the way in and out. Lengths are shown in nm
+   or Angstrom, concentrations in mol/kg, energies in units of kT.        */
+var E0 = 8.8541878e-12;        /* F/m                                     */
+var QE = 1.602176634e-19;      /* C                                       */
+var KB = 1.380649e-23;         /* J/K                                     */
+var NA = 6.02214076e23;        /* /mol                                    */
+var RHOW = 997.0;              /* kg/m3, water at 25 C                    */
+var MONO = 'font-family="IBM Plex Mono,monospace"';
+
+function pillGroup(id, cb){
+  var wrap = document.getElementById(id);
+  wrap.addEventListener("click", function(e){
+    var b = e.target.closest("button.pill");
+    if(!b) return;
+    [].slice.call(wrap.querySelectorAll("button.pill")).forEach(function(o){
+      o.setAttribute("aria-pressed", o === b ? "true" : "false");
+    });
+    cb(b);
+  });
+}
+
+
+/* Debye length, m. I in mol/kg, turned into mol/m3 with the solvent
+   density -- which is why B below carries a density too.                */
+function debyeLen(I, er, T){
+  if(I <= 0) return Infinity;
+  return Math.sqrt(E0 * er * KB * T / (2 * NA * QE * QE * I * RHOW));
+}
+
+/* ================= SHARED ANIMATION LOOP ================================
+   One requestAnimationFrame loop for every animated picture on the page.
+   A picture only redraws while its tab is showing, at about 30 frames a
+   second, and with reduced motion asked for the thermal jiggling stops. */
+var REDUCED = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+var ANIM = [], animLast = 0;
+function animLoop(ts){
+  if(ts - animLast > 32){
+    animLast = ts;
+    ANIM.forEach(function(a){ if(!document.getElementById(a.panel).hidden) a.tick(ts); });
+  }
+  window.requestAnimationFrame(animLoop);
+}
+/* the same, with a tspan, so it also works inside an SVG */
+function sciSvg(x, d){
+  if(x === 0) return "0";
+  var e = Math.floor(Math.log10(Math.abs(x))), m = x / Math.pow(10, e);
+  if(Math.abs(+m.toFixed(d - 1)) >= 10){ m /= 10; e++; }
+  return m.toFixed(d - 1) + ' × 10<tspan baseline-shift="super" font-size="8">' + e + '</tspan>';
+}
+/* x as "1.84 × 10<sup>7</sup>" */
+function sciH(x, d){
+  if(x === 0) return "0";
+  var e = Math.floor(Math.log10(Math.abs(x))), m = x / Math.pow(10, e);
+  if(Math.abs(+m.toFixed(d - 1)) >= 10){ m /= 10; e++; }
+  return m.toFixed(d - 1) + " × 10<sup>" + e + "</sup>";
+}
+var T25 = 298.15;
+
+/* ================= 1c - DRIFT, RELAXATION AND ONSAGER ===================
+   1:1 salts in water at 25 C. The picture is a cartoon with its own clock;
+   every number is computed from the constants and the salt's conductivities.
+     kappa_1   Debye kappa at 1 mol/L
+     A = e F kappa_1 / 3 pi eta          electrophoretic, S m2 mol-1 (mol/L)^-1/2
+     B = lambda_B kappa_1 (2 - sqrt2)/6  relaxation, (mol/L)^-1/2
+     Lambda_m = Lambda0 - (A + B Lambda0) sqrt(c)
+   Molar conductivities at 25 C, S cm2 mol-1: CRC / Robinson & Stokes.      */
+var DF = {
+  KCl:  {nm:"KCl",  L0:149.86, lp:73.48,  cat:"K⁺",
+         d:[[0.0005,147.81],[0.001,146.95],[0.005,143.55],[0.01,141.27],[0.02,138.34],[0.05,133.37],[0.1,128.96]]},
+  NaCl: {nm:"NaCl", L0:126.45, lp:50.08,  cat:"Na⁺",
+         d:[[0.0005,124.50],[0.001,123.74],[0.005,120.65],[0.01,118.51],[0.02,115.76],[0.05,111.06],[0.1,106.74]]},
+  HCl:  {nm:"HCl",  L0:426.16, lp:349.65, cat:"H⁺",
+         d:[[0.0005,422.74],[0.001,421.36],[0.005,415.80],[0.01,412.00],[0.02,407.24],[0.05,399.09],[0.1,391.32]]}
+};
+var DF_ER = 78.4, DF_ETA = 0.890e-3;
+var dfSalt = "KCl", dfOn = true, dfPulseT = null, dfLag = 0, dfX = 0.3, dfLast = 0;
+var DF_BG = (function(){
+  var out = [], seed = 31;
+  function rnd(){ seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+  for(var i = 0; i < 36; i++) out.push({x: rnd(), y: rnd(), q: i % 2 ? 1 : -1, ph: rnd() * 6.283});
+  return out;
+})();
+/* Counter-ions, held in the ion's own frame (dx, dy in units of the cloud
+   radius). They stream backwards past the cation, because a cation and an
+   anion drift in opposite directions: no anion travels with the ion. What
+   travels with it is the excess, drawn as the brightness of each dot.   */
+var DF_CLOUD = (function(){
+  var out = [], seed = 47;
+  function rnd(){ seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+  for(var i = 0; i < 34; i++) out.push({dx: -1.9 + 3.8 * rnd(), dy: -1.15 + 2.3 * rnd(), ph: rnd() * 6.283});
+  return out;
+})();
+
+function dfConst(){
+  var kt = KB * T25, eps = E0 * DF_ER, F = QE * NA;
+  var k1 = Math.sqrt(2 * NA * QE * QE * 1000 / (eps * kt));
+  var lB = QE * QE / (4 * Math.PI * eps * kt);
+  return {kt: kt, eps: eps, F: F, k1: k1,
+          A: F * QE * k1 / (3 * Math.PI * DF_ETA) * 1e4,     /* S cm2 mol-1 (mol/L)^-1/2 */
+          B: lB * k1 * (2 - Math.SQRT2) / 6};
+}
+function dfMeasured(s, c){
+  var d = s.d;
+  if(c < d[0][0] || c > d[d.length - 1][0]) return null;
+  for(var i = 0; i < d.length - 1; i++){
+    if(c >= d[i][0] && c <= d[i + 1][0]){
+      var f = (Math.log(c) - Math.log(d[i][0])) / (Math.log(d[i + 1][0]) - Math.log(d[i][0]));
+      return d[i][1] + f * (d[i + 1][1] - d[i][1]);
+    }
+  }
+  return null;
+}
+
+pillGroup("dfSalt", function(b){ dfSalt = b.getAttribute("data-s"); dfNumbers(); });
+pillGroup("dfOn", function(b){ dfOn = b.getAttribute("data-o") === "1"; dfPulseT = null; dfNumbers(); });
+["dfC", "dfE"].forEach(function(id){ document.getElementById(id).addEventListener("input", dfNumbers); });
+document.getElementById("dfPulse").addEventListener("click", function(){
+  dfOn = false; dfPulseT = performance.now();
+  [].slice.call(document.getElementById("dfOn").querySelectorAll(".pill")).forEach(function(o){
+    o.setAttribute("aria-pressed", o.getAttribute("data-o") === "0" ? "true" : "false");
+  });
+  dfNumbers();
+});
+ANIM.push({panel:"p-drift", tick:function(ts){
+  if(dfPulseT !== null && ts - dfPulseT > 3000){
+    dfOn = true; dfPulseT = null;
+    [].slice.call(document.getElementById("dfOn").querySelectorAll(".pill")).forEach(function(o){
+      o.setAttribute("aria-pressed", o.getAttribute("data-o") === "1" ? "true" : "false");
+    });
+    dfNumbers();
+  }
+  dfPic(ts);
+}});
+
+/* a length in pm without JavaScript's 3.8e+2: plain digits where they read, powers of ten where they don't */
+function dfPm(pm){
+  if(pm >= 10 && pm < 1e5) return String(Math.round(pm));
+  if(pm >= 1 && pm < 10) return pm.toFixed(1);
+  if(pm >= 0.01 && pm < 1) return pm.toPrecision(2);
+  return sciH(pm, 2);
+}
+function dfNumbers(){
+  cdDraw();                                   /* the strong-and-weak plot shares these controls */
+  var s = DF[dfSalt], K = dfConst();
+  var c = Math.pow(10, +document.getElementById("dfC").value);
+  var E = Math.pow(10, +document.getElementById("dfE").value);
+  var sq = Math.sqrt(c);
+  var lam = 1 / (K.k1 * sq);
+  var Lm = s.L0 - (K.A + K.B * s.L0) * sq;                  /* S cm2 mol-1 */
+  var sigma = Lm * c * 0.1;                                   /* S/m         */
+  var tau = K.eps / sigma;
+  var u = s.lp * 1e-4 / K.F;                                  /* m2 V-1 s-1  */
+  var v = u * E, lag = v * tau, meas = dfMeasured(s, c);
+
+  document.getElementById("dfCv").textContent = c >= 0.01 ? (c * 1000).toFixed(0) + " mM" : (c * 1000).toPrecision(2) + " mM";
+  document.getElementById("dfEv").textContent = E >= 1e3 ? (E / 1e3).toPrecision(3) + " kV/m" : E.toPrecision(3) + " V/m";
+  document.getElementById("dfWho").textContent = s.nm + " · " + (c * 1000).toPrecision(2) + " mM";
+  document.getElementById("dfNote").textContent = dfOn ? "field on, " + (E >= 1e3 ? (E / 1e3).toPrecision(2) + " kV/m" : E.toPrecision(2) + " V/m")
+                                                       : "field off — the atmosphere re-centres";
+  document.getElementById("dfL").textContent = (lam * 1e9).toPrecision(3) + " nm";
+  document.getElementById("dfTau").textContent = (tau * 1e9).toPrecision(3) + " ns";
+  document.getElementById("dfV").textContent = dfOn ? (v * 1e6 >= 1000 ? (v * 1e3).toPrecision(3) + " mm/s" : (v * 1e6).toPrecision(3) + " µm/s") : "0 — field off";
+  var pm = lag * 1e12;
+  document.getElementById("dfLag").innerHTML = dfOn ? dfPm(pm) + " pm  (" + sciH(lag / lam, 1) + " of 1/κ)" : "0";
+  document.getElementById("dfRel").textContent = (K.B * sq * 100).toFixed(2) + " % of the applied field";
+  document.getElementById("dfEp").textContent = (K.A * sq).toFixed(2) + " S cm² mol⁻¹  (" + (100 * K.A * sq / s.L0).toFixed(2) + " % of Λ°)";
+  document.getElementById("dfLam").textContent = Lm.toFixed(1) + "  ·  " + (meas === null ? "—" : meas.toFixed(1)) + " S cm² mol⁻¹";
+
+  var dev = meas === null ? null : 100 * (Lm - meas) / meas;
+  var vd = document.getElementById("dfVerdict");
+  if(dev !== null && Math.abs(dev) < 0.5){
+    vd.className = "verdict go";
+    vd.innerHTML = "<b>Onsager holds: within " + Math.abs(dev).toFixed(2) + " %.</b> At " + (c * 1000).toPrecision(2) + " mM the "
+      + "atmosphere is " + (lam * 1e9).toPrecision(2) + " nm thick, far wider than the ions, and a point-charge theory with no "
+      + "fitted parameter predicts the conductivity to measurement accuracy.";
+  }else if(dev !== null && Math.abs(dev) < 2){
+    vd.className = "verdict flat";
+    vd.innerHTML = "<b>Starting to read low: " + Math.abs(dev).toFixed(1) + " %.</b> The atmosphere is still "
+      + (lam * 1e9).toPrecision(2) + " nm thick, about " + Math.round(lam / 0.4e-9) + " times a hydrated ion, but the point-charge "
+      + "picture already overestimates both effects slightly. Dilute and the line and the circles come together.";
+  }else if(dev !== null){
+    vd.className = "verdict stop";
+    vd.innerHTML = "<b>The limiting law reads " + Math.abs(dev).toFixed(1) + " % low.</b> The atmosphere is down to "
+      + (lam * 1e9).toPrecision(2) + " nm, only a few times the size of a hydrated ion, and treating the ions as points "
+      + "overestimates both effects. Real ions have a size — the correction the extended Debye–Hückel law makes for activity.";
+  }else{
+    vd.className = "verdict flat";
+    vd.innerHTML = "Outside the measured range for " + s.nm + ", so there is nothing to compare the line with here.";
+  }
+
+  document.getElementById("dfRead").innerHTML = "<b>Right now:</b> " + s.cat + " in " + (c * 1000).toPrecision(2) + " mM " + s.nm
+    + ". The atmosphere rebuilds in τ = " + (tau * 1e9).toPrecision(2) + " ns"
+    + (dfOn ? ", the ion moves " + dfPm(lag * 1e12) + " pm in that time, and the lopsided cloud takes back "
+              + (K.B * sq * 100).toFixed(1) + " % of the field — the same fraction at any ordinary field strength." : ", and with the field off there is nothing to lag behind.")
+    + " Electrophoresis removes another " + (100 * K.A * sq / s.L0).toFixed(1) + " % of Λ°.";
+  dfPlot(s, K, c, Lm);
+}
+
+/* the real numbers behind the picture: the Debye length and how far the ion
+   moves while its atmosphere is being rebuilt */
+function dfReal(){
+  var s = DF[dfSalt], K = dfConst();
+  var c = Math.pow(10, +document.getElementById("dfC").value);
+  var E = Math.pow(10, +document.getElementById("dfE").value);
+  var sq = Math.sqrt(c), lam = 1 / (K.k1 * sq);
+  var sigma = (s.L0 - (K.A + K.B * s.L0) * sq) * c * 0.1;
+  var tau = K.eps / sigma, v = s.lp * 1e-4 / K.F * E;
+  return {lam: lam, tau: tau, v: v, lag: v * tau};
+}
+
+function dfPic(ts){
+  var W = 520, H = 300, L = 12, R = 12, T = 34, B = 12;
+  var c = Math.pow(10, +document.getElementById("dfC").value);
+  var eFrac = (+document.getElementById("dfE").value - 1) / 5;
+  var lamNm = 0.304 / Math.sqrt(c);
+  var cloudR = 26 + 58 * lamNm / (lamNm + 3);                 /* drawn radius, compressed */
+  var dt = Math.min(0.1, Math.max(0, (ts - dfLast) / 1000)); dfLast = ts;
+  var tauVis = 0.9;                                           /* seconds on screen */
+  var target = dfOn ? (0.25 + 0.55 * eFrac) * cloudR : 0;
+  if(REDUCED) dfLag = target; else dfLag += (target - dfLag) * Math.min(1, dt / tauVis);
+  var speed = dfOn ? 40 + 110 * eFrac : 0;                    /* px/s on screen */
+  if(!REDUCED){ dfX += speed * dt / (W - L - R); if(dfX > 1) dfX -= 1; }
+  var ix = L + dfX * (W - L - R), iy = (T + H - B) / 2 + 10, tt = REDUCED ? 0 : ts / 1000;
+  /* In the ion's frame the counter-ions move backwards at the sum of the two
+     drift speeds, so they wash through the cloud rather than ride in it. A
+     dot that leaves at the back reappears at the front: the atmosphere is
+     torn down behind the ion and rebuilt ahead of it.                    */
+  var relSpeed = dfOn ? (70 + 170 * eFrac) : 0;
+  if(!REDUCED){
+    DF_CLOUD.forEach(function(d){
+      d.dx -= relSpeed * dt / cloudR;
+      if(d.dx < -1.9){ d.dx += 3.8; d.dy = -1.15 + 2.3 * ((Math.sin(d.ph * 91.7 + tt) + 1) / 2); }
+    });
+  }
+  var s = "", i;
+
+  s += '<rect x="' + L + '" y="' + T + '" width="' + (W - L - R) + '" height="' + (H - T - B) + '" rx="6" fill="var(--surface-2)" opacity="0.55" stroke="var(--line-2)"/>';
+  /* the field */
+  s += '<line x1="' + (W / 2 - 60) + '" y1="16" x2="' + (W / 2 + 52) + '" y2="16" stroke="var(--ink-2)" stroke-width="2" opacity="' + (dfOn ? 1 : 0.25) + '"/>';
+  s += '<polygon points="' + (W / 2 + 60) + ',16 ' + (W / 2 + 51) + ',11 ' + (W / 2 + 51) + ',21" fill="var(--ink-2)" opacity="' + (dfOn ? 1 : 0.25) + '"/>';
+  s += '<text x="' + (W / 2 - 68) + '" y="20" text-anchor="end" fill="var(--ink-2)" ' + MONO + ' font-size="13.5">E</text>';
+  s += '<text x="' + (W - R) + '" y="20" text-anchor="end" fill="var(--muted)" ' + MONO + ' font-size="12">' + (dfOn ? "field on" : "field off") + '</text>';
+
+  /* every other ion, drifting with its own sign */
+  DF_BG.forEach(function(p){
+    /* thermal motion runs whether or not the field is on; the drift is the
+       small bias on top of it, which is the whole point of the picture   */
+    var jig = 0.012 * Math.sin(tt * 2.3 + p.ph) + 0.008 * Math.sin(tt * 3.7 + 2 * p.ph);
+    var x = (p.x + jig + (dfOn ? p.q * tt * (0.02 + 0.06 * eFrac) : 0)) % 1; if(x < 0) x += 1;
+    var px = L + 6 + x * (W - L - R - 12), py = T + 8 + p.y * (H - T - B - 16) + 2 * Math.sin(tt * 1.4 + p.ph);
+    s += '<circle cx="' + px.toFixed(1) + '" cy="' + py.toFixed(1) + '" r="2.2" fill="' + (p.q > 0 ? "var(--ox)" : "var(--red-)") + '" opacity="0.28"/>';
+  });
+
+  /* the atmosphere, centred behind the ion by the lag; drawn twice across the wrap */
+  [0, W - L - R, -(W - L - R)].forEach(function(shift){
+    var cx = ix - dfLag + shift;
+    if(cx < L - 2 * cloudR || cx > W - R + 2 * cloudR) return;
+    for(var k = 6; k >= 1; k--){
+      s += '<circle cx="' + cx.toFixed(1) + '" cy="' + iy + '" r="' + (cloudR * k / 4).toFixed(1) + '" fill="var(--red-)" opacity="' + (0.035 + 0.02 * (6 - k)).toFixed(3) + '"/>';
+    }
+    DF_CLOUD.forEach(function(d){
+      /* the dot sits at its own place in the ion's frame; how bright it is
+         says how much excess counter-charge that place holds, and the
+         excess is centred on cx, one lag behind the ion                  */
+      var px = ix + shift + d.dx * cloudR, py = iy + d.dy * cloudR * 0.85 + 2 * Math.sin(tt * 1.3 + d.ph);
+      if(px < L + 3 || px > W - R - 3 || py < T + 3 || py > H - B - 3) return;
+      var q = Math.sqrt(Math.pow(px - cx, 2) + Math.pow((py - iy) / 0.85, 2)) / (0.95 * cloudR);
+      var op = 0.9 * Math.exp(-q * q);
+      if(op < 0.06) return;
+      s += '<circle cx="' + px.toFixed(1) + '" cy="' + py.toFixed(1) + '" r="3" fill="var(--red-)" opacity="' + op.toFixed(2) + '"/>';
+    });
+    /* solvent pushed back by the counter-ions */
+    if(dfOn){
+      for(var j = 0; j < 4; j++){
+        var fy = iy - cloudR * 0.9 + j * cloudR * 0.6, fx = cx + cloudR * 0.5 - ((tt * 30) % 24);
+        s += '<line x1="' + (fx + 22).toFixed(1) + '" y1="' + fy.toFixed(1) + '" x2="' + (fx - 4).toFixed(1) + '" y2="' + fy.toFixed(1)
+           + '" stroke="var(--go)" stroke-width="1.6" stroke-dasharray="4 3" opacity="0.8"/>';
+        s += '<polygon points="' + (fx - 10).toFixed(1) + ',' + fy.toFixed(1) + ' ' + (fx - 3).toFixed(1) + ',' + (fy - 3.5).toFixed(1) + ' '
+           + (fx - 3).toFixed(1) + ',' + (fy + 3.5).toFixed(1) + '" fill="var(--go)" opacity="0.8"/>';
+      }
+    }
+  });
+
+  /* the lag, with a bracket: this is the quantity the readouts give in pm */
+  if(dfLag > 6){
+    var by = iy + 34;
+    s += '<line x1="' + (ix - dfLag).toFixed(1) + '" y1="' + (iy - 14) + '" x2="' + (ix - dfLag).toFixed(1) + '" y2="' + (by + 4) + '" stroke="var(--red-)" stroke-width="1" stroke-dasharray="3 3"/>';
+    s += '<line x1="' + ix.toFixed(1) + '" y1="' + (iy + 12) + '" x2="' + ix.toFixed(1) + '" y2="' + (by + 4) + '" stroke="var(--ox)" stroke-width="1" stroke-dasharray="3 3"/>';
+    s += '<line x1="' + (ix - dfLag).toFixed(1) + '" y1="' + by + '" x2="' + ix.toFixed(1) + '" y2="' + by + '" stroke="var(--ink-2)" stroke-width="1.4"/>';
+    s += '<text x="' + (ix - dfLag / 2).toFixed(1) + '" y="' + (by + 14) + '" text-anchor="middle" fill="var(--ink-2)" ' + MONO + ' font-size="10.5">lag = uE&#964;</text>';
+  }
+
+  /* the ion and the two forces on it. It jiggles: in a real solution the
+     thermal speed is ~10^8 times the drift, so the drift is only a bias. */
+  var jx = REDUCED ? 0 : 2.2 * Math.sin(tt * 5.1) + 1.4 * Math.sin(tt * 8.3);
+  var jy = REDUCED ? 0 : 2.0 * Math.sin(tt * 6.3 + 1.1) + 1.2 * Math.sin(tt * 9.7);
+  s += '<circle cx="' + (ix + jx).toFixed(1) + '" cy="' + (iy + jy).toFixed(1) + '" r="11" fill="var(--ox)" stroke="var(--surface)" stroke-width="2"/>';
+  s += '<text x="' + (ix + jx).toFixed(1) + '" y="' + (iy + jy + 4).toFixed(1) + '" text-anchor="middle" fill="#fff" ' + MONO + ' font-size="13.5" font-weight="700">+</text>';
+  var ay = iy - 26;
+  if(dfOn){
+    s += '<line x1="' + ix.toFixed(1) + '" y1="' + ay + '" x2="' + (ix + 40).toFixed(1) + '" y2="' + ay + '" stroke="var(--ox)" stroke-width="3"/>';
+    s += '<polygon points="' + (ix + 48).toFixed(1) + ',' + ay + ' ' + (ix + 39).toFixed(1) + ',' + (ay - 5) + ' ' + (ix + 39).toFixed(1) + ',' + (ay + 5) + '" fill="var(--ox)"/>';
+  }
+  var back = 40 * dfLag / cloudR;
+  if(back > 3){
+    s += '<line x1="' + ix.toFixed(1) + '" y1="' + (ay + 8) + '" x2="' + (ix - back).toFixed(1) + '" y2="' + (ay + 8) + '" stroke="var(--red-)" stroke-width="3"/>';
+    s += '<polygon points="' + (ix - back - 8).toFixed(1) + ',' + (ay + 8) + ' ' + (ix - back + 1).toFixed(1) + ',' + (ay + 3) + ' ' + (ix - back + 1).toFixed(1) + ',' + (ay + 13) + '" fill="var(--red-)"/>';
+  }
+  var real = dfReal(), drawnRatio = dfLag / cloudR, realRatio = real.lag / real.lam;
+  s += '<text x="' + (L + 6) + '" y="' + (H - B - 8) + '" fill="var(--muted)" ' + MONO + ' font-size="11.5">'
+     + (dfOn && realRatio > 0 ? 'lag drawn ' + sciSvg(drawnRatio / realRatio, 2) + ' × its real share of 1/\u03ba' : 'thermal motion only')
+     + '</text>';
+  document.getElementById("dfpic").innerHTML = s;
+}
+
+function dfPlot(s, K, c, Lm){
+  var W = 520, H = 300, L = 56, R = 16, T = 18, B = 44;
+  var smax = 0.33;
+  var lo = Math.floor((s.L0 - (K.A + K.B * s.L0) * smax) / 10) * 10 - 5, hi = Math.ceil(s.L0 / 10) * 10 + 5;
+  function X(q){ return L + q / smax * (W - L - R); }
+  function Y(v){ return T + (hi - v) / (hi - lo) * (H - T - B); }
+  var p = "", i;
+  p += '<line x1="' + L + '" y1="' + (H - B) + '" x2="' + (W - R) + '" y2="' + (H - B) + '" stroke="var(--line-2)"/>';
+  p += '<line x1="' + L + '" y1="' + T + '" x2="' + L + '" y2="' + (H - B) + '" stroke="var(--line-2)"/>';
+  for(i = 0; i <= 6; i++){
+    var q = i * 0.05;
+    p += '<text x="' + X(q).toFixed(1) + '" y="' + (H - B + 16) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="12">' + q.toFixed(2) + '</text>';
+  }
+  var step = (hi - lo) > 60 ? 20 : 10;
+  for(var v = Math.ceil(lo / step) * step; v <= hi; v += step){
+    p += '<text x="' + (L - 6) + '" y="' + (Y(v) + 3.5).toFixed(1) + '" text-anchor="end" fill="var(--muted)" ' + MONO + ' font-size="12">' + v + '</text>';
+  }
+  p += '<text x="' + ((L + W - R) / 2) + '" y="' + (H - 10) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="12.5">√c  /  (mol/L)^½</text>';
+  p += '<text transform="rotate(-90 13 ' + ((T + H - B) / 2) + ')" x="13" y="' + ((T + H - B) / 2) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="12.5">Λm / S cm² mol⁻¹</text>';
+  p += '<line x1="' + L + '" y1="' + Y(s.L0).toFixed(1) + '" x2="' + (W - R) + '" y2="' + Y(s.L0).toFixed(1) + '" stroke="var(--line-2)" stroke-width="1.6" stroke-dasharray="4 3"/>';
+  p += '<text x="' + (W - R - 4) + '" y="' + (Y(s.L0) - 5).toFixed(1) + '" text-anchor="end" fill="var(--muted)" ' + MONO + ' font-size="12">Λ° = ' + s.L0 + '</text>';
+  p += '<line x1="' + X(0).toFixed(1) + '" y1="' + Y(s.L0).toFixed(1) + '" x2="' + X(smax).toFixed(1) + '" y2="' + Y(s.L0 - (K.A + K.B * s.L0) * smax).toFixed(1)
+     + '" stroke="var(--go)" stroke-width="2.4"/>';
+  s.d.forEach(function(pt){
+    p += '<circle cx="' + X(Math.sqrt(pt[0])).toFixed(1) + '" cy="' + Y(pt[1]).toFixed(1) + '" r="4" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.6"/>';
+  });
+  /* the losses at the chosen concentration, stacked under Lambda0 */
+  var sq = Math.sqrt(c), xb = X(sq);
+  var ep = K.A * sq, rel = K.B * s.L0 * sq;
+  p += '<rect x="' + (xb - 5).toFixed(1) + '" y="' + Y(s.L0).toFixed(1) + '" width="10" height="' + (Y(s.L0 - ep) - Y(s.L0)).toFixed(1) + '" fill="var(--go)" opacity="0.75"/>';
+  p += '<rect x="' + (xb - 5).toFixed(1) + '" y="' + Y(s.L0 - ep).toFixed(1) + '" width="10" height="' + (Y(s.L0 - ep - rel) - Y(s.L0 - ep)).toFixed(1) + '" fill="var(--red-)" opacity="0.75"/>';
+  p += '<line x1="' + xb.toFixed(1) + '" y1="' + T + '" x2="' + xb.toFixed(1) + '" y2="' + (H - B) + '" stroke="var(--ink-2)" stroke-dasharray="2 3" opacity="0.5"/>';
+  var right = xb < W - R - 150;
+  p += '<text x="' + (xb + (right ? 10 : -10)).toFixed(1) + '" y="' + (Y(Lm) + 16).toFixed(1) + '" text-anchor="' + (right ? "start" : "end")
+     + '" fill="var(--go)" ' + MONO + ' font-size="12.5" font-weight="600">Λm = ' + Lm.toFixed(1) + '</text>';
+  document.getElementById("dfplot").innerHTML = p;
+}
+
+/* ================= 1 - CONDUCTIVITY =====================================
+   kappa = (l/A)/R, Lambda = kappa/C. Strong electrolytes: the measured
+   Lambda(C) of DF above, interpolated in sqrt(C) from Lambda0 at C = 0.
+   Acetic acid: Ostwald's law with K = 1.78e-5 mol/L, the value the
+   MacInnes-Shedlovsky conductivities give, and Lambda0 = 390.7 from the
+   ions (lambda0 H+ + lambda0 OAc-).                                        */
+var HOAC_K = 1.78e-5, HOAC_L0 = 390.7;
+var HOAC_D = [[0.0001114,127.7],[0.001028,48.15],[0.005912,20.96],[0.009842,16.37],[0.02,11.57],[0.05,7.36],[0.1,5.20]];
+var CDX = {
+  KCl:  {nm:"KCl",  strong:true, L0:DF.KCl.L0,  d:DF.KCl.d,  col:"var(--go)"},
+  NaCl: {nm:"NaCl", strong:true, L0:DF.NaCl.L0, d:DF.NaCl.d, col:"var(--ink-2)"},
+  HCl:  {nm:"HCl",  strong:true, L0:DF.HCl.L0,  d:DF.HCl.d,  col:"var(--ox)"},
+  /* the weak one is always drawn, for contrast; the salt pills pick among the strong three */
+  hoac: {nm:"acetic acid", strong:false, L0:HOAC_L0, d:HOAC_D, col:"var(--red-)"}
+};
+function cdAlpha(c){ return (-HOAC_K + Math.sqrt(HOAC_K * HOAC_K + 4 * HOAC_K * c)) / (2 * c); }
+function cdLam(k, c){
+  var e = CDX[k];
+  if(!e.strong) return cdAlpha(c) * e.L0;
+  var pts = [[0, e.L0]].concat(e.d.map(function(p){ return [Math.sqrt(p[0]), p[1]]; })), x = Math.sqrt(c), n;
+  for(n = 1; n < pts.length; n++) if(x <= pts[n][0]) break;
+  if(n >= pts.length) n = pts.length - 1;
+  var a = pts[n - 1], b = pts[n];
+  return a[1] + (b[1] - a[1]) * (x - a[0]) / (b[0] - a[0]);
+}
+function cdFmtC(c){ return c >= 0.01 ? (c * 1000).toFixed(0) + " mM" : c >= 0.001 ? (c * 1000).toFixed(1) + " mM" : (c * 1000).toFixed(2) + " mM"; }
+/* driven by the salt pills and the concentration slider above the plots */
+function cdDraw(){
+  var cdSel = dfSalt, e = CDX[cdSel], c = Math.pow(10, +document.getElementById("dfC").value);
+  var lam = cdLam(cdSel, c), al = lam / e.L0;
+
+
+  /* ---- Lambda against sqrt(C) ---- */
+  var W = 520, H = 380, L = 58, Rr = 88, T = 16, B = 46, xmax = 0.34, ymax = 460;
+  function X(v){ return L + v / xmax * (W - L - Rr); }
+  function Y(v){ return H - B - v / ymax * (H - B - T); }
+  var p = "", k;
+  p += '<line x1="' + L + '" y1="' + (H - B) + '" x2="' + (W - Rr) + '" y2="' + (H - B) + '" stroke="var(--line-2)"/>';
+  p += '<line x1="' + L + '" y1="' + T + '" x2="' + L + '" y2="' + (H - B) + '" stroke="var(--line-2)"/>';
+  [0, 0.1, 0.2, 0.3].forEach(function(v){
+    p += '<line x1="' + X(v).toFixed(1) + '" y1="' + (H - B) + '" x2="' + X(v).toFixed(1) + '" y2="' + (H - B + 4) + '" stroke="var(--line-2)"/>';
+    p += '<text x="' + X(v).toFixed(1) + '" y="' + (H - B + 17) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="13">' + v.toFixed(1) + '</text>';
+  });
+  [0, 100, 200, 300, 400].forEach(function(v){
+    p += '<line x1="' + (L - 4) + '" y1="' + Y(v).toFixed(1) + '" x2="' + L + '" y2="' + Y(v).toFixed(1) + '" stroke="var(--line-2)"/>';
+    if(v === 0) return;
+    p += '<text x="' + (L - 7) + '" y="' + (Y(v) + 3.5).toFixed(1) + '" text-anchor="end" fill="var(--muted)" ' + MONO + ' font-size="13">' + v + '</text>';
+  });
+  p += '<text x="' + ((L + W - Rr) / 2) + '" y="' + (H - 8) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="13.5">√C / (mol L⁻¹)^½</text>';
+  p += '<text transform="rotate(-90 14 ' + ((T + H - B) / 2) + ')" x="14" y="' + ((T + H - B) / 2) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="13.5">Λ / S cm² mol⁻¹</text>';
+  var cdTaken = [];
+  Object.keys(CDX).forEach(function(key){
+    var ee = CDX[key], on = key === cdSel, pts = [];
+    for(k = 0; k <= 160; k++){
+      var sq = Math.sqrt(0.1) * Math.pow(k / 160, 2), cc = Math.max(sq * sq, 1e-9);
+      pts.push(X(sq).toFixed(1) + "," + Y(key === "hoac" && k === 0 ? ee.L0 : cdLam(key, cc)).toFixed(1));
+    }
+    p += '<polyline points="' + pts.join(" ") + '" fill="none" stroke="' + ee.col + '" stroke-width="' + (on ? 2.6 : 1.5) + '" opacity="' + (on ? 1 : 0.45) + '"/>';
+    ee.d.forEach(function(d){
+      p += '<circle cx="' + X(Math.sqrt(d[0])).toFixed(1) + '" cy="' + Y(d[1]).toFixed(1) + '" r="3.6" fill="var(--surface)" stroke="' + ee.col + '" stroke-width="1.5" opacity="' + (on ? 1 : 0.5) + '"/>';
+    });
+    var yEnd = Y(cdLam(key, 0.1));
+    while(cdTaken.some(function(y){ return Math.abs(y - yEnd) < 19; })) yEnd += 19;
+    cdTaken.push(yEnd);
+    p += '<text x="' + (X(Math.sqrt(0.1)) + 8).toFixed(1) + '" y="' + (yEnd + 4).toFixed(1) + '" fill="' + ee.col + '" ' + MONO + ' font-size="13.5" font-weight="' + (on ? 700 : 500) + '">' + ee.nm + '</text>';
+    p += '<text x="' + (L + 5) + '" y="' + (Y(ee.L0) - 5).toFixed(1) + '" fill="' + ee.col + '" ' + MONO + ' font-size="12.5" opacity="' + (on ? 1 : 0.6) + '">Λ° = ' + ee.L0.toFixed(1) + '</text>';
+  });
+  p += '<circle cx="' + X(Math.sqrt(c)).toFixed(1) + '" cy="' + Y(lam).toFixed(1) + '" r="5.5" fill="' + e.col + '" stroke="var(--surface)" stroke-width="2"/>';
+  document.getElementById("cdplot").innerHTML = p;
+
+  document.getElementById("cdRead").innerHTML = e.strong
+    ? "<b>" + e.nm + " is a strong electrolyte: every formula unit is two ions.</b> At " + cdFmtC(c) + ", Λ = " + lam.toFixed(1)
+      + ", only " + ((1 - al) * 100).toFixed(1) + " % below Λ° = " + e.L0.toFixed(1) + ". The ions are all there; they just get in each "
+      + "other's way — each drags an atmosphere that pulls it back and pushes solvent against it, as the picture below shows, "
+      + "and both effects grow as √C. Extrapolating the straight part of the plot to C = 0 gives Λ°."
+    : "<b>Acetic acid is a weak electrolyte: mostly molecules.</b> At " + cdFmtC(c) + ", only α = " + (al * 100).toFixed(1)
+      + " % of it is ionised, so Λ is " + (al * 100).toFixed(1) + " % of Λ°. Dilute it and more dissociates, but Ostwald's K = α²C/(1 − α) "
+      + "stays at " + sciH(al * al * c / (1 - al), 3) + " mol/L while α changes tenfold. The curve is still climbing steeply as C → 0, "
+      + "so Λ° cannot be extrapolated from it; it is built from the ions instead: λ°(H⁺) + λ°(OAc⁻) = 390.7 (the <b>Ion Mobility</b> tab).";
+}
+
+/* ================= 3 - ION MOBILITY =====================================
+   lambda per unit charge (S cm2 mol-1) from Bard & Faulkner Table 2.3.2.
+   u = lambda/F, D = RT lambda/(|z| F^2), Stokes r = |z| F^2/(6 pi eta N lambda)
+   (all per unit charge, so a doubly charged ion's per-ion lambda is 2x).
+   rc: Shannon crystal radii, pm; m: mass, amu.                             */
+var FARADAY = QE * NA, RGAS = KB * NA, ETA_W = 0.890e-3;
+var ION = [
+  {k:"H",   nm:"H⁺",    lam:349.82, z:1,  rc:null, m:1.008},
+  {k:"Li",  nm:"Li⁺",   lam:38.69,  z:1,  rc:76,   m:6.94},
+  {k:"Na",  nm:"Na⁺",   lam:50.11,  z:1,  rc:102,  m:22.99},
+  {k:"K",   nm:"K⁺",    lam:73.52,  z:1,  rc:138,  m:39.10},
+  {k:"NH4", nm:"NH₄⁺",  lam:73.4,   z:1,  rc:null, m:18.04},
+  {k:"Ca",  nm:"Ca²⁺",  lam:59.50,  z:2,  rc:100,  m:40.08},
+  {k:"OH",  nm:"OH⁻",   lam:198.0,  z:-1, rc:null, m:17.01},
+  {k:"Cl",  nm:"Cl⁻",   lam:76.34,  z:-1, rc:181,  m:35.45},
+  {k:"Br",  nm:"Br⁻",   lam:78.4,   z:-1, rc:196,  m:79.90},
+  {k:"NO3", nm:"NO₃⁻",  lam:71.44,  z:-1, rc:null, m:62.00},
+  {k:"OAc", nm:"OAc⁻",  lam:40.9,   z:-1, rc:null, m:59.04},
+  {k:"SO4", nm:"SO₄²⁻", lam:79.8,   z:-2, rc:null, m:96.06}
+];
+function ionOf(k){ return ION.filter(function(o){ return o.k === k; })[0]; }
+function mbU(o){ return o.lam * 1e-4 / FARADAY; }                                      /* m2 V-1 s-1 */
+function mbDc(o){ return RGAS * T25 * o.lam * 1e-4 / (Math.abs(o.z) * FARADAY * FARADAY); } /* m2 s-1 */
+function mbRs(o){ return Math.abs(o.z) * FARADAY * FARADAY / (6 * Math.PI * ETA_W * NA * o.lam * 1e-4); } /* m */
+/* ================= 3 - STOKES-EINSTEIN =================================
+   One sphere in one fluid: D = kT/6 pi eta r, u = |z|e/6 pi eta r and
+   lambda = z^2 F^2 D / RT are the same statement. Viscosity follows the
+   Vogel fit for water, scaled to whichever solvent is chosen, so the
+   temperature slider moves eta the way it really moves.               */
+var SE = {eta25: 0.890e-3, nm: "water", z: 1};
+function seEtaW(T){ return 0.02939e-3 * Math.exp(507.88 / (T - 149.3)); }   /* Pa s */
+function seEta(T){ return SE.eta25 * seEtaW(T) / seEtaW(T25); }
+function seD(r, T, eta){ return KB * T / (6 * Math.PI * eta * r); }         /* m2/s */
+/* the Stokes radius a measured lambda implies, in water at 25 C */
+function seRofIon(o){ return mbRs(o); }
+
+pillGroup("seSolv", function(b){
+  SE.eta25 = +b.getAttribute("data-eta") * 1e-3; SE.nm = b.getAttribute("data-nm"); seDraw();
+});
+pillGroup("seZ", function(b){ SE.z = +b.getAttribute("data-z"); seDraw(); });
+document.getElementById("seR").addEventListener("input", seDraw);
+document.getElementById("seT").addEventListener("input", seDraw);
+document.getElementById("seplot").addEventListener("click", function(e){
+  var g = e.target.closest("[data-ion]");
+  if(!g) return;
+  document.getElementById("seR").value = Math.round(seRofIon(ionOf(g.getAttribute("data-ion"))) * 1e12);
+  seDraw();
+});
+
+/* the ions worth marking: spheres only, so no Grotthuss hoppers */
+var SE_IONS = ["Li", "Na", "K", "Ca", "Cl", "Br", "SO4"];
+
+function seDraw(){
+  var r = +document.getElementById("seR").value * 1e-12;          /* m   */
+  var T = +document.getElementById("seT").value;                  /* K   */
+  var eta = seEta(T), z = SE.z;
+  var D = seD(r, T, eta);                                         /* m2/s */
+  var u = z * QE / (6 * Math.PI * eta * r);                       /* m2 V-1 s-1 */
+  var lam = z * z * FARADAY * FARADAY * D / (RGAS * T);           /* S m2/mol   */
+  var v = u * 100;                                                /* m/s in 1 V/cm */
+  var t10 = Math.pow(10e-6, 2) / (2 * D);                         /* s */
+
+  document.getElementById("seRv").textContent = (r * 1e9).toFixed(3) + " nm";
+  document.getElementById("seTv").textContent = T + " K  (" + (T - 273.15).toFixed(0) + " °C)";
+  document.getElementById("seNote").textContent = SE.nm + ", " + (T - 273.15).toFixed(0) + " °C, |z| = " + z;
+  document.getElementById("seEta").textContent = (eta * 1e3).toPrecision(3) + " cP";
+  document.getElementById("seD").innerHTML = sciH(D * 1e4, 3) + " cm² s⁻¹";
+  document.getElementById("seU").innerHTML = sciH(u * 1e4, 3) + " cm² V⁻¹ s⁻¹";
+  document.getElementById("seLam").textContent = (lam * 1e4).toFixed(1) + " S cm² mol⁻¹";
+  document.getElementById("seV").textContent = (v * 1e6).toFixed(1) + " µm s⁻¹";
+  document.getElementById("seT10").textContent = t10 < 1 ? (t10 * 1e3).toFixed(0) + " ms" : t10.toFixed(1) + " s";
+  document.getElementById("seW").textContent = (lam * 1e4 * eta * 1e3).toFixed(1) + " S cm² mol⁻¹ cP";
+
+  /* ---- the plot: D against r, this solvent against water at 25 C ---- */
+  var W = 520, H = 360, L = 62, Rr = 74, Tp = 18, B = 44;
+  /* The scale is fixed, at water and 25 C over the whole radius range, so
+     that changing solvent or temperature visibly moves the curve instead of
+     redrawing the same picture with new numbers on the axis. A curve that
+     leaves the top is clipped and said so.                                */
+  var rMax = 0.62e-9, dMax = seD(60e-12, T25, 0.890e-3);
+  function X(rr){ return L + rr / rMax * (W - L - Rr); }
+  function Y(d){ return Tp + (1 - d / dMax) * (H - Tp - B); }
+  var g = "", i;
+  g += '<line x1="' + L + '" y1="' + (H - B) + '" x2="' + (W - Rr) + '" y2="' + (H - B) + '" stroke="var(--line-2)"/>';
+  g += '<line x1="' + L + '" y1="' + Tp + '" x2="' + L + '" y2="' + (H - B) + '" stroke="var(--line-2)"/>';
+  for(i = 0; i <= 6; i++){
+    var rv = i * 0.1e-9;
+    g += '<line x1="' + X(rv).toFixed(1) + '" y1="' + (H - B) + '" x2="' + X(rv).toFixed(1) + '" y2="' + (H - B + 4) + '" stroke="var(--line-2)"/>';
+    g += '<text x="' + X(rv).toFixed(1) + '" y="' + (H - B + 17) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="11">' + (i * 0.1).toFixed(1) + '</text>';
+  }
+  g += '<text x="' + ((L + W - Rr) / 2) + '" y="' + (H - 8) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="11">hydrodynamic radius, r / nm</text>';
+  var step = Math.pow(10, Math.floor(Math.log10(dMax * 1e4))) / 2;
+  for(i = 1; i * step <= dMax * 1e4; i++){
+    var dv = i * step * 1e-4;
+    g += '<line x1="' + (L - 4) + '" y1="' + Y(dv).toFixed(1) + '" x2="' + L + '" y2="' + Y(dv).toFixed(1) + '" stroke="var(--line-2)"/>';
+    g += '<text x="' + (L - 7) + '" y="' + (Y(dv) + 4).toFixed(1) + '" text-anchor="end" fill="var(--muted)" ' + MONO + ' font-size="11">' + (i * step * 1e5).toFixed(1) + '</text>';
+  }
+  g += '<text transform="rotate(-90 14 ' + ((Tp + H - B) / 2) + ')" x="14" y="' + ((Tp + H - B) / 2) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="11">D / 10⁻⁵ cm² s⁻¹</text>';
+  /* The same height read as a conductivity: lambda = z^2 F^2 D / RT. D itself
+     cannot depend on the charge, so this axis is the only thing the charge
+     buttons move - by z^2.                                              */
+  var lamOf = function(d){ return z * z * FARADAY * FARADAY * d / (RGAS * T) * 1e4; };
+  g += '<line x1="' + (W - Rr) + '" y1="' + Tp + '" x2="' + (W - Rr) + '" y2="' + (H - B) + '" stroke="var(--con, var(--go))" stroke-width="1.2" opacity="0.6"/>';
+  for(i = 1; i * step <= dMax * 1e4; i++){
+    var dv2 = i * step * 1e-4;
+    g += '<line x1="' + (W - Rr) + '" y1="' + Y(dv2).toFixed(1) + '" x2="' + (W - Rr + 4) + '" y2="' + Y(dv2).toFixed(1) + '" stroke="var(--go)" opacity="0.6"/>';
+    g += '<text x="' + (W - Rr + 7) + '" y="' + (Y(dv2) + 4).toFixed(1) + '" fill="var(--go)" ' + MONO + ' font-size="11">' + lamOf(dv2).toFixed(0) + '</text>';
+  }
+  g += '<text transform="rotate(-90 ' + (W - 6) + ' ' + ((Tp + H - B) / 2) + ')" x="' + (W - 6) + '" y="' + ((Tp + H - B) / 2)
+     + '" text-anchor="middle" fill="var(--go)" ' + MONO + ' font-size="11">&#955;&#176; (|z| = ' + z + ') / S cm² mol⁻¹</text>';
+
+  function curve(TT, ee){
+    var pts = [], off = false;
+    for(var k = 0; k <= 160; k++){
+      var rr = 60e-12 + (rMax - 60e-12) * k / 160, dd = seD(rr, TT, ee);
+      if(dd > dMax){ off = true; continue; }
+      pts.push(X(rr).toFixed(1) + "," + Y(dd).toFixed(1));
+    }
+    return {pts: pts.join(" "), off: off};
+  }
+  var sameAsWater = Math.abs(eta - 0.890e-3) < 1e-9 && Math.abs(T - T25) < 0.6;
+  if(!sameAsWater){
+    g += '<polyline points="' + curve(T25, 0.890e-3).pts + '" fill="none" stroke="var(--muted)" stroke-width="1.6" stroke-dasharray="5 4"/>';
+  }
+  var cur = curve(T, eta);
+  g += '<polyline points="' + cur.pts + '" fill="none" stroke="var(--red-)" stroke-width="2.6"/>';
+  if(cur.off){
+    g += '<text x="' + (W - Rr - 4) + '" y="' + (Tp + 13) + '" text-anchor="end" fill="var(--red-)" ' + MONO + ' font-size="10.5">thinner than water: the curve runs off the top</text>';
+  }
+
+  /* real ions, at the Stokes radius their lambda in water implies */
+  /* The ions cluster: Cl-, Br-, K+ differ by hundredths of a nanometre, so a
+     label at a fixed offset would sit on its neighbour. Each label takes the
+     first free slot from a ladder of offsets, with a leader line when it has
+     been pushed away from its dot.                                        */
+  var placed = [], marks = [];
+  SE_IONS.forEach(function(k){
+    var o = ionOf(k), rr = seRofIon(o);
+    if(rr > rMax) return;
+    var d = seD(rr, T, eta);
+    marks.push({k: k, nm: o.nm, x: X(rr), y: Y(Math.min(d, dMax)), over: d > dMax});
+  });
+  marks.sort(function(a, b){ return a.x - b.x; });
+  marks.filter(function(m){ return m.over; }).forEach(function(m){
+    g += '<g data-ion="' + m.k + '" style="cursor:pointer">';
+    g += '<polygon points="' + m.x.toFixed(1) + ',' + (Tp + 2) + ' ' + (m.x - 4).toFixed(1) + ',' + (Tp + 10) + ' ' + (m.x + 4).toFixed(1) + ',' + (Tp + 10) + '" fill="var(--ink-2)" opacity="0.5"/>';
+    g += '</g>';
+  });
+  marks = marks.filter(function(m){ return !m.over; });
+  marks.forEach(function(m){
+    var w = m.nm.length * 7 + 6, cand = [];
+    [-4, -18, 12, -32, 26, -46, 40, -60].forEach(function(dy){ cand.push([9, dy], [-9 - w, dy]); });
+    var put = null;
+    for(var i = 0; i < cand.length && !put; i++){
+      var bx = m.x + cand[i][0], by = m.y + cand[i][1];
+      if(bx < L + 2 || bx + w > W - Rr - 2 || by < Tp + 10 || by > H - B - 4) continue;
+      var clash = placed.some(function(q){ return bx < q.x1 + 5 && q.x0 - 5 < bx + w && by - 13 < q.y1 + 3 && q.y0 - 3 < by + 4; });
+      if(!clash) put = {x: bx, y: by};
+    }
+    if(!put) put = {x: m.x + 9, y: m.y - 4};
+    placed.push({x0: put.x, x1: put.x + w, y0: put.y - 13, y1: put.y + 4});
+    g += '<g data-ion="' + m.k + '" style="cursor:pointer">';
+    if(Math.abs(put.y - m.y) > 10 || put.x < m.x){
+      g += '<line x1="' + m.x.toFixed(1) + '" y1="' + m.y.toFixed(1) + '" x2="' + (put.x < m.x ? put.x + w + 2 : put.x - 2).toFixed(1)
+         + '" y2="' + (put.y - 4).toFixed(1) + '" stroke="var(--line-2)" stroke-width="1"/>';
+    }
+    g += '<circle cx="' + m.x.toFixed(1) + '" cy="' + m.y.toFixed(1) + '" r="4.5" fill="var(--surface)" stroke="var(--ink-2)" stroke-width="1.6"'
+       + (m.over ? ' opacity="0.45"' : '') + '/>';
+    g += '<text x="' + put.x.toFixed(1) + '" y="' + put.y.toFixed(1) + '" fill="var(--ink-2)" ' + MONO + ' font-size="11">' + m.nm + '</text>';
+    g += '</g>';
+  });
+  /* where the slider is */
+  g += '<line x1="' + X(r).toFixed(1) + '" y1="' + Tp + '" x2="' + X(r).toFixed(1) + '" y2="' + (H - B) + '" stroke="var(--ox)" stroke-width="1.4"/>';
+  var yD = Math.max(Tp + 6, Y(D));
+  g += '<circle cx="' + X(r).toFixed(1) + '" cy="' + yD.toFixed(1) + '" r="6" fill="var(--ox)" stroke="var(--surface)" stroke-width="2"'
+     + (D > dMax ? ' opacity="0.5"' : '') + '/>';
+  g += '<text x="' + (X(r) + 9).toFixed(1) + '" y="' + (H - B - 24) + '" fill="var(--ox)" ' + MONO + ' font-size="11" font-weight="600">r = '
+     + (r * 1e9).toFixed(3) + ' nm' + (D > dMax ? ' (D off the top)' : '') + '</text>';
+  /* the solvent-molecule floor */
+  g += '<rect x="' + L + '" y="' + Tp + '" width="' + (X(0.15e-9) - L).toFixed(1) + '" height="' + (H - Tp - B) + '" fill="var(--line-2)" opacity="0.25"/>';
+  g += '<text x="' + (X(0.15e-9) - 6).toFixed(1) + '" y="' + (H - B - 8) + '" text-anchor="end" fill="var(--muted)" ' + MONO + ' font-size="10">r &lt; one water molecule</text>';
+  document.getElementById("seplot").innerHTML = g;
+
+  /* ---- what it means ---- */
+  var vd = document.getElementById("seVerdict"), near = null, best = 1e9;
+  SE_IONS.forEach(function(k){
+    var d = Math.abs(seRofIon(ionOf(k)) - r);
+    if(d < best){ best = d; near = ionOf(k); }
+  });
+  if(r < 0.15e-9){
+    vd.className = "verdict stop";
+    vd.innerHTML = "<b>Smaller than a solvent molecule.</b> A sphere of " + (r * 1e9).toFixed(3) + " nm is below the 0.14 nm radius of a water "
+      + "molecule, so there is no continuous fluid for it to push through and Stokes' law is out of its depth. The number it returns, λ° = "
+      + (lam * 1e4).toFixed(0) + " S cm² mol⁻¹, is larger than any real ion of that charge reaches by this mechanism.";
+  }else{
+    vd.className = "verdict flat";
+    vd.innerHTML = "<b>" + (lam * 1e4).toFixed(1) + " S cm² mol⁻¹, D = " + sciH(D * 1e4, 2) + " cm² s⁻¹.</b> That is close to "
+      + near.nm + " (Stokes radius " + (seRofIon(near) * 1e9).toFixed(3) + " nm, λ° = " + near.lam.toFixed(1) + " S cm² mol⁻¹ in water at 25 °C). "
+      + "In a field of 1 V cm⁻¹ it drifts " + (v * 1e6).toFixed(1) + " µm every second, while diffusion alone takes "
+      + (t10 < 1 ? (t10 * 1e3).toFixed(0) + " ms" : t10.toFixed(1) + " s") + " to carry it 10 µm.";
+  }
+
+  var rd = document.getElementById("seRead");
+  var dW = seD(r, T25, 0.890e-3), fac = D / dW;
+  rd.innerHTML = (z > 1 ? "<b>|z| = " + z + ":</b> the curve has not moved — D is the same for any charge, since Stokes' drag knows nothing about it. "
+      + "What the charge changes is the right-hand axis: u goes as |z| and λ° as z², so this sphere now carries "
+      + (z * z) + " times the conductivity a singly charged one would. " : "")
+    + "<b>Right now:</b> a sphere of r = " + (r * 1e9).toFixed(3) + " nm in " + SE.nm + " at " + (T - 273.15).toFixed(0)
+    + " °C, where η = " + (eta * 1e3).toPrecision(3) + " cP. Against the same sphere in water at 25 °C, D is "
+    + (fac >= 1 ? fac.toFixed(2) + " times larger" : (1 / fac).toFixed(2) + " times smaller")
+    + " — and u and λ° change by exactly the same factor, because all three share one friction. The Walden product λ°η = "
+    + (lam * 1e4 * eta * 1e3).toFixed(1) + " S cm² mol⁻¹ cP barely moves as you switch solvents: that is Walden's rule, and it holds here "
+    + "only because r was held fixed.";
+}
+
+/* ================= 4 - TRANSFERENCE =====================================
+   t_i = |z_i| C_i lambda_i / sum. The salt at C = 1, supporting KNO3 at
+   C = ratio. The animation draws a fixed number of particles per sign; a
+   crossing of the middle plane is weighted by C_i / (particles of i), so
+   the tally converges on the prediction whatever the ratio.               */
+var TR_R = [0, 1, 3, 10, 30, 100];
+var TR = {salt:"H", r:0, play:true, last:0, parts:[], q:[0, 0, 0, 0], t0:0};
+var TR_COL = ["var(--ox)", "var(--red-)", "var(--muted)", "var(--muted)"];
+function trSpecies(){
+  var c = ionOf(TR.salt), a = ionOf("Cl"), k = ionOf("K"), n = ionOf("NO3"), r = TR_R[TR.r];
+  return [{o:c, C:1, dir:1, lab:c.nm}, {o:a, C:1, dir:-1, lab:"Cl⁻"}, {o:k, C:r, dir:1, lab:"K⁺ (support)"}, {o:n, C:r, dir:-1, lab:"NO₃⁻ (support)"}];
+}
+function trTheory(){
+  var sp = trSpecies(), w = sp.map(function(x){ return Math.abs(x.o.z) * x.C * x.o.lam; }), tot = w.reduce(function(a, b){ return a + b; }, 0);
+  return w.map(function(x){ return x / tot; });
+}
+function trAlone(){ var a = ionOf(TR.salt).lam; return a / (a + ionOf("Cl").lam); }
+function trReset(){
+  var sp = trSpecies(), r = TR_R[TR.r], nSalt = r === 0 ? 34 : Math.max(4, Math.round(34 / (1 + r))), seed = 3;
+  function rnd(){ seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+  var counts = [nSalt, nSalt, 34 - nSalt, 34 - nSalt];
+  TR.parts = [];
+  counts.forEach(function(n, i){ for(var m = 0; m < n; m++) TR.parts.push({sp: i, x: rnd(), y: 0.08 + 0.84 * rnd()}); });
+  TR.w = sp.map(function(x, i){ return counts[i] ? x.C / counts[i] : 0; });
+  TR.q = [0, 0, 0, 0]; TR.t0 = 0; TR.last = 0;
+  trDraw();
+}
+pillGroup("trSalt", function(b){ TR.salt = b.getAttribute("data-s"); trReset(); });
+document.getElementById("trR").addEventListener("input", function(){ TR.r = +this.value; trReset(); });
+document.getElementById("trPlay").addEventListener("click", function(){ TR.play = !TR.play; TR.last = 0; trDraw(); });
+document.getElementById("trReset").addEventListener("click", trReset);
+ANIM.push({panel: "p-tr", tick: function(ts){
+  if(!TR.play){ TR.last = 0; return; }
+  var dt = TR.last ? Math.min(0.1, (ts - TR.last) / 1000) : 0;
+  TR.last = ts;
+  if(!dt) return;
+  var sp = trSpecies();
+  TR.parts.forEach(function(pt){
+    var s0 = sp[pt.sp], speed = s0.o.lam / 76.34 * 0.13;                       /* tube lengths per second */
+    var jit = REDUCED ? 0 : (Math.random() - 0.5) * 0.02;
+    var x0 = pt.x;
+    pt.x += s0.dir * speed * dt + jit;
+    pt.y = Math.min(0.94, Math.max(0.06, pt.y + (REDUCED ? 0 : (Math.random() - 0.5) * 0.02)));
+    if((x0 - 0.5) * (pt.x - 0.5) < 0) TR.q[pt.sp] += (pt.x > x0 ? 1 : -1) * s0.dir * Math.abs(s0.o.z) * TR.w[pt.sp];
+    if(pt.x > 1) pt.x -= 1;
+    if(pt.x < 0) pt.x += 1;
+  });
+  TR.t0 += dt;
+  trDraw();
+}});
+
+function trDraw(){
+  var sp = trSpecies(), th = trTheory(), r = TR_R[TR.r];
+  document.getElementById("trRv").textContent = r === 0 ? "none" : r + " : 1";
+  document.getElementById("trPlay").innerHTML = TR.play ? "&#10074;&#10074; Pause" : "&#9654; Run";
+  document.getElementById("trTc").textContent = th[0].toFixed(3) + "  (" + sp[0].lab + ")";
+  document.getElementById("trTa").textContent = th[1].toFixed(3);
+  document.getElementById("trTs").textContent = r === 0 ? "—" : th[2].toFixed(3) + "  ·  " + th[3].toFixed(3);
+  var tot = TR.q.reduce(function(a, b){ return a + Math.max(0, b); }, 0);
+  var cnt = tot > 0 ? TR.q.map(function(x){ return Math.max(0, x) / tot; }) : null;
+  document.getElementById("trCnt").textContent = cnt && TR.t0 > 2 ? cnt[0].toFixed(3) + "  after " + TR.t0.toFixed(0) + " s" : "counting…";
+  document.getElementById("trNote").textContent = "cations → cathode, anions → anode";
+
+  var W = 520, s = "", x0 = 44, x1 = 476, y0 = 36, y1 = 186;
+  s += '<rect x="' + x0 + '" y="' + y0 + '" width="' + (x1 - x0) + '" height="' + (y1 - y0) + '" fill="var(--surface-2)" stroke="var(--line-2)"/>';
+  s += '<rect x="' + (x0 - 12) + '" y="' + y0 + '" width="10" height="' + (y1 - y0) + '" fill="var(--elec)"/>';
+  s += '<rect x="' + (x1 + 2) + '" y="' + y0 + '" width="10" height="' + (y1 - y0) + '" fill="var(--elec)"/>';
+  s += '<text x="' + (x0 - 12) + '" y="' + (y0 - 10) + '" fill="var(--ink-2)" ' + MONO + ' font-size="11">anode (+)</text>';
+  s += '<text x="' + (x1 + 12) + '" y="' + (y0 - 10) + '" text-anchor="end" fill="var(--ink-2)" ' + MONO + ' font-size="11">cathode (−)</text>';
+  var xm = (x0 + x1) / 2;
+  s += '<line x1="' + xm + '" y1="' + (y0 - 4) + '" x2="' + xm + '" y2="' + (y1 + 4) + '" stroke="var(--ink-2)" stroke-dasharray="3 3"/>';
+  TR.parts.forEach(function(pt){
+    var X = x0 + pt.x * (x1 - x0), Y = y0 + pt.y * (y1 - y0), cat = sp[pt.sp].dir > 0, col = TR_COL[pt.sp];
+    s += cat ? '<circle cx="' + X.toFixed(1) + '" cy="' + Y.toFixed(1) + '" r="' + (pt.sp < 2 ? 4.2 : 3.4) + '" fill="' + col + '"' + (pt.sp < 2 ? '' : ' opacity="0.6"') + '/>'
+             : '<circle cx="' + X.toFixed(1) + '" cy="' + Y.toFixed(1) + '" r="' + (pt.sp < 2 ? 3.8 : 3.2) + '" fill="none" stroke="' + col + '" stroke-width="1.6"' + (pt.sp < 2 ? '' : ' opacity="0.6"') + '/>';
+  });
+  function bar(y, fr, lab){
+    var out = '<text x="' + x0 + '" y="' + (y - 5) + '" fill="var(--muted)" ' + MONO + ' font-size="10.5">' + lab + '</text>', x = x0;
+    fr.forEach(function(f, i){
+      var w = f * (x1 - x0);
+      if(w <= 0) return;
+      out += '<rect x="' + x.toFixed(1) + '" y="' + y + '" width="' + w.toFixed(1) + '" height="20" fill="' + TR_COL[i] + '" opacity="' + (i < 2 ? 0.85 : (i === 2 ? 0.45 : 0.25)) + '"/>';
+      if(w > 44) out += '<text x="' + (x + w / 2).toFixed(1) + '" y="' + (y + 14) + '" text-anchor="middle" fill="var(--ink)" ' + MONO + ' font-size="10.5">' + (f * 100).toFixed(0) + ' %</text>';
+      x += w;
+    });
+    return out;
+  }
+  /* the speeds on screen are in the true ratio of the lambdas: say so, and
+     give the one number the compressed clock hides */
+  var fast = sp.slice().sort(function(a, b){ return b.o.lam - a.o.lam; })[0];
+  s += '<text x="' + x0 + '" y="' + (y1 + 16) + '" fill="var(--muted)" ' + MONO + ' font-size="10.5">'
+     + 'speeds in the true ratio of \u03bb\u00b0: ' + sp.filter(function(q){ return q.C > 0; }).map(function(q){ return q.lab.replace(" (support)", "") + ' ' + (q.o.lam / fast.o.lam).toFixed(2); }).join('  \u00b7  ')
+     + '</text>';
+  s += '<text x="' + x0 + '" y="' + (y1 + 30) + '" fill="var(--muted)" ' + MONO + ' font-size="10.5">'
+     + 'only the clock is compressed: in 1 V cm\u207b\u00b9 these ions really need about '
+     + (0.01 / (ionOf(TR.salt).lam * 1e-4 / FARADAY * 100) / 60).toFixed(0) + ' min to cross 1 cm</text>';
+  s += bar(248, th, "predicted share of the current, t_i");
+  s += cnt ? bar(296, cnt, "counted at the dashed plane") : '<text x="' + x0 + '" y="310" fill="var(--muted)" ' + MONO + ' font-size="10.5">counted at the dashed plane: waiting for crossings…</text>';
+  document.getElementById("trpic").innerHTML = s;
+
+  var c = sp[0].lab;
+  document.getElementById("trRead").innerHTML = r === 0
+    ? "<b>" + c + " carries " + (th[0] * 100).toFixed(0) + " % of the current, Cl⁻ " + (th[1] * 100).toFixed(0) + " %.</b> Both are singly charged "
+      + "and equally concentrated, so the split is just their mobilities: t₊ = λ₊/(λ₊ + λ₋) = " + ionOf(TR.salt).lam.toFixed(2) + "/("
+      + ionOf(TR.salt).lam.toFixed(2) + " + 76.34)." + (TR.salt === "H" ? " The proton's hopping makes it the dominant carrier." : TR.salt === "K" ? " K⁺ and Cl⁻ are almost equally mobile — which is why KCl fills salt bridges: neither ion runs ahead, so no junction potential builds up." : TR.salt === "Li" ? " The well-hydrated Li⁺ is slow, so the anion does most of the carrying — a problem in batteries, where only Li⁺ is wanted." : "")
+    : th[0] < 0.05
+    ? "<b>With " + r + " times as much KNO₃, " + c + " now carries only " + (th[0] * 100).toFixed(1) + " % of the current.</b> The supporting "
+      + "ions carry the rest, so almost no " + c + " is moved by the field: it reaches an electrode by diffusion alone, which is what makes a "
+      + "voltammetric current follow Fick's laws. The analyte's own transference number is what the supporting electrolyte suppresses."
+    : "<b>With " + r + " times as much KNO₃, " + c + "'s share drops to " + (th[0] * 100).toFixed(1) + " %</b> of the current, from "
+      + (trAlone() * 100).toFixed(0) + " % on its own. The K⁺ and NO₃⁻ now carry the rest. Push the ratio towards 100 : 1 and " + c
+      + "'s share falls to a few per cent — the point of a supporting electrolyte, which leaves the analyte to arrive by diffusion alone.";
+}
+
+/* ================= CONCEPT CHECK QUESTIONS ============================= */
+var QZ8 = [
+ {q:"A conductivity cell filled with 0.010 M KCl (κ = 0.1413 S m⁻¹) reads R = 1000 Ω. What is its cell constant l/A?",
+  o:["7.08 × 10⁻³ m⁻¹ — it is 1/(κR)",
+     "0.1413 m⁻¹ — the cell constant equals κ for a standard solution",
+     "141 m⁻¹ — because κ = (l/A)/R, so l/A = κR",
+     "1.4 × 10⁵ m⁻¹ — convert κ from S m⁻¹ to S cm⁻¹ first"],
+  a:2,
+  w:"The meter reads a resistance; the cell constant turns it into a property of the solution: κ = (l/A)·(1/R). Rearranged, l/A = κR = 0.1413 × 1000 = 141 m⁻¹ = 1.41 cm⁻¹. This is how every conductivity cell is calibrated — with a KCl standard whose κ is known."},
+ {q:"Acetic acid at 0.010 M has Λ = 16.4 S cm² mol⁻¹, against Λ° = 390.7. What fraction of it is ionised?",
+  o:["About 4 % — α = Λ/Λ° = 0.042",
+     "About 96 % — α = 1 − Λ/Λ°",
+     "All of it — every electrolyte is fully ionised; the low Λ is the atmosphere's drag",
+     "About 20 % — α = √(Λ/Λ°)"],
+  a:0,
+  w:"For a weak electrolyte the fall in Λ is not drag between ions but a shortage of ions: only the fraction α = Λ/Λ° = 16.4/390.7 = 0.042 is dissociated. Ostwald's law then gives K = α²C/(1 − α) = 1.8 × 10⁻⁵ mol L⁻¹, the familiar acid constant. The atmosphere effects exist too, but they are a few per cent next to this."},
+ {q:"Λ° is 426.2 for HCl, 91.0 for NaOAc and 126.5 for NaCl (S cm² mol⁻¹). What is Λ° for acetic acid?",
+  o:["643.7 — add all three",
+     "390.7 — HCl + NaOAc − NaCl",
+     "461.7 — HCl + NaCl − NaOAc",
+     "It cannot be found: acetic acid's curve never levels off, so there is nothing to extrapolate"],
+  a:1,
+  w:"At infinite dilution each ion carries current independently of its partner (Kohlrausch's law of independent migration), so ionic contributions add and subtract like bookkeeping: HCl + NaOAc − NaCl leaves exactly λ°(H⁺) + λ°(OAc⁻) = 390.7. D is right that the weak acid cannot be extrapolated — that is precisely why this route is needed."},
+ {q:"Li⁺ has the smaller crystal radius, yet λ° is 38.7 for Li⁺ and 73.5 for K⁺. Which has the larger diffusion coefficient, and why?",
+  o:["Li⁺ — a smaller ion always diffuses faster",
+     "Neither — D depends only on temperature and the solvent",
+     "Li⁺ — diffusion and conduction are unrelated, so λ° says nothing about D",
+     "K⁺ — D = RTλ°/z²F², and Li⁺ is slowed by the water it binds and drags along"],
+  a:3,
+  w:"Drift and diffusion are resisted by the same friction, so the Nernst–Einstein relation ties them together: D = RTλ°/z²F², giving 1.03 × 10⁻⁵ cm² s⁻¹ for Li⁺ and 1.96 × 10⁻⁵ for K⁺. Li⁺'s charge sits on the smallest surface, binds the most water and moves as the biggest sphere — a Stokes radius of 0.24 nm against 0.13 nm for K⁺."},
+ {q:"In dilute HCl, what fraction of the current is carried by H⁺? (λ°: H⁺ 349.8, Cl⁻ 76.3)",
+  o:["0.50 — each ion carries one charge, so each carries half",
+     "0.82 — t₊ = λ₊/(λ₊ + λ₋)",
+     "0.18 — the anion carries most of the current",
+     "It depends on which electrode reaction consumes the ions"],
+  a:1,
+  w:"The two ions carry the same charge and are equally concentrated, so the split is set by how fast each moves: t₊ = 349.8/(349.8 + 76.3) = 0.82. The proton's hopping along hydrogen bonds makes it far more mobile than chloride. Add a large excess of an inert salt, though, and H⁺'s share collapses — the supporting electrolyte takes over the current."},
+ {q:"Why does Λ of a strong electrolyte fall as √C at low concentration?",
+  o:["Fewer of its molecules dissociate as C rises",
+     "The solution's viscosity rises in proportion to √C",
+     "The ionic atmosphere, whose density goes as κ ∝ √C, pulls each ion back and drags solvent against it",
+     "The electrodes polarise more at higher concentration"],
+  a:2,
+  w:"A strong electrolyte is fully dissociated at every concentration, so A describes a weak one. What changes is the atmosphere: its density goes as κ ∝ √I, and it slows a moving ion twice — the relaxation effect (the lopsided atmosphere pulls it back) and the electrophoretic effect (the counter-ions drag solvent the other way). Both scale as √C, which is Kohlrausch's law, explained by Debye, Hückel and Onsager."}
+];
+
+dfNumbers();
+dfPic(0);
+cdDraw();
+seDraw();
+trReset();
+window.requestAnimationFrame(animLoop);
+/* ================= CONCEPT CHECK ================= */
+var QZ=QZ8;
+
+var LETTERS="ABCD", STORE="ch40051-l8-check-v1";
+var picks=new Array(QZ.length).fill(-1);
+var sId=document.getElementById("sId"), elTally=document.getElementById("tally"),
+    elBar=document.getElementById("scorebar"), elScore=document.getElementById("scoreNum"),
+    elWho=document.getElementById("whoLine"), elIdHint=document.getElementById("idHint"),
+    dlBtn=document.getElementById("dlBtn"), dlHint=document.getElementById("dlHint");
+var startedAt=null, finishedAt=null;
+
+function save(){
+  try{ localStorage.setItem(STORE,JSON.stringify({i:sId.value,p:picks,s:startedAt,t:finishedAt})); }catch(e){}
+}
+function loadState(){
+  try{
+    var d=JSON.parse(localStorage.getItem(STORE)||"null");
+    if(d){ sId.value=d.i||""; if(Array.isArray(d.p)&&d.p.length===QZ.length) picks=d.p.slice();
+           startedAt=d.s||null; finishedAt=d.t||null; }
+  }catch(e){}
+}
+function started(){ return picks.some(function(p){return p>=0;}); }
+function code(str){
+  var h=0x811c9dc5;
+  for(var i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=(h+((h<<1)+(h<<4)+(h<<7)+(h<<8)+(h<<24)))>>>0; }
+  return ("0000000"+h.toString(16).toUpperCase()).slice(-8);
+}
+function scoreOf(){ var s=0; for(var i=0;i<QZ.length;i++) if(picks[i]===QZ[i].a) s++; return s; }
+function answered(){ return picks.filter(function(p){return p>=0;}).length; }
+
+function receipt(){
+  var s=scoreOf(), pct=Math.round(s/QZ.length*100), id=(sId.value||"").trim();
+  var stamp=finishedAt||new Date().toISOString();
+  var vc=code(id+"|"+stamp+"|"+picks.join(""));
+  var head=["lecture","student_id","completed_utc","score","total","percent","verification"];
+  var row=["L8",id,stamp,s,QZ.length,pct,vc];
+  for(var i=0;i<QZ.length;i++){ head.push("a"+(i+1)); row.push(picks[i]>=0?LETTERS[picks[i]]:"-"); }
+  for(var j=0;j<QZ.length;j++){ head.push("ok"+(j+1)); row.push(picks[j]===QZ[j].a?1:0); }
+  function cell(v){ v=String(v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
+  return {csv:head.join(",")+"\n"+row.map(cell).join(",")+"\n", vcode:vc, score:s, pct:pct, id:id};
+}
+
+function render(){
+  var done=answered(), all=(done===QZ.length);
+  elTally.textContent=done+" / "+QZ.length+" answered";
+  elBar.hidden=!all;
+  sId.readOnly=started();
+  elIdHint.innerHTML = all
+    ? "<strong>Attempt complete.</strong> Your answers are final. Every question now shows the correct answer and why — read them before you close this page."
+    : started() ? "<strong>Attempt in progress.</strong><span class=\"locked\">ID locked</span><br>Each answer is final."
+                : "<strong>One attempt.</strong> Enter your student ID before you begin — it locks once you answer the first question.";
+  if(all){
+    if(!finishedAt){ finishedAt=new Date().toISOString(); save(); }
+    var r=receipt();
+    elScore.innerHTML=r.score+' <small>/ '+QZ.length+'  ·  '+r.pct+' %</small>';
+    elWho.innerHTML="Student ID <b>"+esc(r.id||"—")+"</b> &nbsp;·&nbsp; Verification <b>"+r.vcode+"</b>";
+  }
+  for(var i=0;i<QZ.length;i++){
+    var box=document.querySelector('.opts[data-q="'+i+'"]');
+    var kids=[].slice.call(box.children), why=box.parentNode.querySelector(".why");
+    if(picks[i]<0){ kids.forEach(function(o){o.disabled=false;o.className="opt";}); why.hidden=true; }
+    else{
+      (function(qi){ kids.forEach(function(o,j){
+        o.disabled=true;
+        o.className="opt"+(j===QZ[qi].a?" right":(j===picks[qi]?" wrong":""));
+      }); })(i);
+      var _note=(picks[i]!==QZ[i].a)
+        ? '<span class="misc">You chose <b>'+LETTERS[picks[i]]+'</b>. '
+          + 'The correct answer is <b>'+LETTERS[QZ[i].a]+'</b>.</span>'
+        : "";
+      why.innerHTML=_note+QZ[i].w; why.hidden=false;
+    }
+  }
+}
+
+document.getElementById("quiz").innerHTML=QZ.map(function(item,i){
+  return '<div class="card q"><div class="card-b">'
+    +'<p class="stem"><b style="font-family:IBM Plex Mono,monospace;color:var(--muted);font-size:12px">Q'+(i+1)+'</b>  '+item.q+'</p>'
+    +'<div class="opts" data-q="'+i+'">'+item.o.map(function(o,j){
+        return '<button class="opt" data-i="'+j+'"><span class="ltr">'+LETTERS[j]+'</span><span>'+o+'</span></button>';
+      }).join("")+'</div><p class="why" hidden></p></div></div>';
+}).join("");
+
+[].slice.call(document.querySelectorAll(".opts")).forEach(function(box){
+  box.addEventListener("click",function(ev){
+    var b=ev.target.closest(".opt");
+    if(!b||b.disabled) return;
+    var qi=+box.getAttribute("data-q");
+    if(picks[qi]>=0) return;
+    if(!(sId.value||"").trim()){
+      elIdHint.innerHTML="<strong style=\"color:var(--stop)\">Enter your student ID first.</strong> It is written into the result file you submit.";
+      sId.focus(); return;
+    }
+    if(!startedAt) startedAt=new Date().toISOString();
+    picks[qi]=+b.getAttribute("data-i");
+    save(); render();
+  });
+});
+sId.addEventListener("input",save);
+
+dlBtn.addEventListener("click",function(){
+  var id=(sId.value||"").trim();
+  if(!id){ dlHint.textContent="Enter your student ID first — it goes into the file."; return; }
+  var r=receipt();
+  try{
+    var blob=new Blob([r.csv],{type:"text/csv;charset=utf-8"});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement("a");
+    a.href=url; a.download="CH40051-L8-check_"+id.replace(/[^A-Za-z0-9_-]/g,"")+".csv";
+    a.style.display="none";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(url);},1000);
+    dlHint.textContent="Saved. Hand it in as your instructor directs.";
+  }catch(e){
+    dlHint.textContent="Your browser blocked the download. Screenshot this panel and submit that instead.";
+  }
+});
+
+/* ---- submit straight to the course sheet ---------------------------------- */
+var SUBMIT_URL = "https://script.google.com/macros/s/AKfycbxPm7WrbttFu6-gnTi__IcUPt-816GthK0eI8TPuwOZyYlcRW3RAWJlmsr791moxBc5GA/exec";
+
+var sendBtn=document.getElementById("sendBtn");
+if(SUBMIT_URL){
+  sendBtn.hidden=false;
+  dlHint.textContent="Press Submit to send your result to the course. The download is a backup.";
+}
+
+sendBtn.addEventListener("click",function(){
+  var id=(sId.value||"").trim();
+  if(!id){ dlHint.textContent="Enter your student ID first."; return; }
+  var r=receipt();
+  var payload={
+    lecture:"L8", student_id:id, completed_utc:finishedAt||new Date().toISOString(),
+    score:r.score, total:QZ.length, percent:r.pct, verification:r.vcode,
+    answers:picks.map(function(p){ return p>=0?LETTERS[p]:"-"; }),
+    ok:picks.map(function(p,i){ return p===QZ[i].a?1:0; })
+  };
+  sendBtn.disabled=true;
+  dlHint.textContent="Sending...";
+  fetch(SUBMIT_URL,{
+    method:"POST",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify(payload)
+  })
+  .then(function(res){ return res.json(); })
+  .then(function(j){
+    if(j && j.ok){
+      sendBtn.textContent="Submitted ✓";
+      dlHint.textContent="Recorded for student ID "+id+". You can close this page.";
+    }else{
+      /* the sheet answered and refused (already recorded, no ID ...): say why, and do not resend */
+      sendBtn.disabled=false;
+      sendBtn.textContent="Submit to the course";
+      dlHint.textContent="Not recorded — "+((j && j.error) || "the course sheet refused it.")
+        + " Keep the downloaded file and tell your instructor if this looks wrong.";
+    }
+  })
+  .catch(function(){
+    /* the response could not be read - resend blind so the record still lands,
+       then tell the student to keep the file as proof */
+    fetch(SUBMIT_URL,{method:"POST",mode:"no-cors",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(payload)}).catch(function(){});
+    sendBtn.disabled=false;
+    sendBtn.textContent="Submit to the course";
+    dlHint.textContent="Sent, but the confirmation did not come back. "
+      + "Download the file as well and keep it - it is your proof of submission.";
+  });
+});
+
+loadState();
+render();
+
+})();
+</script>
+</body>
+</html>
