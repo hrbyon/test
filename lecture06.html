@@ -801,7 +801,7 @@ tabs.forEach(function(t){
 /* ================= CONCEPT CHECK ================= */
 var QZ=[
  {q:"Two solutions are made up: 0.10 m (mol/kg) NaCl and 0.10 m (mol/kg) MgSO₄. Which has the thicker ion atmosphere?",
-  o:["NaCl — its ionic strength is 0.10 m (mol/kg) against 0.40 m (mol/kg) for MgSO₄, and 1/κ_D goes as 1/√I",
+  o:["NaCl — its ionic strength is 0.10 m (mol/kg) against 0.40 m (mol/kg) for MgSO₄, and 1/κ<sub>D</sub> goes as 1/√I",
      "MgSO₄ — the doubly charged ions attract more counter-charge",
      "They are the same — both are 0.10 m (mol/kg)",
      "MgSO₄ — sulfate is the larger ion"],
@@ -1088,7 +1088,7 @@ function atDraw(){
     var yb = Y(a / rk), ys = Y((a / rk) * Math.exp(-1));
     str += '<line x1="' + X(rk).toFixed(1) + '" y1="' + Tp + '" x2="' + X(rk).toFixed(1) + '" y2="' + (H - B)
          + '" stroke="var(--ox)" stroke-width="1.6"/>';
-    str += '<text x="' + (X(rk) + 5).toFixed(1) + '" y="' + (Tp + 56) + '" ' + MONO + ' font-size="13" paint-order="stroke" stroke="var(--surface)" stroke-width="4" stroke-linejoin="round" fill="var(--ox)">r = a + 1/κ_D</text>';
+    str += '<text x="' + (X(rk) + 5).toFixed(1) + '" y="' + (Tp + 56) + '" ' + MONO + ' font-size="13" paint-order="stroke" stroke="var(--surface)" stroke-width="4" stroke-linejoin="round" fill="var(--ox)">r = a + 1/' + KD_ + '</text>';
     str += '<circle cx="' + X(rk).toFixed(1) + '" cy="' + yb.toFixed(1) + '" r="3.5" fill="var(--surface)" stroke="var(--muted)" stroke-width="1.6"/>';
     str += '<circle cx="' + X(rk).toFixed(1) + '" cy="' + ys.toFixed(1) + '" r="4" fill="var(--red-)"/>';
     str += '<text x="' + (X(rk) + 5).toFixed(1) + '" y="' + (Tp + 74) + '" ' + MONO
@@ -1138,6 +1138,7 @@ var T25 = 298.15;
 /* The solution set at the top of the Ion Atmosphere tab, the central ion
    the salt's size a. The enclosed charge is the Debye-Huckel one, Q(r) = z e (1 + k r) e^-k(r-a) / (1 + k a): all of
    the ion at r = a, none of it once the sphere has taken in the atmosphere. */
+var KD_ = 'κ<tspan baseline-shift="sub" font-size="9">D</tspan>';
 var GS_A = 0.3e-9, GS_NL = 24;
 var gsMode = "atm", gsPlay = false, gsT0 = 0;
 /* the order in which the field lines end on the atmosphere, scattered round the ion */
@@ -1185,10 +1186,10 @@ function gsDraw(ts){
   var Eb = K * sl.zp * QE / (R * R), E = Eb * Q;
 
   document.getElementById("gsRv").textContent = (R * 1e9).toFixed(2) + " nm";
-  document.getElementById("gsRr").textContent = (R * 1e9).toFixed(2) + " nm  = " + ((R - GS_A) / lam).toFixed(2) + " × 1/κ_D beyond the ion";
+  document.getElementById("gsRr").innerHTML = (R * 1e9).toFixed(2) + " nm  = " + ((R - GS_A) / lam).toFixed(2) + " × 1/κ<sub>D</sub> beyond the ion";
   document.getElementById("gsQ").textContent = Q.toFixed(3);
   document.getElementById("gsE").innerHTML = sciH(E, 3) + " V/m";
-  document.getElementById("gsNote").textContent = "around the cation of " + sl.nm + ", a = " + sl.a.toFixed(1) + " Å, 1/κ_D = " + (lam * 1e9).toPrecision(2) + " nm";
+  document.getElementById("gsNote").innerHTML = "around the cation of " + sl.nm + ", a = " + sl.a.toFixed(1) + " Å, 1/κ<sub>D</sub> = " + (lam * 1e9).toPrecision(2) + " nm";
 
   /* ---- the picture ---- */
   var cx = 200, cy = 196, PR = 172;
@@ -1236,7 +1237,7 @@ function gsDraw(ts){
   s += '<text x="10" y="50" fill="var(--ink-2)" ' + MONO + ' font-size="15">' + (atm ? '→ it holds ' + (crossing / GS_NL).toFixed(2) + ' of the ion’s charge' : 'no atmosphere: every line escapes') + '</text>';
   var bar = P(lam);
   s += '<line x1="12" y1="388" x2="' + (12 + bar).toFixed(1) + '" y2="388" stroke="var(--ink-2)" stroke-width="2.5"/>';
-  s += '<text x="' + (16 + bar).toFixed(1) + '" y="393" fill="var(--ink-2)" ' + MONO + ' font-size="15">1/κ_D = ' + (lam * 1e9).toPrecision(2) + ' nm</text>';
+  s += '<text x="' + (16 + bar).toFixed(1) + '" y="393" fill="var(--ink-2)" ' + MONO + ' font-size="15">1/κ<tspan baseline-shift="sub" font-size="9">D</tspan> = ' + (lam * 1e9).toPrecision(2) + ' nm</text>';
   document.getElementById("gspic").innerHTML = s;
 
 
@@ -1297,7 +1298,7 @@ function gsDraw(ts){
       || (xSph > xs && xSph < xs + 5 + xsW + 4 && xs - 5 - xsW > L);
     xsLab = '<rect x="' + (xsEnd ? xs - 5 - xsW : xs + 3).toFixed(1) + '" y="' + (H - B - 17) + '" width="' + (xsW + 2) + '" height="14" rx="2" fill="var(--surface)" opacity="0.92"/>'
       + '<text x="' + (xsEnd ? xs - 5 : xs + 5).toFixed(1) + '" y="' + (H - B - 6) + '"' + (xsEnd ? ' text-anchor="end"' : '')
-       + ' fill="var(--ox)" ' + MONO + ' font-size="10" font-weight="700" paint-order="stroke" stroke="var(--surface)" stroke-width="3.5" stroke-linejoin="round">r = a + 1/κ_D</text>';
+       + ' fill="var(--ox)" ' + MONO + ' font-size="10" font-weight="700" paint-order="stroke" stroke="var(--surface)" stroke-width="3.5" stroke-linejoin="round">r = a + 1/' + KD_ + '</text>';
     /* the three moments of step 3, marked on the curve itself:
        1 r = a, all lines cross; 2 the hump's peak, steepest fall; 3 the edge, none cross */
     p += '<line x1="' + X(rPk).toFixed(1) + '" y1="' + Y(0.55 * gPk / peak).toFixed(1) + '" x2="' + X(rPk).toFixed(1)
@@ -1309,7 +1310,7 @@ function gsDraw(ts){
       var px = X(m[0]), py = Y(gsQ(m[0], kap));
       var bx = Math.max(L + 9, Math.min(W - Rr - 9, px + m[1])), by = Math.max(T + 8, py + m[2]);
       badges.push({x0: bx - 8, x1: bx + 8, y0: by - 8, y1: by + 8, bx: bx, by: by,
-        txt: ["r = a", "r = 1/κ_D", "r = a + 6/κ_D"][n], sub: n === 1 ? " (r = a when 1/κ_D < a)" : ""});
+        txt: ["r = a", "r = 1/" + KD_, "r = a + 6/" + KD_][n], sub: n === 1 ? " (r = a when 1/" + KD_ + " &lt; a)" : ""});
       p += '<circle cx="' + px.toFixed(1) + '" cy="' + py.toFixed(1) + '" r="2.8" fill="var(--ink)"/>';
       p += '<circle cx="' + bx.toFixed(1) + '" cy="' + by.toFixed(1) + '" r="7.5" fill="var(--surface)" stroke="var(--ink-2)" stroke-width="1.2"/>';
       p += '<text x="' + bx.toFixed(1) + '" y="' + (by + 3.5).toFixed(1) + '" text-anchor="middle" fill="var(--ink)" ' + MONO + ' font-size="10" font-weight="700">' + (n + 1) + '</text>';
@@ -1372,7 +1373,7 @@ function gsDraw(ts){
        + '" height="13" rx="2" fill="var(--surface)" opacity="0.92"/>';
     p += '<text x="' + got[0].toFixed(1) + '" y="' + got[1].toFixed(1) + '" text-anchor="' + (got[2] > 0 ? "start" : "end")
        + '" fill="var(--ink)" ' + MONO + ' font-size="9.5" font-weight="600" paint-order="stroke" stroke="var(--surface)" stroke-width="3" stroke-linejoin="round">'
-       + b.txt + (b.sub ? '<tspan font-size="8" font-weight="500">' + b.sub.replace("<", "&lt;") + '</tspan>' : '') + '</text>';
+       + b.txt + (b.sub ? '<tspan font-size="8" font-weight="500">' + b.sub + '</tspan>' : '') + '</text>';
   });
   function free(bx){
     return bx.x0 >= L && bx.x1 <= W - Rr && bx.y0 >= T - 2 && bx.y1 <= H - B
@@ -1628,7 +1629,7 @@ function fpMake(p, src){
     el("Play").innerHTML = st.play ? "&#10074;&#10074; Pause" : "&#9654; Let it go";
     el("Note").textContent = plates
       ? "E = ΔV/d = " + (V / d).toFixed(0) + " V/m everywhere between them"
-      : (st.atm ? "with its atmosphere, 1/κ_D = " + (1e9 / FP_KAP).toFixed(2) + " nm: both cut off faster" : "alone: ψ ∝ 1/r, E ∝ 1/r²");
+      : (st.atm ? "with its atmosphere, 1/κ<sub>D</sub> = " + (1e9 / FP_KAP).toFixed(2) + " nm: both cut off faster" : "alone: ψ ∝ 1/r, E ∝ 1/r²");
     el("Psi").textContent = psiTxt(here.psi);
     el("E").innerHTML = (plates ? here.E.toFixed(0) : sciH(here.E, 3)) + " V/m";
     el("F").innerHTML = sciH(QE * here.E, 3) + " N " + (q > 0 ? "&rarr;" : "&larr;");
@@ -1854,7 +1855,7 @@ function ecDraw(){
   s += '<text x="' + C1 + '" y="' + (eB + 14) + '" text-anchor="end" fill="var(--muted)" ' + MONO + ' font-size="10">0</text>';
   s += '<text x="' + ((A0 + A1) / 2) + '" y="' + (eB + 30) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="10">from the left electrode</text>';
   s += '<text x="' + ((C0 + C1) / 2) + '" y="' + (eB + 30) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="10">from the right electrode</text>';
-  s += '<text x="' + ((A0 + A1) / 2) + '" y="' + (eB + 44) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="9.5">grey: compact layer · 1/κ_D = ' + (m.lam * 1e9).toFixed(2) + ' nm</text>';
+  s += '<text x="' + ((A0 + A1) / 2) + '" y="' + (eB + 44) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="9.5">grey: compact layer · 1/' + KD_ + ' = ' + (m.lam * 1e9).toFixed(2) + ' nm</text>';
   document.getElementById("ecpic").innerHTML = s;
 
   /* numbers */
