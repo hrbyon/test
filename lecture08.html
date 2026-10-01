@@ -1367,20 +1367,20 @@ var QZ8 = [
      "About 20 % — α = √(Λ/Λ°)"],
   a:0,
   w:"For a weak electrolyte the fall in Λ is not drag between ions but a shortage of ions: only the fraction α = Λ/Λ° = 16.4/390.7 = 0.042 is dissociated. Ostwald's law then gives K = α²C/(1 − α) = 1.8 × 10⁻⁵ mol L⁻¹, the familiar acid constant. The atmosphere effects exist too, but they are a few per cent next to this."},
- {q:"Λ° is 426.2 for HCl, 91.0 for NaOAc and 126.5 for NaCl (S cm² mol⁻¹). What is Λ° for acetic acid?",
-  o:["643.7 — add all three",
-     "390.7 — HCl + NaOAc − NaCl",
-     "461.7 — HCl + NaCl − NaOAc",
-     "It cannot be found: acetic acid's curve never levels off, so there is nothing to extrapolate"],
+ {q:"Stokes’ law turns an ionic conductivity into a radius: r = z²F²/6πηN<sub>A</sub>λ°. With λ° = 38.7 for Li⁺ and 73.5 for K⁺ (S cm² mol⁻¹, water at 25 °C, η = 0.890 cP), what do the two radii come out as, and what do they mean?",
+  o:["0.13 nm for Li⁺ and 0.24 nm for K⁺ — the same ranking as the crystal radii",
+     "0.24 nm for Li⁺ and 0.13 nm for K⁺ — Li⁺ moves as the larger sphere, because it drags a hydration shell",
+     "0.24 nm for Li⁺ and 0.13 nm for K⁺ — so the Li⁺ crystal must be the larger of the two",
+     "The same radius for both: r depends only on η and T"],
   a:1,
-  w:"At infinite dilution each ion carries current independently of its partner (Kohlrausch's law of independent migration), so ionic contributions add and subtract like bookkeeping: HCl + NaOAc − NaCl leaves exactly λ°(H⁺) + λ°(OAc⁻) = 390.7. D is right that the weak acid cannot be extrapolated — that is precisely why this route is needed."},
- {q:"Li⁺ has the smaller crystal radius, yet λ° is 38.7 for Li⁺ and 73.5 for K⁺. Which has the larger diffusion coefficient, and why?",
-  o:["Li⁺ — a smaller ion always diffuses faster",
-     "Neither — D depends only on temperature and the solvent",
-     "Li⁺ — diffusion and conduction are unrelated, so λ° says nothing about D",
-     "K⁺ — D = RTλ°/z²F², and Li⁺ is slowed by the water it binds and drags along"],
-  a:3,
-  w:"Drift and diffusion are resisted by the same friction, so the Nernst–Einstein relation ties them together: D = RTλ°/z²F², giving 1.03 × 10⁻⁵ cm² s⁻¹ for Li⁺ and 1.96 × 10⁻⁵ for K⁺. Li⁺'s charge sits on the smallest surface, binds the most water and moves as the biggest sphere — a Stokes radius of 0.24 nm against 0.13 nm for K⁺."},
+  w:"r is inversely proportional to λ°, so the <em>slower</em> ion is the bigger one: 0.238 nm for Li⁺ against 0.125 nm for K⁺. The crystal radii run the other way (0.076 against 0.138 nm), and that is the point — Li⁺’s charge sits on the smallest surface, binds water most tightly and carries that shell with it, so what moves through the solvent is a large, slow sphere. Stokes’ law describes the sphere that is actually moving, not the ion in a crystal; and because the same friction limits diffusion, D = RTλ°/z²F² ranks them the same way — 1.03 × 10⁻⁵ cm² s⁻¹ for Li⁺ against 1.96 × 10⁻⁵ for K⁺."},
+ {q:"Li⁺ has λ° = 38.7 S cm² mol⁻¹ in water (η = 0.890 cP). It is moved into a solvent three times as viscous, and its solvated size does not change. What is λ° there?",
+  o:["About 116 — a more viscous solvent holds the ions closer together, so each carries more current",
+     "38.7, unchanged — λ° is a property of the ion",
+     "About 12.9 — the friction triples, so λ° falls by the same factor: λ°η stays constant",
+     "About 22 — λ° falls as √η, as the atmosphere terms do"],
+  a:2,
+  w:"Stokes’ drag 6πηr<i>v</i> is the only thing resisting the ion, so λ° = z²F²/6πηrN<sub>A</sub> is inversely proportional to η at fixed r — Walden’s rule, λ°η ≈ constant: 38.7/3 = 12.9 S cm² mol⁻¹. The √η answer borrows the square root of the relaxation and electrophoretic terms, which are about concentration, not viscosity. The rule is only as good as its assumption: a solvent that solvates the ion differently changes r as well as η — which is exactly why a Walden plot is used to detect a change in solvation (Lecture 7)."},
  {q:"In dilute HCl, what fraction of the current is carried by H⁺? (λ°: H⁺ 349.8, Cl⁻ 76.3)",
   o:["0.50 — each ion carries one charge, so each carries half",
      "0.82 — t₊ = λ₊/(λ₊ + λ₋)",
@@ -1405,7 +1405,7 @@ window.requestAnimationFrame(animLoop);
 /* ================= CONCEPT CHECK ================= */
 var QZ=QZ8;
 
-var LETTERS="ABCD", STORE="ch40051-l8-check-v1";
+var LETTERS="ABCD", STORE="ch40051-l8-check-v2";
 var picks=new Array(QZ.length).fill(-1);
 var sId=document.getElementById("sId"), elTally=document.getElementById("tally"),
     elBar=document.getElementById("scorebar"), elScore=document.getElementById("scoreNum"),
