@@ -1,0 +1,1827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Junction &amp; Membrane Bench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+:root{
+  --ground:#F1F3F2; --surface:#FFFFFF; --surface-2:#E9EDEB;
+  --ink:#14191B; --ink-2:#3E4A4D; --muted:#68767A; --line:#D6DDDA; --line-2:#C3CCC8;
+  --ox:#A85B33; --ox-soft:#F3E4DA;
+  --red-:#15618E; --red-soft:#DDE9F2;
+  --go:#2C7355; --go-soft:#DCEBE3;
+  --stop:#8A5F0C; --stop-soft:#F3E9D3;
+  --elec:#3E4A4D; --ion-k:#6E4C9B;
+  --shadow:0 1px 2px rgba(20,25,27,.05),0 8px 24px -12px rgba(20,25,27,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+    --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+    --ox:#D08551; --ox-soft:#33231A;
+    --red-:#5AA6D4; --red-soft:#152833;
+    --go:#5DBB8D; --go-soft:#152A21;
+    --stop:#D6A33F; --stop-soft:#2B2415;
+    --elec:#AEBBBE; --ion-k:#B99BE0;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+  --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+  --ox:#D08551; --ox-soft:#33231A;
+  --red-:#5AA6D4; --red-soft:#152833;
+  --go:#5DBB8D; --go-soft:#152A21;
+  --stop:#D6A33F; --stop-soft:#2B2415;
+  --elec:#AEBBBE; --ion-k:#B99BE0;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:32px 20px 72px}
+.masthead{display:flex;flex-wrap:wrap;align-items:flex-end;gap:20px 32px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.eyebrow a{color:inherit}
+h1{font-family:"IBM Plex Serif",Georgia,serif;font-weight:600;font-size:clamp(28px,4.2vw,42px);line-height:1.12;margin:0;text-wrap:balance;letter-spacing:-.015em}
+.sub{margin:8px 0 0;color:var(--ink-2);font-size:15px;max-width:62ch}
+.tabs{display:flex;gap:2px;margin:24px 0 22px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{appearance:none;background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);
+  font-family:inherit;font-size:14.5px;font-weight:500;padding:11px 16px;cursor:pointer;white-space:nowrap;margin-bottom:-1px}
+.tab:hover{color:var(--ink-2)}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ox)}
+.tab:focus-visible{outline:2px solid var(--red-);outline-offset:-2px;border-radius:4px 4px 0 0}
+.panel[hidden]{display:none}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow)}
+.card-h{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.card-h h2{font-size:15px;font-weight:600;margin:0;letter-spacing:-.01em}
+.card-h .note{font-size:12.5px;color:var(--muted)}
+.card-b{padding:18px}
+.stack{display:flex;flex-direction:column;gap:16px}
+.two{display:grid;grid-template-columns:minmax(270px,1fr) minmax(330px,1.45fr);gap:16px;align-items:start}
+@media(max-width:900px){.two{grid-template-columns:1fr}}
+label.fld,span.fld{display:block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+select,input[type=text],input[type=number]{width:100%;font-family:inherit;font-size:14px;color:var(--ink);
+  background:var(--surface-2);border:1px solid var(--line-2);border-radius:7px;padding:9px 10px}
+input:read-only{background:var(--surface);color:var(--muted);cursor:not-allowed}
+select:focus-visible,input:focus-visible{outline:2px solid var(--red-);outline-offset:1px}
+input[type=range]{width:100%;accent-color:var(--ox)}
+input[type=range]:focus-visible{outline:2px solid var(--red-);outline-offset:3px}
+.slider-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;gap:10px}
+.slider-row .val{font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+.readout{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px dotted var(--line)}
+.readout:last-child{border-bottom:0}
+.readout .k{font-size:13px;color:var(--muted)}
+.readout .v{font-family:"IBM Plex Mono",monospace;font-size:16px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--ink)}
+.verdict{padding:12px 14px;border-radius:8px;font-size:13.5px;line-height:1.55}
+.verdict.go{background:var(--go-soft);color:var(--go)}
+.verdict.stop{background:var(--stop-soft);color:var(--stop)}
+.verdict.flat{background:var(--surface-2);color:var(--ink-2)}
+.eqline{font-family:"IBM Plex Mono",monospace;font-size:13px;line-height:1.9;color:var(--ink-2);
+  background:var(--surface-2);border-radius:7px;padding:11px 13px}
+.eqline b{color:var(--ox);font-weight:600}
+svg{display:block;max-width:100%}
+.scrollx{overflow-x:auto}
+.solid{appearance:none;background:var(--ox);border:1px solid var(--ox);color:#fff;font-family:inherit;
+  font-size:13.5px;font-weight:500;padding:10px 16px;border-radius:7px;cursor:pointer}
+.solid:hover{filter:brightness(1.08)}
+.solid:disabled{background:var(--line-2);border-color:var(--line-2);color:var(--muted);cursor:not-allowed}
+.ghost{appearance:none;background:var(--surface-2);border:1px solid var(--line-2);color:var(--ink-2);
+  font-family:inherit;font-size:12.5px;padding:8px 12px;border-radius:7px;cursor:pointer;text-align:left}
+.ghost:hover{border-color:var(--ox);color:var(--ox)}
+table.ions{border-collapse:collapse;width:100%;font-size:13px}
+table.ions th,table.ions td{text-align:left;padding:8px 9px;border-bottom:1px solid var(--line);white-space:nowrap}
+table.ions th{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500}
+table.ions td.num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;text-align:right}
+tr.support td{color:var(--red-)}
+tr.analyte td{color:var(--ox);font-weight:500}
+.bar{display:grid;grid-template-columns:1fr;gap:0;margin-top:4px}
+.tstrip{display:flex;height:22px;border-radius:4px;overflow:hidden;background:var(--surface-2)}
+.tstrip i{display:block;height:100%}
+.tlegend{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted)}
+.tlegend span b{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px}
+.idgrid{display:grid;grid-template-columns:1fr;gap:14px;max-width:340px}
+.scorebar{display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;padding:14px 18px;border-top:1px solid var(--line)}
+.scorenum{font-family:"IBM Plex Mono",monospace;font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+.scorenum small{font-size:14px;font-weight:400;color:var(--muted)}
+.vcode{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted)}
+.vcode b{color:var(--ink);font-weight:600;letter-spacing:.08em}
+.quiz{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:16px}
+.q .stem{font-size:14.5px;line-height:1.6;margin:0 0 12px}
+.q .stem code{font-family:"IBM Plex Mono",monospace;font-size:13px;background:var(--surface-2);padding:1px 5px;border-radius:4px}
+.opts{display:flex;flex-direction:column;gap:7px}
+.opt{appearance:none;text-align:left;font-family:inherit;font-size:13.5px;line-height:1.45;color:var(--ink);
+  background:var(--surface-2);border:1px solid transparent;border-radius:7px;padding:9px 12px;cursor:pointer;display:flex;gap:9px}
+.opt .ltr{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);flex:0 0 auto;padding-top:1px}
+.opt:hover:not(:disabled){border-color:var(--line-2)}
+.opt.right{background:var(--go-soft);color:var(--go);border-color:var(--go);font-weight:500}
+.opt.right .ltr{color:var(--go)}
+.opt.wrong{background:var(--stop-soft);color:var(--stop);border-color:var(--stop)}
+.opt.wrong .ltr{color:var(--stop)}
+.opt:disabled{cursor:default}
+.why{margin:12px 0 0;font-size:13px;line-height:1.65;color:var(--ink-2);border-left:2px solid var(--line-2);padding-left:12px}
+.misc{display:block;margin-top:10px;padding:9px 12px;border-radius:7px;background:var(--stop-soft);color:var(--stop);font-size:12.5px;line-height:1.6}
+.misc a{color:inherit;font-weight:600;white-space:nowrap}
+.why[hidden]{display:none}
+.tally{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.hint{font-size:12.5px;color:var(--muted);line-height:1.65;margin:10px 0 0}
+.locked{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;background:var(--go-soft);color:var(--go);padding:2px 7px;border-radius:4px;margin-left:8px}
+/* ---- flux / Fick / migration panels ------------------------------------- */
+.pill-row{display:flex;gap:3px;background:var(--surface-2);border-radius:8px;padding:3px}
+.pill{flex:1;appearance:none;border:0;background:none;font-family:"IBM Plex Mono",monospace;font-size:12.5px;
+  font-weight:500;color:var(--muted);padding:7px 2px;border-radius:6px;cursor:pointer}
+.pill[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.pill:focus-visible{outline:2px solid var(--red-);outline-offset:1px}
+/* nowrap + scroll: a formula broken across lines mid-term is harder to read
+   than one the reader has to nudge sideways.  Explicit <br> still breaks. */
+.eqbig{font-family:"IBM Plex Mono",monospace;font-size:13.5px;line-height:2.05;color:var(--ink);
+  background:var(--surface-2);border-radius:8px;padding:14px 15px;overflow-x:auto;white-space:nowrap}
+.eqbig small{color:var(--muted);font-size:11.5px;letter-spacing:.04em}
+.dif{color:var(--red-);font-weight:600}
+.mig{color:var(--ox);font-weight:600}
+.con{color:var(--go);font-weight:600}
+.termtbl{border-collapse:collapse;width:100%;font-size:13px}
+.termtbl td,.termtbl th{padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+.termtbl th{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);font-weight:500;text-align:left}
+.termtbl td.num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;text-align:right}
+.termtbl tr.tot td{border-bottom:0;border-top:2px solid var(--line-2);font-weight:600}
+.sumwrap{overflow-x:auto}
+.sumtbl{border-collapse:collapse;width:100%;font-size:13px}
+.sumtbl td,.sumtbl th{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}
+.sumtbl th{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.sumtbl tr:last-child td{border-bottom:0}
+.sumtbl td.eq{font-family:"IBM Plex Mono",monospace;font-size:13.5px;color:var(--ink);white-space:nowrap}
+.sumtbl td.nm{color:var(--ink-2);white-space:nowrap;font-size:12.5px}
+.sumtbl td.sy{color:var(--muted);font-size:12.5px;line-height:1.5;white-space:normal}
+.symgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:4px 20px;font-size:12.5px;color:var(--ink-2);line-height:1.6}
+.symgrid b{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--ink)}
+.termtbl td.dir{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--muted);text-align:right}
+.swatch{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px}
+.trio3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:stretch}
+.trio3>.card{display:flex;flex-direction:column}
+.trio3>.card>.card-b:last-child{flex:1 1 auto}
+@media(max-width:1000px){.trio3{grid-template-columns:1fr 1fr}}
+@media(max-width:720px){.trio3{grid-template-columns:1fr}}
+.two.eq{align-items:stretch}
+.two.wideL{grid-template-columns:minmax(330px,1.5fr) minmax(240px,1fr)}
+.two.eq>.card{display:flex;flex-direction:column}
+.two.eq>.card>.card-b:last-child{flex:1 1 auto}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap}
+.btnrow .ghost{flex:1 1 auto;text-align:center}
+.dfctl{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:14px 16px;align-items:end}
+.trio3 .dfctl{grid-template-columns:1fr}
+.dfctl-2{grid-template-columns:repeat(2,minmax(150px,1fr))}
+.dfctl-wide{grid-column:1 / -1}
+@media(max-width:820px){.dfctl{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.dfctl{grid-template-columns:1fr}}
+.mbtop{display:grid;grid-template-columns:minmax(200px,280px) minmax(0,1fr);gap:8px 20px;align-items:end;margin-bottom:6px}
+@media(max-width:720px){.mbtop{grid-template-columns:1fr}}
+footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;line-height:1.8}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+.glegend{display:flex;flex-direction:column;gap:5px;font-size:12.5px;line-height:1.45;color:var(--ink-2)}
+.glegend > span{display:flex;align-items:flex-start;gap:8px}
+.glegend > span > svg{flex:0 0 26px;margin-top:3px}
+.atmfig{display:grid;grid-template-columns:minmax(240px,320px) minmax(0,1fr);gap:10px 22px;align-items:center}
+@media(max-width:720px){.atmfig{grid-template-columns:1fr}}
+.atmdefs{grid-column:1 / -1;display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:6px 22px;
+  font-size:12.5px;line-height:1.45;color:var(--ink-2);border-top:1px solid var(--line);padding-top:10px}
+.atmdefs > div{display:grid;grid-template-columns:3.2em 1fr;gap:8px}
+.atmdefs .sym{font-family:"IBM Plex Mono",monospace;font-weight:700;text-align:right;color:var(--ink)}
+#p-atm .trio3 .atmfig{grid-template-columns:1fr}
+#p-atm .trio3 .atmdefs{grid-template-columns:1fr}
+#p-atm .trio3 .atmmodel svg{max-width:300px}
+#p-atm .trio3 .eqbig{white-space:normal}
+</style>
+</head>
+<body>
+  <div class="wrap">
+  <header class="masthead">
+    <div style="flex:1 1 380px">
+      <p class="eyebrow"><a href="index.html">CH40051 Electroanalytical Chemistry</a> · Lecture 9 · Liquid junction and Donnan potentials</p>
+      <h1>Junction &amp; Membrane Bench</h1>
+      <p class="sub">Two solutions meet and a voltage appears, with no reaction anywhere. Build the junction and watch the faster ion run ahead until the field it leaves behind holds it back; put a fixed charge inside a membrane and let the salt come to equilibrium around it; then stack the two effects into a pH electrode and find where it stops telling the truth.</p>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true"  aria-controls="p-lj"   id="t-lj">Liquid junction</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-dn"   id="t-dn">Donnan</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-ise"  id="t-ise">Glass electrode</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-sum"  id="t-sum">Summary</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-quiz" id="t-quiz">Concept Check</button>
+  </div>
+
+  <!-- ============== LIQUID JUNCTION ============== -->
+  <section class="panel" id="p-lj" role="tabpanel" aria-labelledby="t-lj">
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>A boundary the two solutions cannot agree on</h2><span class="note">deck p.4&ndash;8 &mdash; the liquid junction, or diffusion, potential</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig" style="white-space:normal">
+          <span class="mig">E<sub>lj</sub> = &phi;<sup>&beta;</sup> &minus; &phi;<sup>&alpha;</sup> =
+            [&Sigma;<sub>j</sub> (|z<sub>j</sub>|u<sub>j</sub>/z<sub>j</sub>)&Delta;c<sub>j</sub> / &Sigma;<sub>j</sub> |z<sub>j</sub>|u<sub>j</sub>&Delta;c<sub>j</sub>]
+            &middot; (RT/F) ln[&Sigma;<sub>j</sub>|z<sub>j</sub>|u<sub>j</sub>c<sub>j</sub>(&alpha;) / &Sigma;<sub>j</sub>|z<sub>j</sub>|u<sub>j</sub>c<sub>j</sub>(&beta;)]</span>
+          <small>Henderson, with &Delta;c<sub>j</sub> = c<sub>j</sub>(&beta;) &minus; c<sub>j</sub>(&alpha;)</small><br>
+          <span class="con">E<sub>lj</sub> = &plusmn;(RT/F) ln(&Lambda;<sup>&alpha;</sup>/&Lambda;<sup>&beta;</sup>)</span> <small>two different 1:1 salts at the same concentration</small>
+          &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="dif">E<sub>lj</sub> = (t<sub>+</sub> &minus; t<sub>&minus;</sub>)(RT/F) ln(c<sup>&alpha;</sup>/c<sup>&beta;</sup>)</span> <small>one salt, two concentrations</small>
+        </div>
+        <p class="hint" style="margin:0">Nothing reacts at a liquid junction. Both ions of the salt diffuse down the same concentration
+          gradient, but they do not diffuse at the same speed, and the faster one gets ahead. That separates charge &mdash; an
+          <b>infinitesimal</b> amount of it, far too little to measure as a concentration &mdash; and the field it sets up does two things
+          at once: it <b>pulls the slow ion forward</b> and <b>holds the fast one back</b>. Within nanoseconds &mdash; the time &epsilon;/&sigma; of Lecture 8, half a nanosecond in 0.1 M KCl &mdash; the two are crossing at
+          exactly the same rate, and the junction settles into a <b>steady state</b> (not equilibrium: the salt is still diffusing) with a
+          standing potential difference across it, the <b>liquid junction</b> or <b>diffusion potential</b>.</p>
+        <p class="hint" style="margin:0">It is the one term in a measured cell voltage that no electrode can account for:
+          E<sub>cell</sub> = E<sub>Nernst</sub> + E<sub>lj</sub>. Two calomel electrodes in 0.1 M HCl and 0.1 M KCl see the same
+          chloride activity, so the cell ought to read zero &mdash; and it reads about 27 mV. That is the junction, and the whole purpose
+          of a saturated KCl salt bridge is to make it small.</p>
+      </div>
+    </div>
+
+    <div class="two eq wideL" style="margin-bottom:16px">
+
+      <div class="card">
+        <div class="card-h"><h2>The junction, running</h2><span class="note" id="ljNote">&mdash;</span></div>
+        <div class="card-b stack">
+          <div class="dfctl dfctl-2" style="margin-bottom:2px">
+            <div>
+              <span class="fld">Left, &alpha;</span>
+              <div class="pill-row" id="ljA">
+                <button class="pill" data-s="HCl"  aria-pressed="true"  type="button">HCl</button>
+                <button class="pill" data-s="KCl"  aria-pressed="false" type="button">KCl</button>
+                <button class="pill" data-s="NaCl" aria-pressed="false" type="button">NaCl</button>
+                <button class="pill" data-s="LiCl" aria-pressed="false" type="button">LiCl</button>
+              </div>
+            </div>
+            <div>
+              <span class="fld">Right, &beta;</span>
+              <div class="pill-row" id="ljB">
+                <button class="pill" data-s="HCl"  aria-pressed="false" type="button">HCl</button>
+                <button class="pill" data-s="KCl"  aria-pressed="true"  type="button">KCl</button>
+                <button class="pill" data-s="NaCl" aria-pressed="false" type="button">NaCl</button>
+                <button class="pill" data-s="LiCl" aria-pressed="false" type="button">LiCl</button>
+              </div>
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">Concentration, &alpha;</span><span class="val" id="ljCav"></span></div>
+              <input type="range" id="ljCa" min="-3" max="0.7" step="0.02" value="-1">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">Concentration, &beta;</span><span class="val" id="ljCbv"></span></div>
+              <input type="range" id="ljCb" min="-3" max="0.7" step="0.02" value="-1">
+            </div>
+            <div class="dfctl-wide btnrow" style="margin:0">
+              <button class="ghost" id="ljPlay" type="button">&#9654; Replay from t = 0</button>
+              <button class="ghost" id="ljP1" type="button">The 27 mV cell: 0.1 M HCl | 0.1 M KCl</button>
+              <button class="ghost" id="ljP2" type="button">One salt, two strengths: 0.01 | 0.1 M HCl</button>
+              <button class="ghost" id="ljP3" type="button">Saturated KCl bridge</button>
+            </div>
+          </div>
+          <svg id="ljpic" viewBox="0 0 540 440" style="display:block;width:100%;height:auto;max-width:540px;margin:0 auto" role="img" aria-label="The junction run forward in time: ions crossing at different speeds, the charge that lines up in the boundary layer, each ion&apos;s speed split into a diffusion part and the part the field it built takes back, the net current falling to zero, and a voltmeter trace climbing to the liquid junction potential"></svg>
+          <div class="glegend">
+            <span><svg viewBox="0 0 124 14" width="124" height="14" style="flex:0 0 124px" aria-hidden="true"><polygon points="8,2 1.5,12 14.5,12" fill="var(--ox)"/><rect x="27" y="2" width="10" height="10" rx="1" fill="var(--stop)"/><polygon points="58,1.5 64.5,7 58,12.5 51.5,7" fill="var(--ion-k)"/><polygon points="84,1.5 89.5,4.5 89.5,10.5 84,13.5 78.5,10.5 78.5,4.5" fill="var(--elec)"/><circle cx="113" cy="7" r="5.5" fill="var(--red-)"/></svg><span><b>one look per ion</b>: copper triangle H<sup>+</sup>, amber square Na<sup>+</sup>, violet diamond K<sup>+</sup>, slate hexagon Li<sup>+</sup>, blue circle Cl<sup>&minus;</sup>. Each cation has its own colour and shape, so the two sides of the junction never blur together. The faint ones behind are the bulk, which stays electroneutral the whole time.</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="2" y1="7" x2="24" y2="7" stroke="var(--line-2)" stroke-width="1"/><line x1="2" y1="7" x2="14" y2="7" stroke="var(--ox)" stroke-width="2.4" opacity="0.55"/><circle cx="14" cy="7" r="2.6" fill="var(--ox)"/></svg><span><b>the thin rail under each lane</b>: how far that ion has travelled since the run started, as a share of the quickest. At t = 0 those shares are the ratio of the <b>mobilities</b> themselves &mdash; H<sup>+</sup> 100 % against K<sup>+</sup> 21 % &mdash; and they close as the field builds, because the field slows the leader and pushes the straggler.</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><rect x="3" y="2" width="8" height="10" fill="var(--red-soft)"/><rect x="15" y="2" width="8" height="10" fill="var(--ox-soft)"/></svg><span><b>the shaded strip</b>: the charge that has separated, darkening as the run goes on. It is the only part of either solution that is not electroneutral, and the amount of charge in it is minute: even a field as large as 2 &times; 10<sup>7</sup> V/m needs only about 1.4 &times; 10<sup>&minus;11</sup> mol/cm<sup>2</sup> of uncompensated charge, since &sigma; = &epsilon;<sub>0</sub>&epsilon;<sub>r</sub>E.</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><rect x="1" y="4" width="12" height="7" fill="var(--line-2)"/><rect x="13" y="4" width="7" height="7" fill="var(--go)" opacity="0.55"/><line x1="20" y1="2" x2="20" y2="13" stroke="var(--ox)" stroke-width="2"/></svg><span><b>the middle bars</b> split each ion&rsquo;s speed in two: <b>grey</b> is diffusion, down its own gradient; the piece in <b>the ion&rsquo;s own colour</b> is what the field it has built takes back (or adds). The tick is the net. Watch the fast ion&rsquo;s tick shrink and the slow one&rsquo;s grow.</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><rect x="2" y="4" width="16" height="7" fill="var(--stop)" opacity="0.75"/></svg><span><b>net current</b>: the sum, weighted by charge. It starts large and falls to zero &mdash; and <em>that</em> is the steady state, not the ions stopping. They keep crossing, in equal and opposite current.</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><path d="M1 12 C8 12 10 3 25 3" fill="none" stroke="var(--go)" stroke-width="2.2"/></svg><span><b>the voltmeter</b>, below: the potential climbing to its plateau. The dashed line is E<sub>lj</sub>, the value Henderson predicts.</span></span>
+            <span style="display:block;color:var(--muted)">Time is stretched enormously: the real field builds in well under a microsecond. Press <b>Replay</b> to run it again, or change the solutions and it restarts itself.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2>The numbers</h2><span class="note" id="ljWho">&mdash;</span></div>
+        <div class="card-b">
+          <div class="readout"><span class="k">who moves faster, u<sub>+</sub> : u<sub>&minus;</sub></span><span class="v" id="ljU">&mdash;</span></div>
+          <div class="readout"><span class="k">t<sub>+</sub> on the left, &alpha;</span><span class="v" id="ljTa">&mdash;</span></div>
+          <div class="readout"><span class="k">t<sub>+</sub> on the right, &beta;</span><span class="v" id="ljTb">&mdash;</span></div>
+          <div class="readout"><span class="k"><span class="mig">E<sub>lj</sub></span>, Henderson</span><span class="v" id="ljE">&mdash;</span></div>
+          <div class="readout"><span class="k">the shortcut for this junction</span><span class="v" id="ljAlt">&mdash;</span></div>
+          <div class="readout"><span class="k">as a pH error, if this cell measured pH</span><span class="v" id="ljPH">&mdash;</span></div>
+          <div id="ljVerdict" class="verdict flat" style="margin-top:14px">&mdash;</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card">
+      <div class="card-h"><h2>How to read it</h2><span class="note">why a bridge of saturated KCl is the standard answer</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="stack" style="gap:12px">
+          <p class="hint" style="margin:0"><b>1. The sign follows the faster ion.</b> Put 0.1 M HCl against 0.1 M KCl. The only
+            difference between the two sides is H<sup>+</sup> against K<sup>+</sup>, and H<sup>+</sup> is nearly five times as mobile.
+            It crosses into the KCl faster than K<sup>+</sup> crosses the other way, so the KCl side charges <b>positive</b> and the HCl
+            side is left <b>negative</b>: E<sub>lj</sub> = &phi;<sup>&beta;</sup> &minus; &phi;<sup>&alpha;</sup> comes out about
+            +27 mV, exactly what the voltmeter sees between two identical calomel electrodes.</p>
+          <p class="hint" style="margin:0"><b>2. A bridge works by drowning the difference.</b> Henderson weights every ion by
+            |z|u c. Flood the junction with 4.2 M KCl and the two bridge ions dominate both sums &mdash; and K<sup>+</sup> and
+            Cl<sup>&minus;</sup> have almost the same mobility (t<sub>+</sub> = 0.49 against t<sub>&minus;</sub> = 0.51), so neither
+            runs ahead and there is almost nothing left to separate. The remaining millivolt or two is why a salt bridge reduces
+            E<sub>lj</sub> rather than removing it. LiCl would be a poor bridge: t<sub>+</sub> = 0.34, so two thirds of the current
+            is carried by Cl<sup>&minus;</sup>.</p>
+          <p class="hint" style="margin:0"><b>3. The same salt, two strengths, is the smaller effect.</b> There the two sides share
+            both ions, and only the transference numbers survive: E<sub>lj</sub> = (t<sub>+</sub> &minus; t<sub>&minus;</sub>)(RT/F)
+            ln(c<sup>&alpha;</sup>/c<sup>&beta;</sup>). For KCl that prefactor is 0.49 &minus; 0.51 = &minus;0.02, so a tenfold step
+            gives about 1 mV; for HCl it is +0.64, and the same step gives 38 mV. One junction, two decades of difference, decided
+            entirely by which ions are carrying the current. Mobilities here are infinite-dilution values (Lecture 8), so above about
+            0.1 M read these numbers as the trend rather than the measurement.</p>
+        </div>
+        <div id="ljRead" class="verdict flat">&mdash;</div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ============== DONNAN ============== -->
+  <section class="panel" id="p-dn" role="tabpanel" aria-labelledby="t-dn" hidden>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>A charge that cannot leave</h2><span class="note">deck p.9&ndash;12 &mdash; the Donnan potential, at equilibrium</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig" style="white-space:normal">
+          <span class="con">&mu;&#771;<sub>i</sub><sup>&alpha;</sup> = &mu;&#771;<sub>i</sub><sup>&beta;</sup></span>
+          &nbsp;&rarr;&nbsp;
+          <span class="mig">&Delta;&phi; = &phi;<sup>&beta;</sup> &minus; &phi;<sup>&alpha;</sup> = (RT/z<sub>i</sub>F) ln(a<sub>i</sub><sup>&alpha;</sup>/a<sub>i</sub><sup>&beta;</sup>)</span>
+          &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="dif">a<sub>K</sub><sup>&alpha;</sup>a<sub>Cl</sub><sup>&alpha;</sup> = a<sub>K</sub><sup>&beta;</sup>a<sub>Cl</sub><sup>&beta;</sup></span> <small>the Donnan equilibrium</small><br>
+          <small>one potential difference, written from either ion &mdash; and they must agree, which is what fixes the concentrations</small>
+        </div>
+        <p class="hint" style="margin:0">Now nothing is diffusing. A membrane carries charges that are <b>part of the polymer</b> and
+          cannot move &mdash; sulfonate groups in Nafion, quaternary ammonium groups in an anion exchanger, oxide in glass. The small ions
+          can cross freely, so at equilibrium each of them has the same <b>electrochemical</b> potential
+          &mu;&#771; = &mu;&deg; + RT ln a + zF&phi; on both sides. That does <em>not</em> make the concentrations equal: an ion can pay for a
+          lower activity inside with a favourable potential. Write &Delta;&phi; from K<sup>+</sup> and again from Cl<sup>&minus;</sup>,
+          insist the two agree, and the Donnan equilibrium falls out &mdash; the ion <b>product</b> is the same on both sides, even though
+          neither concentration is.</p>
+        <p class="hint" style="margin:0">The counter-ion is drawn in and the co-ion is pushed out: <b>Donnan exclusion</b>. It is why a
+          cation-exchange membrane passes Li<sup>+</sup> and blocks the anion in a battery, why a membrane holding impermeant protein anions already has
+          tens of millivolts across it before any pump runs, and why the glass bulb of a pH electrode can have a potential across it before any diffusion begins.</p>
+      </div>
+    </div>
+
+    <div class="two eq wideL" style="margin-bottom:16px">
+
+      <div class="card">
+        <div class="card-h"><h2>The membrane, at equilibrium</h2><span class="note" id="dnNote">&mdash;</span></div>
+        <div class="card-b stack">
+          <div class="dfctl dfctl-2" style="margin-bottom:2px">
+            <div>
+              <span class="fld">Fixed charge on the membrane</span>
+              <div class="pill-row" id="dnSign">
+                <button class="pill" data-q="1"  aria-pressed="true"  type="button">positive (anion exchanger)</button>
+                <button class="pill" data-q="-1" aria-pressed="false" type="button">negative (Nafion)</button>
+              </div>
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">Fixed charge, z<sub>M</sub>c<sub>M</sub></span><span class="val" id="dnQv"></span></div>
+              <input type="range" id="dnQ" min="-3" max="0.3" step="0.02" value="-1">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">KCl in the solution</span><span class="val" id="dnCv"></span></div>
+              <input type="range" id="dnC" min="-3" max="0.3" step="0.02" value="-1">
+            </div>
+            <div class="dfctl-wide btnrow" style="margin:0">
+              <button class="ghost" id="dnPlay" type="button">&#9654; Let it come to equilibrium</button>
+              <button class="ghost" id="dnP1" type="button">The deck&rsquo;s example: c<sub>M</sub> = 1 mM, z<sub>M</sub> = 100</button>
+            </div>
+          </div>
+          <svg id="dnpic" viewBox="0 0 540 440" style="display:block;width:100%;height:auto;max-width:540px;margin:0 auto" role="img" aria-label="A membrane holding fixed charges settling into equilibrium with the solution beside it: each phase drawn as columns of ions on one scale, the fixed charge in a column of its own, arrows for each ion going in and coming out, a pair of bars per ion comparing what its concentration ratio asks with what the potential pays, and the potential step building"></svg>
+          <div class="glegend">
+            <span><svg viewBox="0 0 40 14" width="40" height="14" style="flex:0 0 40px" aria-hidden="true"><polygon points="8,1.5 14.5,7 8,12.5 1.5,7" fill="var(--ion-k)"/><circle cx="30" cy="7" r="5.5" fill="var(--red-)"/></svg><span><b>a column of ions is a concentration</b> &mdash; one glyph per unit, the same unit in both phases, so inside and outside can be compared by eye. Violet diamond K<sup>+</sup> and blue circle Cl<sup>&minus;</sup>, the same shapes they have on the junction tab.</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><rect x="6" y="1" width="13" height="12" rx="2" fill="none" stroke="var(--elec)" stroke-width="1.3" stroke-dasharray="2.5 2"/></svg><span><b>the dashed column</b>: the fixed charge, drawn on the same scale as the ions. It is part of the polymer and never moves &mdash; which is the entire reason the other two cannot even out.</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="2" y1="4" x2="17" y2="4" stroke="var(--ion-k)" stroke-width="2"/><polygon points="23,4 17,1 17,7" fill="var(--ion-k)"/><line x1="24" y1="11" x2="11" y2="11" stroke="var(--red-)" stroke-width="2" opacity="0.8"/><polygon points="5,11 11,8 11,14" fill="var(--red-)" opacity="0.8"/></svg><span><b>the arrows in the channel</b>: each ion going in, and the same ion coming out. One is longer than the other while the system settles; at equilibrium they match, because equilibrium is equal traffic both ways, not stillness.</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><rect x="3" y="1" width="18" height="5" fill="var(--go)" opacity="0.85"/><rect x="3" y="8" width="18" height="5" fill="var(--go)" opacity="0.45"/></svg><span><b>the pair of bars beside each ion</b> is the whole point. The upper one is what that ion&rsquo;s concentrations ask for, (RT/F)ln(c<sup>&alpha;</sup>/c<sup>&beta;</sup>); the lower one is what the potential pays, &plusmn;&Delta;&phi;, with the sign set by its charge. A gap between them is an ion still moving. When <b>both ions have them equal</b>, &mu;&#771; is the same on both sides for both &mdash; which is all equilibrium means.</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><path d="M1 11 L13 11 L13 3 L25 3" fill="none" stroke="var(--go)" stroke-width="2.2"/></svg><span><b>the green step</b>: &Delta;&phi; building as the ions redistribute. There is no gradient inside either phase &mdash; the whole difference sits at the interface.</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2>Where the ions end up</h2><span class="note" id="dnWho">&mdash;</span></div>
+        <div class="card-b">
+          <div class="readout"><span class="k">K<sup>+</sup> in the solution, &alpha;</span><span class="v" id="dnKa">&mdash;</span></div>
+          <div class="readout"><span class="k">Cl<sup>&minus;</sup> in the solution, &alpha;</span><span class="v" id="dnCla">&mdash;</span></div>
+          <div class="readout"><span class="k">K<sup>+</sup> in the membrane, &beta;</span><span class="v" id="dnKb">&mdash;</span></div>
+          <div class="readout"><span class="k">Cl<sup>&minus;</sup> in the membrane, &beta;</span><span class="v" id="dnClb">&mdash;</span></div>
+          <div class="readout"><span class="k">ion product, C<sub>K</sub>C<sub>Cl</sub>, each side</span><span class="v" id="dnProd">&mdash;</span></div>
+          <div class="readout"><span class="k"><span class="mig">&Delta;&phi;<sub>1</sub></span> from K<sup>+</sup> &nbsp;=&nbsp; <span class="dif">&Delta;&phi;<sub>2</sub></span> from Cl<sup>&minus;</sup></span><span class="v" id="dnPhi">&mdash;</span></div>
+          <div class="readout"><span class="k">co-ion kept out of the membrane</span><span class="v" id="dnEx">&mdash;</span></div>
+          <div id="dnVerdict" class="verdict flat" style="margin-top:14px">&mdash;</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card">
+      <div class="card-h"><h2>How to read it</h2><span class="note">the arithmetic behind the picture</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="stack" style="gap:12px">
+          <p class="hint" style="margin:0"><b>1. Two conditions, one unknown.</b> Electroneutrality holds inside each phase
+            separately &mdash; in the solution C<sub>K</sub> = C<sub>Cl</sub>, in the membrane the mobile ions have to balance the fixed
+            charge as well. The Donnan equilibrium, C<sub>K</sub><sup>&alpha;</sup>C<sub>Cl</sub><sup>&alpha;</sup> =
+            C<sub>K</sub><sup>&beta;</sup>C<sub>Cl</sub><sup>&beta;</sup>, is the second condition. With the salt shared between two
+            equal volumes they fix every concentration: for the deck&rsquo;s numbers, 0.1 M KCl against 0.1 M of fixed positive charge,
+            K<sup>+</sup> ends at 0.067 M outside and 0.033 M inside, Cl<sup>&minus;</sup> at 0.067 and 0.133, and
+            &Delta;&phi; = (RT/F) ln 2 = 17.8 mV.</p>
+          <p class="hint" style="margin:0"><b>2. Two bars per ion, and they have to meet.</b> Equilibrium says
+            &mu;&#771; = &mu;&deg; + RT ln a + zF&phi; is the same in both phases. Rearranged, that is
+            (RT/F) ln(c<sup>&alpha;</sup>/c<sup>&beta;</sup>) = z&Delta;&phi; for every ion that can cross &mdash; and the middle
+            panel draws those two quantities, in millivolts, beside each ion. A gap between the bars is an ion still moving.
+            They close from opposite directions for the cation and the anion, because z flips the sign, and both have to close
+            on the <em>same</em> &Delta;&phi;. That last requirement is the whole content of the Donnan condition.</p>
+          <p class="hint" style="margin:0"><b>3. The same step, written from either ion.</b> K<sup>+</sup> says
+            &Delta;&phi; = (RT/F) ln(a<sub>K</sub><sup>&alpha;</sup>/a<sub>K</sub><sup>&beta;</sup>); Cl<sup>&minus;</sup>, with
+            z = &minus;1, says &Delta;&phi; = (RT/F) ln(a<sub>Cl</sub><sup>&beta;</sup>/a<sub>Cl</sub><sup>&alpha;</sup>). The readout
+            shows one number because the equilibrium has already forced them to agree &mdash; and setting them equal is precisely how the
+            ion-product rule is derived.</p>
+          <p class="hint" style="margin:0"><b>4. Salt drowns it, as it drowns everything.</b> Raise the bulk KCl and the fixed charge
+            stops mattering: the mobile ions already outnumber it, the ratio approaches 1 and &Delta;&phi; collapses. Lower it and the
+            membrane is almost pure counter-ion, the co-ion is excluded nearly completely, and &Delta;&phi; grows by 59 mV for every
+            tenfold gap. A membrane electrode is therefore only selective while its fixed charge is large compared with the salt it is
+            sitting in &mdash; which is the same reason a supporting electrolyte wipes out migration in Lecture 8.</p>
+        </div>
+        <div id="dnRead" class="verdict flat">&mdash;</div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ============== GLASS ELECTRODE ============== -->
+  <section class="panel" id="p-ise" role="tabpanel" aria-labelledby="t-ise" hidden>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>Both effects, stacked into one electrode</h2><span class="note">deck p.13&ndash;21 &mdash; the pH glass electrode and its errors</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig" style="white-space:normal">
+          <span class="con">E<sub>m</sub> = constant + (RT/F) ln(a<sub>H</sub><sup>&alpha;</sup> + k<sup>pot</sup><sub>H,Na</sub> a<sub>Na</sub><sup>&alpha;</sup>)</span>
+          &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="mig">k<sup>pot</sup><sub>H,Na</sub> = K<sub>H,Na</sub>(u<sub>Na</sub>/u<sub>H</sub>)</span><br>
+          <span class="dif">E<sub>cell</sub> = L + (0.0592/n) log a</span> <small>25 °C, so 59.2 mV per decade for a singly charged ion</small>
+          &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <small>Nikolsky&ndash;Eisenman &middot; the selectivity coefficient is an <b>ion-exchange equilibrium</b> times a <b>mobility ratio</b></small>
+        </div>
+        <p class="hint" style="margin:0">A pH meter is five interfaces in series, and only one of them knows anything about the sample.
+          The two Donnan equilibria at the hydrated faces of the glass set the ion exchange &mdash; H<sup>+</sup> from the solution for
+          Na<sup>+</sup> in the glass &mdash; and the diffusion potential through the dry middle of the membrane, where only Na<sup>+</sup>
+          and H<sup>+</sup> can move, adds the Henderson term of the first tab. Put them together and the membrane potential is the
+          Nikolsky equation: the electrode responds to a<sub>H</sub> <em>plus</em> a small multiple of a<sub>Na</sub>.</p>
+        <p class="hint" style="margin:0">Everything else in the cell &mdash; both reference electrodes, the internal 0.1 M HCl, the bridge
+          junction &mdash; is deliberately held constant, and swept into L. That is the whole design: five interfaces, four of them fixed,
+          so the reading is a straight line in pH with a slope of 59.2 mV.</p>
+      </div>
+    </div>
+
+    <div class="two eq wideL" style="margin-bottom:16px">
+
+      <div class="card">
+        <div class="card-h"><h2>What the electrode reads</h2><span class="note" id="iseNote">&mdash;</span></div>
+        <div class="card-b stack">
+          <svg id="iseplot" viewBox="0 0 540 330" style="display:block;width:100%;height:auto;max-width:540px;margin:0 auto" role="img" aria-label="Membrane potential against pH: a straight Nernstian line that flattens at high pH as the electrode begins to answer sodium instead of hydrogen"></svg>
+          <div class="glegend">
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="1" y1="3" x2="25" y2="11" stroke="var(--line-2)" stroke-width="1.8" stroke-dasharray="4 3"/></svg><span><b>dashed</b>: the ideal response, 59.2 mV per pH unit, if the glass answered H<sup>+</sup> alone</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><path d="M1 3 C12 7 14 11 25 11" fill="none" stroke="var(--go)" stroke-width="2.4"/></svg><span><b>green</b>: the Nikolsky response, with the sodium term included</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><circle cx="13" cy="7" r="5" fill="var(--ink)"/></svg><span><b>the dot</b>: the solution you have set</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><rect x="2" y="2" width="22" height="10" fill="var(--stop-soft)"/></svg><span><b>the shaded band</b>: where the two curves differ by more than 0.05 pH &mdash; the <b>alkaline error</b></span></span>
+          </div>
+          <div class="dfctl dfctl-2" style="margin-top:4px">
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">pH of the sample</span><span class="val" id="isePHv"></span></div>
+              <input type="range" id="isePH" min="0" max="14" step="0.05" value="7">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">Na<sup>+</sup> in the sample</span><span class="val" id="iseNav"></span></div>
+              <input type="range" id="iseNa" min="-4" max="0.5" step="0.02" value="-1">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">selectivity, k<sup>pot</sup><sub>H,Na</sub></span><span class="val" id="iseKv"></span></div>
+              <input type="range" id="iseK" min="-13" max="-7" step="0.05" value="-11">
+            </div>
+            <div class="btnrow" style="margin:0">
+              <button class="ghost" id="iseP1" type="button">pH 11 in 1 M Na<sup>+</sup></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2>The numbers</h2><span class="note" id="iseWho">&mdash;</span></div>
+        <div class="card-b">
+          <div class="readout"><span class="k">a<sub>H</sub>, what you put in</span><span class="v" id="iseAH">&mdash;</span></div>
+          <div class="readout"><span class="k">k<sup>pot</sup>a<sub>Na</sub>, what the glass adds</span><span class="v" id="iseANa">&mdash;</span></div>
+          <div class="readout"><span class="k">E<sub>m</sub> against its value at pH 7</span><span class="v" id="iseE">&mdash;</span></div>
+          <div class="readout"><span class="k">pH the meter reports</span><span class="v" id="iseApp">&mdash;</span></div>
+          <div class="readout"><span class="k">error</span><span class="v" id="iseErr">&mdash;</span></div>
+          <div class="readout"><span class="k">pH at which the error reaches 0.1</span><span class="v" id="iseLim">&mdash;</span></div>
+          <div id="iseVerdict" class="verdict flat" style="margin-top:14px">&mdash;</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="two eq" style="margin-bottom:16px">
+
+      <div class="card">
+        <div class="card-h"><h2>Five interfaces, four of them constant</h2><span class="note">where each potential in the stack comes from</span></div>
+        <div class="card-b stack">
+          <svg id="isecell" viewBox="0 0 540 250" style="display:block;width:100%;height:auto;max-width:540px;margin:0 auto" role="img" aria-label="The pH cell drawn as a stack: external reference, bridge junction, test solution, glass membrane with its two hydrated layers and dry interior, internal HCl and internal reference"></svg>
+          <div class="glegend">
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><rect x="2" y="2" width="22" height="10" rx="2" fill="var(--go-soft)" stroke="var(--go)" stroke-width="1.2"/></svg><span><b>green</b>: the only interface that answers the sample</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><rect x="2" y="2" width="22" height="10" rx="2" fill="var(--surface-2)" stroke="var(--line-2)" stroke-width="1.2"/></svg><span><b>grey</b>: held constant by design, and absorbed into L</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><rect x="2" y="2" width="22" height="10" rx="2" fill="var(--stop-soft)" stroke="var(--stop)" stroke-width="1.2"/></svg><span><b>amber</b>: the bridge junction &mdash; small, but the first tab&rsquo;s E<sub>lj</sub>, and the reason a pH reading is never better than about &plusmn;0.02</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2>Why the glass has to prefer H<sup>+</sup> by 10<sup>11</sup></h2><span class="note">selectivity, and the two errors</span></div>
+        <div class="card-b stack" style="gap:12px">
+          <p class="hint" style="margin:0"><b>The exchange, and the walk across.</b> At each wet face,
+            Na<sup>+</sup>(&alpha;) + H<sup>+</sup>(m&prime;) &#8652; H<sup>+</sup>(&alpha;) + Na<sup>+</sup>(m&prime;), with equilibrium
+            constant K<sub>H,Na</sub>; inside the dry glass the two cations move at different speeds, which is a Henderson term with
+            u<sub>Na</sub>/u<sub>H</sub>. The selectivity coefficient is the product of the two:
+            k<sup>pot</sup> = K<sub>H,Na</sub>(u<sub>Na</sub>/u<sub>H</sub>) &asymp; 10<sup>&minus;11</sup> for Corning 015 glass
+            (~22 % Na<sub>2</sub>O, 6 % CaO, 72 % SiO<sub>2</sub>). The glass must <b>accept H<sup>+</sup> and release Na<sup>+</sup>
+            readily</b> &mdash; a preference of eleven orders of magnitude is what buys a clean reading all the way to pH 9 in salty
+            samples.</p>
+          <p class="hint" style="margin:0"><b>Alkaline error.</b> The error sets in above about pH 9 and grows a decade at a time: by pH 11 a sample
+            with 1 M Na<sup>+</sup> holds 10<sup>11</sup> times more Na<sup>+</sup> than H<sup>+</sup>, which is where a selectivity of 10<sup>&minus;11</sup>
+            stops being enough. The glass then answers both, the line flattens, and the meter reads <b>lower</b> than the true pH. Every singly charged cation does this, which is
+            why a &ldquo;low-sodium&rdquo; lithium glass is used for strong alkali.</p>
+          <p class="hint" style="margin:0"><b>Acid error.</b> Below about pH 0.5 the opposite happens, and it is not in the equation:
+            every exchange site on the surface is already filled with H<sup>+</sup>, so the glass has nothing left to respond with and
+            the reading comes out <b>higher</b> than the truth. Saturation, not competition &mdash; which is why the Nikolsky curve above
+            is drawn only as far as the glass is still honest.</p>
+        </div>
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- ============== SUMMARY ============== -->
+  <section class="panel" id="p-sum" role="tabpanel" aria-labelledby="t-sum" hidden>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>Two ways a potential appears without a reaction</h2><span class="note">one at steady state, one at equilibrium</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig" style="white-space:normal">
+          <span class="mig">liquid junction</span>: different <b>speeds</b>, a <b>steady state</b>, Henderson
+          &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="dif">Donnan</span>: a <b>fixed charge</b>, true <b>equilibrium</b>, &mu;&#771;<sup>&alpha;</sup> = &mu;&#771;<sup>&beta;</sup><br>
+          <small>and a glass electrode is both at once, in series</small>
+        </div>
+        <p class="hint" style="margin:0">A potential difference in solution can be defined only where nothing is changing: either the
+          system is at <b>equilibrium</b>, or it has reached a <b>steady state</b>. Those are the two cases of this lecture. At a liquid
+          junction the salt is still moving &mdash; the potential is what makes the two ions move together. At a charged membrane nothing is
+          moving <em>on balance</em> &mdash; every ion still crosses, in and out at the same rate &mdash; and the
+          potential is what pays for the uneven concentrations. In both, the charge actually separated is
+          vanishing: a field of 2 &times; 10<sup>7</sup> V/m needs so little charge that both phases stay electroneutral to any
+          measurement you could make on them.</p>
+      </div>
+    </div>
+
+    <div class="two eq" style="margin-bottom:16px">
+
+      <div class="card">
+        <div class="card-h"><h2>Liquid junction</h2><span class="note">steady state &middot; deck p.5&ndash;8</span></div>
+        <div class="card-b">
+          <div class="sumwrap"><table class="sumtbl">
+            <tr><th>equation</th><th>name</th><th>what it says</th></tr>
+            <tr><td class="eq">E<sub>cell</sub> = E<sub>Nernst</sub> + E<sub>lj</sub></td><td class="nm">what a cell reads</td>
+              <td class="sy">The junction rides on top of every potentiometric measurement.</td></tr>
+            <tr><td class="eq">E<sub>lj</sub> = [&Sigma;(|z|u/z)&Delta;c / &Sigma;|z|u&Delta;c]&middot;(RT/F)ln(&Sigma;|z|uc<sup>&alpha;</sup>/&Sigma;|z|uc<sup>&beta;</sup>)</td><td class="nm">Henderson</td>
+              <td class="sy">The general answer for any junction: every ion weighted by its charge, mobility and concentration step.</td></tr>
+            <tr><td class="eq">E<sub>lj</sub> = &plusmn;(RT/F) ln(&Lambda;<sup>&alpha;</sup>/&Lambda;<sup>&beta;</sup>)</td><td class="nm">Lewis&ndash;Sargent</td>
+              <td class="sy">Two different 1:1 salts at the same concentration with an ion in common: 0.1 M HCl | 0.1 M KCl gives 26.8 mV, and the cell measures 27.</td></tr>
+            <tr><td class="eq">E<sub>lj</sub> = (t<sub>+</sub> &minus; t<sub>&minus;</sub>)(RT/F) ln(c<sup>&alpha;</sup>/c<sup>&beta;</sup>)</td><td class="nm">one salt, two strengths</td>
+              <td class="sy">Only the transference numbers survive. KCl: 0.49 against 0.51, so almost nothing. HCl: 0.82 against 0.18, so 38 mV per decade.</td></tr>
+            <tr><td class="eq">t<sub>+</sub> = &lambda;<sub>+</sub>/(&lambda;<sub>+</sub> + &lambda;<sub>&minus;</sub>)</td><td class="nm">transference number</td>
+              <td class="sy">Lecture 8&rsquo;s number, doing the work here: a bridge salt is chosen for t<sub>+</sub> &asymp; t<sub>&minus;</sub> &mdash; KCl 0.49, LiCl 0.34.</td></tr>
+          </table></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2>Donnan</h2><span class="note">equilibrium &middot; deck p.9&ndash;12</span></div>
+        <div class="card-b">
+          <div class="sumwrap"><table class="sumtbl">
+            <tr><th>equation</th><th>name</th><th>what it says</th></tr>
+            <tr><td class="eq">&mu;&#771;<sub>i</sub> = &mu;<sub>i</sub>&deg; + RT ln a<sub>i</sub> + z<sub>i</sub>F&phi;</td><td class="nm">electrochemical potential</td>
+              <td class="sy">Chemistry and electricity in one quantity. It, not the concentration, is what equalises.</td></tr>
+            <tr><td class="eq">&mu;&#771;<sub>i</sub><sup>&alpha;</sup> = &mu;&#771;<sub>i</sub><sup>&beta;</sup></td><td class="nm">equilibrium, per ion</td>
+              <td class="sy">For every ion that can cross. The fixed charge cannot, so it is exempt &mdash; and that is the whole effect.</td></tr>
+            <tr><td class="eq">&Delta;&phi;<sub>1</sub> = (RT/F) ln(a<sub>K</sub><sup>&alpha;</sup>/a<sub>K</sub><sup>&beta;</sup>)</td><td class="nm">from the cation</td>
+              <td class="sy">One phase can hold less K<sup>+</sup> if its potential is lower by exactly this much.</td></tr>
+            <tr><td class="eq">&Delta;&phi;<sub>2</sub> = (RT/F) ln(a<sub>Cl</sub><sup>&beta;</sup>/a<sub>Cl</sub><sup>&alpha;</sup>)</td><td class="nm">from the anion</td>
+              <td class="sy">The same step, written from the other ion &mdash; note the ratio is inverted, because z = &minus;1.</td></tr>
+            <tr><td class="eq">a<sub>K</sub><sup>&alpha;</sup>a<sub>Cl</sub><sup>&alpha;</sup> = a<sub>K</sub><sup>&beta;</sup>a<sub>Cl</sub><sup>&beta;</sup></td><td class="nm">Donnan equilibrium</td>
+              <td class="sy">&Delta;&phi;<sub>1</sub> = &Delta;&phi;<sub>2</sub>, rearranged. The ion <b>product</b> is equal, the concentrations are not: the counter-ion is drawn in, the co-ion excluded.</td></tr>
+          </table></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>The membrane electrode</h2><span class="note">both effects in series &middot; deck p.13&ndash;21</span></div>
+      <div class="card-b">
+        <div class="sumwrap"><table class="sumtbl">
+          <tr><th>equation</th><th>name</th><th>what it says</th></tr>
+          <tr><td class="eq">E<sub>m</sub> = (&phi;<sup>&beta;</sup>&minus;&phi;<sup>m&Prime;</sup>) + (&phi;<sup>m&Prime;</sup>&minus;&phi;<sup>m</sup>) + (&phi;<sup>m</sup>&minus;&phi;<sup>m&prime;</sup>) + (&phi;<sup>m&prime;</sup>&minus;&phi;<sup>&alpha;</sup>)</td><td class="nm">the membrane, in four steps</td>
+            <td class="sy">Two Donnan equilibria at the hydrated faces, two diffusion potentials through the dry interior.</td></tr>
+          <tr><td class="eq">E<sub>m</sub> = constant + (RT/F) ln(a<sub>H</sub><sup>&alpha;</sup> + k<sup>pot</sup>a<sub>Na</sub><sup>&alpha;</sup>)</td><td class="nm">Nikolsky&ndash;Eisenman</td>
+            <td class="sy">Those four steps, collected. The internal solution is fixed, so everything on the inside is a constant.</td></tr>
+          <tr><td class="eq">k<sup>pot</sup><sub>H,Na</sub> = K<sub>H,Na</sub>(u<sub>Na</sub>/u<sub>H</sub>)</td><td class="nm">selectivity coefficient</td>
+            <td class="sy">An ion-exchange equilibrium times a mobility ratio &mdash; Donnan times Henderson. About 10<sup>&minus;11</sup> for pH glass.</td></tr>
+          <tr><td class="eq">E<sub>cell</sub> = L + (0.0592/n) log a<sub>1</sub></td><td class="nm">what the meter shows</td>
+            <td class="sy">59.2 mV per decade at 25 °C; L holds both references, the internal solution and the bridge junction. A Ca<sup>2+</sup> electrode has n = 2, so 29.6 mV per decade.</td></tr>
+          <tr><td class="eq">a<sub>Na</sub>/a<sub>H</sub> &gtrsim; 1/k<sup>pot</sup></td><td class="nm">where it breaks</td>
+            <td class="sy">The alkaline error: at pH 11 in 1 M Na<sup>+</sup> the two terms are equal and the reading is 0.3 pH low. Below pH 0.5 the glass saturates instead &mdash; the acid error, which no equation here covers.</td></tr>
+        </table></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><h2>The symbols</h2><span class="note">and where each number came from</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="symgrid">
+          <span><b>&phi;</b> inner (Galvani) potential, V</span>
+          <span><b>&alpha;, &beta;</b> the two phases</span>
+          <span><b>E<sub>lj</sub></b> liquid junction potential, V</span>
+          <span><b>&Delta;&phi;</b> Donnan potential, V</span>
+          <span><b>E<sub>m</sub></b> membrane potential, V</span>
+          <span><b>u<sub>i</sub></b> mobility, m<sup>2</sup> V<sup>&minus;1</sup> s<sup>&minus;1</sup></span>
+          <span><b>&lambda;<sub>i</sub>&deg;</b> ionic conductivity &prop; u<sub>i</sub></span>
+          <span><b>t<sub>i</sub></b> transference number</span>
+          <span><b>a<sub>i</sub></b> activity</span>
+          <span><b>z<sub>M</sub>c<sub>M</sub></b> fixed charge, mol/L</span>
+          <span><b>k<sup>pot</sup></b> selectivity coefficient</span>
+          <span><b>K<sub>H,Na</sub></b> ion-exchange constant</span>
+          <span><b>RT/F</b> 25.7 mV at 25 °C</span>
+          <span><b>(RT/F)ln10</b> 59.2 mV per decade</span>
+        </div>
+        <p class="hint" style="margin:0">Mobilities and transference numbers are the infinite-dilution values of
+          <a href="lecture08.html">Lecture 8</a> (Bard &amp; Faulkner Table 2.3.2), so Henderson here is exact only in the limit and
+          indicative at molar concentrations; activity coefficients are taken as 1 throughout, as in the deck. The 27 mV junction, the
+          17.8 mV Donnan example and the 10<sup>&minus;11</sup> selectivity are the deck&rsquo;s own numbers, reproduced by the
+          calculations on these tabs.</p>
+      </div>
+    </div>
+
+  </section>
+
+
+  <!-- ============== CONCEPT CHECK ============== -->
+  <section class="panel" id="p-quiz" role="tabpanel" aria-labelledby="t-quiz" hidden>
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h">
+        <h2>Concept check</h2>
+        <span class="note">Answer once per question — the reasoning appears immediately</span>
+        <span class="tally" style="margin-left:auto" id="tally"></span>
+      </div>
+      <div class="card-b">
+        <div class="idgrid">
+          <div>
+            <label class="fld" for="sId">Student ID</label>
+            <input type="text" id="sId" inputmode="numeric" placeholder="e.g. 20261234">
+          </div>
+        </div>
+        <p class="hint" id="idHint"></p>
+      </div>
+      <div class="scorebar" id="scorebar" hidden>
+        <div>
+          <div class="scorenum" id="scoreNum">—</div>
+          <div class="vcode" style="margin-top:4px" id="whoLine">—</div>
+        </div>
+        <div style="flex:1 1 300px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="solid" id="sendBtn" type="button" hidden>Submit to the course</button>
+            <button class="ghost" id="dlBtn" type="button">Download my result</button>
+          </div>
+          <p class="hint" id="dlHint" style="margin-top:8px">Download the file and hand it in as your instructor directs.</p>
+        </div>
+      </div>
+    </div>
+    <div class="quiz" id="quiz"></div>
+  </section>
+
+  <footer>
+    Ionic conductivities &lambda;&deg; (standing in for mobilities) from Bard &amp; Faulkner, Table 2.3.2, water at 25 °C &middot;
+    Henderson&rsquo;s equation and the Donnan example follow the Lecture 9 deck &middot; activity coefficients are taken as 1 throughout<br>
+    CH40051 Electroanalytical Chemistry · Fall 2026 — companion to Lecture 9
+  </footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function sig(x,d){
+  if(x===0) return "0";
+  var e=Math.floor(Math.log10(Math.abs(x)));
+  if(e>=5||e<=-3) return x.toExponential(d-1);
+  return (+x.toPrecision(d)).toString();
+}
+
+/* ---------------- tabs ---------------- */
+var tabs=[].slice.call(document.querySelectorAll(".tab"));
+tabs.forEach(function(t){
+  t.addEventListener("click",function(){
+    tabs.forEach(function(o){
+      var on=(o===t);
+      o.setAttribute("aria-selected",on?"true":"false");
+      document.getElementById(o.getAttribute("aria-controls")).hidden=!on;
+    });
+  });
+});
+
+/* ================= SHARED CONSTANTS AND HELPERS =========================
+   SI throughout, converted on the way in and out. Lengths are shown in nm
+   or Angstrom, concentrations in mol/kg, energies in units of kT.        */
+var E0 = 8.8541878e-12;        /* F/m                                     */
+var QE = 1.602176634e-19;      /* C                                       */
+var KB = 1.380649e-23;         /* J/K                                     */
+var NA = 6.02214076e23;        /* /mol                                    */
+var RHOW = 997.0;              /* kg/m3, water at 25 C                    */
+var MONO = 'font-family="IBM Plex Mono,monospace"';
+
+function pillGroup(id, cb){
+  var wrap = document.getElementById(id);
+  wrap.addEventListener("click", function(e){
+    var b = e.target.closest("button.pill");
+    if(!b) return;
+    [].slice.call(wrap.querySelectorAll("button.pill")).forEach(function(o){
+      o.setAttribute("aria-pressed", o === b ? "true" : "false");
+    });
+    cb(b);
+  });
+}
+
+
+/* Debye length, m. I in mol/kg, turned into mol/m3 with the solvent
+   density -- which is why B below carries a density too.                */
+function debyeLen(I, er, T){
+  if(I <= 0) return Infinity;
+  return Math.sqrt(E0 * er * KB * T / (2 * NA * QE * QE * I * RHOW));
+}
+
+/* ================= SHARED ANIMATION LOOP ================================
+   One requestAnimationFrame loop for every animated picture on the page.
+   A picture only redraws while its tab is showing, at about 30 frames a
+   second, and with reduced motion asked for the thermal jiggling stops. */
+var REDUCED = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+var ANIM = [], animLast = 0;
+function animLoop(ts){
+  if(ts - animLast > 32){
+    animLast = ts;
+    ANIM.forEach(function(a){ if(!document.getElementById(a.panel).hidden) a.tick(ts); });
+  }
+  window.requestAnimationFrame(animLoop);
+}
+/* the same, with a tspan, so it also works inside an SVG */
+function sciSvg(x, d){
+  if(x === 0) return "0";
+  var e = Math.floor(Math.log10(Math.abs(x))), m = x / Math.pow(10, e);
+  if(Math.abs(+m.toFixed(d - 1)) >= 10){ m /= 10; e++; }
+  return m.toFixed(d - 1) + ' × 10<tspan baseline-shift="super" font-size="8">' + e + '</tspan>';
+}
+/* x as "1.84 × 10<sup>7</sup>" */
+function sciH(x, d){
+  if(x === 0) return "0";
+  var e = Math.floor(Math.log10(Math.abs(x))), m = x / Math.pow(10, e);
+  if(Math.abs(+m.toFixed(d - 1)) >= 10){ m /= 10; e++; }
+  return m.toFixed(d - 1) + " × 10<sup>" + e + "</sup>";
+}
+var T25 = 298.15;
+
+/* ================= 1 - LIQUID JUNCTION =================================
+   Henderson, with ionic conductivities standing in for mobilities: every
+   term carries |z|u, and lambda0 = |z|Fu, so the F and the |z| cancel out
+   of every ratio. lambda0 from Bard & Faulkner Table 2.3.2, water, 25 C. */
+var FARADAY = QE * NA, RGAS = KB * NA;
+var RTF = RGAS * T25 / FARADAY;               /* 0.025693 V                */
+var DEC = RTF * Math.LN10;                    /* 0.05916 V per decade      */
+var LAM = {H: 349.82, Li: 38.69, Na: 50.11, K: 73.52, Cl: 76.34};
+var SALT = {
+  HCl:  {cat: "H",  nm: "HCl",  cnm: "H⁺"},
+  KCl:  {cat: "K",  nm: "KCl",  cnm: "K⁺"},
+  NaCl: {cat: "Na", nm: "NaCl", cnm: "Na⁺"},
+  LiCl: {cat: "Li", nm: "LiCl", cnm: "Li⁺"}
+};
+var ljA = "HCl", ljB = "KCl";
+
+function ljConc(salt, c){ var o = {Cl: c}; o[SALT[salt].cat] = (o[SALT[salt].cat] || 0) + c; return o; }
+function ljZ(k){ return k === "Cl" ? -1 : 1; }
+
+/* Henderson: the weighted mean of the transference imbalance, times the
+   log of the two conductivity-weighted sums.                             */
+function ljHenderson(a, b){
+  var keys = {}, num = 0, den = 0, sa = 0, sb = 0;
+  Object.keys(a).forEach(function(k){ keys[k] = 1; });
+  Object.keys(b).forEach(function(k){ keys[k] = 1; });
+  Object.keys(keys).forEach(function(k){
+    var u = LAM[k], z = ljZ(k), ca = a[k] || 0, cb = b[k] || 0, d = cb - ca;
+    num += Math.abs(z) * u / z * d;
+    den += Math.abs(z) * u * d;
+    sa  += Math.abs(z) * u * ca;
+    sb  += Math.abs(z) * u * cb;
+  });
+  if(Math.abs(den) < 1e-14 || sa <= 0 || sb <= 0) return 0;
+  return (num / den) * RTF * Math.log(sa / sb);
+}
+function ljTplus(salt){ var l = LAM[SALT[salt].cat]; return l / (l + LAM.Cl); }
+function ljLam(salt){ return LAM[SALT[salt].cat] + LAM.Cl; }
+function ljCa(){ return Math.pow(10, +document.getElementById("ljCa").value); }
+function ljCb(){ return Math.pow(10, +document.getElementById("ljCb").value); }
+function ljFmtC(c){ return c >= 1 ? c.toFixed(2) + " M" : c >= 0.01 ? (c * 1000).toFixed(0) + " mM" : (c * 1000).toPrecision(2) + " mM"; }
+
+pillGroup("ljA", function(b){ ljA = b.getAttribute("data-s"); ljNumbers(); });
+pillGroup("ljB", function(b){ ljB = b.getAttribute("data-s"); ljNumbers(); });
+["ljCa", "ljCb"].forEach(function(id){ document.getElementById(id).addEventListener("input", ljNumbers); });
+
+function ljPreset(sa, ca, sb, cb){
+  ljA = sa; ljB = sb;
+  [["ljA", sa], ["ljB", sb]].forEach(function(p){
+    [].slice.call(document.getElementById(p[0]).querySelectorAll(".pill")).forEach(function(o){
+      o.setAttribute("aria-pressed", o.getAttribute("data-s") === p[1] ? "true" : "false");
+    });
+  });
+  document.getElementById("ljCa").value = Math.log(ca) / Math.LN10;
+  document.getElementById("ljCb").value = Math.log(cb) / Math.LN10;
+  ljNumbers();
+}
+document.getElementById("ljP1").addEventListener("click", function(){ ljPreset("HCl", 0.1, "KCl", 0.1); });
+document.getElementById("ljP2").addEventListener("click", function(){ ljPreset("HCl", 0.01, "HCl", 0.1); });
+document.getElementById("ljP3").addEventListener("click", function(){ ljPreset("HCl", 0.1, "KCl", 4.2); });
+
+function ljNumbers(){
+  var ca = ljCa(), cb = ljCb(), a = ljConc(ljA, ca), b = ljConc(ljB, cb);
+  var E = ljHenderson(a, b), ta = ljTplus(ljA), tb = ljTplus(ljB);
+  document.getElementById("ljCav").textContent = ljFmtC(ca);
+  document.getElementById("ljCbv").textContent = ljFmtC(cb);
+  document.getElementById("ljWho").textContent = ljFmtC(ca) + " " + ljA + "  |  " + ljFmtC(cb) + " " + ljB;
+  document.getElementById("ljNote").innerHTML = "&alpha; on the left, &beta; on the right";
+
+  var uca = LAM[SALT[ljA].cat], ucb = LAM[SALT[ljB].cat];
+  document.getElementById("ljU").innerHTML = ljA === ljB
+    ? SALT[ljA].cnm + " : Cl⁻ = " + (uca / LAM.Cl).toFixed(2) + " : 1"
+    : SALT[ljA].cnm + " : " + SALT[ljB].cnm + " = " + (uca / ucb).toFixed(2) + " : 1";
+  document.getElementById("ljTa").textContent = ta.toFixed(3) + "  (t₋ = " + (1 - ta).toFixed(3) + ")";
+  document.getElementById("ljTb").textContent = tb.toFixed(3) + "  (t₋ = " + (1 - tb).toFixed(3) + ")";
+  document.getElementById("ljE").textContent = (E * 1000).toFixed(1) + " mV";
+  document.getElementById("ljPH").textContent = Math.abs(E / DEC).toFixed(2) + " pH units";
+
+  var alt = document.getElementById("ljAlt");
+  if(ljA === ljB && Math.abs(ca - cb) > 1e-9){
+    var s = (2 * ta - 1) * RTF * Math.log(ca / cb);
+    alt.innerHTML = "(t₊ − t₋)(RT/F)ln(c<sup>α</sup>/c<sup>β</sup>) = " + (s * 1000).toFixed(1) + " mV";
+  }else if(ljA !== ljB && Math.abs(ca - cb) < 1e-9){
+    var s2 = RTF * Math.log(ljLam(ljA) / ljLam(ljB));
+    alt.innerHTML = "(RT/F)ln(Λ<sup>α</sup>/Λ<sup>β</sup>) = " + (s2 * 1000).toFixed(1) + " mV";
+  }else if(ljA === ljB){
+    alt.innerHTML = "the two sides are identical — nothing to separate";
+  }else{
+    alt.innerHTML = "neither shortcut applies: Henderson only";
+  }
+
+  var v = document.getElementById("ljVerdict"), mv = E * 1000;
+  var fast = uca >= ucb ? SALT[ljA].cnm : SALT[ljB].cnm;
+  if(Math.abs(mv) < 1.5){
+    v.className = "verdict go";
+    v.innerHTML = "<b>Almost nothing, " + mv.toFixed(1) + " mV.</b> " + (ljA === ljB && Math.abs(ca - cb) < 1e-9
+      ? "The two solutions are the same, so no ion has anywhere to go."
+      : "The ions crossing this boundary move at nearly the same speed, so neither gets far enough ahead of the other to separate much charge. "
+        + "This is what a salt bridge is for: " + (ljB === "KCl" || ljA === "KCl" ? "KCl is the standard bridge salt for exactly this reason — t₊ = 0.49 against t₋ = 0.51."
+        : "a bridge salt is chosen so that t₊ ≈ t₋."));
+  }else if(Math.abs(mv) < 15){
+    v.className = "verdict flat";
+    v.innerHTML = "<b>" + mv.toFixed(1) + " mV across the junction.</b> " + fast + " is the quicker ion here, so it runs ahead and the side it moves into "
+      + "charges " + (mv > 0 ? "positive on the right (β)" : "positive on the left (α)") + ". That is small, but it is not nothing: an error of "
+      + Math.abs(mv / DEC / 1000).toFixed(2) + " pH units if this cell were measuring pH, or " + Math.abs(mv).toFixed(1)
+      + " mV added to every Nernst potential you read through it.";
+  }else{
+    v.className = "verdict stop";
+    v.innerHTML = "<b>" + mv.toFixed(1) + " mV — a junction you cannot ignore.</b> " + fast + " crosses far faster than anything coming the other way, "
+      + "and the charge it separates holds the two solutions " + Math.abs(mv).toFixed(0) + " mV apart. In a potentiometric measurement that is a systematic error of "
+      + Math.abs(mv / DEC / 1000).toFixed(2) + " pH units. Put a saturated KCl bridge between the two solutions and the junction splits into two small ones that "
+      + "nearly cancel.";
+  }
+
+  var ro = document.getElementById("ljRead");
+  ro.innerHTML = "<b>Right now:</b> " + ljFmtC(ca) + " " + ljA + " against " + ljFmtC(cb) + " " + ljB
+    + ". Henderson gives E<sub>lj</sub> = φ<sup>β</sup> − φ<sup>α</sup> = " + mv.toFixed(1) + " mV"
+    + (ljA === ljB ? ", the same-salt case, so the prefactor is just t₊ − t₋ = " + (2 * ta - 1).toFixed(2) + "."
+                   : ", with t₊ = " + ta.toFixed(2) + " on the left and " + tb.toFixed(2) + " on the right.")
+    + " The charge that does it is tiny: σ = ε₀ε_r E, so even a field of 2 × 10⁷ V/m asks for no more than "
+    + "about 1.4 × 10⁻¹¹ mol/cm².";
+  ljDraw();
+}
+
+/* ---- one look per ion ---------------------------------------------------
+   Colour alone is not enough once two different cations are on the screen at
+   the same time, so each ion also has a shape. Both pictures on this page use
+   this table, and so do their legends.                                     */
+var ION_STYLE = {
+  H:  {col:"var(--ox)",   shape:"tri", nm:"H\u207a"},
+  Li: {col:"var(--elec)", shape:"hex", nm:"Li\u207a"},
+  Na: {col:"var(--stop)", shape:"sq",  nm:"Na\u207a"},
+  K:  {col:"var(--ion-k)", shape:"dia", nm:"K\u207a"},
+  Cl: {col:"var(--red-)", shape:"cir", nm:"Cl\u207b"}
+};
+function ionCol(k){ return (ION_STYLE[k] || ION_STYLE.Cl).col; }
+function ionGlyph(k, x, y, r, op){
+  var st = ION_STYLE[k] || ION_STYLE.Cl;
+  var a = ' fill="' + st.col + '" opacity="' + (op === undefined ? 1 : op) + '"/>';
+  if(st.shape === "cir")
+    return '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + r.toFixed(1) + '"' + a;
+  if(st.shape === "sq")
+    return '<rect x="' + (x - r * 0.88).toFixed(1) + '" y="' + (y - r * 0.88).toFixed(1) + '" width="'
+         + (r * 1.76).toFixed(1) + '" height="' + (r * 1.76).toFixed(1) + '" rx="1"' + a;
+  if(st.shape === "tri")
+    return '<polygon points="' + x.toFixed(1) + ',' + (y - r * 1.25).toFixed(1) + ' '
+         + (x - r * 1.08).toFixed(1) + ',' + (y + r * 0.8).toFixed(1) + ' '
+         + (x + r * 1.08).toFixed(1) + ',' + (y + r * 0.8).toFixed(1) + '"' + a;
+  if(st.shape === "dia")
+    return '<polygon points="' + x.toFixed(1) + ',' + (y - r * 1.25).toFixed(1) + ' '
+         + (x + r * 1.25).toFixed(1) + ',' + y.toFixed(1) + ' '
+         + x.toFixed(1) + ',' + (y + r * 1.25).toFixed(1) + ' '
+         + (x - r * 1.25).toFixed(1) + ',' + y.toFixed(1) + '"' + a;
+  var pts = [];
+  for(var i = 0; i < 6; i++){
+    var th = Math.PI / 6 + i * Math.PI / 3;
+    pts.push((x + r * 1.1 * Math.cos(th)).toFixed(1) + ',' + (y + r * 1.1 * Math.sin(th)).toFixed(1));
+  }
+  return '<polygon points="' + pts.join(" ") + '"' + a;
+}
+
+/* ---- the junction, as a story in time ------------------------------------
+   The steady state drawn here is the Henderson value computed above; the
+   transient is a first-order approach to it. What the picture is for is the
+   causal loop: the faster ion runs ahead, the charge it separates builds a
+   field, and that field slows it and speeds the other until the two carry
+   equal and opposite current. Velocities come from the local Henderson
+   balance -- diffusion drift A_j = u_j (c_alpha - c_beta)/c_mean, migration
+   -z_j u_j g -- so the net current falls to zero exactly as g reaches its
+   steady value, which is what the bars show.                              */
+var LJ_DOTS = (function(){
+  var out = [], seed = 97;
+  function rnd(){ seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+  for(var i = 0; i < 60; i++) out.push({x: rnd(), y: rnd(), q: i % 2 ? 1 : -1, ph: rnd() * 6.283});
+  return out;
+})();
+var LJ = {t0: 0, last: 0, pos: {}, trav: {}};
+var LJ_TAU = 2000;                 /* ms on screen; the real one is nanoseconds  */
+var LJ_SPAN = 3.6;                 /* how many tau the trace runs for           */
+
+function ljModel(){
+  var ca = ljCa(), cb = ljCb(), a = ljConc(ljA, ca), b = ljConc(ljB, cb);
+  var keys = {};
+  Object.keys(a).forEach(function(k){ keys[k] = 1; });
+  Object.keys(b).forEach(function(k){ keys[k] = 1; });
+  var sp = Object.keys(keys).map(function(k){
+    var u = LAM[k], z = ljZ(k), c1 = a[k] || 0, c2 = b[k] || 0, cm = (c1 + c2) / 2;
+    return {k: k, nm: k === "Cl" ? "Cl⁻" : k + "⁺", u: u, z: z, c1: c1, c2: c2, cbar: cm,
+            A: cm > 0 ? u * (c1 - c2) / cm : 0};
+  });
+  sp.sort(function(p, q){ return Math.abs(q.A) - Math.abs(p.A); });
+  var num = 0, den = 0;
+  sp.forEach(function(s){ num += s.z * s.cbar * s.A; den += s.z * s.z * s.u * s.cbar; });
+  var g = den > 0 ? num / den : 0;
+  var amax = 1e-9;
+  sp.forEach(function(s){ amax = Math.max(amax, Math.abs(s.A), Math.abs(s.A - s.z * s.u * g)); });
+  return {sp: sp, g: g, I0: num, den: den, amax: amax, E: ljHenderson(a, b), ca: ca, cb: cb};
+}
+function ljVel(s, M, f){ return s.A - s.z * s.u * M.g * f; }
+
+function ljRestart(){
+  LJ.t0 = (window.performance && performance.now) ? performance.now() : 0;
+  LJ.last = LJ.t0;
+  LJ.pos = {};
+  LJ.trav = {};              /* distance covered since t = 0 */
+  ljDraw(LJ.t0);
+}
+document.getElementById("ljPlay").addEventListener("click", ljRestart);
+document.getElementById("t-lj").addEventListener("click", ljRestart);
+
+function ljDraw(ts){
+  if(ts === undefined) ts = LJ.last;
+  var M = ljModel(), W = 540, X0 = 14, X1 = W - 14, XM = (X0 + X1) / 2;
+  var dt = Math.min(0.08, Math.max(0, (ts - LJ.last) / 1000));
+  LJ.last = ts;
+  var el = Math.max(0, ts - LJ.t0);
+  var f = REDUCED ? 1 : 1 - Math.exp(-el / LJ_TAU);
+  var s = "";
+
+  /* ---------- 1. the junction itself ---------- */
+  var TOP = 30, BOT = 150, GAP = 30;                       /* the charge-separated zone */
+  s += '<rect x="' + X0 + '" y="' + TOP + '" width="' + (XM - X0) + '" height="' + (BOT - TOP) + '" fill="var(--surface-2)" opacity="0.8"/>';
+  s += '<rect x="' + XM + '" y="' + TOP + '" width="' + (X1 - XM) + '" height="' + (BOT - TOP) + '" fill="var(--surface-2)" opacity="0.4"/>';
+  var sgn = M.E >= 0 ? 1 : -1, amp = Math.min(1, Math.abs(M.E) / 30) * f;
+  s += '<rect x="' + (XM - GAP) + '" y="' + TOP + '" width="' + GAP + '" height="' + (BOT - TOP) + '" fill="'
+     + (sgn > 0 ? "var(--red-soft)" : "var(--ox-soft)") + '" opacity="' + (0.15 + 0.85 * amp).toFixed(2) + '"/>';
+  s += '<rect x="' + XM + '" y="' + TOP + '" width="' + GAP + '" height="' + (BOT - TOP) + '" fill="'
+     + (sgn > 0 ? "var(--ox-soft)" : "var(--red-soft)") + '" opacity="' + (0.15 + 0.85 * amp).toFixed(2) + '"/>';
+  for(var q = 0; q < 4; q++){
+    var yy = TOP + 26 + q * 28;
+    s += '<text x="' + (XM - 15) + '" y="' + yy + '" text-anchor="middle" fill="' + (sgn > 0 ? "var(--red-)" : "var(--ox)")
+       + '" ' + MONO + ' font-size="13" opacity="' + (0.12 + 0.88 * amp).toFixed(2) + '">' + (sgn > 0 ? "−" : "+") + '</text>';
+    s += '<text x="' + (XM + 15) + '" y="' + yy + '" text-anchor="middle" fill="' + (sgn > 0 ? "var(--ox)" : "var(--red-)")
+       + '" ' + MONO + ' font-size="13" opacity="' + (0.12 + 0.88 * amp).toFixed(2) + '">' + (sgn > 0 ? "+" : "−") + '</text>';
+  }
+  s += '<line x1="' + XM + '" y1="' + TOP + '" x2="' + XM + '" y2="' + BOT + '" stroke="var(--line-2)" stroke-width="1.4" stroke-dasharray="5 4"/>';
+
+  /* background ions: the bulk, which stays electroneutral throughout */
+  function dens(c){ return Math.max(0.18, Math.min(1, (Math.log10(c) + 3.3) / 4)); }
+  var da = dens(M.ca), db = dens(M.cb);
+  LJ_DOTS.forEach(function(d, i){
+    var left = i % 2 === 0;
+    if(((i * 37) % 100) / 100 > (left ? da : db)) return;
+    var key = (i % 4 < 2) ? SALT[left ? ljA : ljB].cat : "Cl";
+    var jx = REDUCED ? 0 : 2.5 * Math.sin(ts / 420 + d.ph), jy = REDUCED ? 0 : 2.5 * Math.cos(ts / 380 + d.ph * 1.7);
+    var x = left ? X0 + 10 + d.x * (XM - GAP - X0 - 20) : XM + GAP + 10 + d.x * (X1 - XM - GAP - 20);
+    var y = TOP + 10 + d.y * (BOT - TOP - 20);
+    s += ionGlyph(key, x + jx, y + jy, 2.8, 0.34);
+  });
+
+  /* the ions that are actually crossing, one row each, drawn in a window
+     around the boundary so they read as crossing rather than sweeping     */
+  var rows = M.sp.filter(function(p){ return Math.abs(p.A) > 1e-12; }).slice(0, 3);
+  var WIN = 150, PXS = 46;                                  /* window half-width, px per unit v */
+  rows.forEach(function(p, n){
+    var v = ljVel(p, M, f), y = TOP + 24 + n * 34;
+    /* Spread through the lane, not bunched: ions of one sign repel, and a
+       solution is uniform -- they never travel as a convoy. The jitter keeps
+       them from reading as a marching band.                                */
+    if(!LJ.pos[p.k]) LJ.pos[p.k] = [0.13, 0.37, 0.62, 0.88].map(function(u0, j){
+      return (u0 * 2 - 1) * WIN + ((j * 37 + p.k.length * 11) % 17) - 8;
+    });
+    if(LJ.trav[p.k] === undefined) LJ.trav[p.k] = 0;
+    var col = ionCol(p.k);
+    LJ.pos[p.k] = LJ.pos[p.k].map(function(x){
+      var nx = x + (REDUCED ? 0 : v / M.amax * PXS * dt);
+      if(nx > WIN) nx -= 2 * WIN;
+      if(nx < -WIN) nx += 2 * WIN;
+      return nx;
+    });
+    var sp = v / M.amax;                                  /* share of the fastest */
+    LJ.trav[p.k] += Math.abs(sp) * PXS * dt;              /* distance since t = 0 */
+    LJ.pos[p.k].forEach(function(x, j){
+      var jy = REDUCED ? 0 : 1.8 * Math.sin(ts / 300 + j * 2.1 + n);
+      s += ionGlyph(p.k, XM + x, y + jy, 5.5);
+    });
+    /* the net velocity, drawn as an arrow from the leading ion */
+    var lead = LJ.pos[p.k][0], L = v / M.amax * 34;
+    if(Math.abs(L) > 3){
+      var x0 = XM + lead + (L > 0 ? 8 : -8), x1 = XM + lead + L + (L > 0 ? 8 : -8);
+      s += '<line x1="' + x0.toFixed(1) + '" y1="' + y + '" x2="' + x1.toFixed(1) + '" y2="' + y + '" stroke="' + col + '" stroke-width="2"/>';
+      s += '<polygon points="' + (x1 + (L > 0 ? 6 : -6)).toFixed(1) + ',' + y + ' ' + x1.toFixed(1) + ',' + (y - 4)
+         + ' ' + x1.toFixed(1) + ',' + (y + 4) + '" fill="' + col + '"/>';
+    }
+    /* u in 10^-4 cm2 V-1 s-1 is lambda0/F, which is lambda0 x 0.1036 */
+    s += '<text x="' + (X0 + 6) + '" y="' + (y + 4) + '" fill="' + col + '" ' + MONO
+       + ' font-size="11">' + p.nm + '<tspan fill="var(--muted)" font-size="9.5">  u° '
+       + (p.u * 0.10364).toFixed(1) + '</tspan></text>';
+    /* The rail under the lane: how far this ion has got since t = 0, as a
+       share of the quickest. At the start those shares are the ratio of the
+       mobilities themselves; they close as the field takes hold.           */
+    var best = 0;
+    rows.forEach(function(q){ best = Math.max(best, LJ.trav[q.k] || 0); });
+    var RX0 = XM - WIN, RL = 2 * WIN, frac = best > 0 ? (LJ.trav[p.k] || 0) / best : 0;
+    s += '<line x1="' + RX0 + '" y1="' + (y + 14) + '" x2="' + (RX0 + RL) + '" y2="' + (y + 14)
+       + '" stroke="var(--line-2)" stroke-width="1" opacity="0.6"/>';
+    s += '<line x1="' + RX0 + '" y1="' + (y + 14) + '" x2="' + (RX0 + RL * frac).toFixed(1) + '" y2="' + (y + 14)
+       + '" stroke="' + col + '" stroke-width="2.4" opacity="0.5"/>';
+    s += '<circle cx="' + (RX0 + RL * frac).toFixed(1) + '" cy="' + (y + 14) + '" r="2.6" fill="' + col + '"/>';
+    s += '<text x="' + (RX0 + RL + 7) + '" y="' + (y + 17) + '" fill="var(--muted)" ' + MONO + ' font-size="9.5">'
+       + Math.round(frac * 100) + ' %</text>';
+  });
+  s += '<text x="' + (X0 + 6) + '" y="' + (TOP - 9) + '" fill="var(--ink-2)" ' + MONO + ' font-size="12" font-weight="600">α · '
+     + ljFmtC(M.ca) + ' ' + ljA + '</text>';
+  s += '<text x="' + (X1 - 6) + '" y="' + (TOP - 9) + '" text-anchor="end" fill="var(--ink-2)" ' + MONO + ' font-size="12" font-weight="600">β · '
+     + ljFmtC(M.cb) + ' ' + ljB + '</text>';
+  s += '<text x="' + (X0 + 6) + '" y="' + (BOT + 14) + '" fill="var(--muted)" ' + MONO + ' font-size="10.5">'
+     + 'thin rail: distance since t = 0, as a share of the quickest</text>';
+
+  /* ---------- 2. where each ion's speed comes from ---------- */
+  var BT = 190, BC = 320, BS = 78;                           /* top, centre x, px per unit */
+  s += '<text x="' + X0 + '" y="' + BT + '" fill="var(--muted)" ' + MONO + ' font-size="11">each ion&rsquo;s speed = '
+     + 'grey: diffusion + its own colour: the field it built</text>';
+  s += '<line x1="' + BC + '" y1="' + (BT + 8) + '" x2="' + BC + '" y2="' + (BT + 26 + rows.length * 26 + 16) + '" stroke="var(--line-2)" stroke-width="1"/>';
+  rows.forEach(function(p, n){
+    var y = BT + 26 + n * 26, A = p.A / M.amax * BS, v = ljVel(p, M, f) / M.amax * BS;
+    var col = ionCol(p.k);
+    s += ionGlyph(p.k, BC - BS - 58, y, 4.6);
+    s += '<text x="' + (BC - BS - 46) + '" y="' + (y + 4) + '" text-anchor="end" fill="' + col + '" ' + MONO
+       + ' font-size="11" font-weight="600">' + p.nm + '</text>';
+    s += '<rect x="' + Math.min(BC, BC + A).toFixed(1) + '" y="' + (y - 6) + '" width="' + Math.abs(A).toFixed(1)
+       + '" height="12" fill="var(--line-2)" opacity="0.85"/>';
+    if(Math.abs(v - A) > 0.6){
+      s += '<rect x="' + Math.min(BC + A, BC + v).toFixed(1) + '" y="' + (y - 6) + '" width="' + Math.abs(v - A).toFixed(1)
+         + '" height="12" fill="' + col + '" opacity="0.42"/>';
+    }
+    s += '<line x1="' + (BC + v).toFixed(1) + '" y1="' + (y - 9) + '" x2="' + (BC + v).toFixed(1) + '" y2="' + (y + 9)
+       + '" stroke="' + col + '" stroke-width="2.4"/>';
+  });
+  var yI = BT + 26 + rows.length * 26 + 14, I = M.I0 * (1 - f), I0 = Math.abs(M.I0) || 1;
+  s += '<text x="' + (BC - BS - 46) + '" y="' + (yI + 4) + '" text-anchor="end" fill="var(--ink-2)" ' + MONO
+     + ' font-size="11" font-weight="600">net current</text>';
+  s += '<rect x="' + Math.min(BC, BC + I / I0 * BS).toFixed(1) + '" y="' + (yI - 6) + '" width="'
+     + Math.abs(I / I0 * BS).toFixed(1) + '" height="12" fill="var(--stop)" opacity="0.75"/>';
+  s += '<text x="' + (W - 16) + '" y="' + (yI + 4) + '" text-anchor="end" fill="var(--muted)" ' + MONO + ' font-size="10.5">'
+     + (Math.abs(I / I0) < 0.03 ? "→ 0: steady" : "still charging") + '</text>';
+
+  /* ---------- 3. the voltmeter ---------- */
+  var PT = yI + 34, PB = 416, PL = 56, PR = 16;
+  var E = M.E * 1000, span = Math.max(8, Math.abs(E) * 1.35);
+  function TX(u){ return PL + u / LJ_SPAN * (W - PL - PR); }
+  function TY(mv){ return (PT + PB) / 2 - mv / span * ((PB - PT) / 2); }
+  s += '<line x1="' + PL + '" y1="' + TY(0).toFixed(1) + '" x2="' + (W - PR) + '" y2="' + TY(0).toFixed(1) + '" stroke="var(--line-2)" stroke-width="1"/>';
+  s += '<line x1="' + PL + '" y1="' + PT + '" x2="' + PL + '" y2="' + PB + '" stroke="var(--line-2)" stroke-width="1"/>';
+  s += '<line x1="' + PL + '" y1="' + TY(E).toFixed(1) + '" x2="' + (W - PR) + '" y2="' + TY(E).toFixed(1)
+     + '" stroke="var(--go)" stroke-width="1.2" stroke-dasharray="4 4" opacity="0.75"/>';
+  var path = "", tmax = Math.min(LJ_SPAN, REDUCED ? LJ_SPAN : el / LJ_TAU);
+  for(var i = 0; i <= 60; i++){
+    var u = tmax * i / 60;
+    path += (i ? " L" : "M") + TX(u).toFixed(1) + " " + TY(E * (1 - Math.exp(-u))).toFixed(1);
+  }
+  s += '<path d="' + path + '" fill="none" stroke="var(--go)" stroke-width="2.6"/>';
+  var vx = TX(tmax), vy = TY(E * (1 - Math.exp(-tmax)));
+  s += '<circle cx="' + vx.toFixed(1) + '" cy="' + vy.toFixed(1) + '" r="4.5" fill="var(--go)"/>';
+  var ey = Math.min(Math.max(TY(E) - 7, PT + 12), PB - 6);
+  s += '<text x="' + (W - PR) + '" y="' + ey.toFixed(1) + '" text-anchor="end" fill="var(--go)" ' + MONO
+     + ' font-size="12" font-weight="600">E_lj = ' + E.toFixed(1) + ' mV</text>';
+  s += '<text x="14" y="' + (PT + 10) + '" fill="var(--muted)" ' + MONO + ' font-size="11">the voltmeter</text>';
+  s += '<text x="' + PL + '" y="' + (PB + 14) + '" fill="var(--muted)" ' + MONO + ' font-size="10.5">'
+     + 'time → (drawn over a second; the real one settles in nanoseconds)</text>';
+  document.getElementById("ljpic").innerHTML = s;
+
+  var note = document.getElementById("ljNote");
+  if(note){
+    note.innerHTML = Math.abs(M.E) < 1e-9 ? "the two solutions are the same — nothing to separate"
+      : f < 0.9 ? "charge separating: the faster ion is still ahead"
+      : "steady state: equal and opposite current, " + (M.E * 1000).toFixed(1) + " mV standing across the boundary";
+  }
+}
+ANIM.push({panel: "p-lj", tick: ljDraw});
+
+
+/* ================= 2 - DONNAN ==========================================
+   A closed system, as in the deck: KCl at C0 on one side, a membrane
+   holding a fixed charge Q = zM cM balanced by its own counter-ions, equal
+   volumes. Electroneutrality in each phase plus the Donnan equilibrium
+   C_K C_Cl (alpha) = C_K C_Cl (beta) give x = C0^2/(2 C0 + Q).           */
+var dnSign = 1;
+pillGroup("dnSign", function(b){ dnSign = +b.getAttribute("data-q"); dnNumbers(); });
+["dnQ", "dnC"].forEach(function(id){ document.getElementById(id).addEventListener("input", dnNumbers); });
+document.getElementById("dnP1").addEventListener("click", function(){
+  document.getElementById("dnQ").value = -1;         /* zM cM = 100 x 1 mM = 0.1 M */
+  document.getElementById("dnC").value = -1;
+  dnNumbers();
+});
+
+function dnQ(){ return Math.pow(10, +document.getElementById("dnQ").value); }
+function dnC0(){ return Math.pow(10, +document.getElementById("dnC").value); }
+function dnFmt(c){ return c >= 0.1 ? c.toFixed(3) + " M" : c >= 0.001 ? (c * 1000).toFixed(1) + " mM" : sciH(c, 2) + " M"; }
+
+function dnSolve(){
+  var C0 = dnC0(), Q = dnQ();
+  var x = C0 * C0 / (2 * C0 + Q);                 /* the co-ion inside the membrane */
+  var out = C0 - x;                               /* both ions in the solution      */
+  return dnSign > 0
+    ? {Ka: out, Cla: out, Kb: x, Clb: x + Q, C0: C0, Q: Q, co: "K⁺", counter: "Cl⁻"}
+    : {Ka: out, Cla: out, Kb: x + Q, Clb: x,  C0: C0, Q: Q, co: "Cl⁻", counter: "K⁺"};
+}
+
+function dnNumbers(){
+  var r = dnSolve();
+  var dphi = RTF * Math.log(r.Ka / r.Kb), mv = dphi * 1000;
+  document.getElementById("dnQv").textContent = dnFmt(r.Q);
+  document.getElementById("dnCv").textContent = dnFmt(r.C0);
+  document.getElementById("dnWho").textContent = (dnSign > 0 ? "fixed +" : "fixed −") + " " + dnFmt(r.Q) + "  ·  KCl " + dnFmt(r.C0);
+  document.getElementById("dnNote").innerHTML = "α, the solution &nbsp;|&nbsp; β, the membrane";
+  document.getElementById("dnKa").textContent = dnFmt(r.Ka);
+  document.getElementById("dnCla").textContent = dnFmt(r.Cla);
+  document.getElementById("dnKb").textContent = dnFmt(r.Kb);
+  document.getElementById("dnClb").textContent = dnFmt(r.Clb);
+  document.getElementById("dnProd").innerHTML = sciH(r.Ka * r.Cla, 3) + " = " + sciH(r.Kb * r.Clb, 3) + " M<sup>2</sup>";
+  document.getElementById("dnPhi").textContent = mv.toFixed(1) + " mV";
+  var coIn = dnSign > 0 ? r.Kb : r.Clb, coOut = dnSign > 0 ? r.Ka : r.Cla;
+  document.getElementById("dnEx").textContent = (100 * (1 - coIn / coOut)).toFixed(1) + " % of " + r.co;
+
+  var v = document.getElementById("dnVerdict"), ratio = r.Q / r.C0;
+  if(ratio > 3){
+    v.className = "verdict go";
+    v.innerHTML = "<b>The membrane is almost pure counter-ion.</b> Its fixed charge, " + dnFmt(r.Q) + ", swamps the "
+      + dnFmt(r.C0) + " of salt around it, so " + r.counter + " fills it and " + r.co + " is kept out: "
+      + (100 * (1 - coIn / coOut)).toFixed(1) + " % excluded. The potential step is " + Math.abs(mv).toFixed(1)
+      + " mV, with the membrane " + (mv > 0 ? "positive" : "negative") + " — this is the regime a membrane electrode or a battery separator is built to work in.";
+  }else if(ratio > 0.3){
+    v.className = "verdict flat";
+    v.innerHTML = "<b>Fixed charge and salt are comparable.</b> " + dnFmt(r.Q) + " of fixed charge against " + dnFmt(r.C0)
+      + " of KCl gives Δφ = " + mv.toFixed(1) + " mV and lets " + (100 * coIn / coOut).toFixed(0) + " % of the "
+      + r.co + " concentration into the membrane. Exclusion is partial here, and the selectivity of a membrane in this state is poor.";
+  }else{
+    v.className = "verdict stop";
+    v.innerHTML = "<b>Drowned in salt.</b> " + dnFmt(r.C0) + " of KCl against only " + dnFmt(r.Q)
+      + " of fixed charge: the mobile ions outnumber it, both phases look almost the same, and Δφ falls to "
+      + mv.toFixed(1) + " mV. A membrane electrode used in a solution this concentrated has lost its selectivity — the same way a "
+      + "supporting electrolyte wipes out migration in Lecture 8.";
+  }
+
+  document.getElementById("dnRead").innerHTML = "<b>Right now:</b> the solution holds " + dnFmt(r.Ka)
+    + " each of K⁺ and Cl⁻; the membrane holds " + dnFmt(r.Kb) + " K⁺ and " + dnFmt(r.Clb) + " Cl⁻ beside its "
+    + dnFmt(r.Q) + " of fixed " + (dnSign > 0 ? "positive" : "negative") + " charge. The two ion products agree to the digit, which is "
+    + "the Donnan condition; the concentrations do not, which is the Donnan potential: Δφ = (RT/F)ln("
+    + r.Ka.toPrecision(3) + "/" + r.Kb.toPrecision(3) + ") = " + mv.toFixed(1) + " mV.";
+  dnDraw();
+}
+
+/* ---- the membrane, settling into equilibrium -----------------------------
+   Three panels, read top to bottom, and each answers one question.
+
+   What is where?      Each phase holds a column of ions, one glyph per unit of
+                       concentration, so inside and outside can be compared by
+                       eye. The fixed charge stands in its own column and never
+                       moves.
+   Why does it move?   Equilibrium means RT ln a + zF phi is the same on both
+                       sides, so for each ion the concentration ratio and the
+                       potential have to agree, in millivolts: (RT/F)ln(c_a/c_b)
+                       against z*dphi. The two bars start apart -- that gap is
+                       the driving force -- and end on top of each other.
+   What does it cost?  The potential step, built as the ions redistribute.
+
+   The end state is the exact closed-system solution; only the approach to it
+   is drawn.                                                                */
+var DN = {t0: 0, last: 0};
+var DN_TAU = 1500;
+
+function dnStart(){
+  var C0 = dnC0(), Q = dnQ();
+  return dnSign > 0 ? {Ka: C0, Cla: C0, Kb: 0, Clb: Q} : {Ka: C0, Cla: C0, Kb: Q, Clb: 0};
+}
+function dnMix(f){
+  var i = dnStart(), e = dnSolve();
+  return {Ka: i.Ka + (e.Ka - i.Ka) * f, Cla: i.Cla + (e.Cla - i.Cla) * f,
+          Kb: i.Kb + (e.Kb - i.Kb) * f, Clb: i.Clb + (e.Clb - i.Clb) * f,
+          Q: e.Q, C0: e.C0, co: e.co, counter: e.counter, eq: e};
+}
+/* dnFmt writes <sup> for small values, which an SVG text element silently
+   drops -- 0.00022 M came out as "2.2 x 10". Inside the picture, millimolar
+   all the way down.                                                      */
+function dnFmtS(c){
+  if(c >= 0.1) return c.toFixed(3) + " M";
+  if(c >= 0.001) return (c * 1000).toFixed(1) + " mM";
+  if(c >= 1e-6) return (c * 1000).toPrecision(2) + " mM";
+  return c > 0 ? "< 0.001 mM" : "0";
+}
+
+function dnRestart(){
+  DN.t0 = (window.performance && performance.now) ? performance.now() : 0;
+  DN.last = DN.t0;
+  dnDraw(DN.t0);
+}
+document.getElementById("dnPlay").addEventListener("click", dnRestart);
+document.getElementById("t-dn").addEventListener("click", dnRestart);
+
+function dnDraw(ts){
+  if(ts === undefined) ts = DN.last;
+  var W = 540, s = "";
+  DN.last = ts;
+  var el = Math.max(0, ts - DN.t0);
+  var f = REDUCED ? 1 : 1 - Math.exp(-el / DN_TAU);
+  var m = dnMix(f), e = m.eq;
+  var dphi = RTF * Math.log(e.Ka / e.Kb) * 1000 * f;          /* mV, building */
+  var counter = dnSign > 0 ? "Cl" : "K", co = dnSign > 0 ? "K" : "Cl";
+  var denom = Math.max(e.C0, e.Q + e.C0 / 2, 1e-9), unit = denom / 9;
+
+  s += '<defs><pattern id="dnhatch" width="8" height="8" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">'
+     + '<line x1="0" y1="0" x2="0" y2="8" stroke="var(--line-2)" stroke-width="1" opacity="0.7"/></pattern></defs>';
+
+  /* ---------- 1. what is where ---------- */
+  var AX0 = 14, AX1 = 226, BX0 = 268, BX1 = W - 14, GC = (AX1 + BX0) / 2;
+  var TOP = 32, BASE = 190, BOT = 212;
+  s += '<text x="' + AX0 + '" y="12" fill="var(--muted)" ' + MONO + ' font-size="11">'
+     + (f < 0.25 ? "1 · salt outside, fixed charge inside — and it can never leave"
+      : f < 0.9  ? "2 · " + ION_STYLE[counter].nm + " is drawn in, " + ION_STYLE[co].nm + " is kept out"
+                 : "3 · equilibrium — unequal concentrations, paid for by φ")
+     + '</text>';
+  s += '<text x="' + (W - 14) + '" y="26" text-anchor="end" fill="var(--muted)" ' + MONO + ' font-size="10.5">'
+     + 'one glyph = ' + dnFmtS(unit) + '</text>';
+  s += '<rect x="' + AX0 + '" y="' + TOP + '" width="' + (AX1 - AX0) + '" height="' + (BOT - TOP)
+     + '" rx="4" fill="var(--surface-2)" opacity="0.65"/>';
+  s += '<rect x="' + BX0 + '" y="' + TOP + '" width="' + (BX1 - BX0) + '" height="' + (BOT - TOP)
+     + '" rx="4" fill="url(#dnhatch)" opacity="0.5"/>';
+  s += '<rect x="' + BX0 + '" y="' + TOP + '" width="' + (BX1 - BX0) + '" height="' + (BOT - TOP)
+     + '" rx="4" fill="none" stroke="var(--elec)" stroke-width="1.3"/>';
+  s += '<line x1="' + GC + '" y1="' + (TOP - 4) + '" x2="' + GC + '" y2="' + (BOT + 4)
+     + '" stroke="var(--line-2)" stroke-width="1" stroke-dasharray="4 4"/>';
+  s += '<text x="' + (AX0 + 10) + '" y="' + (TOP + 15) + '" fill="var(--ink-2)" ' + MONO + ' font-size="11.5" font-weight="600">α · solution</text>';
+  s += '<text x="' + (BX1 - 10) + '" y="' + (TOP + 15) + '" text-anchor="end" fill="var(--ink-2)" ' + MONO
+     + ' font-size="11.5" font-weight="600">β · the membrane itself</text>';
+
+  /* One glyph per unit of concentration -- and the unit is fixed by the two
+     sliders, not by whatever is largest on screen. A relative scale drew the
+     same picture at 1 mM and at 1 M, with only the labels moving. The tallest
+     a column can ever reach is the counter-ion, Q + C0/2.                  */
+  function column(x, key, v, label){
+    var out = "", n = v > 0 ? Math.max(1, Math.round(v / unit)) : 0;
+    for(var i = 0; i < Math.min(9, n); i++) out += ionGlyph(key, x, BASE - 8 - i * 15, 5.4, 0.95);
+    if(n === 0) out += '<text x="' + x + '" y="' + (BASE - 6) + '" text-anchor="middle" fill="var(--muted)" '
+      + MONO + ' font-size="11">none</text>';
+    out += '<text x="' + x + '" y="' + (BASE + 14) + '" text-anchor="middle" fill="' + ionCol(key) + '" ' + MONO
+      + ' font-size="10.5">' + dnFmtS(v) + '</text>';
+    out += '<text x="' + x + '" y="' + (BOT + 14) + '" text-anchor="middle" fill="var(--muted)" ' + MONO
+      + ' font-size="10.5">' + label + '</text>';
+    return out;
+  }
+  var ax = (AX0 + AX1) / 2;
+  s += column(ax - 48, "K", m.Ka, "K⁺");
+  s += column(ax + 48, "Cl", m.Cla, "Cl⁻");
+  s += column(BX0 + 52, "K", m.Kb, "K⁺");
+  s += column(BX0 + 134, "Cl", m.Clb, "Cl⁻");
+  /* the fixed charge: same scale, drawn tethered */
+  var nf = Math.min(9, Math.max(1, Math.round(e.Q / unit))), fx = BX0 + 216;
+  for(var i = 0; i < nf; i++){
+    var fy = BASE - 8 - i * 15;
+    s += '<rect x="' + (fx - 6) + '" y="' + (fy - 6) + '" width="12" height="12" rx="2" fill="none" '
+       + 'stroke="var(--elec)" stroke-width="1.3" stroke-dasharray="2.5 2"/>';
+    s += '<text x="' + fx + '" y="' + (fy + 4) + '" text-anchor="middle" fill="var(--elec)" ' + MONO
+       + ' font-size="10">' + (dnSign > 0 ? "+" : "−") + '</text>';
+  }
+  s += '<text x="' + fx + '" y="' + (BASE + 14) + '" text-anchor="middle" fill="var(--elec)" ' + MONO
+     + ' font-size="10.5">' + dnFmtS(e.Q) + '</text>';
+  s += '<text x="' + fx + '" y="' + (BOT + 14) + '" text-anchor="middle" fill="var(--elec)" ' + MONO
+     + ' font-size="10.5">fixed</text>';
+
+  /* in and out, in the channel between the phases */
+  s += '<text x="' + GC + '" y="' + (BOT - 4) + '" text-anchor="middle" fill="var(--muted)" ' + MONO
+     + ' font-size="10.5">' + (f > 0.92 ? "in = out" : "crossing") + '</text>';
+  [{k: "K", y: TOP + 26, a: m.Ka, b: m.Kb, ae: e.Ka, be: e.Kb},
+   {k: "Cl", y: TOP + 86, a: m.Cla, b: m.Clb, ae: e.Cla, be: e.Clb}].forEach(function(p){
+    var kk = p.be > 0 ? p.ae / p.be : 1, into = p.a, outof = p.b * kk;
+    var big = Math.max(into, outof, 1e-12), col = ionCol(p.k), L = 30;
+    var Li = L * into / big, Lo = L * outof / big;
+    s += ionGlyph(p.k, AX1 - 12, p.y + 7, 5, 1);
+    s += '<line x1="' + (AX1 + 4) + '" y1="' + p.y + '" x2="' + (AX1 + 4 + Li).toFixed(1) + '" y2="' + p.y
+       + '" stroke="' + col + '" stroke-width="2.2"/>';
+    s += '<polygon points="' + (AX1 + 10 + Li).toFixed(1) + ',' + p.y + ' ' + (AX1 + 4 + Li).toFixed(1) + ','
+       + (p.y - 4) + ' ' + (AX1 + 4 + Li).toFixed(1) + ',' + (p.y + 4) + '" fill="' + col + '"/>';
+    s += '<line x1="' + (BX0 - 4) + '" y1="' + (p.y + 14) + '" x2="' + (BX0 - 4 - Lo).toFixed(1) + '" y2="' + (p.y + 14)
+       + '" stroke="' + col + '" stroke-width="2.2" opacity="0.75"/>';
+    s += '<polygon points="' + (BX0 - 10 - Lo).toFixed(1) + ',' + (p.y + 14) + ' ' + (BX0 - 4 - Lo).toFixed(1) + ','
+       + (p.y + 10) + ' ' + (BX0 - 4 - Lo).toFixed(1) + ',' + (p.y + 18) + '" fill="' + col + '" opacity="0.75"/>';
+  });
+
+  /* ---------- 2. the two things that have to agree ---------- */
+  var LT = 246, CX = 300, HW = 168, LIM = 95;
+  s += '<text x="' + AX0 + '" y="' + LT + '" fill="var(--muted)" ' + MONO + ' font-size="11">'
+     + 'for each ion, in mV: upper bar (RT/F)ln(c_α/c_β), lower bar ±Δφ</text>';
+  var rows = [{k: "K", z: 1, a: m.Ka, b: m.Kb}, {k: "Cl", z: -1, a: m.Cla, b: m.Clb}];
+  rows.forEach(function(p){
+    p.chem = (p.b > 0 && p.a > 0) ? RTF * Math.log(p.a / p.b) * 1000 : 999 * (p.a > 0 ? 1 : -1);
+    p.elec = p.z * dphi;
+  });
+  var peak = rows.reduce(function(t, p){ return Math.max(t, Math.min(LIM, Math.abs(p.chem)), Math.abs(p.elec)); }, 0);
+  var SC = HW / Math.max(20, peak * 1.15);
+  var agreed = true;
+  rows.forEach(function(p, n){
+    var y = LT + 30 + n * 44, col = ionCol(p.k);
+    var chem = p.chem, elec = p.elec;
+    var cc = Math.max(-LIM, Math.min(LIM, chem)), off = Math.abs(chem) > LIM;
+    if(Math.abs(chem - elec) > 0.5) agreed = false;
+    s += ionGlyph(p.k, AX0 + 10, y + 6, 5.2, 1);
+    s += '<line x1="' + CX + '" y1="' + (y - 12) + '" x2="' + CX + '" y2="' + (y + 24)
+       + '" stroke="var(--line-2)" stroke-width="1"/>';
+    s += '<rect x="' + Math.min(CX, CX + cc * SC).toFixed(1) + '" y="' + (y - 10) + '" width="'
+       + Math.abs(cc * SC).toFixed(1) + '" height="10" fill="' + col + '" opacity="0.85"/>';
+    s += '<rect x="' + Math.min(CX, CX + elec * SC).toFixed(1) + '" y="' + (y + 2) + '" width="'
+       + Math.abs(elec * SC).toFixed(1) + '" height="10" fill="var(--go)" opacity="0.7"/>';
+    s += '<text x="' + (W - 14) + '" y="' + (y + 4) + '" text-anchor="end" fill="'
+       + (Math.abs(chem - elec) < 0.5 ? "var(--go)" : "var(--muted)") + '" ' + MONO + ' font-size="10.5">'
+       + (off ? "≫ " : (chem >= 0 ? "+" : "") + chem.toFixed(1) + " ") + "vs " + (elec >= 0 ? "+" : "") + elec.toFixed(1)
+       + (Math.abs(chem - elec) < 0.5 ? "  ✓" : "") + '</text>';
+  });
+  s += '<text x="' + (AX0 + 10) + '" y="' + (LT + 112) + '" fill="' + (agreed ? "var(--go)" : "var(--muted)") + '" '
+     + MONO + ' font-size="10.5">'
+     + (agreed ? "both ions agree — μ̃ is the same on both sides, which is all equilibrium means"
+               : "the gap between the two bars is what is still driving the ions") + '</text>';
+
+  /* ---------- 3. the potential it costs ---------- */
+  var FT = LT + 138, FB = FT + 52, mid = (FT + FB) / 2;
+  var h = Math.max(-26, Math.min(26, dphi * 26 / 60));
+  s += '<line x1="' + AX0 + '" y1="' + mid + '" x2="' + (W - 14) + '" y2="' + mid + '" stroke="var(--line)" stroke-width="1"/>';
+  s += '<path d="M' + AX0 + ' ' + (mid + h / 2).toFixed(1) + ' L' + GC + ' ' + (mid + h / 2).toFixed(1)
+     + ' L' + GC + ' ' + (mid - h / 2).toFixed(1) + ' L' + (W - 14) + ' ' + (mid - h / 2).toFixed(1)
+     + '" fill="none" stroke="var(--go)" stroke-width="2.4"/>';
+  s += '<text x="' + AX0 + '" y="' + (FT - 6) + '" fill="var(--muted)" ' + MONO + ' font-size="11">'
+     + 'φ: flat inside each phase, the whole step at the interface</text>';
+  s += '<text x="' + (W - 14) + '" y="' + (mid - h / 2 + (h >= 0 ? -8 : 16)).toFixed(1) + '" text-anchor="end" fill="var(--go)" '
+     + MONO + ' font-size="13" font-weight="600">Δφ = ' + dphi.toFixed(1) + ' mV</text>';
+  document.getElementById("dnpic").innerHTML = s;
+
+  var note = document.getElementById("dnNote");
+  if(note){
+    note.innerHTML = f < 0.9
+      ? "settling: the two bars for each ion have not met yet"
+      : "equilibrium: unequal concentrations, equal electrochemical potentials, and every ion still crossing";
+  }
+}
+ANIM.push({panel: "p-dn", tick: dnDraw});
+
+
+/* ================= 3 - THE GLASS ELECTRODE =============================
+   Nikolsky-Eisenman, drawn against pH, with the ideal line beside it. The
+   zero of E is taken at pH 7 with no sodium, so the numbers read as the
+   departure from an ideal electrode rather than as absolute potentials.  */
+["isePH", "iseNa", "iseK"].forEach(function(id){ document.getElementById(id).addEventListener("input", iseNumbers); });
+document.getElementById("iseP1").addEventListener("click", function(){
+  document.getElementById("isePH").value = 11;
+  document.getElementById("iseNa").value = 0;
+  document.getElementById("iseK").value = -11;
+  iseNumbers();
+});
+function isePH(){ return +document.getElementById("isePH").value; }
+function iseNa(){ return Math.pow(10, +document.getElementById("iseNa").value); }
+function iseK(){ return Math.pow(10, +document.getElementById("iseK").value); }
+function iseApparent(pH, k, na){ return -Math.log10(Math.pow(10, -pH) + k * na); }
+
+function iseNumbers(){
+  var pH = isePH(), na = iseNa(), k = iseK();
+  var aH = Math.pow(10, -pH), add = k * na, app = iseApparent(pH, k, na), err = app - pH;
+  var E = DEC * (7 - app) * 1000;                        /* mV, zero at pH 7 */
+  document.getElementById("isePHv").textContent = pH.toFixed(2);
+  document.getElementById("iseNav").textContent = na >= 0.1 ? na.toFixed(2) + " M" : (na * 1000).toPrecision(2) + " mM";
+  document.getElementById("iseKv").innerHTML = sciH(k, 2);
+  document.getElementById("iseWho").textContent = "pH " + pH.toFixed(2) + "  ·  Na⁺ " + (na >= 0.1 ? na.toFixed(2) + " M" : (na * 1000).toPrecision(2) + " mM");
+  document.getElementById("iseNote").innerHTML = "E<sub>m</sub> measured against its value at pH 7";
+  document.getElementById("iseAH").innerHTML = sciH(aH, 2);
+  document.getElementById("iseANa").innerHTML = sciH(add, 2);
+  document.getElementById("iseE").textContent = E.toFixed(1) + " mV";
+  document.getElementById("iseApp").textContent = app.toFixed(2);
+  document.getElementById("iseErr").textContent = (err >= 0 ? "+" : "") + err.toFixed(2) + " pH";
+  var lim = -Math.log10(add / (Math.pow(10, 0.1) - 1));
+  document.getElementById("iseLim").textContent = add > 0 ? "pH " + lim.toFixed(1) : "—";
+
+  var v = document.getElementById("iseVerdict");
+  if(Math.abs(err) < 0.02){
+    v.className = "verdict go";
+    v.innerHTML = "<b>Honest here.</b> a<sub>H</sub> = " + sciH(aH, 2) + " is " + sciH(aH / Math.max(add, 1e-30), 2)
+      + " times the sodium term, so the glass is answering hydrogen alone and the response is Nernstian: 59.2 mV per pH unit. "
+      + "This electrode stays within 0.1 pH up to about pH " + lim.toFixed(1) + " in this sample.";
+  }else if(Math.abs(err) < 0.3){
+    v.className = "verdict flat";
+    v.innerHTML = "<b>The sodium is beginning to show.</b> k<sup>pot</sup>a<sub>Na</sub> = " + sciH(add, 2)
+      + " is no longer negligible beside a<sub>H</sub> = " + sciH(aH, 2) + ", so the meter reads " + app.toFixed(2)
+      + " against a true pH of " + pH.toFixed(2) + " — " + Math.abs(err).toFixed(2) + " pH <b>low</b>. The curve has started to bend away from the dashed line.";
+  }else{
+    v.className = "verdict stop";
+    v.innerHTML = "<b>Alkaline error.</b> The sample holds " + sciH(na / aH, 2) + " times more Na⁺ than H⁺, which beats a selectivity of "
+      + sciH(k, 2) + ": the glass is now answering both ions. The meter reports pH " + app.toFixed(2) + " for a solution that is really pH "
+      + pH.toFixed(2) + ", an error of " + Math.abs(err).toFixed(2) + " pH units, and the response has flattened — more alkali barely moves it. "
+      + "A lithium-glass electrode, with a smaller k<sup>pot</sup>, is the usual answer.";
+  }
+  iseDraw();
+}
+
+function iseDraw(){
+  var W = 540, H = 330, L = 54, R = 18, T = 20, B = 44;
+  var pH = isePH(), na = iseNa(), k = iseK();
+  function X(p){ return L + p / 14 * (W - L - R); }
+  function Y(e){ return T + (420 - e) / 840 * (H - T - B); }      /* pH 0 is +414 mV */
+  var s = "";
+  s += '<line x1="' + L + '" y1="' + Y(-420) + '" x2="' + (W - R) + '" y2="' + Y(-420) + '" stroke="var(--line-2)" stroke-width="1"/>';
+  s += '<line x1="' + L + '" y1="' + T + '" x2="' + L + '" y2="' + Y(-420) + '" stroke="var(--line-2)" stroke-width="1"/>';
+  for(var p = 0; p <= 14; p += 2){
+    s += '<line x1="' + X(p).toFixed(1) + '" y1="' + Y(-420) + '" x2="' + X(p).toFixed(1) + '" y2="' + (Y(-420) + 4) + '" stroke="var(--line-2)"/>';
+    s += '<text x="' + X(p).toFixed(1) + '" y="' + (Y(-420) + 17) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="10.5">' + p + '</text>';
+  }
+  for(var e = -400; e <= 400; e += 200){
+    s += '<line x1="' + (L - 4) + '" y1="' + Y(e).toFixed(1) + '" x2="' + L + '" y2="' + Y(e).toFixed(1) + '" stroke="var(--line-2)"/>';
+    s += '<text x="' + (L - 8) + '" y="' + (Y(e) + 4).toFixed(1) + '" text-anchor="end" fill="var(--muted)" ' + MONO + ' font-size="10.5">' + e + '</text>';
+  }
+  s += '<text x="' + ((L + W - R) / 2) + '" y="' + (H - 8) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="11">true pH of the sample</text>';
+  s += '<text x="14" y="13" fill="var(--muted)" ' + MONO + ' font-size="11">E / mV</text>';
+
+  /* the band where the two differ by more than 0.05 pH */
+  var pBand = null;
+  for(var q = 0; q <= 140; q++){
+    var pp = q / 10;
+    if(Math.abs(iseApparent(pp, k, na) - pp) > 0.05){ pBand = pp; break; }
+  }
+  if(pBand !== null && pBand < 14){
+    s += '<rect x="' + X(pBand).toFixed(1) + '" y="' + T + '" width="' + (X(14) - X(pBand)).toFixed(1) + '" height="' + (Y(-420) - T).toFixed(1)
+       + '" fill="var(--stop-soft)" opacity="0.65"/>';
+    s += '<text x="' + Math.min(X(pBand) + 6, W - R - 86).toFixed(1) + '" y="' + (T + 32) + '" fill="var(--stop)" ' + MONO
+       + ' font-size="10.5">alkaline error</text>';
+  }
+  /* the acid error, which the equation does not describe */
+  s += '<rect x="' + X(0) + '" y="' + T + '" width="' + (X(0.5) - X(0)).toFixed(1) + '" height="' + (Y(-420) - T).toFixed(1)
+     + '" fill="var(--stop-soft)" opacity="0.45"/>';
+
+  var ideal = "", nik = "";
+  for(var i = 0; i <= 140; i++){
+    var pp = i / 10;
+    ideal += (i ? " L" : "M") + X(pp).toFixed(1) + " " + Y(DEC * (7 - pp) * 1000).toFixed(1);
+    nik += (i ? " L" : "M") + X(pp).toFixed(1) + " " + Y(DEC * (7 - iseApparent(pp, k, na)) * 1000).toFixed(1);
+  }
+  s += '<path d="' + ideal + '" fill="none" stroke="var(--line-2)" stroke-width="1.8" stroke-dasharray="5 4"/>';
+  s += '<path d="' + nik + '" fill="none" stroke="var(--go)" stroke-width="2.6"/>';
+
+  var app = iseApparent(pH, k, na), ey = Y(DEC * (7 - app) * 1000);
+  s += '<circle cx="' + X(pH).toFixed(1) + '" cy="' + ey.toFixed(1) + '" r="5.5" fill="var(--ink)"/>';
+  var right = pH < 9;
+  var ly = Math.min(Math.max(ey - 8, T + 26), Y(-420) - 6);
+  s += '<text x="' + (X(pH) + (right ? 10 : -10)).toFixed(1) + '" y="' + ly.toFixed(1) + '" text-anchor="' + (right ? "start" : "end")
+     + '" fill="var(--ink)" ' + MONO + ' font-size="12" font-weight="600">reads pH ' + app.toFixed(2) + '</text>';
+  s += '<text x="' + (W - R) + '" y="' + (T + 14) + '" text-anchor="end" fill="var(--muted)" ' + MONO + ' font-size="10.5">slope 59.2 mV / pH</text>';
+  document.getElementById("iseplot").innerHTML = s;
+}
+
+/* the cell, drawn once: five interfaces, and what each one answers */
+(function(){
+  var W = 540, T = 64, Hh = 86, s = "";
+  var cells = [
+    {w: 74, t: "Ag/AgCl", sub: "internal RE", kind: "grey"},
+    {w: 74, t: "0.1 M HCl", sub: "internal soln", kind: "grey"},
+    {w: 96, t: "glass", sub: "m″ · m · m′", kind: "go"},
+    {w: 86, t: "test soln", sub: "a(H⁺) = ?", kind: "go"},
+    {w: 74, t: "sat. KCl", sub: "bridge", kind: "stop"},
+    {w: 74, t: "SCE", sub: "external RE", kind: "grey"}
+  ];
+  var x = 22;
+  cells.forEach(function(c, i){
+    var fill = c.kind === "go" ? "var(--go-soft)" : c.kind === "stop" ? "var(--stop-soft)" : "var(--surface-2)";
+    var stroke = c.kind === "go" ? "var(--go)" : c.kind === "stop" ? "var(--stop)" : "var(--line-2)";
+    s += '<rect x="' + x + '" y="' + T + '" width="' + c.w + '" height="' + Hh + '" rx="4" fill="' + fill + '" stroke="' + stroke + '" stroke-width="1.3"/>';
+    s += '<text x="' + (x + c.w / 2) + '" y="' + (T + 36) + '" text-anchor="middle" fill="var(--ink)" ' + MONO + ' font-size="11.5" font-weight="600">' + c.t + '</text>';
+    s += '<text x="' + (x + c.w / 2) + '" y="' + (T + 54) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="10">' + c.sub + '</text>';
+    x += c.w + 6;
+  });
+  var marks = [
+    {at: 0, lab: "Δφ₁", note: "constant"},
+    {at: 1, lab: "Δφ₂", note: "Donnan · fixed"},
+    {at: 2, lab: "Δφ₃", note: "Donnan · the sample"},
+    {at: 3, lab: "Δφ_lj", note: "small"},
+    {at: 4, lab: "Δφ₄", note: "constant"}
+  ];
+  x = 22;
+  var edges = [];
+  cells.forEach(function(c){ x += c.w; edges.push(x + 3); x += 6; });
+  marks.forEach(function(m, i){
+    var ex = edges[m.at];
+    s += '<line x1="' + ex + '" y1="' + (T - 18) + '" x2="' + ex + '" y2="' + (T + Hh + 16) + '" stroke="var(--line-2)" stroke-width="1" stroke-dasharray="3 3"/>';
+    s += '<text x="' + ex + '" y="' + (T - 24) + '" text-anchor="middle" fill="var(--ink-2)" ' + MONO + ' font-size="11">' + m.lab + '</text>';
+    s += '<text x="' + ex + '" y="' + (T + Hh + 30) + '" text-anchor="middle" fill="var(--muted)" ' + MONO + ' font-size="10">' + m.note + '</text>';
+  });
+  s += '<text x="22" y="14" fill="var(--muted)" ' + MONO + ' font-size="11">E_cell = Σ of five interfaces — only the glass pair follows the sample</text>';
+  s += '<text x="22" y="' + (T + Hh + 58) + '" fill="var(--muted)" ' + MONO + ' font-size="10.5">'
+     + 'grey is fixed by design and absorbed into L: E_cell = L + 0.0592 log a(H⁺)</text>';
+  document.getElementById("isecell").innerHTML = s;
+})();
+
+
+/* ================= CONCEPT CHECK QUESTIONS ============================= */
+var QZ9 = [
+  {q:"Two identical calomel electrodes sit in 0.1 M HCl and 0.1 M KCl, joined by a porous frit. The chloride activity is the same on both sides, so the Nernst equation predicts zero. The meter reads about 27 mV. Why?",
+   o:["The HCl is a stronger acid, so its electrode potential is higher",
+      "H⁺ crosses the junction faster than K⁺ crosses the other way, separating charge until the field it leaves holds the two fluxes equal",
+      "Chloride reacts with the frit, so the two chloride activities are not really equal",
+      "The two electrodes are at different temperatures"],
+   a:1,
+   w:"Nothing reacts at the junction, and nothing is wrong with either electrode. Both salts share Cl⁻; the difference is H⁺ against K⁺, and H⁺ is about five times as mobile. It runs ahead into the KCl, leaving the HCl side negative, and the field that builds up slows it and speeds K⁺ until both cross at the same rate — a steady state with a standing 27 mV across it. This is E_lj, and it adds to every cell voltage measured through a junction: E_cell = E_Nernst + E_lj."},
+
+  {q:"Why is a salt bridge filled with <i>saturated</i> (4.2 M) KCl rather than, say, 0.1 M LiCl?",
+   o:["KCl is cheaper and more soluble than LiCl",
+      "Saturated KCl has the highest conductivity, so it short-circuits the junction",
+      "K⁺ and Cl⁻ have nearly equal mobilities (t₊ = 0.49), and at 4.2 M they dominate the Henderson sums on both sides",
+      "Lithium reacts with the analyte"],
+   a:2,
+   w:"Henderson weights every ion by |z|u c. Making the bridge salt very concentrated means its two ions dominate both sums, so the junction is effectively KCl against KCl — and since t₊ ≈ t₋ for KCl, neither ion runs ahead and almost no charge separates. LiCl fails on the second count: t₊ = 0.34, so Cl⁻ carries two thirds of the current and the junction stays large however concentrated it is."},
+
+  {q:"A junction between 0.01 M and 0.1 M of the same salt gives about 1 mV for KCl but about 38 mV for HCl. What accounts for the difference?",
+   o:["The prefactor (t₊ − t₋): 0.49 − 0.51 ≈ −0.02 for KCl, but 0.82 − 0.18 = 0.64 for HCl",
+      "HCl is a strong acid and KCl is a neutral salt",
+      "The activity coefficients of HCl are much smaller",
+      "The concentration ratio is not really the same in the two cases"],
+   a:0,
+   w:"With the same salt on both sides the two ions share the same tenfold step, so the log term is identical. All that is left is how unevenly the two ions carry the current: E_lj = (t₊ − t₋)(RT/F)ln(c^α/c^β). KCl is almost balanced, so it nearly cancels; in HCl the proton carries 82 % of the current and the imbalance is large."},
+
+  {q:"A membrane carrying 0.1 M of fixed positive charge sits in 0.1 M KCl (equal volumes). At equilibrium the solution holds 0.067 M K⁺ and 0.067 M Cl⁻, the membrane 0.033 M K⁺ and 0.133 M Cl⁻. Which statement is correct?",
+   o:["The system is not at equilibrium, because the concentrations are unequal",
+      "The electrochemical potential of each mobile ion is the same in both phases, and the two ion products are equal even though the concentrations are not",
+      "K⁺ must have the same concentration in both phases, or it would keep moving",
+      "The fixed charges have been neutralised by the chloride"],
+   a:1,
+   w:"Equilibrium equalises the electrochemical potential μ̃ = μ° + RT ln a + zFφ, not the concentration. An ion can sit at a lower activity in one phase if the potential there is favourable by exactly RT/zF ln(a^α/a^β). Writing that for K⁺ and for Cl⁻ and insisting the two give the same Δφ gives the Donnan condition C_K C_Cl (α) = C_K C_Cl (β): 0.0667 × 0.0667 = 0.00444 = 0.0333 × 0.1333. The potential is (RT/F)ln(0.067/0.033) = 17.8 mV."},
+
+  {q:"The same membrane is moved into 2 M KCl. What happens to the Donnan potential and to the exclusion of the co-ion?",
+   o:["Both grow, because there is more salt to redistribute",
+      "The potential grows but the exclusion disappears",
+      "Both collapse: the mobile ions now far outnumber the fixed charge, so the two phases look almost alike",
+      "Nothing changes — the Donnan potential depends only on the fixed charge"],
+   a:2,
+   w:"The whole effect is the ratio of fixed charge to mobile salt. With 0.1 M of fixed charge in 2 M KCl the membrane is mostly ordinary salt solution, the co-ion is barely excluded, and the ratio of concentrations across the interface approaches 1 — so Δφ falls towards zero. A membrane electrode is only selective while its fixed charge dominates the sample, which is the same arithmetic that lets a supporting electrolyte kill migration in Lecture 8."},
+
+  {q:"A pH glass electrode has k<sup>pot</sup><sub>H,Na</sub> = 10⁻¹¹. It is placed in a solution of true pH 11 containing 1 M Na⁺. What does the meter read, and why?",
+   o:["pH 11.00 — the selectivity is far too small to matter",
+      "About pH 10.7, because k·a(Na⁺) = 10⁻¹¹ is equal to a(H⁺) = 10⁻¹¹, so the glass answers both ions",
+      "About pH 11.3, because sodium raises the potential",
+      "Nothing: the electrode saturates and the reading drifts"],
+   a:1,
+   w:"Nikolsky–Eisenman: E = constant + (RT/F)ln(a_H + k a_Na). Here a_H = 10⁻¹¹ and k a_Na = 10⁻¹¹ × 1 = 10⁻¹¹, so the argument is twice a_H and the electrode reports −log(2 × 10⁻¹¹) = 10.70 — an alkaline error of 0.3 pH, reading low. Below pH 0.5 the opposite error appears for a different reason: every surface site is already occupied by H⁺, so the glass saturates and reads high. That one is not in the equation."}
+];
+
+ljNumbers();
+dnNumbers();
+iseNumbers();
+ljRestart();
+dnRestart();
+window.requestAnimationFrame(animLoop);
+
+/* ================= CONCEPT CHECK ================= */
+var QZ=QZ9;
+
+var LETTERS="ABCD", STORE="ch40051-l9-check-v1";
+var picks=new Array(QZ.length).fill(-1);
+var sId=document.getElementById("sId"), elTally=document.getElementById("tally"),
+    elBar=document.getElementById("scorebar"), elScore=document.getElementById("scoreNum"),
+    elWho=document.getElementById("whoLine"), elIdHint=document.getElementById("idHint"),
+    dlBtn=document.getElementById("dlBtn"), dlHint=document.getElementById("dlHint");
+var startedAt=null, finishedAt=null;
+
+function save(){
+  try{ localStorage.setItem(STORE,JSON.stringify({i:sId.value,p:picks,s:startedAt,t:finishedAt})); }catch(e){}
+}
+function loadState(){
+  try{
+    var d=JSON.parse(localStorage.getItem(STORE)||"null");
+    if(d){ sId.value=d.i||""; if(Array.isArray(d.p)&&d.p.length===QZ.length) picks=d.p.slice();
+           startedAt=d.s||null; finishedAt=d.t||null; }
+  }catch(e){}
+}
+function started(){ return picks.some(function(p){return p>=0;}); }
+function code(str){
+  var h=0x811c9dc5;
+  for(var i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=(h+((h<<1)+(h<<4)+(h<<7)+(h<<8)+(h<<24)))>>>0; }
+  return ("0000000"+h.toString(16).toUpperCase()).slice(-8);
+}
+function scoreOf(){ var s=0; for(var i=0;i<QZ.length;i++) if(picks[i]===QZ[i].a) s++; return s; }
+function answered(){ return picks.filter(function(p){return p>=0;}).length; }
+
+function receipt(){
+  var s=scoreOf(), pct=Math.round(s/QZ.length*100), id=(sId.value||"").trim();
+  var stamp=finishedAt||new Date().toISOString();
+  var vc=code(id+"|"+stamp+"|"+picks.join(""));
+  var head=["lecture","student_id","completed_utc","score","total","percent","verification"];
+  var row=["L9",id,stamp,s,QZ.length,pct,vc];
+  for(var i=0;i<QZ.length;i++){ head.push("a"+(i+1)); row.push(picks[i]>=0?LETTERS[picks[i]]:"-"); }
+  for(var j=0;j<QZ.length;j++){ head.push("ok"+(j+1)); row.push(picks[j]===QZ[j].a?1:0); }
+  function cell(v){ v=String(v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
+  return {csv:head.join(",")+"\n"+row.map(cell).join(",")+"\n", vcode:vc, score:s, pct:pct, id:id};
+}
+
+function render(){
+  var done=answered(), all=(done===QZ.length);
+  elTally.textContent=done+" / "+QZ.length+" answered";
+  elBar.hidden=!all;
+  sId.readOnly=started();
+  elIdHint.innerHTML = all
+    ? "<strong>Attempt complete.</strong> Your answers are final. Every question now shows the correct answer and why — read them before you close this page."
+    : started() ? "<strong>Attempt in progress.</strong><span class=\"locked\">ID locked</span><br>Each answer is final."
+                : "<strong>One attempt.</strong> Enter your student ID before you begin — it locks once you answer the first question.";
+  if(all){
+    if(!finishedAt){ finishedAt=new Date().toISOString(); save(); }
+    var r=receipt();
+    elScore.innerHTML=r.score+' <small>/ '+QZ.length+'  ·  '+r.pct+' %</small>';
+    elWho.innerHTML="Student ID <b>"+esc(r.id||"—")+"</b> &nbsp;·&nbsp; Verification <b>"+r.vcode+"</b>";
+  }
+  for(var i=0;i<QZ.length;i++){
+    var box=document.querySelector('.opts[data-q="'+i+'"]');
+    var kids=[].slice.call(box.children), why=box.parentNode.querySelector(".why");
+    if(picks[i]<0){ kids.forEach(function(o){o.disabled=false;o.className="opt";}); why.hidden=true; }
+    else{
+      (function(qi){ kids.forEach(function(o,j){
+        o.disabled=true;
+        o.className="opt"+(j===QZ[qi].a?" right":(j===picks[qi]?" wrong":""));
+      }); })(i);
+      var _note=(picks[i]!==QZ[i].a)
+        ? '<span class="misc">You chose <b>'+LETTERS[picks[i]]+'</b>. '
+          + 'The correct answer is <b>'+LETTERS[QZ[i].a]+'</b>.</span>'
+        : "";
+      why.innerHTML=_note+QZ[i].w; why.hidden=false;
+    }
+  }
+}
+
+document.getElementById("quiz").innerHTML=QZ.map(function(item,i){
+  return '<div class="card q"><div class="card-b">'
+    +'<p class="stem"><b style="font-family:IBM Plex Mono,monospace;color:var(--muted);font-size:12px">Q'+(i+1)+'</b>  '+item.q+'</p>'
+    +'<div class="opts" data-q="'+i+'">'+item.o.map(function(o,j){
+        return '<button class="opt" data-i="'+j+'"><span class="ltr">'+LETTERS[j]+'</span><span>'+o+'</span></button>';
+      }).join("")+'</div><p class="why" hidden></p></div></div>';
+}).join("");
+
+[].slice.call(document.querySelectorAll(".opts")).forEach(function(box){
+  box.addEventListener("click",function(ev){
+    var b=ev.target.closest(".opt");
+    if(!b||b.disabled) return;
+    var qi=+box.getAttribute("data-q");
+    if(picks[qi]>=0) return;
+    if(!(sId.value||"").trim()){
+      elIdHint.innerHTML="<strong style=\"color:var(--stop)\">Enter your student ID first.</strong> It is written into the result file you submit.";
+      sId.focus(); return;
+    }
+    if(!startedAt) startedAt=new Date().toISOString();
+    picks[qi]=+b.getAttribute("data-i");
+    save(); render();
+  });
+});
+sId.addEventListener("input",save);
+
+dlBtn.addEventListener("click",function(){
+  var id=(sId.value||"").trim();
+  if(!id){ dlHint.textContent="Enter your student ID first — it goes into the file."; return; }
+  var r=receipt();
+  try{
+    var blob=new Blob([r.csv],{type:"text/csv;charset=utf-8"});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement("a");
+    a.href=url; a.download="CH40051-L9-check_"+id.replace(/[^A-Za-z0-9_-]/g,"")+".csv";
+    a.style.display="none";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(url);},1000);
+    dlHint.textContent="Saved. Hand it in as your instructor directs.";
+  }catch(e){
+    dlHint.textContent="Your browser blocked the download. Screenshot this panel and submit that instead.";
+  }
+});
+
+/* ---- submit straight to the course sheet ---------------------------------- */
+var SUBMIT_URL = "https://script.google.com/macros/s/AKfycbxPm7WrbttFu6-gnTi__IcUPt-816GthK0eI8TPuwOZyYlcRW3RAWJlmsr791moxBc5GA/exec";
+
+var sendBtn=document.getElementById("sendBtn");
+if(SUBMIT_URL){
+  sendBtn.hidden=false;
+  dlHint.textContent="Press Submit to send your result to the course. The download is a backup.";
+}
+
+sendBtn.addEventListener("click",function(){
+  var id=(sId.value||"").trim();
+  if(!id){ dlHint.textContent="Enter your student ID first."; return; }
+  var r=receipt();
+  var payload={
+    lecture:"L9", student_id:id, completed_utc:finishedAt||new Date().toISOString(),
+    score:r.score, total:QZ.length, percent:r.pct, verification:r.vcode,
+    answers:picks.map(function(p){ return p>=0?LETTERS[p]:"-"; }),
+    ok:picks.map(function(p,i){ return p===QZ[i].a?1:0; })
+  };
+  sendBtn.disabled=true;
+  dlHint.textContent="Sending...";
+  fetch(SUBMIT_URL,{
+    method:"POST",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify(payload)
+  })
+  .then(function(res){ return res.json(); })
+  .then(function(j){
+    if(j && j.ok){
+      sendBtn.textContent="Submitted ✓";
+      dlHint.textContent="Recorded for student ID "+id+". You can close this page.";
+    }else{
+      /* the sheet answered and refused (already recorded, no ID ...): say why, and do not resend */
+      sendBtn.disabled=false;
+      sendBtn.textContent="Submit to the course";
+      dlHint.textContent="Not recorded — "+((j && j.error) || "the course sheet refused it.")
+        + " Keep the downloaded file and tell your instructor if this looks wrong.";
+    }
+  })
+  .catch(function(){
+    /* the response could not be read - resend blind so the record still lands,
+       then tell the student to keep the file as proof */
+    fetch(SUBMIT_URL,{method:"POST",mode:"no-cors",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(payload)}).catch(function(){});
+    sendBtn.disabled=false;
+    sendBtn.textContent="Submit to the course";
+    dlHint.textContent="Sent, but the confirmation did not come back. "
+      + "Download the file as well and keep it - it is your proof of submission.";
+  });
+});
+
+loadState();
+render();
+
+})();
+</script>
+</body>
+</html>
