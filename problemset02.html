@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Problem Set 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+:root{
+  --ground:#F1F3F2; --surface:#FFFFFF; --surface-2:#E9EDEB;
+  --ink:#14191B; --ink-2:#3E4A4D; --muted:#68767A; --line:#D6DDDA; --line-2:#C3CCC8;
+  --ox:#A85B33; --ox-soft:#F3E4DA;
+  --red-:#15618E; --red-soft:#DDE9F2;
+  --go:#2C7355; --go-soft:#DCEBE3;
+  --stop:#8A5F0C; --stop-soft:#F3E9D3;
+  --shadow:0 1px 2px rgba(20,25,27,.05),0 8px 24px -12px rgba(20,25,27,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+    --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+    --ox:#D08551; --ox-soft:#33231A;
+    --red-:#5AA6D4; --red-soft:#152833;
+    --go:#5DBB8D; --go-soft:#152A21;
+    --stop:#D6A33F; --stop-soft:#2B2415;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+  --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+  --ox:#D08551; --ox-soft:#33231A;
+  --red-:#5AA6D4; --red-soft:#152833;
+  --go:#5DBB8D; --go-soft:#152A21;
+  --stop:#D6A33F; --stop-soft:#2B2415;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:880px;margin:0 auto;padding:32px 20px 80px}
+
+.masthead{padding-bottom:20px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.eyebrow a{color:inherit}
+h1{font-family:"IBM Plex Serif",Georgia,serif;font-weight:600;font-size:clamp(28px,4.2vw,40px);line-height:1.12;margin:0;letter-spacing:-.015em}
+.sub{margin:10px 0 0;color:var(--ink-2);font-size:15px;max-width:62ch}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);margin-top:16px}
+.card-h{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.card-h h2{font-size:15px;font-weight:600;margin:0}
+.card-h .note{font-size:12.5px;color:var(--muted)}
+.card-b{padding:18px}
+
+label.fld{display:block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+input[type=text]{width:100%;font-family:inherit;font-size:14px;color:var(--ink);background:var(--surface-2);
+  border:1px solid var(--line-2);border-radius:7px;padding:9px 10px}
+input:read-only{background:var(--surface);color:var(--muted);cursor:not-allowed}
+input:focus-visible,button:focus-visible{outline:2px solid var(--red-);outline-offset:1px}
+.startrow{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:end}
+@media(max-width:560px){.startrow{grid-template-columns:1fr}}
+
+.solid{appearance:none;background:var(--ox);border:1px solid var(--ox);color:#fff;font-family:inherit;
+  font-size:13.5px;font-weight:500;padding:10px 18px;border-radius:7px;cursor:pointer;white-space:nowrap}
+.solid:hover{filter:brightness(1.08)}
+.solid:disabled{background:var(--line-2);border-color:var(--line-2);color:var(--muted);cursor:not-allowed;filter:none}
+.ghost{appearance:none;background:var(--surface-2);border:1px solid var(--line-2);color:var(--ink-2);
+  font-family:inherit;font-size:12.5px;padding:8px 13px;border-radius:7px;cursor:pointer}
+.ghost:hover{border-color:var(--ox);color:var(--ox)}
+
+.pnum{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);letter-spacing:.1em}
+.ptopic{font-size:14px;font-weight:600;flex:1 1 auto}
+.stem{font-size:15px;line-height:1.7;margin:0 0 16px}
+.stem b{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--ox);font-size:14.5px}
+.answer{display:grid;grid-template-columns:minmax(120px,190px) auto auto;gap:10px;align-items:center}
+@media(max-width:560px){.answer{grid-template-columns:1fr}}
+.unit{font-family:"IBM Plex Mono",monospace;font-size:13.5px;color:var(--muted)}
+.verdict{margin:14px 0 0;padding:11px 14px;border-radius:8px;font-size:13.5px;line-height:1.6}
+.verdict[hidden]{display:none}
+.verdict.ok{background:var(--go-soft);color:var(--go)}
+.verdict.no{background:var(--stop-soft);color:var(--stop)}
+.sol{margin:14px 0 0;border-left:2px solid var(--line-2);padding-left:14px}
+.sol[hidden]{display:none}
+.sol h3{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 10px;font-weight:500}
+.sol ol{margin:0;padding-left:20px}
+.sol li{font-size:13.5px;line-height:1.8;color:var(--ink-2);margin-bottom:6px}
+.sol code{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--ink)}
+.sol .final{color:var(--ox);font-weight:600}
+.done .card-h{background:var(--go-soft)}
+
+.scorebar{display:flex;flex-wrap:wrap;align-items:center;gap:14px 22px;padding:16px 18px}
+.scorenum{font-family:"IBM Plex Mono",monospace;font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+.scorenum small{font-size:14px;font-weight:400;color:var(--muted)}
+.vcode{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted)}
+.vcode b{color:var(--ink);font-weight:600;letter-spacing:.08em}
+.hint{font-size:12.5px;color:var(--muted);line-height:1.65;margin:10px 0 0}
+footer{margin-top:44px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;line-height:1.8}
+
+/* --- section rules between Part A and Part B --- */
+.sect{margin:34px 0 0;padding:0 0 8px;border-bottom:1px solid var(--line-2);
+  display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.sect h2{font-family:"IBM Plex Serif",Georgia,serif;font-size:19px;font-weight:600;margin:0;letter-spacing:-.01em}
+.sect p{margin:0;font-size:12.5px;color:var(--muted)}
+
+/* --- multiple-choice items --- */
+.lect{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--muted);border:1px solid var(--line-2);border-radius:99px;padding:2px 8px}
+.opts{display:grid;gap:8px;margin:0}
+.opt{display:flex;gap:11px;align-items:flex-start;width:100%;text-align:left;
+  background:var(--surface-2);border:1px solid var(--line-2);border-radius:8px;
+  padding:11px 13px;font-family:inherit;font-size:13.5px;line-height:1.6;color:var(--ink);cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--ox)}
+.opt:disabled{cursor:default}
+.opt .k{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);flex:0 0 auto;padding-top:1px}
+.opt.picked{border-color:var(--ink-2)}
+.opt.right{background:var(--go-soft);border-color:var(--go);color:var(--go)}
+.opt.right .k{color:var(--go)}
+.opt.wrong{background:var(--stop-soft);border-color:var(--stop);color:var(--stop)}
+.opt.wrong .k{color:var(--stop)}
+.why{margin:14px 0 0;border-left:2px solid var(--line-2);padding-left:14px;
+  font-size:13.5px;line-height:1.75;color:var(--ink-2)}
+.why[hidden]{display:none}
+.why b{color:var(--ox)}
+
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow"><a href="index.html" style="color:inherit">CH40051 Electroanalytical Chemistry</a> · Problem Set 2</p>
+    <h1>Your own problem set</h1>
+    <p class="sub">Twelve problems on Lectures 4&ndash;8: the double layer, mass transport, the ion atmosphere,
+      solvents, and ionic conductivity. Six are calculations &mdash; one from each lecture, with Lecture 8 asked twice
+      &mdash; and six are concept questions. Every number is generated from your student ID, so no two of you get the
+      same set: an answer copied from anyone else will simply be wrong.</p>
+  </header>
+
+  <div class="card" id="startCard">
+    <div class="card-h"><h2>Generate your set</h2><span class="note">same ID always gives the same problems</span></div>
+    <div class="card-b">
+      <div class="startrow">
+        <div>
+          <label class="fld" for="sId">Student ID</label>
+          <input type="text" id="sId" inputmode="numeric" placeholder="e.g. 20261234" autocomplete="off">
+        </div>
+        <button class="solid" id="genBtn" type="button">Generate my problems</button>
+      </div>
+      <p class="hint" id="startHint">You can close this page and come back &mdash; your work is saved in this
+        browser, and the same ID regenerates the same set.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h2>How this is marked</h2><span class="note">read once before you start</span></div>
+    <div class="card-b">
+      <p class="hint" style="margin-top:0">
+        <b style="color:var(--ink)">Calculations</b> allow two attempts. A wrong first attempt earns one diagnostic
+        hint; the worked solution opens after the second. <b style="color:var(--ink)">Concept questions</b> allow
+        one attempt, then the reasoning is shown &mdash; guessing costs you the mark, so think before you click.
+        Give calculations to three significant figures in the unit printed beside the box; anything within 2 % counts.
+      </p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h2>What you may need</h2><span class="note">nothing else is required</span></div>
+    <div class="card-b">
+      <p class="hint" style="margin-top:0">
+        F = 96 485 C mol⁻¹ &nbsp;·&nbsp; R = 8.314 J mol⁻¹ K⁻¹ &nbsp;·&nbsp; RT/F = 25.69 mV at 25 °C &nbsp;·&nbsp;
+        k<sub>B</sub> = 1.381 × 10⁻²³ J K⁻¹ &nbsp;·&nbsp; e = 1.602 × 10⁻¹⁹ C &nbsp;·&nbsp;
+        N<sub>A</sub> = 6.022 × 10²³ mol⁻¹ &nbsp;·&nbsp; ε<sub>0</sub> = 8.854 × 10⁻¹² F m⁻¹<br>
+        water at 25 °C: ε<sub>r</sub> = 78.39, η = 0.890 cP &nbsp;·&nbsp; 1/κ<sub>D</sub> = 0.304/√I nm (I in mol/L)
+        &nbsp;·&nbsp; λ<sub>B</sub>(water) = 0.71 nm &nbsp;·&nbsp; log γ± = &minus;0.509 |z₊z₋| √I
+      </p>
+    </div>
+  </div>
+
+  <div id="sheet" hidden></div>
+
+  <div class="card" id="summary" hidden>
+    <div class="card-h"><h2>Submission</h2><span class="note">one button &mdash; the file is only a backup</span></div>
+    <div class="scorebar">
+      <div>
+        <div class="scorenum" id="scoreNum">&mdash;</div>
+        <div class="vcode" style="margin-top:5px" id="whoLine">&mdash;</div>
+      </div>
+      <div style="flex:1 1 300px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="solid" id="sendBtn" type="button" hidden>Submit to the course</button>
+          <button class="ghost" id="dlBtn" type="button">Download my result</button>
+        </div>
+        <p class="hint" id="dlHint" style="margin-top:8px">Answer every problem first &mdash; unanswered ones are recorded as incomplete.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Permittivities and viscosities from the Lecture 7 table (Izutsu) · molar conductivities from the Lecture 8 tables
+    (CRC, Robinson &amp; Stokes, Bard &amp; Faulkner 2.3.2) · every constant above is the one the lectures use<br>
+    CH40051 Electroanalytical Chemistry · Fall 2026
+  </footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+var F = 96485.33;             /* C/mol                                   */
+var RG = 8.314462;            /* J/(mol K)                               */
+var E0 = 8.8541878e-12;       /* F/m                                     */
+var QE = 1.602176634e-19;     /* C                                       */
+var KB = 1.380649e-23;        /* J/K                                     */
+var NA = 6.02214076e23;       /* /mol                                    */
+var T25 = 298.15;             /* K                                       */
+var ER_W = 78.39;             /* water at 25 C                           */
+var ETA_W = 0.890e-3;         /* Pa s                                    */
+
+/* ---------- deterministic RNG: same student ID -> same problem set ---------- */
+function hash32(s){
+  var h = 0x811c9dc5;
+  for (var i = 0; i < s.length; i++){
+    h ^= s.charCodeAt(i);
+    h = (h + ((h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24))) >>> 0;
+  }
+  return h >>> 0;
+}
+function mulberry32(a){
+  return function(){
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    var t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function ri(r, a, b){ return a + Math.floor(r() * (b - a + 1)); }
+function rf(r, a, b, d){ var v = a + r() * (b - a); return +v.toFixed(d); }
+function pick(r, arr){ return arr[Math.floor(r() * arr.length)]; }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function gcd(a,b){ while(b){ var t=b; b=a%b; a=t; } return a; }
+function lcm(a,b){ return a*b/gcd(a,b); }
+function sig(x, d){
+  if (x === 0) return "0";
+  var e = Math.floor(Math.log10(Math.abs(x)));
+  if (e >= 4 || e <= -3) return x.toExponential(d - 1);
+  return (+x.toPrecision(d)).toString();
+}
+/* Fisher-Yates on a copy, reporting where a tracked index landed. */
+function shuffle(r, arr, track){
+  var a = arr.slice(), pos = track;
+  for (var i = a.length - 1; i > 0; i--){
+    var j = Math.floor(r() * (i + 1));
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+    if (pos === i) pos = j; else if (pos === j) pos = i;
+  }
+  return { list: a, at: pos };
+}
+
+/* ---------- chemistry data, Lectures 4-8 ----------
+   Permittivities and viscosities from the Lecture 7 table (Izutsu 1.1, 1.5);
+   molar conductivities from the Lecture 8 tables (CRC, Robinson & Stokes,
+   Bard & Faulkner 2.3.2). Every number a problem uses is one the lectures
+   already put on screen.                                                  */
+var SALTS = [
+ {nm:"NaCl",   zz:1, f:1, ions:"Na⁺ (z = +1) and Cl⁻ (z = −1)",       mult:"1 × 1² + 1 × 1²"},
+ {nm:"KCl",    zz:1, f:1, ions:"K⁺ (z = +1) and Cl⁻ (z = −1)",        mult:"1 × 1² + 1 × 1²"},
+ {nm:"CaCl₂",  zz:2, f:3, ions:"Ca²⁺ (z = +2) and 2 Cl⁻ (z = −1)",    mult:"1 × 2² + 2 × 1²"},
+ {nm:"Na₂SO₄", zz:2, f:3, ions:"2 Na⁺ (z = +1) and SO₄²⁻ (z = −2)",   mult:"2 × 1² + 1 × 2²"},
+ {nm:"MgSO₄",  zz:4, f:4, ions:"Mg²⁺ (z = +2) and SO₄²⁻ (z = −2)",    mult:"1 × 2² + 1 × 2²"},
+ {nm:"AlCl₃",  zz:3, f:6, ions:"Al³⁺ (z = +3) and 3 Cl⁻ (z = −1)",    mult:"1 × 3² + 3 × 1²"}
+];
+var SOLV = [
+ {nm:"water",                  er:78.39},
+ {nm:"propylene carbonate (PC)", er:64.92},
+ {nm:"dimethyl sulfoxide (DMSO)", er:46.5},
+ {nm:"N,N-dimethylformamide (DMF)", er:36.7},
+ {nm:"acetonitrile (MeCN)",    er:35.9},
+ {nm:"methanol",               er:32.7},
+ {nm:"acetone",                er:20.6},
+ {nm:"pyridine",               er:12.9},
+ {nm:"dichloromethane (DCM)",  er:8.93},
+ {nm:"tetrahydrofuran (THF)",  er:7.58},
+ {nm:"1,2-dimethoxyethane (DME)", er:7.20},
+ {nm:"1,4-dioxane",            er:2.21}
+];
+var PAIRS = [
+ {nm:"a 1:1 salt such as LiClO₄", zz:1},
+ {nm:"a 2:1 salt such as CaCl₂",  zz:2},
+ {nm:"a 2:2 salt such as MgSO₄",  zz:4}
+];
+/* measured molar conductivities, S cm² mol⁻¹ at 25 °C */
+var COND = [
+ {nm:"KCl",  L0:149.86, d:[[0.001,146.95],[0.005,143.55],[0.010,141.27],[0.020,138.34],[0.050,133.37],[0.100,128.96]]},
+ {nm:"NaCl", L0:126.45, d:[[0.001,123.74],[0.005,120.65],[0.010,118.51],[0.020,115.76],[0.050,111.06],[0.100,106.74]]},
+ {nm:"HCl",  L0:426.16, d:[[0.001,421.36],[0.005,415.80],[0.010,412.00],[0.020,407.24],[0.050,399.09],[0.100,391.32]]}
+];
+/* limiting ionic conductivities per unit charge, S cm² mol⁻¹ */
+var IONS = [
+ {nm:"H⁺",    lam:349.82, rc:null},
+ {nm:"Li⁺",   lam:38.69,  rc:0.076},
+ {nm:"Na⁺",   lam:50.11,  rc:0.102},
+ {nm:"K⁺",    lam:73.52,  rc:0.138},
+ {nm:"NH₄⁺",  lam:73.4,   rc:null},
+ {nm:"OH⁻",   lam:198.0,  rc:null},
+ {nm:"Cl⁻",   lam:76.34,  rc:0.181},
+ {nm:"NO₃⁻",  lam:71.44,  rc:null},
+ {nm:"CH₃COO⁻", lam:40.9, rc:null}
+];
+
+/* the Debye length of an aqueous solution at 25 C, from the constants */
+function debyeNm(I){ return Math.sqrt(E0 * ER_W * KB * T25 / (2 * NA * 1000 * I * QE * QE)) * 1e9; }
+
+/* ---------- Part A: calculations ----------
+   each returns {kind:"calc", lec, topic, stem, unit, answer, abstol, solution[]} */
+
+function pStern(r){
+  var c = pick(r, [1, 2, 5, 10, 20, 50, 100]);            /* mM, 1:1 */
+  var CH = pick(r, [16, 18, 20, 24, 28]);                 /* µF/cm², inner layer */
+  var I = c / 1000;
+  var lam = debyeNm(I);                                   /* nm */
+  var Cd = E0 * ER_W / (lam * 1e-9) * 100;                /* µF/cm²: 1 F/m² = 100 µF/cm² */
+  var C = 1 / (1 / CH + 1 / Cd);
+  return {
+    kind:"calc", lec:"Lecture 4", topic:"The double layer as two capacitors in series", unit:"µF/cm²",
+    answer:C, abstol:0.05,
+    stem:"A mercury electrode sits at the potential of zero charge in <b>" + c + " mM</b> aqueous 1:1 "
+        + "electrolyte at 25 °C (ε<sub>r</sub> = 78.39). The compact (Helmholtz) layer contributes "
+        + "<b>C<sub>H</sub> = " + CH + " µF/cm²</b>, and the diffuse layer contributes its Gouy&ndash;Chapman "
+        + "value at the pzc,<br><br><b>C<sub>d</sub> = ε<sub>0</sub>ε<sub>r</sub> / λ<sub>D</sub></b>"
+        + "<br><br>What is the <b>total</b> double-layer capacitance the experiment measures?",
+    solution:[
+      "The two layers are in <b>series</b>, because the same charge sits on both: <code>1/C = 1/C_H + 1/C_d</code>.",
+      "Ionic strength of a 1:1 salt is just its concentration: <code>I = " + sig(I, 3) + " mol/L</code>, so "
+        + "<code>λ_D = 0.304/√I nm = " + sig(lam, 4) + " nm</code> (the same number the constants give exactly).",
+      "<code>C_d = ε₀ε_r/λ_D = (8.854×10⁻¹² × 78.39)/(" + sig(lam, 4) + "×10⁻⁹) = " + sig(Cd / 100, 4)
+        + " F/m² = " + sig(Cd, 4) + " µF/cm²</code>",
+      "<span class='final'>1/C = 1/" + CH + " + 1/" + sig(Cd, 4) + "  →  C = " + sig(C, 4) + " µF/cm²</span>",
+      "Series capacitors are dominated by the <b>smaller</b> one, so the answer always comes out under "
+        + CH + " µF/cm². Dilute the solution and C_d falls as √c until the diffuse layer is the bottleneck; "
+        + "concentrate it and C_d grows until only C_H is left &mdash; which is why a measured C<sub>dl</sub> "
+        + "flattens out at high salt."
+    ]
+  };
+}
+
+function pCottrell(r){
+  var n = pick(r, [1, 2]);
+  var D = pick(r, [0.50, 0.65, 0.72, 0.90, 1.00, 1.20]);  /* 10⁻⁵ cm²/s */
+  var C = pick(r, [0.50, 1.00, 2.00, 5.00]);              /* mM */
+  var t = pick(r, [0.10, 0.25, 0.50, 1.00, 2.00, 5.00, 10.0]);
+  var Dc = D * 1e-5, Cc = C * 1e-6;                       /* cm²/s, mol/cm³ */
+  var i = n * F * Math.sqrt(Dc) * Cc / Math.sqrt(Math.PI * t) * 1000;   /* mA/cm² */
+  return {
+    kind:"calc", lec:"Lecture 5", topic:"Cottrell: diffusion-limited current after a step", unit:"mA/cm²",
+    answer:i, abstol:0.0005,
+    stem:"A planar electrode is stepped to a potential where the analyte reacts as fast as it arrives "
+        + "(the diffusion limit). The analyte is <b>" + C.toFixed(2) + " mM</b>, its diffusion coefficient is "
+        + "<b>" + D.toFixed(2) + " × 10⁻⁵ cm² s⁻¹</b>, and <b>n = " + n + "</b>. The solution is quiet "
+        + "(no stirring).<br><br>Using the Cottrell equation<br><b>i(t) = nFD<sup>1/2</sup>C* / √(πt)</b>"
+        + "<br><br>what is the current density <b>" + t.toFixed(2) + " s</b> after the step?",
+    solution:[
+      "Put everything in centimetre units first &mdash; this is where most of the marks are lost. "
+        + "<code>C* = " + C.toFixed(2) + " mM = " + sig(Cc, 3) + " mol/cm³</code> (1 mM = 10⁻⁶ mol/cm³), "
+        + "<code>D = " + sig(Dc, 3) + " cm²/s</code>.",
+      "<code>√D = " + sig(Math.sqrt(Dc), 4) + " cm/s^½</code> &nbsp;·&nbsp; <code>√(πt) = √(" + sig(Math.PI * t, 4)
+        + ") = " + sig(Math.sqrt(Math.PI * t), 4) + " s^½</code>",
+      "<code>i = " + n + " × 96485 × " + sig(Math.sqrt(Dc), 4) + " × " + sig(Cc, 3) + " / " + sig(Math.sqrt(Math.PI * t), 4)
+        + " = " + sig(i / 1000, 4) + " A/cm²</code>",
+      "<span class='final'>i = " + sig(i, 4) + " mA/cm²</span>",
+      "The current falls as <b>t<sup>−1/2</sup></b> even though the bulk concentration never changes: what grows "
+        + "is the depleted layer, √(πDt) thick, and the gradient across it thins in the same proportion. Wait four "
+        + "times as long and the current halves."
+    ]
+  };
+}
+
+function pDebye(r){
+  var s = pick(r, SALTS);
+  var c = pick(r, [0.50, 1.0, 2.0, 5.0, 10.0, 20.0, 50.0]);    /* mM */
+  var I = s.f * c / 1000;
+  var lam = debyeNm(I);
+  var gam = Math.pow(10, -0.509 * s.zz * Math.sqrt(I));
+  return {
+    kind:"calc", lec:"Lecture 6", topic:"Ionic strength and the Debye length", unit:"nm",
+    answer:lam, abstol:0.02,
+    stem:"An aqueous solution of <b>" + s.nm + "</b> at <b>" + c.toFixed(2) + " mM</b> and 25 °C contains "
+        + s.ions + ".<br><br>How thick is the ion atmosphere &mdash; that is, what is the Debye length "
+        + "1/κ<sub>D</sub>?<br><br><span style='color:var(--muted);font-size:13px'>For water at 25 °C, 1/κ<sub>D</sub> = 0.304/√I nm "
+        + "with I in mol/L.</span>",
+    solution:[
+      "Ionic strength counts every ion and weights it by the <b>square</b> of its charge: "
+        + "<code>I = ½ Σ c_i z_i²</code>.",
+      "For " + s.nm + ": <code>I = ½ × " + c.toFixed(2) + " mM × (" + s.mult + ") = " + s.f + " × "
+        + c.toFixed(2) + " mM = " + sig(I * 1000, 3) + " mM = " + sig(I, 3) + " mol/L</code>",
+      "<code>1/κ_D = 0.304/√" + sig(I, 3) + " = " + sig(lam, 4) + " nm</code>",
+      "<span class='final'>1/κ_D = " + sig(lam, 4) + " nm</span>",
+      "Two things worth carrying away. The atmosphere thins as <b>√I</b>, so a hundredfold dilution makes it only "
+        + "ten times thicker; and a higher charge counts far more than more salt &mdash; "
+        + (s.f > 1 ? s.nm + " gives " + s.f + " times the ionic strength of the same concentration of NaCl."
+                   : "a 2:2 salt at this concentration would give four times this ionic strength, and half this "
+                     + "Debye length.")
+        + " As a check on the same I, the Debye&ndash;Hückel limiting law gives "
+        + "<code>log γ± = −0.509 × " + s.zz + " × √" + sig(I, 3) + "</code>, so <code>γ± = " + sig(gam, 3) + "</code>."
+    ]
+  };
+}
+
+function pPairing(r){
+  var sv = pick(r, SOLV), p = pick(r, PAIRS);
+  var lB = QE * QE / (4 * Math.PI * E0 * sv.er * KB * T25) * 1e9;    /* nm */
+  var q = lB * p.zz / 2;
+  return {
+    kind:"calc", lec:"Lecture 7", topic:"Permittivity and the ion-pairing distance", unit:"nm",
+    answer:q, abstol:0.004,
+    stem:"<b>" + p.nm + "</b> is dissolved in <b>" + sv.nm + "</b> (ε<sub>r</sub> = " + sv.er + ") at 25 °C."
+        + "<br><br>Two ions count as paired once they are close enough that their Coulomb energy reaches 2k<sub>B</sub>T. "
+        + "That happens inside<br><br><b>q = |z₊z₋| e² / 8πε<sub>0</sub>ε<sub>r</sub>k<sub>B</sub>T = "
+        + "|z₊z₋| λ<sub>B</sub>/2</b><br><br>where λ<sub>B</sub> is the Bjerrum length. How large is q here?",
+    solution:[
+      "The Bjerrum length is the distance at which the Coulomb energy of two unit charges equals k<sub>B</sub>T: "
+        + "<code>λ_B = e²/4πε₀ε_r k_BT</code>. In water (ε_r = 78.39) it is 0.71 nm, and it scales as "
+        + "<b>1/ε_r</b>, so in " + sv.nm + ": <code>λ_B = 0.71 × 78.39/" + sv.er + " = " + sig(lB, 3) + " nm</code>",
+      "<code>q = |z₊z₋| λ_B/2 = " + p.zz + " × " + sig(lB, 3) + "/2 = " + sig(q, 3) + " nm</code>",
+      "<span class='final'>q = " + sig(q, 3) + " nm</span>",
+      (q > 0.5
+        ? "Ions in contact are about 0.3&ndash;0.5 nm apart, so <b>q is larger than the ions themselves</b>: in this "
+          + "solvent the salt is substantially paired, and the pairs carry no current. That is why a low-permittivity "
+          + "solvent needs either a large, weakly coordinating anion or a strong donor to work as an electrolyte."
+        : "Ions in contact are about 0.3&ndash;0.5 nm apart, so <b>q is no bigger than contact</b>: pairing is not the "
+          + "limiting problem in this solvent, and the salt can be treated as dissociated.")
+        + " Note what q does <em>not</em> depend on: the concentration. Permittivity, charge and temperature set it.",
+      "Charge matters quadratically through the product z₊z₋: a 2:2 salt pairs out to four times the distance of a "
+        + "1:1 salt in the same solvent."
+    ]
+  };
+}
+
+function pConduct(r){
+  var s = pick(r, COND), row = pick(r, s.d), k = pick(r, [0.500, 1.000, 1.413, 2.000]);
+  var c = row[0], Lm = row[1];
+  var kap = Lm * c / 1000;                       /* S/cm */
+  var R = +(k / kap).toPrecision(4);             /* ohm, as the meter would read it */
+  var kapS = k / R, LmS = 1000 * kapS / c;
+  return {
+    kind:"calc", lec:"Lecture 8", topic:"Cell constant, conductivity, molar conductivity", unit:"S cm² mol⁻¹",
+    answer:LmS, abstol:0.3,
+    stem:"A conductivity cell of cell constant <b>l/A = " + k.toFixed(3) + " cm⁻¹</b> is filled with "
+        + "<b>" + (c * 1000).toFixed(0) + " mM " + s.nm + "</b> at 25 °C and reads "
+        + "<b>R = " + R.toPrecision(4) + " Ω</b>.<br><br>What is the molar conductivity Λ of this solution?",
+    solution:[
+      "The meter measures a resistance; the cell constant turns it into a property of the solution: "
+        + "<code>κ = (l/A)·(1/R) = " + k.toFixed(3) + "/" + R.toPrecision(4) + " = " + sig(kapS, 4) + " S/cm</code>"
+        + " &nbsp;(= " + sig(kapS * 1000, 4) + " mS/cm).",
+      "Molar conductivity is conductivity per mole of salt, <code>Λ = κ/C</code>, with C in <b>mol/cm³</b>: "
+        + "<code>C = " + (c * 1000).toFixed(0) + " mM = " + sig(c / 1000, 3) + " mol/cm³</code>.",
+      "<code>Λ = " + sig(kapS, 4) + " / " + sig(c / 1000, 3) + " = " + sig(LmS, 4) + " S cm² mol⁻¹</code>"
+        + " &nbsp;— or in one step, <code>Λ = 1000κ/c[mol/L]</code>.",
+      "<span class='final'>Λ = " + sig(LmS, 4) + " S cm² mol⁻¹</span>",
+      "Compare it with Λ° for " + s.nm + ", <b>" + s.L0.toFixed(2) + "</b>: the solution carries "
+        + (100 * LmS / s.L0).toFixed(1) + " % of what its ions would carry if they never met each other. "
+        + s.nm + " is a strong electrolyte, so the shortfall is not a shortage of ions &mdash; it is the ion "
+        + "atmosphere, through the relaxation and electrophoretic effects, and it grows as √c."
+    ]
+  };
+}
+
+function pMobility(r){
+  var ion = pick(r, IONS), want = pick(r, ["D", "r"]);
+  var lamSI = ion.lam * 1e-4;                                    /* S m² mol⁻¹ */
+  var D = RG * T25 * ion.lam / (F * F);                          /* cm²/s, with lambda in S cm2/mol */
+  var rS = F * F / (6 * Math.PI * ETA_W * NA * lamSI) * 1e9;     /* nm */
+  var u = ion.lam * 1e-4 / F * 1e8;                              /* 10⁻⁴ cm² V⁻¹ s⁻¹ */
+  if (want === "D"){
+    return {
+      kind:"calc", lec:"Lecture 8", topic:"Nernst–Einstein: a diffusion coefficient from a conductivity",
+      unit:"10⁻⁵ cm² s⁻¹", answer:D * 1e5, abstol:0.01,
+      stem:"The limiting ionic conductivity of <b>" + ion.nm + "</b> in water at 25 °C is "
+          + "<b>λ° = " + ion.lam.toFixed(2) + " S cm² mol⁻¹</b> (per unit charge, as the tables list it)."
+          + "<br><br>Drift and diffusion are resisted by the same friction, so<br><br>"
+          + "<b>D° = RTλ° / z²F²</b><br><br>What is the diffusion coefficient of " + ion.nm + "?",
+      solution:[
+        "This is a singly charged ion, so <code>z² = 1</code> and the tabulated λ° is already the one to use.",
+        "Collect the constants once: <code>RT/F² = (8.314 × 298.15)/96485² = " + sig(RG * T25 / (F * F), 4)
+          + "</code>. Feed λ° to it in S cm² mol⁻¹ and D° comes out in cm² s⁻¹ directly.",
+        "<code>D° = " + sig(RG * T25 / (F * F), 4) + " × " + ion.lam.toFixed(2) + " = " + sig(D, 4) + " cm²/s</code>",
+        "<span class='final'>D° = " + sig(D * 1e5, 4) + " × 10⁻⁵ cm² s⁻¹</span>",
+        "As a cross-check, the same λ° gives a mobility <code>u° = λ°/|z|F = " + u.toFixed(2)
+          + " × 10⁻⁴ cm² V⁻¹ s⁻¹</code>, and <code>D° = u°RT/|z|F</code> returns the same number. One measured "
+          + "conductivity, three quantities."
+      ]
+    };
+  }
+  return {
+    kind:"calc", lec:"Lecture 8", topic:"Stokes–Einstein: an effective size from a conductivity",
+    unit:"nm", answer:rS, abstol:0.001,
+    stem:"The limiting ionic conductivity of <b>" + ion.nm + "</b> in water at 25 °C is "
+        + "<b>λ° = " + ion.lam.toFixed(2) + " S cm² mol⁻¹</b> (per unit charge). The viscosity of water is "
+        + "<b>η = 0.890 cP</b>.<br><br>Treating the ion as a sphere dragged through a continuous fluid,<br><br>"
+        + "<b>r = z²F² / 6πηN<sub>A</sub>λ°</b><br><br>what Stokes radius does that give?",
+    solution:[
+      "Work in SI: <code>λ° = " + ion.lam.toFixed(2) + " S cm² mol⁻¹ = " + sig(lamSI, 4) + " S m² mol⁻¹</code>, "
+        + "<code>η = 0.890 cP = 8.90×10⁻⁴ Pa s</code>.",
+      "<code>r = F²/(6πηN_Aλ°) = 96485²/(6π × 8.90×10⁻⁴ × 6.022×10²³ × " + sig(lamSI, 4) + ")</code>",
+      "<span class='final'>r = " + sig(rS, 3) + " nm</span>",
+      (ion.rc
+        ? "Its crystal radius is " + ion.rc.toFixed(3) + " nm. " + (rS > ion.rc * 1.3
+            ? "The moving ion is the <b>larger</b> of the two: its charge sits on a small surface, binds water "
+              + "tightly, and drags that shell along. Li⁺ is the extreme case — smallest crystal, largest moving sphere, "
+              + "slowest of the alkali metals."
+            : "Here Stokes' law returns something <b>smaller</b> than the crystal. Read r as an effective size that "
+              + "ranks ions, not as a real one: an ion this size barely holds its water, and the solvent is not a "
+              + "continuum at 0.1 nm.")
+        : "There is no useful crystal radius to compare with here. For H⁺ and OH⁻ the answer comes out far too small "
+          + "to be a real particle at all — they do not swim, they hop along the hydrogen-bond network (Grotthuss), "
+          + "which is exactly how Stokes' law tells you its own assumption has failed.")
+    ]
+  };
+}
+
+var CALC = [pStern, pCottrell, pDebye, pPairing, pConduct, pMobility];
+
+
+
+/* ---------- state ---------- */
+var STORE = "ch40051-ps2-v1";
+var probs = [], state = [], sid = "";
+var sId       = document.getElementById("sId"),
+    genBtn    = document.getElementById("genBtn"),
+    sheet     = document.getElementById("sheet"),
+    summary   = document.getElementById("summary"),
+    startHint = document.getElementById("startHint");
+
+function save(){
+  try { localStorage.setItem(STORE, JSON.stringify({id:sid, st:state})); } catch(e){}
+}
+function load(){
+  try {
+    var d = JSON.parse(localStorage.getItem(STORE) || "null");
+    if (d && d.id){ sId.value = d.id; return d; }
+  } catch(e){}
+  return null;
+}
+
+/* ---------- Part B: concepts ----------
+   Four per lecture, written fresh but aimed at the same misconceptions the
+   concept checks probe, so revising the checks is the right preparation and
+   memorising their answers is not enough. One question is drawn from each of
+   Lectures 4-8, plus a second from one lecture chosen by your ID, and the
+   options are shuffled per student.                                        */
+var CONCEPTS = {
+"Lecture 4": [
+ {q:"A measured double-layer capacitance barely changes when 0.1 M KCl is made 1 M, but changes a great deal between 1 mM and 10 mM. Why?",
+  o:["The compact layer disappears at high concentration",
+     "The two layers are in series, so the measurement follows whichever is smaller — the diffuse layer when dilute, the compact layer once concentrated",
+     "Ions stop adsorbing above 0.1 M",
+     "The Debye length is independent of concentration above 0.1 M"],
+  a:1,
+  why:"<code>1/C = 1/C_H + 1/C_d</code>. C_d grows as √c, so in dilute solution it is the small one and the measurement tracks it closely. By 1 M it is several hundred µF/cm² and contributes almost nothing to the sum: the compact layer, fixed at some 20 µF/cm², is all that is left to measure. Nothing has disappeared — it is just that series capacitors are dominated by the smaller."},
+ {q:"The Gouy–Chapman model predicts a double-layer capacitance that keeps rising as the electrode is polarised, while real capacitances level off and often fall. What is the model missing?",
+  o:["Ions have a finite size, so the interface runs out of room to crowd more in",
+     "The solvent's permittivity is temperature dependent",
+     "Specific adsorption of anions, which the model forbids",
+     "The diffuse layer is actually thinner than the Debye length"],
+  a:0,
+  why:"Gouy–Chapman treats ions as point charges, so cosh(zFφ/2RT) lets the surface concentration grow without limit. Put a size on them — Bikerman, or any lattice-gas correction — and the layer saturates: once the first plane is packed, extra potential has to be dropped across a thicker, not a denser, layer, and C falls. Specific adsorption and the permittivity matter too, but the divergence itself is the point-charge assumption."},
+ {q:"Diluting an aqueous 1:1 electrolyte from 100 mM to 1 mM changes the Debye length by what factor?",
+  o:["10 times thicker", "100 times thicker", "No change — it depends on the electrode potential", "3.2 times thicker"],
+  a:0,
+  why:"1/κ<sub>D</sub> ∝ 1/√I, so a hundredfold dilution thickens it tenfold: 0.96 nm at 100 mM, 9.6 nm at 1 mM. The Debye length belongs to the solution — its concentration, its permittivity and the temperature — and knows nothing about the electrode or its potential."},
+ {q:"In the Gouy–Chapman picture, what is the potential of zero charge (pzc)?",
+  o:["The potential at which the electrode carries no excess charge, so the diffuse layer has nothing to screen and its capacitance is at a minimum",
+     "The potential at which the measured capacitance is largest",
+     "The potential at which no ions are present at the surface",
+     "The potential at which the Debye length goes to infinity"],
+  a:0,
+  why:"At the pzc the metal's excess charge is zero, the diffuse layer is unpolarised, and C_d takes its smallest value, ε₀ε_r/λ_D — which is exactly why the capacitance curve has a <b>minimum</b> there in dilute solution. Ions are still present; they are simply not pushed around."}
+],
+"Lecture 5": [
+ {q:"A voltammogram is run with 1 mM analyte and then repeated with 100 mM KNO₃ added. The limiting current changes very little, but the shape improves. What has the supporting electrolyte done?",
+  o:["Increased the analyte's diffusion coefficient",
+     "Taken over the current in the bulk, so the analyte's share of migration falls to a few per cent and it arrives by diffusion alone",
+     "Lowered the analyte's activity coefficient so much that the flux changes",
+     "Removed the diffusion layer"],
+  a:1,
+  why:"Each ion carries a share of the current set by |z|Cλ. Add a hundredfold excess of inert salt and the analyte's transference number drops to about 2 %: the field no longer moves it, so the flux at the electrode is diffusion only — and Fick's laws, which is what the analysis assumes, now hold. It also collapses the ohmic drop, which is the other half of the improvement."},
+ {q:"Why does the Cottrell current fall with time even though the bulk concentration of analyte never changes?",
+  o:["The electrode slowly deactivates",
+     "The depleted layer thickens as √(πDt), so the concentration gradient across it thins in the same proportion",
+     "The diffusion coefficient falls as the layer depletes",
+     "Convection gradually takes over from diffusion"],
+  a:1,
+  why:"At the diffusion limit the surface concentration is pinned at zero, so the whole gradient is C*/√(πDt) — set by how far the depletion has spread, not by anything changing in the bulk. The current therefore decays as t<sup>−1/2</sup>: four times the time, half the current. Left long enough, natural convection does eventually intervene, which is why the Cottrell regime is a few seconds to a minute."},
+ {q:"Stirring a solution harder raises the limiting current. In the Nernst film picture, what quantity has changed?",
+  o:["The diffusion coefficient D", "The bulk concentration C*", "The film thickness δ, and i_lim = nFDC*/δ", "The number of electrons n"],
+  a:2,
+  why:"Convection cannot cross the last micrometre or so to the surface: it works by thinning the stagnant film, δ ≈ D/|v| in the simplest model. The flux through that film is still pure diffusion, so i_lim = nFDC*/δ rises as δ falls. D, C* and n are properties of the chemistry, and stirring does not touch them."},
+ {q:"At the electrode surface itself, which terms of the total flux J = −D∂C/∂x − (zF/RT)DC∂φ/∂x + Cv actually deliver the analyte?",
+  o:["All three equally",
+     "Only diffusion: the migration and convection terms both carry a factor C, which the diffusion limit has driven to zero at the wall",
+     "Only migration, because the field is strongest at the surface",
+     "Only convection, because the solution moves fastest there"],
+  a:1,
+  why:"Migration and convection are both proportional to the local concentration, and at the diffusion limit that concentration is zero at the wall — so both terms vanish exactly where the current is counted. They matter by setting the profile that the diffusion term then reads: convection by thinning the film, migration by dragging ions through the bulk. The flux at the wall is diffusion, every time."}
+],
+"Lecture 6": [
+ {q:"Why is the mean activity coefficient of a dilute salt less than 1, and why does log γ± fall as √I rather than as I?",
+  o:["Because ions are solvated, and solvation is proportional to √I",
+     "Because each ion is surrounded by an excess of counter-charge that lowers its energy, and the thickness of that atmosphere scales as 1/√I",
+     "Because ion pairing removes free ions in proportion to √I",
+     "Because the permittivity of water falls as √I"],
+  a:1,
+  why:"Every ion sits in a cloud of net opposite charge. That lowers its free energy relative to the ideal, so γ± < 1. The work of charging the ion inside its own atmosphere goes as z²/(1/κ<sub>D</sub>), and 1/κ<sub>D</sub> ∝ 1/√I — which is where the √I of the Debye–Hückel limiting law comes from, with no adjustable parameter. Pairing and permittivity changes are real but separate effects, and they appear at higher concentration."},
+ {q:"&ldquo;The ion atmosphere is one Debye length thick.&rdquo; At r = a + 1/κ<sub>D</sub> from the centre of an ion, how much of its bare potential is left?",
+  o:["1/e of it, about 37 % — so about 63 % has been screened away",
+     "Half of it", "None of it — 1/κ<sub>D</sub> is where the potential reaches zero", "1/e² of it, about 13 %"],
+  a:0,
+  why:"The screened potential falls as (a/r)·e<sup>−κ(r−a)</sup>. One Debye length <em>beyond the ion's own radius</em> the exponential has run down by exactly 1/e: 37 % remains, 63 % is screened. Note which distance that is — r = 1/κ<sub>D</sub> measured from the centre is a different question, and for an ion of finite size a it can even lie inside the ion."},
+ {q:"The same salt is dissolved in water (ε_r = 78) and in THF (ε_r = 7.6). What happens to the distance out to which the two ions count as paired?",
+  o:["It falls by a factor of about 10, because pairing needs a polar solvent",
+     "It rises by a factor of about 10, because q ∝ 1/ε_r",
+     "It is unchanged: pairing is set by the ions, not the solvent",
+     "It depends on the concentration, which is not given"],
+  a:1,
+  why:"q = |z₊z₋|e²/8πε₀ε_rk<sub>B</sub>T. The solvent enters only as 1/ε_r, so dropping ε_r tenfold pushes the pairing distance out tenfold: 0.36 nm in water becomes 3.7 nm in THF, far larger than the ions themselves. That is the single most important consequence of a low permittivity — and it has nothing to do with concentration."},
+ {q:"Two quantities in this course are written κ. Which pair of statements is right?",
+  o:["κ is the conductivity, S m⁻¹, and κ<sub>D</sub> is the Debye parameter, m⁻¹ — unrelated quantities that share a letter",
+     "They are the same quantity in different units",
+     "κ is the Debye parameter and κ<sub>D</sub> its reciprocal, the Debye length",
+     "κ is the conductivity and κ<sub>D</sub> is its value at infinite dilution"],
+  a:0,
+  why:"One belongs to the whole solution and is what a cell measures, κ = (l/A)(1/R), in S m⁻¹. The other is an inverse length around a single ion, so 1/κ<sub>D</sub> is the Debye length. Both grow with concentration — κ roughly as c, κ<sub>D</sub> as √c — which is exactly why the clash of letters is easy to miss."}
+],
+"Lecture 7": [
+ {q:"Acetonitrile has a larger dipole moment than water (3.53 D against 1.77 D) yet a much smaller relative permittivity (35.9 against 78.4). How can both be true?",
+  o:["The dipole moment was measured in the gas phase and is not comparable",
+     "Permittivity depends on how the molecular dipoles cooperate in the liquid, and water's hydrogen-bond network aligns them where acetonitrile's do not",
+     "Acetonitrile is less dense, so it holds fewer dipoles",
+     "Permittivity is set by polarisability alone, not by the dipole"],
+  a:1,
+  why:"ε<sub>r</sub> is a property of the bulk liquid, not of one molecule. It counts the dipole density <em>and</em> the correlation between neighbours. Water's hydrogen bonding makes neighbouring dipoles reinforce each other; acetonitrile's dipoles tend to pair antiparallel and partly cancel. A large molecular dipole usually means a large ε<sub>r</sub>, but the liquid gets the last word."},
+ {q:"THF and DME have low permittivities (7.6 and 7.2) and yet are standard solvents in lithium battery electrolytes. What makes them work?",
+  o:["Their low viscosity alone",
+     "Their high donor numbers (20 and 24): a strong lone pair coordinates Li⁺ directly, which is what separates the salt",
+     "Their high acceptor numbers, which stabilise the anion",
+     "Nothing — they only work when mixed with water"],
+  a:1,
+  why:"Dissolving a salt needs the ions solvated, and bulk permittivity is only one route to that. Ethers coordinate Li⁺ through the oxygen lone pair — a specific, short-range interaction measured by the donor number — and that is enough to pull the lattice apart even though ε<sub>r</sub> is small. The price is extensive ion pairing (q is large when ε<sub>r</sub> is small), which is why such electrolytes need weakly coordinating anions and why their conductivities are modest."},
+ {q:"Across the common solvents, the ones that dissolve a salt most readily are often the ones in which its ions move most slowly. Why?",
+  o:["High permittivity and high viscosity tend to go together, and λ° ∝ 1/η at fixed solvated size",
+     "Strongly solvating solvents destroy the ions",
+     "Conductivity is unrelated to viscosity",
+     "Because high-permittivity solvents are always protic"],
+  a:0,
+  why:"The molecular features that make a solvent polar — a large dipole, hydrogen bonding, a heavy strongly interacting molecule — also make it viscous, and Walden's rule says λ°η is roughly constant at fixed solvated radius. So a solvent that separates the salt well tends to slow the ions, and electrolyte design is a compromise rather than an optimum: propylene carbonate dissolves lithium salts well and is 2.5 cP; DME is 0.46 cP and barely dissociates them, so the two are mixed."},
+ {q:"Donor and acceptor numbers cannot be read off the permittivity. Which example makes that point best?",
+  o:["Water, with a high ε_r and a high acceptor number",
+     "Nitromethane: ε_r = 36.7, as high as DMF, but DN = 2.7 against DMF's 26.6",
+     "Dioxane, with a low ε_r and a low donor number",
+     "Methanol, which is protic"],
+  a:1,
+  why:"Permittivity is a bulk, non-specific response; DN and AN measure a specific chemical interaction with one site. Nitromethane and DMF have nearly the same ε<sub>r</sub> and completely different donor strength, so a cation that needs coordinating is solvated by one and not the other. Pyridine makes the opposite point: ε<sub>r</sub> only 12.9, DN 33.1 — the strongest donor in the table."}
+],
+"Lecture 8": [
+ {q:"Λ of KCl falls by about 14 % from 1 mM to 100 mM; Λ of acetic acid falls by about 96 % over the same range. What are the two different reasons?",
+  o:["Both are the ion atmosphere; acetic acid simply has a denser one",
+     "KCl: its ions are slowed by their atmospheres, as √c. Acetic acid: it has far fewer ions, because α falls as it is concentrated",
+     "KCl: ion pairing. Acetic acid: viscosity",
+     "KCl: the electrodes polarise. Acetic acid: the acid attacks the cell"],
+  a:1,
+  why:"A strong electrolyte is fully dissociated at every concentration, so all that changes is how much the relaxation and electrophoretic effects slow its ions — both ∝ κ<sub>D</sub> ∝ √c, a few per cent. A weak electrolyte changes its <em>number</em> of ions: α = Λ/Λ° runs from 33 % to 1.3 % across that range, held by Ostwald's law K = α²C/(1 − α) with K unchanged. Different mechanisms, two orders of magnitude apart in size."},
+ {q:"Λ° is 426.2 for HCl, 91.0 for sodium acetate and 126.5 for NaCl (S cm² mol⁻¹). What is Λ° for acetic acid, and what justifies the arithmetic?",
+  o:["390.7 — HCl + NaOAc − NaCl, because at infinite dilution each ion conducts independently of its partner",
+     "643.7 — add all three, because conductivities are additive",
+     "461.7 — HCl + NaCl − NaOAc",
+     "It cannot be obtained this way: acetic acid is weak, so Λ° does not exist"],
+  a:0,
+  why:"Kohlrausch's law of independent migration: at infinite dilution no ion knows what it came in with, so ionic contributions add and subtract like bookkeeping. HCl + NaOAc − NaCl cancels Na⁺ and Cl⁻ and leaves λ°(H⁺) + λ°(OAc⁻) = 390.7. Λ° certainly exists for a weak acid — it just cannot be reached by extrapolating its own curve, which is still climbing steeply as C → 0, so it is built from the ions instead."},
+ {q:"Li⁺ has the smallest crystal radius of the alkali metals yet the smallest λ° of them. What does that tell you, and what does Stokes' law return for it?",
+  o:["λ° must be mis-tabulated; the smallest ion should be the fastest",
+     "Li⁺ binds and drags the most water, so it moves as the largest sphere — Stokes' law gives r ≈ 0.24 nm against 0.076 nm in a crystal",
+     "Li⁺ is slowed by ion pairing with water",
+     "Its diffusion coefficient is large even though λ° is small"],
+  a:1,
+  why:"Charge density, not bare size, sets how tightly an ion holds its hydration shell, and it is the solvated sphere that has to be dragged through the solvent. Li⁺ — smallest crystal, highest charge density — carries the biggest shell and comes out the slowest: r = z²F²/6πηN<sub>A</sub>λ° gives 0.24 nm, three times its crystal radius. And since the same friction resists diffusion, D° = RTλ°/z²F² is the smallest of the three too: 1.03 against 1.96 × 10⁻⁵ cm² s⁻¹ for K⁺."},
+ {q:"A salt bridge is filled with saturated KCl rather than, say, saturated LiCl. Which property decides that, and where does it come from?",
+  o:["KCl is more soluble, so the bridge conducts better",
+     "t₊ ≈ t₋ for KCl (0.49 against 0.51), because λ° of K⁺ and Cl⁻ are nearly equal — so neither ion runs ahead at the junction",
+     "K⁺ is less reactive than Li⁺ towards analytes",
+     "KCl has the higher limiting molar conductivity"],
+  a:1,
+  why:"A junction potential appears because the two ions of a salt cross a boundary at different rates. Choose a salt whose two ions have nearly the same mobility and almost no charge separates: t₊ = λ₊/(λ₊ + λ₋) = 0.49 for KCl. LiCl fails on exactly this count — λ°(Li⁺) = 38.7 against λ°(Cl⁻) = 76.3, so t₊ = 0.34 and chloride carries two thirds of the current. Concentration matters too, but only to make the bridge ions dominate the junction; it cannot fix an unbalanced pair."}
+]
+};
+
+function build(id){
+  sid = id;
+  var r = mulberry32(hash32("CH40051-PS2-" + id));
+  probs = CALC.map(function(fn){ return fn(r); });
+
+  /* one concept question from each lecture, and a second from one of them */
+  var LECS = ["Lecture 4", "Lecture 5", "Lecture 6", "Lecture 7", "Lecture 8"];
+  var want = {};
+  LECS.forEach(function(L){ want[L] = 1; });
+  want[pick(r, LECS)] += 1;
+  LECS.forEach(function(L){
+    var pool = CONCEPTS[L].map(function(c, i){ return {c:c, i:i}; });
+    for (var k = 0; k < want[L]; k++){
+      var take = pool.splice(Math.floor(r() * pool.length), 1)[0];
+      var sh = shuffle(r, take.c.o, take.c.a);
+      probs.push({
+        kind:"mcq", lec:L, topic:"Concept — " + L + " #" + (take.i + 1),
+        stem:take.c.q, opts:sh.list, answer:sh.at, why:take.c.why
+      });
+    }
+  });
+}
+
+
+/* ---------- rendering ---------- */
+var LETTER = ["A", "B", "C", "D", "E"];
+
+function section(title, note){
+  return '<div class="sect"><h2>' + title + '</h2><p>' + note + '</p></div>';
+}
+
+function render(){
+  sheet.hidden = false;
+  summary.hidden = false;
+  sId.readOnly = true;
+
+  var h = "";
+  probs.forEach(function(p, i){
+    if (i === 0) h += section("Part A &mdash; calculations", "six problems, one from each of Lectures 4&ndash;8 &middot; two attempts each &middot; answers within 2 %");
+    if (i === 6) h += section("Part B &mdash; concepts", "six questions across Lectures 4&ndash;8 &middot; one attempt each &middot; think before you click");
+
+    var st = state[i];
+    h += '<div class="card' + (st.solved ? " done" : "") + '">'
+       +   '<div class="card-h">'
+       +     '<span class="pnum">' + (i < 9 ? "0" : "") + (i + 1) + '</span>'
+       +     '<span class="ptopic">' + esc(p.topic) + '</span>'
+       +     '<span class="lect">' + esc(p.lec) + '</span>'
+       +   '</div>'
+       +   '<div class="card-b">'
+       +     '<p class="stem">' + p.stem + '</p>';
+
+    if (p.kind === "calc"){
+      h += '<div class="answer">'
+         +   '<input type="text" id="in' + i + '" inputmode="decimal" autocomplete="off"'
+         +     ' placeholder="your answer" value="' + esc(st.given) + '"'
+         +     (st.solved ? " readonly" : "") + '>'
+         +   '<span class="unit">' + esc(p.unit) + '</span>'
+         +   '<button class="ghost" type="button" data-check="' + i + '"'
+         +     (st.solved ? " disabled" : "") + '>Check</button>'
+         + '</div>';
+      if (st.msg) h += '<p class="verdict ' + st.msgKind + '">' + st.msg + '</p>';
+      if (st.showSol){
+        h += '<div class="sol"><h3>Worked solution</h3><ol>';
+        p.solution.forEach(function(s){ h += "<li>" + s + "</li>"; });
+        h += '</ol></div>';
+      }
+    } else {
+      h += '<div class="opts">';
+      p.opts.forEach(function(o, j){
+        var cls = "opt";
+        if (st.showSol){
+          if (j === p.answer) cls += " right";
+          else if (String(j) === String(st.given)) cls += " wrong";
+        }
+        h += '<button type="button" class="' + cls + '" data-mcq="' + i + '" data-opt="' + j + '"'
+           +   (st.showSol ? " disabled" : "") + '>'
+           +   '<span class="k">' + LETTER[j] + '</span><span>' + o + '</span></button>';
+      });
+      h += '</div>';
+      if (st.msg) h += '<p class="verdict ' + st.msgKind + '">' + st.msg + '</p>';
+      if (st.showSol) h += '<div class="why"><b>Why.</b> ' + p.why + '</div>';
+    }
+    h += '</div></div>';
+  });
+  sheet.innerHTML = h;
+
+  var solved = state.filter(function(s){ return s.solved; }).length;
+  document.getElementById("scoreNum").innerHTML = solved + ' <small>/ ' + probs.length + ' correct</small>';
+  document.getElementById("whoLine").innerHTML = esc(sid) + " &middot; verification <b>" + vcode() + "</b>";
+}
+
+/* A short code over the student ID and the exact answers this set expects, so a
+   marker can confirm a submitted file was produced by this page and not edited. */
+function vcode(){
+  var s = sid + "|";
+  probs.forEach(function(p){ s += sig(p.answer, 6) + "|"; });
+  var v = hash32(s).toString(36).toUpperCase();
+  while (v.length < 7) v = "0" + v;
+  return v.slice(0, 4) + "-" + v.slice(4);
+}
+
+/* ---------- checking ---------- */
+function check(i){
+  var el = document.getElementById("in" + i);
+  var raw = (el.value || "").trim().replace(/,/g, "").replace(/\s+/g, "");
+  var v = parseFloat(raw);
+  var st = state[i], p = probs[i];
+  if (!raw || !isFinite(v)){
+    st.msg = "Type a number. Use a decimal point, and scientific notation like <code>1.7e-2</code> if you need it.";
+    st.msgKind = "no";
+    render(); return;
+  }
+  st.tries++;
+  st.given = raw;
+  var tol = Math.max(Math.abs(p.answer) * 0.02, p.abstol || 1e-9);
+  if (Math.abs(v - p.answer) <= tol){
+    st.solved = true; st.showSol = true;
+    st.msg = "Correct. The exact value is <b>" + sig(p.answer, 4) + " " + esc(p.unit) + "</b>.";
+    st.msgKind = "ok";
+  } else if (st.tries >= 2){
+    st.showSol = true;
+    st.msg = "Not correct, and that was your second attempt &mdash; the worked solution is below. "
+           + "Read it, then try the number again.";
+    st.msgKind = "no";
+  } else {
+    var ratio = v / p.answer, nudge = "";
+    function near(x, f){ return Math.abs(ratio - x) < x * f; }
+    if (ratio < 0)
+      nudge = " Check the sign &mdash; every answer here is a positive magnitude.";
+    else if (ratio > 0.9 && ratio < 1.1)
+      nudge = " You are very close &mdash; check your rounding or significant figures.";
+    else if (near(1000, 0.08) || near(0.001, 0.08))
+      nudge = " Out by a factor of 1000 &mdash; look for a milli- prefix: mM against M, mS against S, or mol/L against mol/cm\u00b3.";
+    else if (near(1e4, 0.08) || near(1e-4, 0.08))
+      nudge = " Out by 10\u2074 &mdash; that is cm\u00b2 against m\u00b2. Decide once whether you are working in centimetres or in metres, and convert everything.";
+    else if (near(100, 0.08) || near(0.01, 0.08))
+      nudge = " Out by 100 &mdash; check a cm-to-m conversion, or F/m\u00b2 against \u00b5F/cm\u00b2 (1 F/m\u00b2 = 100 \u00b5F/cm\u00b2).";
+    else if (near(10, 0.08) || near(0.1, 0.08))
+      nudge = " Out by 10 &mdash; check nm against \u00c5, or mm against cm.";
+    else if (p.unit === "nm" && (near(2, 0.06) || near(0.5, 0.06) || near(3, 0.06) || near(1/3, 0.06)
+          || near(4, 0.06) || near(0.25, 0.06) || near(6, 0.06)))
+      nudge = " Out by a small whole-number factor &mdash; that is the charge. Ionic strength weights every ion by z\u00b2, and the pairing distance carries |z\u2081z\u2082|.";
+    else if (near(Math.PI, 0.05) || near(1 / Math.PI, 0.05) || near(Math.sqrt(Math.PI), 0.04))
+      nudge = " Out by \u03c0 or \u221a\u03c0 &mdash; check whether a \u221a(\u03c0t) or a 4\u03c0\u03b5\u2080 has gone missing.";
+    else if (near(2, 0.06) || near(0.5, 0.06))
+      nudge = " Out by a factor of 2 &mdash; look for n, for the 2 in the ionic-strength \u00bd, or for the 2k_BT in the pairing criterion.";
+    st.msg = "Not correct." + nudge + " One more attempt before the solution appears.";
+    st.msgKind = "no";
+  }
+  save(); render();
+}
+
+function choose(i, j){
+  var st = state[i], p = probs[i];
+  if (st.showSol) return;
+  st.tries = 1;
+  st.given = String(j);
+  st.showSol = true;
+  st.solved = (j === p.answer);
+  st.msg = st.solved
+    ? "Correct."
+    : "Not correct &mdash; the right option is <b>" + LETTER[p.answer] + "</b>. Concept questions get one attempt.";
+  st.msgKind = st.solved ? "ok" : "no";
+  save(); render();
+}
+
+sheet.addEventListener("click", function(ev){
+  var b = ev.target.closest("[data-check]");
+  if (b){ check(+b.getAttribute("data-check")); return; }
+  var m = ev.target.closest("[data-mcq]");
+  if (m) choose(+m.getAttribute("data-mcq"), +m.getAttribute("data-opt"));
+});
+sheet.addEventListener("keydown", function(ev){
+  if (ev.key !== "Enter") return;
+  var m = (ev.target.id || "").match(/^in(\d+)$/);
+  if (m){ ev.preventDefault(); check(+m[1]); }
+});
+
+function start(id){
+  build(id);
+  if (!state.length || state.length !== probs.length){
+    state = probs.map(function(){
+      return {solved:false, tries:0, given:"", msg:"", msgKind:"", showSol:false};
+    });
+  }
+  save(); render();
+}
+
+genBtn.addEventListener("click", function(){
+  var id = (sId.value || "").trim();
+  if (!id){
+    startHint.innerHTML = "<b style='color:var(--stop)'>Enter your student ID first.</b> "
+                        + "It is what generates your particular problems.";
+    sId.focus(); return;
+  }
+  state = []; start(id);
+});
+sId.addEventListener("keydown", function(e){ if (e.key === "Enter") genBtn.click(); });
+
+/* ---------- the result, in one shape ----------
+   The download and the course submission carry exactly the same columns, so a
+   sheet export and a handed-in file can be marked by the same tool. */
+function result(){
+  var solved = state.filter(function(s){ return s.solved; }).length;
+  var r = {
+    assignment:"PS2", student_id:sid, completed_utc:new Date().toISOString(),
+    solved:solved, total:probs.length, verification:vcode(),
+    kinds:[], topics:[], expected:[], given:[], tries:[], ok:[]
+  };
+  probs.forEach(function(p, i){
+    var g = state[i].given;
+    r.kinds.push(p.kind);
+    r.topics.push(p.topic);
+    r.expected.push(p.kind === "calc" ? sig(p.answer, 5) : LETTER[p.answer]);
+    r.given.push(p.kind === "calc" ? g : (g === "" ? "" : LETTER[+g]));
+    r.tries.push(state[i].tries);
+    r.ok.push(state[i].solved ? 1 : 0);
+  });
+  return r;
+}
+
+/* ---------- submission file ---------- */
+document.getElementById("dlBtn").addEventListener("click", function(){
+  var res = result();
+  var head = ["assignment", "student_id", "completed_utc", "solved", "total", "verification"];
+  var row  = [res.assignment, res.student_id, res.completed_utc, res.solved, res.total, res.verification];
+  probs.forEach(function(p, i){
+    head.push("q" + (i+1) + "_kind");     row.push(res.kinds[i]);
+    head.push("q" + (i+1) + "_topic");    row.push(res.topics[i]);
+    head.push("q" + (i+1) + "_expected"); row.push(res.expected[i]);
+    head.push("q" + (i+1) + "_given");    row.push(res.given[i]);
+    head.push("q" + (i+1) + "_tries");    row.push(res.tries[i]);
+    head.push("q" + (i+1) + "_solved");   row.push(res.ok[i]);
+  });
+  function cell(v){ v = String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+  var csv = head.join(",") + "\n" + row.map(cell).join(",") + "\n";
+  try {
+    var blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = "CH40051-PS2_" + sid.replace(/[^A-Za-z0-9_-]/g, "") + ".csv";
+    a.style.display = "none";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+    document.getElementById("dlHint").textContent =
+      "Saved. Keep it as your backup — the submission itself is the button beside this one.";
+  } catch(e){
+    document.getElementById("dlHint").textContent =
+      "Your browser blocked the download. Screenshot this page and submit that instead.";
+  }
+});
+
+/* ---- submit straight to the course sheet ----------------------------------
+   The same endpoint the concept checks use; the assignment field is what
+   routes this row to the "Problem set" tab of the submissions sheet. Left
+   empty, the button stays hidden and only the download exists.             */
+var SUBMIT_URL = "https://script.google.com/macros/s/AKfycbxPm7WrbttFu6-gnTi__IcUPt-816GthK0eI8TPuwOZyYlcRW3RAWJlmsr791moxBc5GA/exec";
+
+var sendBtn = document.getElementById("sendBtn"),
+    dlHint  = document.getElementById("dlHint");
+if (SUBMIT_URL){
+  sendBtn.hidden = false;
+  dlHint.textContent = "Press Submit to send your result to the course. The download is a backup.";
+}
+
+sendBtn.addEventListener("click", function(){
+  if (!sid){ dlHint.textContent = "Generate your set first."; return; }
+  var payload = result();
+  sendBtn.disabled = true;
+  dlHint.textContent = "Sending\u2026";
+
+  /* text/plain keeps this a simple request, so the browser sends it without
+     a preflight the Apps Script endpoint cannot answer */
+  fetch(SUBMIT_URL, {
+    method:"POST",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify(payload)
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(j){
+    if (j && j.ok){
+      sendBtn.textContent = "Submitted \u2713";
+      dlHint.textContent = "Recorded for student ID " + payload.student_id + " \u2014 "
+        + payload.solved + " of " + payload.total + " correct. You can close this page.";
+    } else {
+      var e = new Error((j && j.error) || "rejected"); e.fromServer = !!(j && j.error); throw e;
+    }
+  })
+  .catch(function(err){
+    /* a refusal the endpoint gave us is the student's to act on and resending
+       would not help; a reply we could not read is ours, so resend blind and
+       let the downloaded file stand as proof */
+    if (err && err.fromServer){
+      sendBtn.disabled = false;
+      sendBtn.textContent = "Submit to the course";
+      dlHint.textContent = err.message;
+      return;
+    }
+    fetch(SUBMIT_URL, {method:"POST", mode:"no-cors",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(payload)}).catch(function(){});
+    sendBtn.disabled = false;
+    sendBtn.textContent = "Submit to the course";
+    dlHint.textContent = "Sent, but the confirmation did not come back. "
+      + "Download the file as well and keep it \u2014 it is your proof of submission.";
+  });
+});
+
+/* resume a set from a previous visit */
+var prev = load();
+if (prev){ state = prev.st || []; start(prev.id); }
+
+})();
+</script>
+</body>
+</html>
