@@ -237,9 +237,13 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
         <p class="hint" style="margin:0">Nothing reacts at a liquid junction. Both ions of the salt diffuse down the same concentration
           gradient, but they do not diffuse at the same speed, and the faster one gets ahead. That separates charge &mdash; an
           <b>infinitesimal</b> amount of it, far too little to measure as a concentration &mdash; and the field it sets up does two things
-          at once: it <b>pulls the slow ion forward</b> and <b>holds the fast one back</b>. Within nanoseconds &mdash; the time &epsilon;/&sigma; of Lecture 8, half a nanosecond in 0.1 M KCl &mdash; the two are crossing at
-          exactly the same rate, and the junction settles into a <b>steady state</b> (not equilibrium: the salt is still diffusing) with a
-          standing potential difference across it, the <b>liquid junction</b> or <b>diffusion potential</b>.</p>
+          at once: it <b>pulls the slow ion forward</b> and <b>holds the fast one back</b>. Within nanoseconds &mdash; the time
+          &epsilon;/&sigma; of Lecture 8, half a nanosecond in 0.1 M KCl &mdash; it has grown until the <b>charge</b> the ions carry
+          cancels: every ion is still crossing, and their fluxes are not equal, but <b>&Sigma; z<sub>j</sub>j<sub>j</sub> = 0</b> and no
+          net current flows. That is the <b>steady state</b> (not equilibrium: the salt is still diffusing), and the potential standing
+          across the boundary is the <b>liquid junction</b> or <b>diffusion potential</b>. Only when the two sides hold the <em>same</em>
+          salt does the condition simplify to the cation and the anion crossing at the same rate; with HCl against KCl it is the three
+          fluxes of H<sup>+</sup>, K<sup>+</sup> and Cl<sup>&minus;</sup> that have to add to zero charge.</p>
         <p class="hint" style="margin:0">It is the one term in a measured cell voltage that no electrode can account for:
           E<sub>cell</sub> = E<sub>Nernst</sub> + E<sub>lj</sub>. Two calomel electrodes in 0.1 M HCl and 0.1 M KCl see the same
           chloride activity, so the cell ought to read zero &mdash; and it reads about 27 mV. That is the junction, and the whole purpose
@@ -283,7 +287,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
               <button class="ghost" id="ljPlay" type="button">&#9654; Replay from t = 0</button>
               <button class="ghost" id="ljP1" type="button">The 27 mV cell: 0.1 M HCl | 0.1 M KCl</button>
               <button class="ghost" id="ljP2" type="button">One salt, two strengths: 0.01 | 0.1 M HCl</button>
-              <button class="ghost" id="ljP3" type="button">Saturated KCl bridge</button>
+              <button class="ghost" id="ljP3" type="button">One side of a bridge: 0.1 M HCl | sat. KCl</button>
             </div>
           </div>
           <svg id="ljpic" viewBox="0 0 540 440" style="display:block;width:100%;height:auto;max-width:540px;margin:0 auto" role="img" aria-label="The junction run forward in time: ions crossing at different speeds, the charge that lines up in the boundary layer, each ion&apos;s speed split into a diffusion part and the part the field it built takes back, the net current falling to zero, and a voltmeter trace climbing to the liquid junction potential"></svg>
@@ -308,6 +312,9 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
           <div class="readout"><span class="k"><span class="mig">E<sub>lj</sub></span>, Henderson</span><span class="v" id="ljE">&mdash;</span></div>
           <div class="readout"><span class="k">the shortcut for this junction</span><span class="v" id="ljAlt">&mdash;</span></div>
           <div class="readout"><span class="k">as a pH error, if this cell measured pH</span><span class="v" id="ljPH">&mdash;</span></div>
+          <div class="readout"><span class="k">through a sat. KCl bridge: &alpha; | KCl</span><span class="v" id="ljB1">&mdash;</span></div>
+          <div class="readout"><span class="k">&hellip; and KCl | &beta;</span><span class="v" id="ljB2">&mdash;</span></div>
+          <div class="readout"><span class="k"><b>what the meter reads with the bridge</b></span><span class="v" id="ljBT">&mdash;</span></div>
           <div id="ljVerdict" class="verdict flat" style="margin-top:14px">&mdash;</div>
         </div>
       </div>
@@ -323,19 +330,26 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
             It crosses into the KCl faster than K<sup>+</sup> crosses the other way, so the KCl side charges <b>positive</b> and the HCl
             side is left <b>negative</b>: E<sub>lj</sub> = &phi;<sup>&beta;</sup> &minus; &phi;<sup>&alpha;</sup> comes out about
             +27 mV, exactly what the voltmeter sees between two identical calomel electrodes.</p>
-          <p class="hint" style="margin:0"><b>2. A bridge works by drowning the difference.</b> Henderson weights every ion by
+          <p class="hint" style="margin:0"><b>2. A bridge is two junctions, not one.</b> Putting saturated KCl between the two
+            solutions does not remove the boundary &mdash; it replaces one boundary with two, &alpha;|KCl and KCl|&beta;, and the meter
+            reads their <b>sum</b>. The picture above is a single junction, so setting &beta; to 4.2 M KCl shows you only the first of
+            the two; the strip below, and the three readouts beside it, do the whole configuration for whatever &alpha; and &beta; you
+            have set. The two steps carry opposite signs and largely cancel: 0.1 M HCl against 0.1 M KCl falls from 27 mV to about
+            3 mV once the bridge is in.</p>
+          <p class="hint" style="margin:0"><b>3. Why it works: the bridge drowns the difference.</b> Henderson weights every ion by
             |z|u c. Flood the junction with 4.2 M KCl and the two bridge ions dominate both sums &mdash; and K<sup>+</sup> and
             Cl<sup>&minus;</sup> have almost the same mobility (t<sub>+</sub> = 0.49 against t<sub>&minus;</sub> = 0.51), so neither
             runs ahead and there is almost nothing left to separate. The remaining millivolt or two is why a salt bridge reduces
             E<sub>lj</sub> rather than removing it. LiCl would be a poor bridge: t<sub>+</sub> = 0.34, so two thirds of the current
             is carried by Cl<sup>&minus;</sup>.</p>
-          <p class="hint" style="margin:0"><b>3. The same salt, two strengths, is the smaller effect.</b> There the two sides share
+          <p class="hint" style="margin:0"><b>4. The same salt, two strengths, is the smaller effect.</b> There the two sides share
             both ions, and only the transference numbers survive: E<sub>lj</sub> = (t<sub>+</sub> &minus; t<sub>&minus;</sub>)(RT/F)
             ln(c<sup>&alpha;</sup>/c<sup>&beta;</sup>). For KCl that prefactor is 0.49 &minus; 0.51 = &minus;0.02, so a tenfold step
             gives about 1 mV; for HCl it is +0.64, and the same step gives 38 mV. One junction, two decades of difference, decided
             entirely by which ions are carrying the current. Mobilities here are infinite-dilution values (Lecture 8), so above about
             0.1 M read these numbers as the trend rather than the measurement.</p>
         </div>
+        <svg id="ljbr" viewBox="0 0 540 104" style="display:block;width:100%;height:auto;max-width:540px;margin:0 auto" role="img" aria-label="The same two solutions joined through a saturated KCl bridge: three compartments, a junction at each face of the bridge, the potential step at each one, and their sum, with the direct junction for comparison"></svg>
         <div id="ljRead" class="verdict flat">&mdash;</div>
       </div>
     </div>
@@ -864,9 +878,17 @@ document.getElementById("ljP1").addEventListener("click", function(){ ljPreset("
 document.getElementById("ljP2").addEventListener("click", function(){ ljPreset("HCl", 0.01, "HCl", 0.1); });
 document.getElementById("ljP3").addEventListener("click", function(){ ljPreset("HCl", 0.1, "KCl", 4.2); });
 
+var LJ_BRIDGE = 4.2;                      /* saturated KCl, mol/L */
+
 function ljNumbers(){
   var ca = ljCa(), cb = ljCb(), a = ljConc(ljA, ca), b = ljConc(ljB, cb);
   var E = ljHenderson(a, b), ta = ljTplus(ljA), tb = ljTplus(ljB);
+  /* a bridge is two junctions in series, and what the meter reads is the sum */
+  var br = ljConc("KCl", LJ_BRIDGE);
+  var e1 = ljHenderson(a, br), e2 = ljHenderson(br, b), et = e1 + e2;
+  document.getElementById("ljB1").textContent = (e1 * 1000).toFixed(1) + " mV";
+  document.getElementById("ljB2").textContent = (e2 * 1000).toFixed(1) + " mV";
+  document.getElementById("ljBT").textContent = (et * 1000).toFixed(1) + " mV";
   document.getElementById("ljCav").textContent = ljFmtC(ca);
   document.getElementById("ljCbv").textContent = ljFmtC(cb);
   document.getElementById("ljWho").textContent = ljFmtC(ca) + " " + ljA + "  |  " + ljFmtC(cb) + " " + ljB;
@@ -918,6 +940,7 @@ function ljNumbers(){
   }
 
   var ro = document.getElementById("ljRead");
+  ljBridge(e1, e2, E);
   ro.innerHTML = "<b>Right now:</b> " + ljFmtC(ca) + " " + ljA + " against " + ljFmtC(cb) + " " + ljB
     + ". Henderson gives E<sub>lj</sub> = φ<sup>β</sup> − φ<sup>α</sup> = " + mv.toFixed(1) + " mV"
     + (ljA === ljB ? ", the same-salt case, so the prefactor is just t₊ − t₋ = " + (2 * ta - 1).toFixed(2) + "."
@@ -962,6 +985,36 @@ function ionGlyph(k, x, y, r, op){
     pts.push((x + r * 1.1 * Math.cos(th)).toFixed(1) + ',' + (y + r * 1.1 * Math.sin(th)).toFixed(1));
   }
   return '<polygon points="' + pts.join(" ") + '"' + a;
+}
+
+/* ---- the bridge, drawn as what it is: two junctions in series ----------- */
+function ljBridge(e1, e2, direct){
+  var W = 540, X0 = 14, X1 = W - 14, BW = 150, G = 26;
+  var ax1 = X0 + BW, bx0 = ax1 + G, bx1 = bx0 + BW, cx0 = bx1 + G;
+  var TOP = 26, BOT = 62, J1 = ax1 + G / 2, J2 = bx1 + G / 2;
+  var s = "";
+  s += '<text x="' + X0 + '" y="12" fill="var(--muted)" ' + MONO + ' font-size="10.5">'
+     + 'with a bridge there are two junctions, and the meter reads the sum</text>';
+  [[X0, ax1, "α · " + ljFmtC(ljCa()) + " " + ljA, "var(--surface-2)", 0.75],
+   [bx0, bx1, "sat. KCl " + LJ_BRIDGE.toFixed(1) + " M", "var(--go-soft)", 0.9],
+   [cx0, X1, "β · " + ljFmtC(ljCb()) + " " + ljB, "var(--surface-2)", 0.45]].forEach(function(p){
+    s += '<rect x="' + p[0] + '" y="' + TOP + '" width="' + (p[1] - p[0]) + '" height="' + (BOT - TOP)
+       + '" rx="3" fill="' + p[3] + '" opacity="' + p[4] + '"/>';
+    s += '<text x="' + ((p[0] + p[1]) / 2) + '" y="' + (TOP + 22) + '" text-anchor="middle" fill="var(--ink-2)" ' + MONO
+       + ' font-size="10.5">' + p[2] + '</text>';
+  });
+  [[J1, e1], [J2, e2]].forEach(function(p, i){
+    s += '<line x1="' + p[0] + '" y1="' + (TOP - 6) + '" x2="' + p[0] + '" y2="' + (BOT + 6)
+       + '" stroke="var(--line-2)" stroke-width="1" stroke-dasharray="3 3"/>';
+    s += '<text x="' + p[0] + '" y="' + (BOT + 20) + '" text-anchor="middle" fill="var(--ox)" ' + MONO
+       + ' font-size="10.5">E' + (i + 1) + ' = ' + (p[1] * 1000).toFixed(1) + '</text>';
+  });
+  var tot = (e1 + e2) * 1000, dir = direct * 1000;
+  s += '<text x="' + X0 + '" y="' + (BOT + 38) + '" fill="var(--go)" ' + MONO + ' font-size="11.5" font-weight="600">'
+     + 'E1 + E2 = ' + tot.toFixed(1) + ' mV</text>';
+  s += '<text x="' + (X0 + 150) + '" y="' + (BOT + 38) + '" fill="var(--muted)" ' + MONO + ' font-size="10.5">'
+     + 'the same two solutions, joined directly: ' + dir.toFixed(1) + ' mV</text>';
+  document.getElementById("ljbr").innerHTML = s;
 }
 
 /* ---- the junction, as a story in time ------------------------------------
@@ -1594,11 +1647,11 @@ function iseDraw(){
 var QZ9 = [
   {q:"Two identical calomel electrodes sit in 0.1 M HCl and 0.1 M KCl, joined by a porous frit. The chloride activity is the same on both sides, so the Nernst equation predicts zero. The meter reads about 27 mV. Why?",
    o:["The HCl is a stronger acid, so its electrode potential is higher",
-      "H⁺ crosses the junction faster than K⁺ crosses the other way, separating charge until the field it leaves holds the two fluxes equal",
+      "H⁺ crosses the junction faster than K⁺ crosses the other way, separating charge until the field it leaves brings the net ionic current to zero",
       "Chloride reacts with the frit, so the two chloride activities are not really equal",
       "The two electrodes are at different temperatures"],
    a:1,
-   w:"Nothing reacts at the junction, and nothing is wrong with either electrode. Both salts share Cl⁻; the difference is H⁺ against K⁺, and H⁺ is about five times as mobile. It runs ahead into the KCl, leaving the HCl side negative, and the field that builds up slows it and speeds K⁺ until both cross at the same rate — a steady state with a standing 27 mV across it. This is E_lj, and it adds to every cell voltage measured through a junction: E_cell = E_Nernst + E_lj."},
+   w:"Nothing reacts at the junction, and nothing is wrong with either electrode. Both salts share Cl⁻; the difference is H⁺ against K⁺, and H⁺ is about five times as mobile. It runs ahead into the KCl, leaving the HCl side negative, and the field that builds up retards H⁺ and accelerates the others until the <b>charge</b> they carry cancels: Σ z_j j_j = 0, so no net current flows. Note what that does <em>not</em> say — the individual fluxes are neither equal nor zero. Here three ions move (H⁺ and K⁺ in opposite directions, Cl⁻ down its own small gradient) and it is the sum of their charge fluxes that vanishes; only for one salt at two concentrations does the condition reduce to equal cation and anion fluxes. The standing 27 mV is E_lj, and it adds to every cell voltage measured through a junction: E_cell = E_Nernst + E_lj."},
 
   {q:"Why is a salt bridge filled with <i>saturated</i> (4.2 M) KCl rather than, say, 0.1 M LiCl?",
    o:["KCl is cheaper and more soluble than LiCl",
