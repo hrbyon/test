@@ -572,6 +572,11 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
             <span style="display:block"><b>Read it downward.</b> Top bar = what thermodynamics promises; each bar below is one term taking its cut;
               bottom bar = what the cell delivers, or what an electrolyser demands. The percentage is voltage efficiency
               V<sub>work</sub>/E<sub>rev</sub>, not energy efficiency.</span>
+            <span style="display:block"><b>Past i<sub>L</sub> the bars say so.</b> The
+              <b class="cnc">concentration</b> row is drawn full width and marked &rarr; &infin;, and the
+              bottom row reads &rarr; &minus;&infin; with &ldquo;nothing &mdash; the cell is being
+              driven&rdquo;. There is no working voltage at that current, so the efficiency has no value
+              either &mdash; the readouts beside the plot show em dashes rather than numbers.</span>
             <span style="display:block"><b>All bars to one scale</b>, so the largest cut is obvious. Slide the current: <b class="act">activation</b>
               barely moves (logarithmic), <b class="ohm">ohmic</b> grows in proportion,
               <b class="cnc">concentration</b> is nothing at all until it is everything.</span>
@@ -589,7 +594,18 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
               <b>below</b> that line and the brackets hang down from it; for an electrolyser it runs <b>above</b> and they stack up.
               Either way the brackets split the gap into <b class="act">&eta;<sub>act</sub></b>,
               <b class="ohm">&eta;<sub>&Omega;</sub></b>, <b class="cnc">&eta;<sub>conc</sub></b> &mdash; the waterfall&rsquo;s
-              numbers, drawn in place, each arrow exactly as long as the number beside it.</span>
+              numbers, drawn in place, each band exactly as long as the number beside it. If
+              <b class="cnc">&eta;<sub>conc</sub></b> has run away, the other two still carry numbers: they
+              are what activation and iR <em>would</em> cost at that current. Raise i<sub>L</sub> past it and
+              all three are finite again.</span>
+            <span style="display:block"><b class="cnc">What &eta;<sub>conc</sub> is, and when it stops
+              being a number.</b> Below the limit it is the voltage the depleted surface costs you,
+              (RT/nF)ln(1 &minus; i/i<sub>L</sub>): the reactant arrives more slowly than you are consuming it,
+              c<sub>s</sub> falls below c*, and Nernst charges you for the difference. At
+              <b>i = i<sub>L</sub></b> the surface is empty, c<sub>s</sub> = 0, and the logarithm diverges
+              &mdash; so it is not a large loss but a <b>wall</b>: no potential makes the reactant arrive any
+              faster, the cell has no steady voltage at that current, and the extra current a real cell is
+              asked for goes into some other reaction &mdash; in water, breaking up the solvent.</span>
             <span style="display:block"><b>When the losses beat E<sub>rev</sub>.</b> Draw a large current through a large
               R<sub>u</sub> and the three overpotentials together exceed <b class="pot">E<sub>rev</sub></b>: the curve crosses the
               grey dotted <b>V = 0</b> line, the voltage axis opens downward, and the cell delivers nothing &mdash; it is being
@@ -1724,59 +1740,75 @@ function alDrawPol(){
        + (px(jset) - 4).toFixed(1) + "," + (Y1 + 2) + " "
        + (px(jset) + 4).toFixed(1) + "," + (Y1 + 2)
        + '" fill="var(--ion-k)"/>';
-    s += tx(clamp(px(jset), X0 + 76, X1 - 76), Y1 + 15,
-            "this point, in time below", "var(--ion-k)", 8.5, "middle", 600);
-    /* the three losses, bracketed in place, so the curve says which is
-       which. They stack away from E_rev on the side the voltage actually
-       moves: down for a galvanic cell, up for an electrolyser.
-       Every term that exists is drawn: a term too short for an arrow gets
-       a tick pair and a leader, and an unbounded one runs off the frame.
-       Dropping the small ones is what used to hide eta_conc entirely.  */
-    var sgn = c.gal ? -1 : 1, lastY = null, taken = [];
-    var xb = px(jset) + (right ? -22 : 22), acc = c.Erev;
+    s += tx(clamp(px(jset), X0 + 44, X1 - 42), Y1 + 15,
+            "in time, below", "var(--ion-k)", 8.5, "middle", 600);
+    /* the three losses as one ruler from E_rev to the operating point,
+       coloured in contiguous bands at exact scale, with the numbers in a
+       column and a leader from each to its own band. Two of the three are
+       routinely a pixel or two tall, so a label stepped clear of its
+       neighbour with nothing joining them pointed at nothing at all.    */
+    var sgn = c.gal ? -1 : 1, taken = [], acc = c.Erev, bands = [];
     [[t0.es + t0.ef, "var(--ox)", "η_act"], [t0.eo, "var(--ohmic)", "η_Ω"],
      [t0.ec, "var(--cnc)", "η_conc"]].forEach(function(q){
       if(!(q[0] > 5e-5)) return;          /* under 0.05 mV there is nothing */
       var inf = !isFinite(q[0]);
       var va = acc;
       acc += sgn * (inf ? vSpan : q[0]);
-      var vb = acc;
-      /* clip to the frame, and say so, rather than drawing a short arrow
-         with the full number beside it                                  */
-      var lo = Math.max(Math.min(va, vb), vLo), hi = Math.min(Math.max(va, vb), vHi);
+      var lo = Math.max(Math.min(va, acc), vLo), hi = Math.min(Math.max(va, acc), vHi);
       if(hi <= lo) return;
-      var cut = !inf && hi - lo < q[0] * 0.98;
-      var yhi = py(hi), ylo = py(lo), thin = ylo - yhi < 10;
-      if(thin){
-        s += ln(xb - 4, yhi, xb + 4, yhi, q[1], 1.4);
-        s += ln(xb - 4, ylo, xb + 4, ylo, q[1], 1.4);
-        s += ln(xb, (yhi + ylo) / 2, xb + (right ? -11 : 11), (yhi + ylo) / 2, q[1], 1);
-      }else{
-        s += arrowV(xb, yhi, ylo, q[1], "", "l");
-      }
-      /* the numbers follow the arrows, except that two thin brackets would
-         write over each other: then the later one steps clear            */
-      var ly = (yhi + ylo) / 2 + 3.5;
-      if(lastY !== null){
-        if(c.gal && ly - lastY < 13) ly = lastY + 13;
-        if(!c.gal && lastY - ly < 13) ly = lastY - 13;
-      }
-      lastY = ly;
-      var btx = q[2] + " " + (inf ? "unbounded"
-                                  : (q[0] * 1000).toFixed(q[0] < 0.0095 ? 1 : 0)
-                                    + (cut ? " (part off frame)" : ""));
-      var bax = xb + (right ? -1 : 1) * (thin ? 14 : 6), bw = btx.length * 5.7;
-      taken.push({x0: right ? bax - bw : bax, x1: right ? bax : bax + bw,
-                  y0: ly - 9, y1: ly + 3});
-      s += txh(bax, ly, btx, q[1], 9.5, right ? "end" : "start", 600);
+      bands.push({yhi: py(hi), ylo: py(lo), col: q[1], nm: q[2], v: q[0], inf: inf,
+                  cut: !inf && hi - lo < q[0] * 0.98});
     });
+    var xb = px(jset) + (right ? -17 : 17);
+    bands.forEach(function(b){
+      /* a band that runs off the frame is drawn broken, with an open end and
+         a chevron: a solid band is the mark a measured length gets         */
+      s += ln(xb, b.yhi, xb, b.ylo, b.col, 5.5, b.inf ? "7 4" : null, b.inf ? 0.75 : 0.9);
+      var yStart = c.gal ? b.yhi : b.ylo, yEnd = c.gal ? b.ylo : b.yhi;
+      s += ln(xb - 4.5, yStart, xb + 4.5, yStart, b.col, 1.1);
+      if(b.inf){
+        var dir = c.gal ? 1 : -1;
+        s += pth("M" + (xb - 5).toFixed(1) + " " + (yEnd - 7 * dir).toFixed(1)
+               + "L" + (xb + 5).toFixed(1) + " " + (yEnd - 7 * dir).toFixed(1)
+               + "L" + xb.toFixed(1) + " " + yEnd.toFixed(1) + "Z", "none", 0, b.col, 0.9);
+      }else{
+        s += ln(xb - 4.5, yEnd, xb + 4.5, yEnd, b.col, 1.1);
+      }
+    });
+    /* the column: each label wants its band's middle, then they are pushed
+       apart just enough not to touch, in the order the bands stack       */
+    var want = bands.map(function(b){ return (b.yhi + b.ylo) / 2; });
+    var GAP = 13;
+    for(var p1 = 1; p1 < want.length; p1++)
+      if(Math.abs(want[p1] - want[p1 - 1]) < GAP)
+        want[p1] = want[p1 - 1] + (c.gal ? GAP : -GAP);
+    var shift = 0;
+    want.forEach(function(y){
+      if(y < Y0 + 8) shift = Math.max(shift, Y0 + 8 - y);
+      if(y > Y1 - 6) shift = Math.min(shift, Y1 - 6 - y);
+    });
+    var lx = xb + (right ? -13 : 13);
+    bands.forEach(function(b, k){
+      var ly = want[k] + shift, my = (b.yhi + b.ylo) / 2;
+      s += ln(xb + (right ? -5 : 5), my, lx, ly, b.col, 1, null, 0.85);
+      var btx = b.inf ? b.nm + " \u2192 \u221e : i has reached i_L"
+                      : b.nm + " " + (b.v * 1000).toFixed(b.v < 0.0095 ? 1 : 0)
+                        + (b.cut ? " (part off frame)" : "");
+      var bw = btx.length * 5.7;
+      taken.push({x0: right ? lx - bw : lx, x1: right ? lx : lx + bw,
+                  y0: ly - 9, y1: ly + 3});
+      s += txh(lx + (right ? -3 : 3), ly + 3.5, btx, b.col, 9.5,
+               right ? "end" : "start", 600);
+    });
+    /* where the column ended, so the operating-point label can stay clear */
+    var lastY = bands.length ? want[want.length - 1] + shift + 3.5 : null;
     if(inFr(t0.V)){
       s += cir(px(jset), py(t0.V), 4.5, "var(--ion-k)");
       /* the dot is ON the curve, so its label has to find a corner the
          curve does not pass through: below for a cell, above for an
          electrolyser, on the bracket side first, then the other, and
          clear of the last bracket number, which may have been pushed  */
-      var vtx = t0.V.toFixed(3) + " V", wpx = vtx.length * 6.3, cand = [];
+      var vtx = "V_cell = " + t0.V.toFixed(3) + " V", wpx = vtx.length * 6.3, cand = [];
       var aw = c.gal ? 1 : -1;                /* away from E_rev, in pixels */
       [0, 1].forEach(function(flip){
         var endSide = flip ? !right : right;
@@ -1821,8 +1853,11 @@ function alDrawPol(){
       s += pth("M" + (xm - 5).toFixed(1) + " " + yt.toFixed(1) + "L" + (xm + 5).toFixed(1)
              + " " + yt.toFixed(1) + "L" + xm.toFixed(1) + " " + ye.toFixed(1) + "Z",
              "none", 0, "var(--ion-k)", 0.95);
+      /* past i_L there is no steady voltage at all, so there is no number to
+         quote - saying "-Infinity V" invited it to be read as an overpotential */
       s += txh(xm + (right ? -8 : 8), ye + (low ? -14 : 22),
-              t0.V.toFixed(3) + " V, off the frame", "var(--ion-k)", 10,
+              isFinite(t0.V) ? "V_cell = " + t0.V.toFixed(3) + " V, off the frame"
+                             : "no steady V_cell: i \u2265 i_L", "var(--ion-k)", 10,
               right ? "end" : "start", 600);
     }
   }
