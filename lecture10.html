@@ -18,6 +18,8 @@
   --stop:#8A5F0C; --stop-soft:#F3E9D3;
   --elec:#3E4A4D; --ion-k:#6E4C9B; --ion-k-soft:#EBE3F5;
   --ohmic:#0E96B5; --ohmic-soft:#DCF0F6;   /* iR: a light blue, away from the brown of eta_act */
+  --cnc:#9A2E8C; --cnc-soft:#F6E2F3;       /* eta_conc: a purple, magenta-leaning so that it
+                                              does not read as the blue-violet of a marker */
   --shadow:0 1px 2px rgba(20,25,27,.05),0 8px 24px -12px rgba(20,25,27,.18);
 }
 @media (prefers-color-scheme: dark){
@@ -30,6 +32,7 @@
     --stop:#D6A33F; --stop-soft:#2B2415;
     --elec:#AEBBBE; --ion-k:#B99BE0; --ion-k-soft:#241C33;
     --ohmic:#47D4E6; --ohmic-soft:#102A30;
+    --cnc:#E58BD4; --cnc-soft:#2E1A2B;
     --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
   }
 }
@@ -42,6 +45,7 @@
   --stop:#D6A33F; --stop-soft:#2B2415;
   --elec:#AEBBBE; --ion-k:#B99BE0; --ion-k-soft:#241C33;
     --ohmic:#47D4E6; --ohmic-soft:#102A30;
+  --cnc:#E58BD4; --cnc-soft:#2E1A2B;
   --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
 }
 *{box-sizing:border-box}
@@ -145,7 +149,7 @@ table.ions tr.lo td{color:var(--red-)}
 .eqbig small{color:var(--muted);font-size:11.5px;letter-spacing:.04em}
 /* one colour per loss term, used in prose, in the equations and in every picture */
 .act{color:var(--ox);font-weight:600}
-.cnc{color:var(--red-);font-weight:600}
+.cnc{color:var(--cnc);font-weight:600}
 .ohm{color:var(--ohmic);font-weight:600}
 .pot{color:var(--go);font-weight:600}
 .mix{color:var(--ion-k);font-weight:600}
@@ -200,6 +204,9 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
 .pairfig>.card>.card-b:last-child{flex:1 1 auto}
 @media(max-width:880px){.pairfig{grid-template-columns:1fr}}
 /* a wide figure with its legend beside it rather than beneath it */
+.pairfig.eq{align-items:stretch}
+.pairfig.eq>.card{display:flex;flex-direction:column}
+.pairfig.eq>.card>.card-b:last-child{flex:1 1 auto}
 .figside{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(210px,1fr);gap:14px 18px;align-items:start}
 @media(max-width:880px){.figside{grid-template-columns:1fr}}
 /* terse notes, two to a row */
@@ -360,9 +367,30 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
           <span class="cnc">&eta;<sub>conc</sub> = (RT/nF) ln(1 &minus; j/j<sub>L</sub>)</span><br>
           <small>Fick&rsquo;s first law across a layer made linear &nbsp;&middot;&nbsp; the ceiling it sets &nbsp;&middot;&nbsp; what approaching that ceiling costs</small>
         </div>
-        <p class="hint" style="margin:8px 0 0;color:var(--muted)">The two panels below differ in one thing only: what sets
-          <b class="cnc">&delta;</b>. Nothing fixes it in a still cell, so it grows and the current decays; rotation fixes it on a
-          disc, so the current is steady. Everything else on this tab is these three equations read at that &delta;.</p>
+        <div class="notes2" style="margin-top:12px">
+          <p class="hint"><b class="cnc">&delta; &mdash; the Nernst diffusion layer</b>, in cm. The slab of solution against the
+            electrode that is <em>treated</em> as stagnant, so that transport across it is pure diffusion and the profile through it
+            is a straight line; beyond &delta; the solution is taken to be perfectly mixed at c*. No such boundary exists: &delta; is
+            defined as the distance at which the tangent to the real profile at the surface reaches the bulk concentration, which is
+            exactly what makes the straight-line picture give the right current. Typically a few hundred &micro;m in a quiet cell and
+            ten-odd &micro;m on a spinning disc.</p>
+          <p class="hint"><b class="cnc">j<sub>L</sub> &mdash; the limiting current density</b>, in A/cm<sup>2</sup>. The most
+            current the solution can deliver. Push harder and c<sub>s</sub> falls; once it hits zero the gradient is as steep as it
+            can be, c*/&delta;, and <b>no potential will raise the current any further</b> &mdash; the extra drive goes into
+            &eta;<sub>conc</sub>, or into some other reaction. Since j<sub>L</sub> &prop; c*/&delta;, there are only two ways to
+            lift the ceiling: more reactant, or a thinner layer.</p>
+        </div>
+        <div class="symgrid" style="margin-top:10px">
+          <span><b>j</b> current density drawn, A/cm<sup>2</sup></span>
+          <span><b>c*</b> concentration in the bulk</span>
+          <span><b>c<sub>s</sub></b> concentration at the surface</span>
+          <span><b>D</b> diffusion coefficient, cm<sup>2</sup>/s</span>
+          <span><b>n</b> electrons per molecule</span>
+          <span><b>F</b> 96 485 C/mol</span>
+        </div>
+        <p class="hint" style="margin:10px 0 0;color:var(--muted)">The two panels below differ in one thing only: <b>what sets
+          &delta;</b>. Nothing fixes it in a still cell, so it grows and the current decays; rotation fixes it on a disc, so the
+          current is steady. Everything else on this tab is these three equations read at that &delta;.</p>
       </div>
     </div>
 
@@ -410,11 +438,17 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
               <div class="slider-row"><span class="fld" style="margin:0">j / j<sub>L</sub> held</span><span class="val" id="cnFv2"></span></div>
               <input type="range" id="cnF2" min="0" max="0.999" step="0.001" value="0.5">
             </div>
+            <div class="btnrow" style="align-self:end">
+              <button class="ghost" id="cnPlay2" type="button">&#9654; Replay the step from t = 0</button>
+            </div>
           </div>
           <svg id="cnrde" viewBox="0 0 1100 254" style="display:block;width:100%;height:auto;margin:0 auto" role="img" aria-label="A rotating disc electrode cell on the left: solution drawn up the axis and flung outward along the disc face, with a thin Nernst diffusion layer against the disc; the concentration profile in the middle; and the limiting current rising as the square root of the rotation rate on the right."></svg>
           <div class="glegend g2">
             <span style="display:block"><b>Convection carries, diffusion does only the last step.</b> That makes &delta; calculable rather than
               estimated: you choose &delta; by choosing &omega;.</span>
+            <span style="display:block"><b>Replay the step</b> and the disc has a transient too: &delta; grows as
+              &radic;(&pi;Dt), exactly as in the still cell, until the flow pins it at the Levich thickness. The difference is
+              when &mdash; milliseconds here, never there.</span>
             <span style="display:block"><b>The Levich test.</b> j<sub>L</sub> against &radic;&omega; straight through the origin = genuinely
               transport-limited, slope nD<sup>2/3</sup>c*. Bent, or missing the origin, = kinetics or a film.</span>
           </div>
@@ -475,6 +509,15 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
           <span class="act">b<sub>a</sub>log(i/i<sub>0,a</sub>)</span> + <span class="act">b<sub>c</sub>log(i/i<sub>0,c</sub>)</span> +
           <span class="ohm">iR<sub>area</sub></span> &minus; <span class="cnc">(RT/nF)ln(1 &minus; i/i<sub>L</sub>)</span>
         </div>
+        <p class="hint" style="margin:0;color:var(--muted)"><b>Why the last term alone flips the other way.</b> The first three
+          are written as positive quantities &mdash; b log(i/i<sub>0</sub>) &gt; 0 once i &gt; i<sub>0</sub>, and iR<sub>area</sub>
+          &gt; 0 &mdash; so they are subtracted from a galvanic cell and added to an electrolytic one. The last is written as the
+          <em>signed</em> Nernst shift, and (RT/nF)ln(1 &minus; i/i<sub>L</sub>) is <b>negative</b> for every 0 &lt; i &lt;
+          i<sub>L</sub>, because the logarithm of a number below 1 is negative. So it needs the opposite operator to mean the same
+          thing: <b>+ in the galvanic line and &minus; in the electrolytic one</b>, both of which cost you
+          |&eta;<sub>conc</sub>|. The page computes it with the sign already taken out,
+          &eta;<sub>conc</sub> = &minus;(RT/n<sub>c</sub>F)ln(1 &minus; i/i<sub>L</sub>) &gt; 0, and then subtracts all four from
+          E<sub>rev</sub> or adds all four to it.</p>
         <div class="notes2">
           <p class="hint">Same three terms, opposite signs. A fuel cell worth 1.23 V delivers less; an electrolyser needing
             1.23 V is fed more; <b>both differences are overpotential</b>, wasted as heat. Round-trip efficiency is the ratio of
@@ -519,7 +562,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
       </div>
     </div>
 
-    <div class="pairfig" style="margin-bottom:16px">
+    <div class="pairfig eq" style="margin-bottom:16px">
 
       <div class="card">
         <div class="card-h"><h2>Where the voltage goes</h2><span class="note" id="alNote">&mdash;</span></div>
@@ -539,10 +582,8 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
       <div class="card">
         <div class="card-h"><h2>The polarisation curve, and how to read it</h2><span class="note">V against i, with each loss labelled</span></div>
         <div class="card-b stack" style="gap:12px">
-          <svg id="alpol" viewBox="0 0 450 300" style="display:block;width:100%;height:auto;margin:0 auto" role="img" aria-label="Cell voltage against current density, with the activation-controlled, ohmic and mass-transport-controlled regions shaded, the reversible voltage as a dashed ceiling, and a marker at the operating point currently set."></svg>
+          <svg id="alpol" viewBox="0 0 450 286" style="display:block;width:100%;height:auto;margin:0 auto" role="img" aria-label="Cell voltage against current density, with the activation-controlled, ohmic and mass-transport-controlled regions shaded, the reversible voltage as a dashed ceiling, and a marker at the operating point currently set."></svg>
           <div class="glegend">
-            <span style="display:block"><b>Axes.</b> Across: the current density drawn or pushed. Up: the terminal voltage at that current. One point is
-              one steady operating condition &mdash; <b>not</b> a sweep in time, which is the commonest misreading.</span>
             <span style="display:block"><b>Reading a loss off it.</b> Pick a current and measure from the dashed
               <b class="pot">E<sub>rev</sub></b> line to the curve: that gap is everything you lost. For a cell the curve runs
               <b>below</b> that line and the brackets hang down from it; for an electrolyser it runs <b>above</b> and they stack up.
@@ -553,10 +594,6 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
               R<sub>u</sub> and the three overpotentials together exceed <b class="pot">E<sub>rev</sub></b>: the curve crosses the
               grey dotted <b>V = 0</b> line, the voltage axis opens downward, and the cell delivers nothing &mdash; it is being
               driven instead. Near j<sub>L</sub> the voltage runs away altogether and the curve simply leaves the frame.</span>
-            <span style="display:block"><b>The shape.</b> Steep out of open circuit (a logarithm), then straight (iR is linear), then off a cliff (the
-              reactant runs out). <b>The shaded bands</b> mark where each term is largest, computed from the curve itself.</span>
-            <span style="display:block"><b>The gap never closes.</b> A real fuel cell also opens 200&ndash;300 mV below 1.23 V for another reason: it
-              sits at a <b class="mix">mixed potential</b> &mdash; <a href="lecture11.html">Lecture 11</a>.</span>
           </div>
         </div>
       </div>
@@ -564,15 +601,16 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
     </div>
 
     <div class="card" style="margin-bottom:16px">
-      <div class="card-h"><h2>Switch the current on and watch the clock</h2><span class="note">the experiment that tells the three apart</span></div>
+      <div class="card-h"><h2>Switch the current on and watch the clock</h2><span class="note">one point of the curve above, taken apart in time</span></div>
       <div class="card-b figside">
         <svg id="altime" viewBox="0 0 660 300" style="display:block;width:100%;height:auto;margin:0 auto" role="img" aria-label="The voltage of a cell against time after a constant current is switched on, broken into the three loss terms: the ohmic drop appears instantly as a step, the activation overpotential appears within microseconds as the double layer charges, and the concentration overpotential grows over tens of seconds as the diffusion layer develops."></svg>
         <div class="glegend">
-          <span style="display:block">Hold the current constant from t = 0 and record the voltage. Each loss has its own clock &mdash; which is why the
-            three are treated as three things.</span>
+          <span style="display:block"><b>This is the violet point on the polarisation curve above</b>, at the same current, with
+            time on the axis instead of current. Hold the current constant from t = 0 and record the voltage: each loss has its
+            own clock, and the gap the brackets measure up there is what this curve ends at on the right.</span>
           <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><path d="M2 12 L8 12 L8 3 L24 3" fill="none" stroke="var(--ohmic)" stroke-width="2.2"/></svg><span><b class="ohm">&eta;<sub>&Omega;</sub> is a step</b>: Ohm&rsquo;s law has nothing to charge or deplete. <b>Interrupt the current and whatever vanishes instantly is the iR drop</b> &mdash; that is current-interrupt compensation.</span></span>
           <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><path d="M2 12 C5 12 6 4 12 3.4 L24 3" fill="none" stroke="var(--ox)" stroke-width="2.2"/></svg><span><b class="act">&eta;<sub>act</sub> in microseconds</b>, the time the double layer needs to charge through R<sub>u</sub> &mdash; R<sub>u</sub>C<sub>d</sub>. Chemically instant too, hence the confusion; only one of the two survives an interruption.</span></span>
-          <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><path d="M2 4 C10 4 14 8 24 12" fill="none" stroke="var(--red-)" stroke-width="2.2"/></svg><span><b class="cnc">&eta;<sub>conc</sub> in tens of seconds</b>, as &delta; = &radic;(&pi;Dt) thickens, stopping only when convection pins &delta;. Above j<sub>L</sub> it never stops.</span></span>
+          <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><path d="M2 4 C10 4 14 8 24 12" fill="none" stroke="var(--cnc)" stroke-width="2.2"/></svg><span><b class="cnc">&eta;<sub>conc</sub> in tens of seconds</b>, as &delta; = &radic;(&pi;Dt) thickens, stopping only when convection pins &delta;. Above j<sub>L</sub> it never stops.</span></span>
           <span style="display:block;color:var(--muted)">The double-layer transient is stretched to be visible &mdash; the real one
             is four to six decades faster.</span>
         </div>
@@ -734,6 +772,7 @@ function sciSvg(x, d){
 }
 /* a current density, in whatever unit keeps it readable */
 function fmtJ(j){
+  if(!isFinite(j)) return j > 0 ? "→ ∞" : "—";
   var a = Math.abs(j);
   if(a === 0) return "0";
   if(a >= 1) return j.toFixed(2) + " A/cm²";
@@ -1076,7 +1115,7 @@ var CN_SP = {
   e2: {n: 2, D: 0.7e-5, nm: "Cu²⁺ + 2e⁻ → Cu", c: 1},
   o2: {n: 4, D: 2.0e-5, nm: "O₂ + 4H⁺ + 4e⁻ → 2H₂O", c: 0.25}
 };
-var CN = {sp: "e2", t0: 0, dots: null};
+var CN = {sp: "e2", t0: 0, rt0: null, dots: null};
 var NU_W = 0.0100;                 /* cm2/s, water at 25 C                   */
 var CN_CONV = 0.05;                /* cm: where natural convection pins delta */
 var CN_TMAX = 60;                  /* s of the still-cell experiment on screen */
@@ -1100,6 +1139,10 @@ function cnEta(f){ return f >= 1 ? -Infinity : RTF / cnN() * Math.log(1 - f); }
 function cnTconv(){ return CN_CONV * CN_CONV / (Math.PI * cnD()); }
 
 function cnRestart(){ CN.t0 = 0; CN.dots = null; }
+/* the disc has a transient too: delta grows exactly as it does in a still cell
+   until the flow pins it, which on a disc happens in milliseconds rather than
+   never. rt0 = null is the steady state, 0 arms the replay on the next frame */
+function cnRestartR(){ CN.rt0 = 0; CN.dots = null; }
 
 /* ---- the cell cartoons need a box with an edge, a Bezier streamline and a
    single arrowhead, none of which the shared helpers do ------------------ */
@@ -1204,7 +1247,14 @@ function cnCellRDE(X0, X1, Y0, Y1, delta, ts, rpm){
     s += ln(CXc + DW, (DY + DH + YB) / 2, CXc + DW + 16, (DY + DH + YB) / 2 - 11, "var(--red-)", 1);
     s += tx(CXc + DW + 18, (DY + DH + YB) / 2 - 9, "δ", "var(--red-)", 10, null, 600);
   }
-  /* convection: up the axis, then flung out along the face */
+  /* convection: up the axis, then flung out along the face. The von Karman
+     solution draws solution in at 0.886*sqrt(nu*omega) far from the disc, so
+     the inflow goes as sqrt(omega) - the same square root that thins delta,
+     and a tenfold range of speed across the slider. The dots are timed from
+     that velocity, so a faster disc visibly pulls harder; the clamp only
+     bites below about 280 rpm, where the true transit would take 16 s.     */
+  var vIn = 0.886 * Math.sqrt(NU_W * 2 * Math.PI * rpm / 60);     /* cm/s */
+  var FLOW = clamp(2600 * Math.sqrt(2000 / rpm), 900, 11000);     /* ms    */
   var LEFT  = [CXc, Y1 - 14, CXc, YB + 34, CXc - 34, YB + 8, X0 + 14, YB + 4];
   var RIGHT = [CXc, Y1 - 14, CXc, YB + 34, CXc + 34, YB + 8, X1 - 14, YB + 4];
   [LEFT, RIGHT].forEach(function(p){
@@ -1213,11 +1263,12 @@ function cnCellRDE(X0, X1, Y0, Y1, delta, ts, rpm){
     s += cnHead(b[0], b[1], b[0] - a[0], b[1] - a[1], "var(--go)");
     if(REDUCED) return;
     for(var k = 0; k < 5; k++){
-      var u = ((ts / 2000) + k / 5) % 1, q = cnBez(p, u);
+      var u = ((ts / FLOW) + k / 5) % 1, q = cnBez(p, u);
       s += cir(q[0], q[1], 2.3, "var(--go)", 0.65 * (1 - 0.5 * u));
     }
   });
-  s += tx(CXc, Y1 - 4, "convection in", "var(--go)", 8.5, "middle");
+  s += tx(CXc, Y1 - 4, "convection in at " + vIn.toFixed(2) + " cm/s",
+          "var(--go)", 8.5, "middle");
   s += tx(X0 + 5, DY + 2, "flung out →", "var(--go)", 8.5, null, 600);
   s += tx(X0 + 5, Y0 + 10, "δ = " + (delta * 1e4).toFixed(1) + " µm", "var(--red-)", 9.5, null, 600);
   s += cnScale(X0 + 6, Y1 - 22, 44, "100 µm");
@@ -1274,7 +1325,7 @@ function cnEtaPlot(X0, X1, Y0, Y1, f, jL, foot){
     var r = 0.999 * i / 120;
     d += (i ? "L" : "M") + px(r).toFixed(1) + " " + py(cnEta(r)).toFixed(1) + " ";
   }
-  s += pth(d, "var(--cnc, var(--red-))", 2.2);
+  s += pth(d, "var(--cnc)", 2.2);
   /* the two landmarks everyone quotes, marked on the curve and priced in the
      corner the curve never reaches                                        */
   [[0.5, "½ j_L"], [0.99, "0.99 j_L"]].forEach(function(q, k){
@@ -1293,7 +1344,7 @@ function cnEtaPlot(X0, X1, Y0, Y1, f, jL, foot){
   s += axY(X0 - 34, Y0, Y1, "η_conc   /mV");
   s += tx(X0 - 4, Y0 + 7, "0", "var(--muted)", 8.5, "end");
   s += tx(X0 - 4, Y1 + 3.5, (-EMAX * 1000).toFixed(0), "var(--muted)", 8.5, "end");
-  s += tx(X1 - 5, Y0 + 12, "(RT/nF) ln(1 − j/j_L)", "var(--red-)", 9, "end", 600);
+  s += tx(X1 - 5, Y0 + 12, "(RT/nF) ln(1 − j/j_L)", "var(--cnc)", 9, "end", 600);
   s += tx(X1, Y1 + 46, foot + fmtJ(f * jL), "var(--ink-2)", 9, "end");
   return s;
 }
@@ -1360,7 +1411,21 @@ function cnDrawStatic(ts){
 function cnDrawRDE(ts){
   var el = document.getElementById("cnrde");
   if(!el) return;
-  var d = cnDeltaRDE(), cstar = cnCstar(), f = cnFrac();
+  var dSS = cnDeltaRDE(), cstar = cnCstar(), f = cnFrac();
+  /* delta(t) = sqrt(pi D t), capped by the flow at the Levich thickness */
+  var d = dSS, tss = dSS * dSS / (Math.PI * cnD()), tr = -1;
+  if(CN.rt0 !== null && !REDUCED){
+    if(!CN.rt0) CN.rt0 = ts;
+    var ph = clamp((ts - CN.rt0) / 3000, 0, 1);
+    /* delta goes as sqrt(t), so t as ph^2 makes delta grow evenly on screen,
+       reaching the Levich thickness at 80 % and holding for the rest        */
+    tr = tss * Math.pow(ph / 0.8, 2);
+    /* never exactly zero: a layer of no thickness carries an infinite current,
+       and 0 x Infinity is NaN. Two per cent of the final thickness is a very
+       large current rather than an impossible one.                        */
+    d = clamp(Math.sqrt(Math.PI * cnD() * tr), dSS * 0.02, dSS);
+    if(ph >= 1) CN.rt0 = null;
+  }
   var cs = cstar * (1 - f);
   /* the cell, with the flow the disc makes */
   var s = cnCellRDE(16, 236, 30, 196, d, ts, cnRPM());
@@ -1406,15 +1471,20 @@ function cnDrawRDE(ts){
   s += tx(clamp(bx(r0) + 6, BX0, BX1 - 46), by(jAt(r0)) + 15, cnRPM().toFixed(0) + " rpm",
           "var(--ion-k)", 9, null, 600);
   /* the cost of drawing a fraction of that steady ceiling */
-  s += cnEtaPlot(884, 1074, BY0, BY1, f, cnJL(),
+  s += cnEtaPlot(884, 1074, BY0, BY1, f, cnJ(d),
                  "at j/j_L = " + (f * 100).toFixed(0) + " % that is j = ");
   s += tx(16, 228, cnRPM().toFixed(0) + " rpm   ·   δ = " + (d * 1e4).toFixed(1)
-        + " µm   ·   j_L = " + fmtJ(cnJL()), "var(--ink-2)", 10);
-  s += tx(16, 244, "steady: flow renews the surface as fast as the reaction empties it",
+        + " µm   ·   j_L = " + fmtJ(cnJ(d)), "var(--ink-2)", 10);
+  s += tx(16, 244, tr >= 0
+        ? "t = " + (tr * 1000).toFixed(0) + " ms after the step · δ still growing toward "
+          + (dSS * 1e4).toFixed(1) + " µm, reached at " + (tss * 1000).toFixed(0) + " ms"
+        : "steady: flow renews the surface as fast as the reaction empties it",
           "var(--muted)", 9.5);
   el.innerHTML = s;
-  document.getElementById("cnHnote").textContent =
-    "δ fixed by ω · steady state · " + cnRPM().toFixed(0) + " rpm";
+  document.getElementById("cnHnote").textContent = tr >= 0
+    ? "settling · " + (tr * 1000).toFixed(0) + " ms after the step · "
+      + cnRPM().toFixed(0) + " rpm"
+    : "δ fixed by ω · steady state · " + cnRPM().toFixed(0) + " rpm";
 }
 
 function cnNumbers(){
@@ -1456,7 +1526,11 @@ function cnNumbers(){
   }
 }
 
-function cnAll(){ cnNumbers(); }
+/* the two experiment figures are drawn from the animation loop, so a browser
+   that throttles requestAnimationFrame - a background tab, a window behind
+   another one - would leave them as two empty boxes. Draw a frame here too,
+   so they exist from the first paint and after every control.            */
+function cnAll(){ cnNumbers(); cnDrawStatic(performance.now()); cnDrawRDE(performance.now()); }
 
 /* j/j_L has a slider in each panel: whichever moves, the other follows, so
    the two cells are always compared at the same fraction of their ceilings */
@@ -1468,6 +1542,7 @@ function cnAll(){ cnNumbers(); }
 });
 document.getElementById("cnW").addEventListener("input", function(){ CN.dots = null; cnAll(); });
 document.getElementById("cnPlay").addEventListener("click", function(){ cnRestart(); });
+document.getElementById("cnPlay2").addEventListener("click", function(){ cnRestartR(); });
 
 ANIM.push({panel: "p-cnc", tick: function(ts){ cnDrawStatic(ts); cnDrawRDE(ts); }});
 
@@ -1525,7 +1600,7 @@ function alDrawWaterfall(){
               ["η slow", t.es, "var(--ox)", c.slow],
               ["η fast", t.ef, "var(--ox)", c.fast],
               ["η ohmic", t.eo, "var(--ohmic)", "iR through the cell"],
-              ["η conc", t.ec, "var(--red-)", "reactant supply"],
+              ["η conc", t.ec, "var(--cnc)", "reactant supply"],
               [c.gal ? "V delivered" : "V required", t.V, "var(--ink)",
                c.gal ? (t.V < 0 ? "nothing \u2014 the cell is being driven" : "what you get") : "what you pay"]];
   /* "all bars to one scale" only holds if the scale holds every bar: a 5 V
@@ -1575,7 +1650,7 @@ function alDrawPol(){
   var el = document.getElementById("alpol");
   if(!el) return;
   var c = alCell(), jset = alJ(), il = alIL();
-  var X0 = 54, X1 = 426, Y0 = 22, Y1 = 218;
+  var X0 = 54, X1 = 426, Y0 = 22, Y1 = 222;   /* 450x286, as the waterfall is */
   var jmax = il * 1.02;
   var vals = [], i;
   for(i = 0; i <= 200; i++){
@@ -1603,23 +1678,9 @@ function alDrawPol(){
   function py(v){ return Y1 - (v - vLo) / vSpan * (Y1 - Y0); }
   function inFr(v){ return v >= vLo && v <= vHi; }
   var s = rc(X0, Y0, X1 - X0, Y1 - Y0, "var(--surface-2)", 0.5, 4);
-  /* which term is the biggest at each current, collected into runs so the
-     key below the axis can name them. At 0.1 the shading was invisible  */
-  var runs = [], was = null;
-  vals.forEach(function(o, k){
-    if(k === 0) return;
-    var t = o.t, cand = [[t.es + t.ef, "var(--ox)", "activation"],
-                         [t.eo, "var(--ohmic)", "ohmic"],
-                         [t.ec, "var(--red-)", "mass transport"]];
-    cand.sort(function(a, b){ return (isFinite(b[0]) ? b[0] : 1e9) - (isFinite(a[0]) ? a[0] : 1e9); });
-    if(cand[0][2] !== was){ runs.push({a: vals[k - 1].j, b: o.j, col: cand[0][1], nm: cand[0][2]});
-                            was = cand[0][2]; }
-    else runs[runs.length - 1].b = o.j;
-  });
-  runs.forEach(function(r){
-    s += rc(px(r.a), Y0, px(r.b) - px(r.a) + 0.6, Y1 - Y0, r.col, 0.12);
-    if(r.a > 0) s += ln(px(r.a), Y0, px(r.a), Y1, "var(--line-2)", 1, "3 3", 0.8);
-  });
+  /* no shaded regions across the current axis: which loss is which is a
+     statement about the voltage at one current, so it is made down the y
+     axis by the brackets below and nowhere else                         */
   if(vLo < -0.06 * vSpan){
     s += ln(X0, py(0), X1, py(0), "var(--ink-2)", 1, "2 3", 0.75);
     /* on the far side from the bracket column, so the two never overlap.
@@ -1655,35 +1716,56 @@ function alDrawPol(){
     prev = cur;
   });
   s += pth(d, "var(--ink)", 2.6);
-  if(isFinite(t0.V)){
+  {
     s += ln(px(jset), Y0, px(jset), Y1, "var(--ion-k)", 1, "3 3", 0.8);
+    /* the clock panel below takes this one point apart in time, which is easy
+       to miss when the two plots share a y axis and a ceiling              */
+    s += '<polygon points="' + px(jset).toFixed(1) + "," + (Y1 + 9) + " "
+       + (px(jset) - 4).toFixed(1) + "," + (Y1 + 2) + " "
+       + (px(jset) + 4).toFixed(1) + "," + (Y1 + 2)
+       + '" fill="var(--ion-k)"/>';
+    s += tx(clamp(px(jset), X0 + 76, X1 - 76), Y1 + 15,
+            "this point, in time below", "var(--ion-k)", 8.5, "middle", 600);
     /* the three losses, bracketed in place, so the curve says which is
        which. They stack away from E_rev on the side the voltage actually
-       moves: down for a galvanic cell, up for an electrolyser.          */
+       moves: down for a galvanic cell, up for an electrolyser.
+       Every term that exists is drawn: a term too short for an arrow gets
+       a tick pair and a leader, and an unbounded one runs off the frame.
+       Dropping the small ones is what used to hide eta_conc entirely.  */
     var sgn = c.gal ? -1 : 1, lastY = null, taken = [];
     var xb = px(jset) + (right ? -22 : 22), acc = c.Erev;
     [[t0.es + t0.ef, "var(--ox)", "η_act"], [t0.eo, "var(--ohmic)", "η_Ω"],
-     [t0.ec, "var(--red-)", "η_conc"]].forEach(function(q){
-      if(!isFinite(q[0]) || q[0] < vSpan * 0.012) return;
+     [t0.ec, "var(--cnc)", "η_conc"]].forEach(function(q){
+      if(!(q[0] > 5e-5)) return;          /* under 0.05 mV there is nothing */
+      var inf = !isFinite(q[0]);
       var va = acc;
-      acc += sgn * q[0];
+      acc += sgn * (inf ? vSpan : q[0]);
       var vb = acc;
       /* clip to the frame, and say so, rather than drawing a short arrow
          with the full number beside it                                  */
       var lo = Math.max(Math.min(va, vb), vLo), hi = Math.min(Math.max(va, vb), vHi);
-      if(hi - lo < q[0] * 0.02) return;
-      var cut = hi - lo < q[0] * 0.98;
-      s += arrowV(xb, py(hi), py(lo), q[1], "", "l");
+      if(hi <= lo) return;
+      var cut = !inf && hi - lo < q[0] * 0.98;
+      var yhi = py(hi), ylo = py(lo), thin = ylo - yhi < 10;
+      if(thin){
+        s += ln(xb - 4, yhi, xb + 4, yhi, q[1], 1.4);
+        s += ln(xb - 4, ylo, xb + 4, ylo, q[1], 1.4);
+        s += ln(xb, (yhi + ylo) / 2, xb + (right ? -11 : 11), (yhi + ylo) / 2, q[1], 1);
+      }else{
+        s += arrowV(xb, yhi, ylo, q[1], "", "l");
+      }
       /* the numbers follow the arrows, except that two thin brackets would
          write over each other: then the later one steps clear            */
-      var ly = (py(hi) + py(lo)) / 2 + 3.5;
+      var ly = (yhi + ylo) / 2 + 3.5;
       if(lastY !== null){
         if(c.gal && ly - lastY < 13) ly = lastY + 13;
         if(!c.gal && lastY - ly < 13) ly = lastY - 13;
       }
       lastY = ly;
-      var btx = q[2] + " " + (q[0] * 1000).toFixed(0) + (cut ? " (part off frame)" : "");
-      var bax = xb + (right ? -6 : 6), bw = btx.length * 5.7;
+      var btx = q[2] + " " + (inf ? "unbounded"
+                                  : (q[0] * 1000).toFixed(q[0] < 0.0095 ? 1 : 0)
+                                    + (cut ? " (part off frame)" : ""));
+      var bax = xb + (right ? -1 : 1) * (thin ? 14 : 6), bw = btx.length * 5.7;
       taken.push({x0: right ? bax - bw : bax, x1: right ? bax : bax + bw,
                   y0: ly - 9, y1: ly + 3});
       s += txh(bax, ly, btx, q[1], 9.5, right ? "end" : "start", 600);
@@ -1762,15 +1844,6 @@ function alDrawPol(){
     s += tx(X0, Y1 + 50, "at " + (jset * 1000).toPrecision(3) + " mA/cm² this cell needs "
           + (isFinite(t0.V) ? t0.V.toFixed(3) : "∞") + " V", "var(--muted)", 9.5);
   }
-  /* the key to the shaded bands: the same runs, on the same x scale, named */
-  var KY = Y1 + 56;
-  s += tx(X0 - 4, KY + 8.6, "biggest", "var(--muted)", 8.5, "end");
-  runs.forEach(function(r){
-    var a = px(r.a), b = px(r.b);
-    s += rc(a, KY, b - a + 0.6, 12, r.col, 0.42, 2);
-    if(b - a > r.nm.length * 5.3 + 10)
-      s += tx((a + b) / 2, KY + 8.6, r.nm, r.col, 8.5, "middle", 600);
-  });
   el.innerHTML = s;
 }
 
@@ -1799,7 +1872,7 @@ function alDrawTime(){
     return {eo: eo, ea: ea, ec: ec, tot: eo + ea + ec};
   }
   /* the three bands, stacked, so the areas are the terms */
-  var bands = [["ec", "var(--red-)", 0.30], ["ea", "var(--ox)", 0.30], ["eo", "var(--ohmic)", 0.30]];
+  var bands = [["ec", "var(--cnc)", 0.30], ["ea", "var(--ox)", 0.30], ["eo", "var(--ohmic)", 0.30]];
   bands.forEach(function(bd, bi){
     var d = "";
     for(var i = 0; i <= 170; i++){
@@ -1835,7 +1908,7 @@ function alDrawTime(){
   var LY = Y1 + 48;
   s += tx(X0 + 5, LY, "η_Ω: already there", "var(--ohmic)", 10, "start", 600);
   [[Math.log10(TAU), "var(--ox)", "R_u C_d = " + (TAU * 1e6).toPrecision(2) + " µs  (C_d = 50 µF/cm²)", "η_act arrives"],
-   [Math.log10(TD), "var(--red-)", "δ = √(πDt)", "η_conc grows"]].forEach(function(m){
+   [Math.log10(TD), "var(--cnc)", "δ = √(πDt)", "η_conc grows"]].forEach(function(m){
     var lx = px(m[0]), rt = lx > X1 - 95, ax = rt ? lx - 5 : lx + 5;
     s += ln(lx, Y0, lx, Y1, m[1], 1.2, "3 3", 0.85);
     s += tx(ax, LY + 13, m[3], m[1], 10, rt ? "end" : "start", 600);
@@ -1914,13 +1987,13 @@ pillGroup("alC", function(v){
 
 /* ================= CONCEPT CHECK QUESTIONS ============================= */
 var QZ10 = [
-  {q:"A table lists Li⁺/Li at −3.04 V vs SHE. Battery papers quote the same electrode as 0 V, on a scale where SHE then appears at +3.04 V and a 3.7 V cathode material sits at +3.74 V. What has physically changed between the two scales?",
+  {q:"A table lists Li⁺/Li at −3.04 V vs SHE. Battery papers quote the same electrode as 0 V, on a scale where SHE then appears at +3.04 V and a cathode material at +0.70 V vs SHE sits at +3.74 V. What has physically changed between the two scales?",
    o:["Nothing physical. A reference is an arbitrary zero, so every potential on the scale shifts by the same constant — no cell voltage, no ΔG and no equilibrium is altered",
       "The lithium electrode has been made 3.04 V more positive",
       "The free energy of lithium deposition changes sign between the two scales",
       "Only the sign convention for anodic and cathodic current changes"],
    a:0,
-   w:"A single electrode potential cannot be measured at all — only the difference between two electrodes can. What a table calls <i>the</i> potential of a couple is always its voltage against some chosen reference, and choosing a different reference adds one constant to every entry. The cell Li | Li⁺ ‖ H⁺ | H₂ reads 3.04 V whichever scale you quote it on, because 0 − (−3.04) and 3.04 − 0 are the same number. The deck draws exactly this on p.4: the same ladder twice, once against H⁺/½H₂ and once against Li⁺/Li, with 0.7 V on the first becoming 3.74 V on the second. Battery work uses the lithium scale because it puts the negative electrode at zero, so a cathode potential can be read directly as a cell voltage. The underlying statement is the electrochemical potential μ̃ = μ° + RT ln a + zFφ: only differences in φ are observable, and the Nernst equation only ever gives you one."},
+   w:"A single electrode potential cannot be measured at all — only the difference between two electrodes can. What a table calls <i>the</i> potential of a couple is always its voltage against some chosen reference, and choosing a different reference adds one constant to every entry. The cell Li | Li⁺ ‖ H⁺ | H₂ reads 3.04 V whichever scale you quote it on, because 0 − (−3.04) and 3.04 − 0 are the same number. The deck draws exactly this on p.4: the same ladder twice, once against H⁺/½H₂ and once against Li⁺/Li, with 0.70 V on the first becoming 3.74 V on the second. Battery work uses the lithium scale because it puts the negative electrode at zero, so a cathode potential can be read directly as a cell voltage. The underlying statement is the electrochemical potential μ̃ = μ° + RT ln a + zFφ: only differences in φ are observable, and the Nernst equation only ever gives you one."},
 
   {q:"Oxygen evolution is quoted at 1.23 V vs RHE at every pH, but on an Ag/AgCl scale the same reaction shifts by about −59 mV for each pH unit. Why does the pH dependence vanish on one scale and not the other?",
    o:["Because oxygen evolution does not involve protons",
