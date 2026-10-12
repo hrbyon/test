@@ -1,0 +1,2562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Electrochemical Kinetics Bench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+:root{
+  --ground:#F1F3F2; --surface:#FFFFFF; --surface-2:#E9EDEB;
+  --ink:#14191B; --ink-2:#3E4A4D; --muted:#68767A; --line:#D6DDDA; --line-2:#C3CCC8;
+  --ox:#A85B33; --ox-soft:#F3E4DA;
+  --red-:#15618E; --red-soft:#DDE9F2;
+  --go:#2C7355; --go-soft:#DCEBE3;
+  --stop:#8A5F0C; --stop-soft:#F3E9D3;
+  --elec:#3E4A4D; --ion-k:#6E4C9B; --ion-k-soft:#EBE3F5;
+  --shadow:0 1px 2px rgba(20,25,27,.05),0 8px 24px -12px rgba(20,25,27,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+    --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+    --ox:#D08551; --ox-soft:#33231A;
+    --red-:#5AA6D4; --red-soft:#152833;
+    --go:#5DBB8D; --go-soft:#152A21;
+    --stop:#D6A33F; --stop-soft:#2B2415;
+    --elec:#AEBBBE; --ion-k:#B99BE0; --ion-k-soft:#241C33;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+  --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+  --ox:#D08551; --ox-soft:#33231A;
+  --red-:#5AA6D4; --red-soft:#152833;
+  --go:#5DBB8D; --go-soft:#152A21;
+  --stop:#D6A33F; --stop-soft:#2B2415;
+  --elec:#AEBBBE; --ion-k:#B99BE0; --ion-k-soft:#241C33;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:32px 20px 72px}
+.masthead{display:flex;flex-wrap:wrap;align-items:flex-end;gap:20px 32px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.eyebrow a{color:inherit}
+h1{font-family:"IBM Plex Serif",Georgia,serif;font-weight:600;font-size:clamp(28px,4.2vw,42px);line-height:1.12;margin:0;text-wrap:balance;letter-spacing:-.015em}
+.sub{margin:8px 0 0;color:var(--ink-2);font-size:15px;max-width:62ch}
+.tabs{display:flex;gap:2px;margin:24px 0 22px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{appearance:none;background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);
+  font-family:inherit;font-size:14.5px;font-weight:500;padding:11px 16px;cursor:pointer;white-space:nowrap;margin-bottom:-1px}
+.tab:hover{color:var(--ink-2)}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ox)}
+.tab:focus-visible{outline:2px solid var(--red-);outline-offset:-2px;border-radius:4px 4px 0 0}
+.panel[hidden]{display:none}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow)}
+.card-h{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.card-h h2{font-size:15px;font-weight:600;margin:0;letter-spacing:-.01em}
+.card-h .note{font-size:12.5px;color:var(--muted)}
+.card-b{padding:18px}
+.stack{display:flex;flex-direction:column;gap:16px}
+.two{display:grid;grid-template-columns:minmax(270px,1fr) minmax(330px,1.45fr);gap:16px;align-items:start}
+@media(max-width:900px){.two{grid-template-columns:minmax(0,1fr)}}
+label.fld,span.fld{display:block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+select,input[type=text],input[type=number]{width:100%;font-family:inherit;font-size:14px;color:var(--ink);
+  background:var(--surface-2);border:1px solid var(--line-2);border-radius:7px;padding:9px 10px}
+input:read-only{background:var(--surface);color:var(--muted);cursor:not-allowed}
+select:focus-visible,input:focus-visible{outline:2px solid var(--red-);outline-offset:1px}
+input[type=range]{width:100%;accent-color:var(--ox)}
+input[type=range]:focus-visible{outline:2px solid var(--red-);outline-offset:3px}
+input[type=range]:disabled{opacity:.4;cursor:not-allowed}
+.slider-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;gap:10px}
+.slider-row .val{font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+.readout{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px dotted var(--line)}
+.readout:last-child{border-bottom:0}
+.readout .k{font-size:13px;color:var(--muted)}
+.readout .v{font-family:"IBM Plex Mono",monospace;font-size:16px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--ink);text-align:right}
+.readout.sm{padding:7px 0}
+.readout.sm .v{font-size:14px}
+.verdict{padding:12px 14px;border-radius:8px;font-size:13.5px;line-height:1.55}
+.verdict.go{background:var(--go-soft);color:var(--go)}
+.verdict.stop{background:var(--stop-soft);color:var(--stop)}
+.verdict.flat{background:var(--surface-2);color:var(--ink-2)}
+.verdict.mixv{background:var(--ion-k-soft);color:var(--ion-k)}
+.verdict.cav{background:var(--red-soft);color:var(--red-)}
+.verdict.anv{background:var(--ox-soft);color:var(--ox)}
+.eqline{font-family:"IBM Plex Mono",monospace;font-size:13px;line-height:1.9;color:var(--ink-2);
+  background:var(--surface-2);border-radius:7px;padding:11px 13px}
+.eqline b{color:var(--ox);font-weight:600}
+svg{display:block;max-width:100%}
+.scrollx{overflow-x:auto}
+.solid{appearance:none;background:var(--ox);border:1px solid var(--ox);color:#fff;font-family:inherit;
+  font-size:13.5px;font-weight:500;padding:10px 16px;border-radius:7px;cursor:pointer}
+.solid:hover{filter:brightness(1.08)}
+.solid:disabled{background:var(--line-2);border-color:var(--line-2);color:var(--muted);cursor:not-allowed}
+.ghost{appearance:none;background:var(--surface-2);border:1px solid var(--line-2);color:var(--ink-2);
+  font-family:inherit;font-size:12.5px;padding:8px 12px;border-radius:7px;cursor:pointer;text-align:left}
+.ghost:hover{border-color:var(--ox);color:var(--ox)}
+table.ions{border-collapse:collapse;width:100%;font-size:13px}
+table.ions th,table.ions td{text-align:left;padding:8px 9px;border-bottom:1px solid var(--line);white-space:nowrap}
+table.ions th{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500}
+/* symbols and units keep their case inside a capitalised header: k is not K, mV is not MV */
+table.ions th .nt{text-transform:none;letter-spacing:.02em;font-size:11px}
+table.ions td.num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;text-align:right}
+table.ions td.wr{white-space:normal;color:var(--ink-2);font-size:12.5px;line-height:1.5}
+table.ions tr.hi td{color:var(--ox);font-weight:500}
+table.ions tr.lo td{color:var(--red-)}
+table.ions tr.sep td{border-top:2px solid var(--line-2)}
+.idgrid{display:grid;grid-template-columns:1fr;gap:14px;max-width:340px}
+.scorebar{display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;padding:14px 18px;border-top:1px solid var(--line)}
+.scorenum{font-family:"IBM Plex Mono",monospace;font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+.scorenum small{font-size:14px;font-weight:400;color:var(--muted)}
+.vcode{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted)}
+.vcode b{color:var(--ink);font-weight:600;letter-spacing:.08em}
+.quiz{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:16px}
+.q .stem{font-size:14.5px;line-height:1.6;margin:0 0 12px}
+.q .stem code{font-family:"IBM Plex Mono",monospace;font-size:13px;background:var(--surface-2);padding:1px 5px;border-radius:4px}
+.opts{display:flex;flex-direction:column;gap:7px}
+.opt{appearance:none;text-align:left;font-family:inherit;font-size:13.5px;line-height:1.45;color:var(--ink);
+  background:var(--surface-2);border:1px solid transparent;border-radius:7px;padding:9px 12px;cursor:pointer;display:flex;gap:9px}
+.opt .ltr{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);flex:0 0 auto;padding-top:1px}
+.opt:hover:not(:disabled){border-color:var(--line-2)}
+.opt.right{background:var(--go-soft);color:var(--go);border-color:var(--go);font-weight:500}
+.opt.right .ltr{color:var(--go)}
+.opt.wrong{background:var(--stop-soft);color:var(--stop);border-color:var(--stop)}
+.opt.wrong .ltr{color:var(--stop)}
+.opt:disabled{cursor:default}
+.why{margin:12px 0 0;font-size:13px;line-height:1.65;color:var(--ink-2);border-left:2px solid var(--line-2);padding-left:12px}
+.misc{display:block;margin-top:10px;padding:9px 12px;border-radius:7px;background:var(--stop-soft);color:var(--stop);font-size:12.5px;line-height:1.6}
+.misc a{color:inherit;font-weight:600;white-space:nowrap}
+.why[hidden]{display:none}
+.tally{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.hint{font-size:12.5px;color:var(--muted);line-height:1.65;margin:10px 0 0}
+.locked{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;background:var(--go-soft);color:var(--go);padding:2px 7px;border-radius:4px;margin-left:8px}
+.pill-row{display:flex;gap:3px;background:var(--surface-2);border-radius:8px;padding:3px}
+.pill{flex:1;appearance:none;border:0;background:none;font-family:"IBM Plex Mono",monospace;font-size:12.5px;
+  font-weight:500;color:var(--muted);padding:7px 2px;border-radius:6px;cursor:pointer}
+.pill[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.pill:focus-visible{outline:2px solid var(--red-);outline-offset:1px}
+.pill-row.pw .pill{font-size:11.5px}
+/* nowrap + scroll: a formula broken across lines mid-term is harder to read
+   than one the reader has to nudge sideways.  Explicit <br> still breaks. */
+.eqbig{font-family:"IBM Plex Mono",monospace;font-size:13.5px;line-height:2.05;color:var(--ink);
+  background:var(--surface-2);border-radius:8px;padding:14px 15px;overflow-x:auto;white-space:nowrap}
+.eqbig small{color:var(--muted);font-size:11.5px;letter-spacing:.04em}
+/* one colour per direction, used in prose, in the equations and in every
+   picture on the page: oxidation (anodic) copper, reduction (cathodic) blue,
+   equilibrium and i0 green, mass transport violet                        */
+.an{color:var(--ox);font-weight:600}
+.ca{color:var(--red-);font-weight:600}
+.eqm{color:var(--go);font-weight:600}
+.mt{color:var(--ion-k);font-weight:600}
+.lin{color:var(--stop);font-weight:600}
+.act{color:var(--ox);font-weight:600}
+.cnc{color:var(--red-);font-weight:600}
+.ohm{color:var(--stop);font-weight:600}
+.pot{color:var(--go);font-weight:600}
+.mix{color:var(--ion-k);font-weight:600}
+.termtbl{border-collapse:collapse;width:100%;font-size:13px}
+.termtbl td,.termtbl th{padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+.termtbl th{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);font-weight:500;text-align:left}
+.termtbl td.num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;text-align:right}
+.termtbl tr.tot td{border-bottom:0;border-top:2px solid var(--line-2);font-weight:600}
+.symgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:4px 20px;font-size:12.5px;color:var(--ink-2);line-height:1.6}
+.symgrid b{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--ink)}
+.swatch{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px}
+.trio3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:stretch}
+.trio3>.card{display:flex;flex-direction:column}
+.trio3>.card>.card-b:last-child{flex:1 1 auto}
+@media(max-width:1000px){.trio3{grid-template-columns:1fr 1fr}}
+@media(max-width:720px){.trio3{grid-template-columns:1fr}}
+.two.eq{align-items:stretch}
+.two.wideL{grid-template-columns:minmax(330px,1.5fr) minmax(240px,1fr)}
+@media(max-width:900px){.two.wideL{grid-template-columns:minmax(0,1fr)}}
+.two.eq>.card{display:flex;flex-direction:column}
+.two.eq>.card>.card-b:last-child{flex:1 1 auto}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap}
+.btnrow .ghost{flex:1 1 auto;text-align:center}
+.dfctl{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:14px 16px;align-items:end}
+.trio3 .dfctl{grid-template-columns:1fr}
+.dfctl-2{grid-template-columns:repeat(2,minmax(150px,1fr))}
+.dfctl-3{grid-template-columns:repeat(3,minmax(150px,1fr))}
+.dfctl-wide{grid-column:1 / -1}
+@media(max-width:820px){.dfctl{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.dfctl{grid-template-columns:1fr}}
+footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;line-height:1.8}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+.glegend{display:flex;flex-direction:column;gap:5px;font-size:12.5px;line-height:1.45;color:var(--ink-2)}
+.glegend > span{display:flex;align-items:flex-start;gap:8px}
+.glegend > span > svg{flex:0 0 26px;margin-top:3px}
+.glegend.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 22px}
+@media(max-width:760px){.glegend.g2{grid-template-columns:1fr}}
+.wide1{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+.pairfig{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:stretch}
+.pairfig>.card{display:flex;flex-direction:column}
+.pairfig>.card>.card-b:last-child{flex:1 1 auto}
+@media(max-width:880px){.pairfig{grid-template-columns:minmax(0,1fr)}}
+/* a wide figure with its numbers beside it rather than beneath it */
+.figside{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(250px,1fr);gap:14px 20px;align-items:start}
+@media(max-width:880px){.figside{grid-template-columns:minmax(0,1fr)}}
+/* a control two grid columns wide, one when the grid is one */
+.span2{grid-column:span 2}
+@media(max-width:520px){.span2{grid-column:auto}}
+/* readouts two to a row in a full-width card */
+.rgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 32px}
+.rgrid .readout:last-child{border-bottom:1px dotted var(--line)}
+@media(max-width:760px){.rgrid{grid-template-columns:minmax(0,1fr)}}
+/* terse notes, two to a row */
+.notes2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 22px}
+.notes2>p{margin:0}
+@media(max-width:760px){.notes2{grid-template-columns:minmax(0,1fr)}}
+</style>
+</head>
+<body>
+  <div class="wrap">
+  <header class="masthead">
+    <div style="flex:1 1 380px">
+      <p class="eyebrow"><a href="index.html">CH40051 Electroanalytical Chemistry</a> &middot; Lecture 11 &middot; Electrochemical kinetics</p>
+      <h1>Electrochemical Kinetics Bench</h1>
+      <p class="sub">A current is a rate. Each direction of O + e<sup>&minus;</sup> &#8652; R has its own rate constant, set by a barrier that the electrode potential tilts &mdash; and only a fraction &alpha; of the tilt reaches the top. Follow that from the barrier to k&deg; and k, to the exchange current and Butler&ndash;Volmer, then read a Tafel plot, including the ways it goes wrong.</p>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true"  aria-controls="p-bar"  id="t-bar">The barrier</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-k"    id="t-k">k&deg;, k and i<sub>0</sub></button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-bv"   id="t-bv">Butler&ndash;Volmer</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-taf"  id="t-taf">Tafel analysis</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-quiz1" id="t-quiz1">Concept Check 1</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-quiz2" id="t-quiz2">Concept Check 2</button>
+  </div>
+
+  <!-- ============== THE BARRIER ============== -->
+  <section class="panel" id="p-bar" role="tabpanel" aria-labelledby="t-bar">
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>Why the current is exponential in the potential</h2><span class="note">the transition-state picture behind Butler&ndash;Volmer</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig">
+          <span class="ca">&Delta;G<sup>&Dagger;</sup><sub>c</sub> = &Delta;G<sup>&Dagger;</sup><sub>0</sub> + &alpha;<sub>c</sub>F&eta;</span>
+          &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="an">&Delta;G<sup>&Dagger;</sup><sub>a</sub> = &Delta;G<sup>&Dagger;</sup><sub>0</sub> &minus; &alpha;<sub>a</sub>F&eta;</span>
+          <small>&alpha;<sub>a</sub> + &alpha;<sub>c</sub> = 1 &middot; &eta; = E &minus; E<sub>eq</sub>, anodic positive</small><br>
+          k = A<sub>f</sub> exp(&minus;&Delta;G<sup>&Dagger;</sup>/RT) &nbsp;&rArr;&nbsp;
+          i = i<sub>0</sub>[exp(&alpha;<sub>a</sub>F&eta;/RT) &minus; exp(&minus;&alpha;<sub>c</sub>F&eta;/RT)]
+          <small>Butler&ndash;Volmer, if &alpha; is constant and the surface sees the bulk</small>
+        </div>
+        <div class="notes2">
+          <p class="hint">Making the electrode more positive by &eta; lowers the energy of an electron in the metal by F&eta;,
+            so the <b class="ca">O + e<sup>&minus;</sup></b> well drops by F&eta; while the <b class="an">R</b> well stays put.
+            <b>The top of the barrier does not move by the whole of it</b>: only a fraction reaches the transition state, and
+            that fraction is <b>&alpha;</b>. Rate is exponential in the barrier and the barrier is linear in &eta;, so the
+            current is exponential in &eta;.</p>
+          <p class="hint">What the picture does <em>not</em> give is the size of i<sub>0</sub> &mdash; that is the barrier height
+            &Delta;G<sup>&Dagger;</sup><sub>0</sub>, set by the couple and the electrode. The next tab puts a number on it, as
+            k&deg;. What &alpha; is, how to read it off the two curves, and what it does and does not control are at the
+            bottom of this tab; press <b>Animate &alpha;</b> to watch it change the barrier.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-b">
+        <div class="dfctl dfctl-wide">
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">&alpha;<sub>c</sub> (transfer coefficient)</span><span class="val" id="acAv"></span></div>
+            <input type="range" id="acA" min="0.2" max="0.8" step="0.01" value="0.5">
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">&eta; applied / mV</span><span class="val" id="acEv"></span></div>
+            <input type="range" id="acE" min="-400" max="400" step="5" value="-120">
+          </div>
+          <div class="dfctl-wide btnrow" style="margin:0">
+            <button class="ghost" id="acSweepA" type="button">&#9654; Animate &alpha; from 0.2 to 0.8</button>
+            <button class="ghost" id="acSweep" type="button">&#9654; Sweep &eta; back and forth</button>
+            <button class="ghost" id="acP1" type="button">&eta; = 0: equilibrium, and traffic both ways</button>
+            <button class="ghost" id="acP3" type="button">&alpha; = 0.25: a lopsided barrier</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="two eq wideL">
+      <div class="card">
+        <div class="card-h"><h2>The barrier, tilting</h2><span class="note">O + e<sup>&minus;</sup> moves with the potential; R stays put</span></div>
+        <div class="card-b stack" style="gap:12px">
+          <svg id="acbar" viewBox="0 0 460 246" style="display:block;width:100%;height:auto;margin:0 auto" role="img" aria-label="Two free-energy wells, one for the oxidised species plus an electron in the metal and one for the reduced species, with the barrier between them. Overpotential moves the oxidised well up or down and the top of the barrier moves by only a fraction of that; particles hop across in both directions at rates set by the two barrier heights."></svg>
+          <div class="glegend">
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><path d="M1 13 Q7 1 13 13" fill="none" stroke="var(--red-)" stroke-width="2"/><path d="M13 13 Q19 1 25 13" fill="none" stroke="var(--ox)" stroke-width="2"/></svg><span><b>two wells</b>: <b class="ca">O + e<sup>&minus;</sup></b> in the metal on the left, <b class="an">R</b> on the right. The potential moves the left-hand one by &minus;F&eta;; its dashed copy is where it sat at &eta; = 0, and the open ring is the old crossing.</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="6" y1="2" x2="6" y2="12" stroke="var(--red-)" stroke-width="2"/><polygon points="6,2 3.5,6 8.5,6" fill="var(--red-)"/><line x1="19" y1="12" x2="19" y2="2" stroke="var(--ox)" stroke-width="2"/><polygon points="19,2 16.5,6 21.5,6" fill="var(--ox)"/></svg><span><b>the two arrows</b> are the barriers each direction sees, <span class="ca">reduction</span> from the left well and <span class="an">oxidation</span> from the right: &Delta;G<sup>&Dagger;</sup><sub>0</sub> + &alpha;<sub>c</sub>F&eta; and &Delta;G<sup>&Dagger;</sup><sub>0</sub> &minus; &alpha;<sub>a</sub>F&eta;.</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><circle cx="6" cy="7" r="3" fill="var(--red-)"/><circle cx="20" cy="7" r="3" fill="var(--ox)"/></svg><span><b>hopping dots</b> show the balance, not the magnitude: equal both ways at &eta; = 0, which is i<sub>0</sub>. Tilt the wells and the traffic goes one way &mdash; by the same share whatever &alpha; is.</span></span>
+            <span style="display:block;color:var(--muted)">Two parabolas, scaled so that the barrier at &eta; = 0 is 0.25 eV whatever &alpha; is; their curvature ratio is set by the &alpha; you choose, &alpha;<sub>c</sub> = 1/(1 + &radic;(a<sub>R</sub>/a<sub>O</sub>)). At &alpha; = &frac12; they are Marcus parabolas with &lambda; = 1.0 eV and &Delta;G<sup>&Dagger;</sup><sub>0</sub> = &lambda;/4.</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h"><h2>What the picture says</h2><span class="note" id="acWho">&mdash;</span></div>
+        <div class="card-b">
+          <div class="readout sm"><span class="k">&alpha;<sub>c</sub> &nbsp;/&nbsp; &alpha;<sub>a</sub></span><span class="v" id="acRa">&mdash;</span></div>
+          <div class="readout sm"><span class="k">crossing point x* (1 &minus; &alpha;<sub>c</sub> at &eta; = 0)</span><span class="v" id="acRx">&mdash;</span></div>
+          <div class="readout sm"><span class="k">&minus;F&eta;, how far O + e<sup>&minus;</sup> moved</span><span class="v" id="acRd">&mdash;</span></div>
+          <div class="readout sm"><span class="k"><span class="ca">&Delta;G<sup>&Dagger;</sup><sub>c</sub></span> &nbsp;/&nbsp; <span class="an">&Delta;G<sup>&Dagger;</sup><sub>a</sub></span></span><span class="v" id="acRg">&mdash;</span></div>
+          <div class="readout sm"><span class="k"><span class="ca">k<sub>c</sub></span> since &eta; = 0: barrier / BV</span><span class="v" id="acRkc">&mdash;</span></div>
+          <div class="readout sm"><span class="k"><span class="an">k<sub>a</sub></span> since &eta; = 0: barrier / BV</span><span class="v" id="acRka">&mdash;</span></div>
+          <div class="readout sm"><span class="k">local &alpha;<sub>c</sub> = tan&theta;/(tan&theta; + tan&phi;) here</span><span class="v" id="acRloc">&mdash;</span></div>
+          <div class="readout sm"><span class="k">share of the hops that are reductions</span><span class="v" id="acRp">&mdash;</span></div>
+          <div class="readout sm"><span class="k"><span class="ca">b<sub>c</sub></span> / <span class="an">b<sub>a</sub></span> = 2.303RT/&alpha;F</span><span class="v" id="acRb">&mdash;</span></div>
+          <div id="acVerdict" class="verdict flat" style="margin-top:14px">&mdash;</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pairfig" style="margin:16px 0">
+      <div class="card">
+        <div class="card-h"><h2>Zoom on the crossing</h2><span class="note">where &alpha; = tan&theta;/(tan&theta; + tan&phi;) comes from</span></div>
+        <div class="card-b stack" style="gap:12px">
+          <svg id="aczoom" viewBox="0 0 340 262" style="display:block;width:100%;height:auto" role="img" aria-label="The two curves near their crossing drawn as straight lines. The oxidised well's line is shifted by F eta; the crossing slides along the reduced well's line, and the shift splits into the part the transition state follows, alpha-a F eta, and the rest, alpha-c F eta. The angles theta and phi of the two lines give alpha as tan theta over the sum of the two tangents."></svg>
+          <div class="glegend">
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="1" y1="12" x2="25" y2="4" stroke="var(--red-)" stroke-width="1.4" stroke-dasharray="3 3" opacity="0.6"/><line x1="1" y1="9" x2="25" y2="1" stroke="var(--red-)" stroke-width="2"/></svg><span><b class="ca">O + e<sup>&minus;</sup></b> before (dashed) and after the potential step; <b class="an">R</b> does not move. The crossing slides along the R line by &Delta;x.</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="6" y1="2" x2="6" y2="12" stroke="var(--ink-2)" stroke-width="2"/><line x1="18" y1="2" x2="18" y2="7" stroke="var(--ox)" stroke-width="2"/><line x1="18" y1="7" x2="18" y2="12" stroke="var(--red-)" stroke-width="2"/></svg><span>The step F|&eta;| splits in two: <b class="an">&alpha;<sub>a</sub>F|&eta;|</b>, how far the top of the barrier follows, and <b class="ca">&alpha;<sub>c</sub>F|&eta;|</b>, the rest. Then tan&theta; = &alpha;<sub>c</sub>F|&eta;|/&Delta;x and tan&phi; = &alpha;<sub>a</sub>F|&eta;|/&Delta;x.</span></span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h"><h2>The barriers against &eta;</h2><span class="note">&alpha; is the slope</span></div>
+        <div class="card-b stack" style="gap:12px">
+          <svg id="aclines" viewBox="0 0 340 262" style="display:block;width:100%;height:auto" role="img" aria-label="Activation free energy for reduction and for oxidation against overpotential. Dashed: the straight lines Butler-Volmer assumes, with slopes alpha-c and minus alpha-a through 0.25 eV at zero overpotential. Solid: the barriers the two parabolas actually give, which curve gently away from the straight lines."></svg>
+          <div class="glegend">
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="1" y1="12" x2="25" y2="2" stroke="var(--red-)" stroke-width="1.5" stroke-dasharray="5 3"/><path d="M1 12 Q13 9 25 3" fill="none" stroke="var(--red-)" stroke-width="2"/></svg><span><b>dashed</b>: Butler&ndash;Volmer&rsquo;s straight lines, slope <b class="ca">+&alpha;<sub>c</sub></b> and <b class="an">&minus;&alpha;<sub>a</sub></b>, pivoting about &Delta;G<sup>&Dagger;</sup><sub>0</sub> as &alpha; changes. <b>Solid</b>: what the two parabolas give.</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><circle cx="13" cy="7" r="4" fill="var(--ion-k)"/></svg><span>The gap between solid and dashed is &alpha; drifting with &eta; &mdash; small near &eta; = 0, larger at a few hundred millivolts.</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><h2>The transfer coefficient, &alpha;</h2><span class="note">what the number means &mdash; and what it does not</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig">
+          &alpha;<sub>c</sub> = &part;&Delta;G<sup>&Dagger;</sup><sub>c</sub>/&part;(F&eta;) &nbsp;&middot;&nbsp; &alpha;<sub>a</sub> = &minus;&part;&Delta;G<sup>&Dagger;</sup><sub>a</sub>/&part;(F&eta;) &nbsp;&middot;&nbsp; &alpha;<sub>a</sub> + &alpha;<sub>c</sub> = 1
+          <small>the share of a shift that reaches the barrier top; one step, one e<sup>&minus;</sup></small><br>
+          &alpha;<sub>c</sub> = tan&theta; / (tan&theta; + tan&phi;)
+          <small>&theta;, &phi;: slopes of the O + e<sup>&minus;</sup> and R curves at the crossing</small><br>
+          b<sub>c</sub> = 2.303RT/&alpha;<sub>c</sub>F &nbsp;&middot;&nbsp; b<sub>a</sub> = 2.303RT/&alpha;<sub>a</sub>F
+          <small>the Tafel slopes are &alpha; seen from outside: 118 mV/dec at &alpha; = &frac12;, 25 &deg;C</small>
+        </div>
+        <div class="notes2">
+          <p class="hint"><b>1 &middot; A share of the push.</b> A step of &eta; moves the O + e<sup>&minus;</sup> well by
+            &minus;F&eta;. The crossing moves too, but less: by &alpha;<sub>a</sub>F&eta; in the same direction. So the oxidation
+            barrier, measured from the R well that stayed put, changes by &minus;&alpha;<sub>a</sub>F&eta;, and the reduction
+            barrier, measured from the well that moved, by the rest, +&alpha;<sub>c</sub>F&eta;. Both are measured to the same
+            top, which is why the two shares add to one.</p>
+          <p class="hint"><b>2 &middot; Set by the slopes, not by the position.</b> If the R curve is steep and the
+            O + e<sup>&minus;</sup> curve shallow where they cross, the crossing slides along the steep one and its height
+            hardly changes for reduction: &alpha;<sub>c</sub> is small. Equal slopes give &frac12;. Note what this does
+            <em>not</em> say: at &alpha;<sub>c</sub> = 0.25 these parabolas cross at x* = 0.75, close to R. &alpha; is read from
+            the slopes, not from where along the coordinate the crossing sits.</p>
+          <p class="hint"><b>3 &middot; The same number, seen in the double layer.</b> The potential difference between metal and
+            solution falls across the interfacial region. A reactant at the outer Helmholtz plane meets the transition state
+            part-way in, where it feels only part of that drop &mdash; the fraction &alpha;, which is why &alpha; is also called
+            the <b>symmetry factor</b> (Butler&rsquo;s and Gurney&rsquo;s picture; Bockris writes &beta;). Both pictures say the
+            same thing: the barrier top sees a fraction of the potential.</p>
+          <p class="hint"><b>4 &middot; What &alpha; controls.</b> The Tafel slopes (118 mV/dec at &frac12;; 237 and
+            79 mV/dec at &alpha;<sub>c</sub> = 0.25); how lopsided the Butler&ndash;Volmer curve is; and the reaction orders of
+            i<sub>0</sub>, 1 &minus; &alpha; in O and &alpha; in R. Most one-electron outer-sphere couples measure between 0.3 and
+            0.7, and &frac12; is the usual assumption when nothing has been measured.</p>
+          <p class="hint"><b>5 &middot; What &alpha; does not control.</b> Not E<sub>eq</sub>. Not the ratio of the two rates at a
+            given &eta;, which is e<sup>F&eta;/RT</sup> whatever &alpha; is &mdash; animate &alpha; and the share of hops does not
+            move. Not the small-&eta; slope either: i &asymp; i<sub>0</sub>F&eta;/RT, because &alpha;<sub>a</sub> +
+            &alpha;<sub>c</sub> = 1. &alpha; decides only how the change is <em>shared</em> between the two directions.</p>
+          <p class="hint"><b>6 &middot; Constant only approximately.</b> With curved wells the slopes at the crossing change as
+            it slides, so &alpha; drifts with &eta;: for two equal parabolas &alpha;<sub>c</sub> = &frac12; + F&eta;/2&lambda;,
+            0.05 per 100 mV at &lambda; = 1 eV (the <b>local &alpha;</b> readout and the right-hand plot). Over the 100&ndash;200 mV
+            of a typical Tafel fit this hides in the scatter; it has been seen where kinetics can be followed over a volt
+            (Chidsey, 1991). For a reaction of several steps, the &alpha; a Tafel slope gives is an <b>apparent</b> one and can
+            exceed 1 &mdash; see the Tafel analysis tab.</p>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ============== k0, k AND i0 ============== -->
+  <section class="panel" id="p-k" role="tabpanel" aria-labelledby="t-k" hidden>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>Two rate constants, one k&deg;, and where Nernst comes from</h2><span class="note">the rate constants, and what the concentrations add</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig">
+          <span class="ca">k<sub>c</sub> = k&deg; exp[&minus;&alpha;f(E &minus; E&deg;&prime;)]</span>
+          &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="an">k<sub>a</sub> = k&deg; exp[(1 &minus; &alpha;)f(E &minus; E&deg;&prime;)]</span>
+          <small>f = F/RT &middot; k&deg; is the value both take at E&deg;&prime;</small><br>
+          i = nFA[<span class="an">k<sub>a</sub>C<sub>R</sub>(0,t)</span> &minus; <span class="ca">k<sub>c</sub>C<sub>O</sub>(0,t)</span>]
+          <small>each direction is a rate constant times what is there to react &mdash; anodic positive</small><br>
+          i = 0 &nbsp;&rArr;&nbsp; <span class="eqm">E<sub>eq</sub> = E&deg;&prime; + (RT/nF) ln(C<sub>O</sub>*/C<sub>R</sub>*)</span>
+          <small>Nernst, out of kinetics: k&deg; and &alpha; cancel</small><br>
+          <span class="eqm">i<sub>0</sub> = nFAk&deg; C<sub>O</sub>*<sup>(1&minus;&alpha;)</sup> C<sub>R</sub>*<sup>&alpha;</sup></span>
+          <small>the size of either partial current at E<sub>eq</sub>; = nFAk&deg;C* when C<sub>O</sub>* = C<sub>R</sub>* = C*</small>
+        </div>
+        <div class="notes2">
+          <p class="hint"><b>Two zeros of potential.</b> k&deg; is defined at E&deg;&prime;, so in the k&deg; form the exponent
+            carries E &minus; E&deg;&prime;. The overpotential &eta; is measured from E<sub>eq</sub>. The two are easily written with
+            the same symbol, and they are the same only when C<sub>O</sub>* = C<sub>R</sub>*, which is what i<sub>0</sub> = nFAk&deg;C*
+            in Butler&ndash;Volmer assumes. Move one
+            concentration below and watch the two crossings separate.</p>
+          <p class="hint"><b>k&deg; belongs to the couple on this electrode; i<sub>0</sub> to the couple, the electrode
+            <em>and the solution</em>.</b> Change C<sub>O</sub>* and i<sub>0</sub> follows with order 1 &minus; &alpha;; change k&deg; and
+            E<sub>eq</sub> does not move at all. No mass transport on this tab: the surface sees the bulk concentrations.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-b">
+        <div class="dfctl">
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">k&deg; / cm s<sup>&minus;1</sup></span><span class="val" id="kkKv"></span></div>
+            <input type="range" id="kkK" min="-8" max="0" step="0.1" value="-3">
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">&alpha; (= &alpha;<sub>c</sub>)</span><span class="val" id="kkAv"></span></div>
+            <input type="range" id="kkA" min="0.2" max="0.8" step="0.01" value="0.5">
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">C<sub>O</sub>*</span><span class="val" id="kkOv"></span></div>
+            <input type="range" id="kkO" min="-1" max="2" step="0.05" value="0">
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">C<sub>R</sub>*</span><span class="val" id="kkRv"></span></div>
+            <input type="range" id="kkR" min="-1" max="2" step="0.05" value="0">
+          </div>
+          <div class="dfctl-wide">
+            <div class="slider-row"><span class="fld" style="margin:0">electrode potential, E &minus; E&deg;&prime; / mV</span><span class="val" id="kkEv"></span></div>
+            <input type="range" id="kkE" min="-400" max="400" step="1" value="-100">
+          </div>
+          <div class="dfctl-wide btnrow" style="margin:0">
+            <button class="ghost" id="kkP1" type="button">1 &middot; C<sub>O</sub>* = C<sub>R</sub>*: E<sub>eq</sub> sits on E&deg;&prime;</button>
+            <button class="ghost" id="kkP2" type="button">2 &middot; C<sub>O</sub>* = 100 C<sub>R</sub>*: E<sub>eq</sub> moves, k&deg; does not</button>
+            <button class="ghost" id="kkP3" type="button">3 &middot; k&deg; a hundred times smaller: same E<sub>eq</sub></button>
+            <button class="ghost" id="kkP4" type="button">4 &middot; &alpha; = 0.25: the lines tilt unequally</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="two eq wideL" style="margin-bottom:16px">
+      <div class="card">
+        <div class="card-h"><h2>Rate constants above, currents below</h2><span class="note">the same potential axis, so E&deg;&prime;, E<sub>eq</sub> and E line up</span></div>
+        <div class="card-b stack" style="gap:10px">
+          <span class="fld" style="margin:0">The rate constants &mdash; log k, they cross at E&deg;&prime;, at k&deg;</span>
+          <svg id="kkk" viewBox="0 0 470 240" style="display:block;width:80%;height:auto;margin:0 auto" role="img" aria-label="Logarithm of the two heterogeneous rate constants against electrode potential measured from the formal potential. The reduction rate constant falls in a straight line, the oxidation rate constant rises; they cross at the formal potential at the standard rate constant k zero. A marker shows both at the chosen potential."></svg>
+          <span class="fld" style="margin:4px 0 0">The two partial currents &mdash; log |i|, they cross at E<sub>eq</sub>, at i<sub>0</sub></span>
+          <svg id="kki" viewBox="0 0 470 240" style="display:block;width:80%;height:auto;margin:0 auto" role="img" aria-label="Logarithm of the anodic and cathodic partial current densities against potential. They are the rate constants multiplied by the bulk concentrations, so they cross at the equilibrium potential rather than the formal potential, and the height of that crossing is the exchange current. The net current, their difference, dips to zero there."></svg>
+          <div class="glegend g2">
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="1" y1="2" x2="25" y2="12" stroke="var(--red-)" stroke-width="2"/></svg><span><b class="ca">k<sub>c</sub></b> falls by a decade every 59/&alpha; mV of positive potential; <b class="an">k<sub>a</sub></b> rises by a decade every 59/(1 &minus; &alpha;) mV.</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><circle cx="13" cy="7" r="4" fill="var(--ink-2)"/></svg><span>They cross at <b>E&deg;&prime;</b>, at <b>k&deg;</b> &mdash; whatever the concentrations. Their ratio k<sub>c</sub>/k<sub>a</sub> = e<sup>&minus;f(E&minus;E&deg;&prime;)</sup> is fixed by the potential alone.</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="1" y1="12" x2="25" y2="2" stroke="var(--ox)" stroke-width="2"/></svg><span><b class="an">i<sub>a</sub> = Fk<sub>a</sub>C<sub>R</sub>*</b> and <b class="ca">|i<sub>c</sub>| = Fk<sub>c</sub>C<sub>O</sub>*</b>: the same two lines, each lifted by its own concentration &mdash; which moves their crossing from E&deg;&prime; to E<sub>eq</sub>.</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><path d="M1 3 C8 3 11 13 13 13 C15 13 18 3 25 3" fill="none" stroke="var(--ink)" stroke-width="2"/></svg><span><b>|net i|</b>, what an ammeter reads, dips to zero at <b class="eqm">E<sub>eq</sub></b>; the height of the crossing there is <b class="eqm">i<sub>0</sub></b>. The arrow from E&deg;&prime; to E<sub>eq</sub> is the Nernst term.</span></span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h"><h2>The numbers</h2><span class="note" id="kkWho">&mdash;</span></div>
+        <div class="card-b">
+          <div class="readout sm"><span class="k"><span class="ca">k<sub>c</sub></span> at this E</span><span class="v" id="kkRkc">&mdash;</span></div>
+          <div class="readout sm"><span class="k"><span class="an">k<sub>a</sub></span> at this E</span><span class="v" id="kkRka">&mdash;</span></div>
+          <div class="readout sm"><span class="k">k<sub>c</sub>/k<sub>a</sub> = e<sup>&minus;f(E&minus;E&deg;&prime;)</sup></span><span class="v" id="kkRrat">&mdash;</span></div>
+          <div class="readout sm"><span class="k"><span class="eqm">E<sub>eq</sub></span> &minus; E&deg;&prime; (Nernst)</span><span class="v" id="kkReq">&mdash;</span></div>
+          <div class="readout sm"><span class="k">&eta; = E &minus; E<sub>eq</sub></span><span class="v" id="kkReta">&mdash;</span></div>
+          <div class="readout sm"><span class="k"><span class="eqm">i<sub>0</sub></span>, per cm<sup>2</sup></span><span class="v" id="kkRi0">&mdash;</span></div>
+          <div class="readout sm"><span class="k"><span class="an">i<sub>a</sub></span> &nbsp;/&nbsp; <span class="ca">i<sub>c</sub></span></span><span class="v" id="kkRiac">&mdash;</span></div>
+          <div class="readout sm"><span class="k"><b>net i</b></span><span class="v" id="kkRi">&mdash;</span></div>
+          <div class="readout sm"><span class="k">reaction orders of i<sub>0</sub> in O / R</span><span class="v" id="kkRord">&mdash;</span></div>
+          <div id="kkVerdict" class="verdict flat" style="margin-top:14px">&mdash;</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><h2>What changes what</h2><span class="note">one slider at a time</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="scrollx">
+          <table class="ions">
+            <thead><tr><th>move&hellip;</th><th><span class="nt">k&deg;</span> crossing</th><th><span class="nt">E<sub>eq</sub></span></th><th><span class="nt">i<sub>0</sub></span></th><th>why</th></tr></thead>
+            <tbody>
+              <tr><td>k&deg; &times; 10</td><td>up 1 decade</td><td>stays</td><td>&times; 10</td><td class="wr">both lines lift together; equilibrium is where they balance, not how high they are</td></tr>
+              <tr><td>C<sub>O</sub>* &times; 10</td><td>stays</td><td>+59 mV</td><td>&times; 10<sup>1&minus;&alpha;</sup></td><td class="wr">more O to reduce; the balance point slides positive, where k<sub>c</sub> is smaller</td></tr>
+              <tr><td>C<sub>R</sub>* &times; 10</td><td>stays</td><td>&minus;59 mV</td><td>&times; 10<sup>&alpha;</sup></td><td class="wr">the mirror image</td></tr>
+              <tr><td>&alpha;</td><td>stays</td><td>stays</td><td>changes unless C<sub>O</sub>* = C<sub>R</sub>*</td><td class="wr">tilts the two lines against each other about E&deg;&prime;</td></tr>
+              <tr><td>E</td><td>stays</td><td>stays</td><td>stays</td><td class="wr">moves only where you are on the lines: that is &eta;</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="hint" style="margin:0">Read the last column of the C<sub>O</sub>* row as a measurement: plot log i<sub>0</sub> against
+          log C<sub>O</sub>* at fixed C<sub>R</sub>* and the slope is 1 &minus; &alpha; &mdash; a value of &alpha; that needs no Tafel plot at all.
+          Measured k&deg; run from above 1 cm/s for the fastest outer-sphere couples to below 10<sup>&minus;9</sup> cm/s.</p>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ============== BUTLER-VOLMER ============== -->
+  <section class="panel" id="p-bv" role="tabpanel" aria-labelledby="t-bv" hidden>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>One equation, three regions</h2><span class="note">electron transfer and mass transfer in series</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig">
+          i = i<sub>0</sub>[<span class="an">e<sup>&alpha;<sub>a</sub>f&eta;</sup></span> &minus; <span class="ca">e<sup>&minus;&alpha;<sub>c</sub>f&eta;</sup></span>]
+          <small>Butler&ndash;Volmer, surface = bulk &middot; &alpha;<sub>a</sub> = 1 &minus; &alpha;, &alpha;<sub>c</sub> = &alpha;, f = F/RT</small><br>
+          i = i<sub>0</sub>[e<sup>&alpha;<sub>a</sub>f&eta;</sup> &minus; e<sup>&minus;&alpha;<sub>c</sub>f&eta;</sup>] / [1 + <span class="mt">(i<sub>0</sub>/i<sub>l</sub>)</span>(e<sup>&alpha;<sub>a</sub>f&eta;</sup> + e<sup>&minus;&alpha;<sub>c</sub>f&eta;</sup>)]
+          <small>with mass transfer: C<sub>O</sub>(0)/C* = 1 + i/i<sub>l</sub>, C<sub>R</sub>(0)/C* = 1 &minus; i/i<sub>l</sub></small><br>
+          <span class="lin">|&eta;| small: i &asymp; i<sub>0</sub>f&eta; &nbsp;&rArr;&nbsp; R<sub>ct</sub> = RT/nFi<sub>0</sub></span>
+          &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="eqm">|&eta;| large: log|i| = log i<sub>0</sub> + &alpha;<sub>a</sub>f&prime;&eta; &nbsp;or&nbsp; log i<sub>0</sub> &minus; &alpha;<sub>c</sub>f&prime;&eta;</span>
+          <small>f&prime; = F/2.303RT</small>
+        </div>
+        <div class="notes2">
+          <p class="hint"><b>Two steps in series.</b> The electron has to cross at the surface, and the reactant has to get
+            there. Near E<sub>eq</sub> the crossing is the slow step and the current is <b>electron-transfer-limited</b>; far out it
+            is so fast that the surface runs dry and the current becomes <b class="mt">mass-transfer-limited</b>, a plateau no
+            potential can raise. Switch mass transport on to see the second.</p>
+          <p class="hint"><b>Signs.</b> Everything here is anodic positive, so the linear region is i &asymp; +i<sub>0</sub>f&eta;.
+            Bard &amp; Faulkner&rsquo;s figures count cathodic current as positive, which is where the form
+            i &asymp; &minus;i<sub>0</sub>f&eta; comes from &mdash; the same curve turned through 180&deg;.</p>
+          <p class="hint"><b>At the surface.</b> The strip above the left plot is the Nernst diffusion layer at the &eta; marked.
+            While C<sub>O</sub>(0) &asymp; C<sub>O</sub>*, the electrode takes what it is given and the rate is the electron
+            transfer&rsquo;s. Once C(0) heads for zero the rate is whatever diffusion across the layer can deliver,
+            i<sub>l</sub> = nFm C*, and the potential has nothing more to say.</p>
+          <p class="hint"><b>Which limit comes first</b> is the ratio <b>i<sub>0</sub>/i<sub>l</sub></b>. A Tafel line needs back
+            reaction &lt; 1 % (|&eta;| &gt; 118 mV, whatever &alpha; is) and depletion &lt; 10 % (|i| &lt; 0.1 i<sub>l</sub>). At
+            &alpha; = &frac12; the current at 118 mV is 10 i<sub>0</sub>, so the clean stretch is log(i<sub>l</sub>/i<sub>0</sub>) &minus; 2
+            decades long; on a branch with transfer coefficient &alpha; it is log(i<sub>l</sub>/i<sub>0</sub>) &minus; 1 &minus; 2&alpha;.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-b">
+        <div class="dfctl">
+          <div>
+            <span class="fld">three exchange currents</span>
+            <div class="pill-row pw" id="bvP">
+              <button class="pill" data-s="-3" aria-pressed="false" type="button">(a) 10&#8315;&#179;</button>
+              <button class="pill" data-s="-6" aria-pressed="true"  type="button">(b) 10&#8315;&#8310;</button>
+              <button class="pill" data-s="-9" aria-pressed="false" type="button">(c) 10&#8315;&#8313;</button>
+            </div>
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">i<sub>0</sub> / A cm<sup>&minus;2</sup></span><span class="val" id="bvIv"></span></div>
+            <input type="range" id="bvI" min="-10" max="-1" step="0.05" value="-6">
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">&alpha; (= &alpha;<sub>c</sub>)</span><span class="val" id="bvAv"></span></div>
+            <input type="range" id="bvA" min="0.2" max="0.8" step="0.01" value="0.5">
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">&eta; marked / mV</span><span class="val" id="bvEv"></span></div>
+            <input type="range" id="bvE" min="-400" max="400" step="1" value="-100">
+          </div>
+          <div>
+            <span class="fld">mass transport</span>
+            <div class="pill-row pw" id="bvM">
+              <button class="pill" data-s="off" aria-pressed="true"  type="button">off</button>
+              <button class="pill" data-s="on"  aria-pressed="false" type="button">on</button>
+            </div>
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">i<sub>l</sub>, either side</span><span class="val" id="bvLv"></span></div>
+            <input type="range" id="bvL" min="-2" max="2" step="0.05" value="0" disabled>
+          </div>
+          <div class="dfctl-wide">
+            <span class="fld">current axis of the left plot</span>
+            <div class="pill-row pw" id="bvY">
+              <button class="pill" data-s="0" aria-pressed="true"  type="button">&plusmn;10 &micro;A/cm&sup2;</button>
+              <button class="pill" data-s="1" aria-pressed="false" type="button">&plusmn;1 mA/cm&sup2;</button>
+              <button class="pill" data-s="2" aria-pressed="false" type="button">&plusmn;100 mA/cm&sup2;</button>
+            </div>
+          </div>
+          <div class="dfctl-wide btnrow" style="margin:0">
+            <button class="ghost" id="bvQ1" type="button">i<sub>0</sub> = i<sub>l</sub> &mdash; no Tafel line at all</button>
+            <button class="ghost" id="bvQ2" type="button">i<sub>0</sub> = i<sub>l</sub>/1000 &mdash; one clean decade</button>
+            <button class="ghost" id="bvQ3" type="button">i<sub>0</sub> = i<sub>l</sub>/10<sup>4</sup> &mdash; two clean decades</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pairfig" style="margin-bottom:16px">
+      <div class="card">
+        <div class="card-h"><h2>i against &eta;</h2><span class="note" id="bvJVn">linear axes</span></div>
+        <div class="card-b stack" style="gap:8px">
+          <span class="fld" style="margin:0" id="bvPrn">At the surface &mdash; C(x) across the diffusion layer, at the &eta; marked</span>
+          <svg id="bvpr" viewBox="0 0 470 104" style="display:block;width:100%;height:auto" role="img" aria-label="Concentration of O and R against distance from the electrode at the marked overpotential, in the Nernst diffusion-layer picture: linear across the layer and equal to the bulk value beyond it. When the surface value of the consumed species approaches zero the reaction is mass-transfer-limited."></svg>
+          <svg id="bvjv" viewBox="0 0 470 292" style="display:block;width:100%;height:auto" role="img" aria-label="Current density against overpotential on linear axes: the anodic and cathodic partial currents, their sum, and faintly three electrodes with exchange currents of ten to the minus three, minus six and minus nine amperes per square centimetre. With mass transport switched on the curve levels off at the limiting current on either side."></svg>
+          <div class="glegend">
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="1" y1="5" x2="25" y2="5" stroke="var(--ox)" stroke-width="1.6" stroke-dasharray="4 3"/><line x1="1" y1="10" x2="25" y2="10" stroke="var(--red-)" stroke-width="1.6" stroke-dasharray="4 3"/></svg><span><b class="an">anodic</b> and <b class="ca">cathodic</b> partial currents; <b>solid black</b> is their sum, all a potentiostat sees.</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><path d="M1 13 C10 13 16 1 25 1" fill="none" stroke="var(--muted)" stroke-width="1.4" opacity="0.5"/></svg><span><b>faint</b>: three electrodes, i<sub>0</sub> = 10<sup>&minus;3</sup>, 10<sup>&minus;6</sup> and 10<sup>&minus;9</sup> A/cm<sup>2</sup>, at the same &alpha;. Large i<sub>0</sub> stands nearly upright; small i<sub>0</sub> needs hundreds of mV before anything flows.</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="1" y1="7" x2="25" y2="7" stroke="var(--ion-k)" stroke-width="1.4" stroke-dasharray="3 3"/></svg><span><b class="mt">&plusmn;i<sub>l</sub></b> when mass transport is on: the ceiling the plateau runs into.</span></span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h"><h2>The same curve on a log axis</h2><span class="note">where each approximation holds</span></div>
+        <div class="card-b stack" style="gap:12px">
+          <svg id="bvtf" viewBox="0 0 470 292" style="display:block;width:100%;height:auto" role="img" aria-label="Logarithm of the magnitude of the current against overpotential, with the regions shaded: a narrow ohmic band around zero where the current is linear in overpotential, the Tafel regions on either side where the plot is a straight line, and, with mass transport on, the region where the current approaches the limiting current."></svg>
+          <div class="glegend g2">
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><rect x="1" y="1" width="24" height="12" fill="var(--stop)" opacity="0.25"/><path d="M1 12 C9 9 15 4 25 2" fill="none" stroke="var(--stop)" stroke-width="1.6" stroke-dasharray="1.5 2.5"/></svg><span><b class="lin">ohmic region</b>: i<sub>0</sub>f&eta; (dotted) within 5 % of the truth.</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><rect x="1" y="1" width="24" height="12" fill="var(--go)" opacity="0.22"/><line x1="1" y1="12" x2="25" y2="2" stroke="var(--ox)" stroke-width="1.4" stroke-dasharray="5 3"/></svg><span><b class="eqm">Tafel region</b>: back reaction under 1 %, surface under 10 % depleted. Dashed: the Tafel lines.</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><rect x="1" y="1" width="24" height="12" fill="var(--ion-k)" opacity="0.22"/></svg><span><b class="mt">mass transfer</b> matters: more than 10 % depleted &mdash; not a region for a Tafel fit.</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><circle cx="13" cy="7" r="4" fill="var(--go)"/></svg><span><b class="eqm">i<sub>0</sub></b>, where the Tafel lines meet at &eta; = 0.</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+        <div class="card-h"><h2>The numbers</h2><span class="note" id="bvWho">&mdash;</span></div>
+        <div class="card-b">
+          <div class="rgrid">
+          <div class="readout sm"><span class="k"><span class="an">b<sub>a</sub></span> / <span class="ca">b<sub>c</sub></span>, Tafel slopes</span><span class="v" id="bvRb">&mdash;</span></div>
+          <div class="readout sm"><span class="k"><span class="lin">R<sub>ct</sub> = RT/Fi<sub>0</sub></span>, per cm<sup>2</sup></span><span class="v" id="bvRct">&mdash;</span></div>
+          <div class="readout sm"><span class="k">small-&eta; slope, measured, as a resistance</span><span class="v" id="bvRtot">&mdash;</span></div>
+          <div class="readout sm"><span class="k">at &eta;: <b>net i</b></span><span class="v" id="bvRi">&mdash;</span></div>
+          <div class="readout sm"><span class="k">back reaction, as a share of forward</span><span class="v" id="bvRback">&mdash;</span></div>
+          <div class="readout sm"><span class="k"><span class="lin">linear</span> / <span class="eqm">Tafel</span> error at &eta;</span><span class="v" id="bvRerr">&mdash;</span></div>
+          <div class="readout sm"><span class="k">C<sub>O</sub>(0)/C* &nbsp;/&nbsp; C<sub>R</sub>(0)/C*</span><span class="v" id="bvRcs">&mdash;</span></div>
+          <div class="readout sm"><span class="k"><span class="lin">ohmic region</span>, |&eta;| below</span><span class="v" id="bvRlinw">&mdash;</span></div>
+          <div class="readout sm"><span class="k"><span class="eqm">Tafel region</span>, cathodic</span><span class="v" id="bvRtc">&mdash;</span></div>
+          <div class="readout sm"><span class="k"><span class="eqm">Tafel region</span>, anodic</span><span class="v" id="bvRta">&mdash;</span></div>
+          </div>
+          <div id="bvVerdict" class="verdict flat" style="margin-top:14px">&mdash;</div>
+        </div>
+    </div>
+
+  </section>
+
+  <!-- ============== TAFEL ANALYSIS ============== -->
+  <section class="panel" id="p-taf" role="tabpanel" aria-labelledby="t-taf" hidden>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>Two numbers from one plot, and how to get them wrong</h2><span class="note">the slope gives &alpha;, the intercept i<sub>0</sub></span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig">
+          <span class="an">log i<sub>a</sub> = log i<sub>0</sub> + &alpha;<sub>a</sub>f&prime;&eta;</span>
+          &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="ca">log|i<sub>c</sub>| = log i<sub>0</sub> &minus; &alpha;<sub>c</sub>f&prime;&eta;</span>
+          <small>f&prime; = F/2.303RT = 16.9 V<sup>&minus;1</sup> at 25 &deg;C, 15.1 V<sup>&minus;1</sup> at 60 &deg;C</small><br>
+          b = 1/(&alpha;f&prime;) = 2.303RT/&alpha;F &nbsp;&rArr;&nbsp; &alpha; = 1/(bf&prime;)
+          <small>the slope gives &alpha;; the line, run back to &eta; = 0, gives <span class="eqm">i<sub>0</sub></span></small>
+        </div>
+        <div class="notes2">
+          <p class="hint">The data below are <b>synthetic</b>: a Butler&ndash;Volmer curve with the i<sub>0</sub> and b of the system
+            chosen &mdash; Pt(110) for hydrogen, or a one-electron couple whose &alpha; you set &mdash; sampled every 1 or 2.5 mV, with
+            2 % of fixed scatter. Pick a window with the buttons, and the page fits a straight line to log|i| on each side, runs
+            it back to &eta; = 0 and compares what it gets with the numbers that made the data.</p>
+          <p class="hint">The lecture&rsquo;s zinc electrode is the warning behind the exercise: one data set, four windows, and four
+            exchange currents spanning a factor of almost 30. A window has to start where the back reaction has died and stop
+            before the reactant runs short. Turn mass transport on to see the second limit arrive.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-b">
+        <div class="dfctl">
+          <div class="span2">
+            <span class="fld">system</span>
+            <div class="pill-row pw" id="tfS">
+              <button class="pill" data-s="p110" aria-pressed="true"  type="button">Pt(110), H<sub>2</sub> &middot; 60 &deg;C</button>
+              <button class="pill" data-s="one"  aria-pressed="false" type="button">one-electron couple &middot; 25 &deg;C</button>
+            </div>
+          </div>
+          <div class="span2">
+            <div class="slider-row"><span class="fld" style="margin:0">&alpha;<sub>c</sub> of the one-electron couple (&alpha;<sub>a</sub> = 1 &minus; &alpha;<sub>c</sub>)</span><span class="val" id="tfAv"></span></div>
+            <input type="range" id="tfA" min="0.2" max="0.8" step="0.01" value="0.5" disabled>
+          </div>
+          <div class="span2">
+            <span class="fld">mass transport</span>
+            <div class="pill-row pw" id="tfM">
+              <button class="pill" data-s="off" aria-pressed="true"  type="button">off</button>
+              <button class="pill" data-s="on"  aria-pressed="false" type="button">on</button>
+            </div>
+          </div>
+          <div class="span2">
+            <div class="slider-row"><span class="fld" style="margin:0">i<sub>l</sub>, either side</span><span class="val" id="tfLv"></span></div>
+            <input type="range" id="tfL" min="-1" max="3" step="0.05" value="1" disabled>
+          </div>
+          <div class="dfctl-wide btnrow" style="margin:0">
+            <button class="ghost" id="tfB2" type="button">Window: near equilibrium only</button>
+            <button class="ghost" id="tfB3" type="button">Window: a defensible one</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>The fit</h2><span class="note" id="tfNote">&mdash;</span></div>
+      <div class="card-b">
+        <div class="figside">
+          <div class="stack" style="gap:12px">
+            <svg id="tfplot" viewBox="0 0 520 300" style="display:block;width:100%;height:auto" role="img" aria-label="Tafel plot of synthetic data: logarithm of the current magnitude against overpotential, with the points inside the chosen window coloured, a straight line fitted on each side and extrapolated back to zero overpotential, and the exchange current those lines imply marked against the true one."></svg>
+            <div class="glegend g2">
+              <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><circle cx="7" cy="7" r="2.6" fill="var(--ox)"/><circle cx="19" cy="7" r="2.6" fill="var(--red-)"/></svg><span>points <b>inside</b> the window, <span class="an">anodic</span> and <span class="ca">cathodic</span>; grey ones are left out of the fit.</span></span>
+              <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="1" y1="11" x2="11" y2="7" stroke="var(--ox)" stroke-width="1.6" stroke-dasharray="4 3"/><line x1="11" y1="7" x2="25" y2="2" stroke="var(--ox)" stroke-width="2"/></svg><span>the <b>fitted line</b>, solid over the window, dashed where it is extrapolated back to &eta; = 0.</span></span>
+              <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><circle cx="7" cy="7" r="4" fill="none" stroke="var(--ox)" stroke-width="1.6"/><circle cx="19" cy="7" r="4" fill="var(--go)"/></svg><span>rings: the i<sub>0</sub> each line implies; <b class="eqm">green dot</b>: the true i<sub>0</sub>.</span></span>
+              <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><rect x="1" y="1" width="24" height="12" fill="var(--go)" opacity="0.18"/><line x1="4" y1="3" x2="22" y2="3" stroke="var(--ion-k)" stroke-width="2"/></svg><span>green band: your window; <b class="mt">violet bar</b>: a defensible one for these data.</span></span>
+            </div>
+          </div>
+          <div>
+            <div class="readout sm"><span class="k">window, |&eta;|</span><span class="v" id="tfRwin">&mdash;</span></div>
+            <div class="readout sm"><span class="k"><span class="an">b<sub>a</sub></span> fitted / true</span><span class="v" id="tfRba">&mdash;</span></div>
+            <div class="readout sm"><span class="k"><span class="ca">b<sub>c</sub></span> fitted / true</span><span class="v" id="tfRbc">&mdash;</span></div>
+            <div class="readout sm"><span class="k">&alpha;<sub>a</sub> = 1/(b<sub>a</sub>f&prime;), fitted / true</span><span class="v" id="tfRaa">&mdash;</span></div>
+            <div class="readout sm"><span class="k">&alpha;<sub>c</sub> = 1/(b<sub>c</sub>f&prime;), fitted / true</span><span class="v" id="tfRac">&mdash;</span></div>
+            <div class="readout sm"><span class="k">i<sub>0</sub> from the <span class="an">anodic</span> line</span><span class="v" id="tfRi0a">&mdash;</span></div>
+            <div class="readout sm"><span class="k">i<sub>0</sub> from the <span class="ca">cathodic</span> line</span><span class="v" id="tfRi0c">&mdash;</span></div>
+            <div class="readout sm"><span class="k"><span class="eqm">true i<sub>0</sub></span></span><span class="v" id="tfRtrue">&mdash;</span></div>
+            <div class="readout sm"><span class="k">a defensible window here</span><span class="v" id="tfRrec">&mdash;</span></div>
+            <div id="tfVerdict" class="verdict flat" style="margin-top:14px">&mdash;</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pairfig">
+      <div class="card">
+        <div class="card-h"><h2>What a slope can tell you</h2><span class="note">an apparent &alpha; is not a symmetry factor</span></div>
+        <div class="card-b stack" style="gap:12px">
+          <div class="scrollx">
+            <table class="ions">
+              <thead><tr><th>hydrogen, if&hellip;</th><th><span class="nt">&alpha;<sub>c</sub></span></th><th><span class="nt">&alpha;<sub>a</sub></span></th><th><span class="nt">b<sub>c</sub></span> at 25 &deg;C</th><th><span class="nt">b<sub>c</sub></span> at 60 &deg;C</th></tr></thead>
+              <tbody id="tfMech"></tbody>
+            </table>
+          </div>
+          <p class="hint" style="margin:0">Volmer H<sup>+</sup> + e<sup>&minus;</sup> &rarr; H<sub>ad</sub>; Heyrovsky H<sub>ad</sub> + H<sup>+</sup> +
+            e<sup>&minus;</sup> &rarr; H<sub>2</sub>; Tafel 2H<sub>ad</sub> &rarr; H<sub>2</sub>. If the Volmer step is fast and stays at
+            equilibrium, H<sub>ad</sub> builds up as e<sup>F|&eta;|/RT</sup>, and a later step that consumes it inherits that potential
+            dependence: once for Heyrovsky (plus half its own electron), twice for the purely chemical Tafel step. Classic
+            low-coverage values with a symmetry factor of 0.5. <b>An &alpha; above 1 is therefore not a broken
+            symmetry factor</b> &mdash; it says the slow step comes after one or more electrons have already been transferred.
+            A matching slope is evidence for a mechanism, not proof of one.</p>
+          <p class="hint" style="margin:0">With one slow step the two add to <b>&alpha;<sub>a</sub> + &alpha;<sub>c</sub> = n/&nu;</b>
+            (Parsons): n = 2 electrons per H<sub>2</sub>, and the slow step runs &nu; times per H<sub>2</sub> &mdash; twice for Volmer,
+            once for Heyrovsky or Tafel. For a slow Tafel step the oxidation side has &alpha;<sub>a</sub> = 0: it levels off at a kinetic
+            limit instead of climbing. So a fit with 33 mV/dec on <em>both</em> branches, &alpha;<sub>a</sub> = &alpha;<sub>c</sub> = 2,
+            describes the data near &eta; = 0 but cannot come from one slow step &mdash; the Pt(110) data on this tab reproduce that fit
+            as reported. A further caution: 2.303RT/2F is also the slope that H<sub>2</sub> diffusion alone gives on the evolution side of
+            a reversible electrode, and measurements free of the rotating disk&rsquo;s transport limit find hydrogen on Pt in acid far
+            faster than the disk shows (Sheng, Gasteiger &amp; Shao-Horn, 2010; Durst et al., 2014).</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h"><h2>Reading published slopes</h2><span class="note">&alpha; = 2.303RT/bF</span></div>
+        <div class="card-b stack" style="gap:12px">
+          <div class="scrollx">
+            <table class="ions">
+              <thead><tr><th>system</th><th><span class="nt">b / mV dec<sup>&minus;1</sup></span></th><th><span class="nt">T</span></th><th><span class="nt">&alpha;</span>, apparent</th></tr></thead>
+              <tbody id="tfLit"></tbody>
+            </table>
+          </div>
+          <p class="hint" style="margin:0">Pt(hkl): HOR/HER in 0.05 M H<sub>2</sub>SO<sub>4</sub> (Markovi&#263; et al., 1997).
+            OER on layered LiCoO<sub>2</sub> in 0.1 M alkali hydroxides (Kim et al., 2022), read here at 25 &deg;C. A smaller b
+            means the current climbs a decade for fewer millivolts &mdash; a steeper Tafel line, faster kinetics. It says nothing
+            about i<sub>0</sub> by itself: two catalysts with different b and i<sub>0</sub> can cross, and which one is better then
+            depends on the current you need.</p>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ============== CONCEPT CHECKS ============== -->
+  <section class="panel" id="p-quiz1" role="tabpanel" aria-labelledby="t-quiz1" hidden>
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h">
+        <h2>Concept check 1 &middot; the barrier, k&deg; and i<sub>0</sub></h2>
+        <span class="note">six questions on the first two tabs &mdash; answer once per question; the reasoning appears immediately</span>
+        <span class="tally" style="margin-left:auto" id="tally1"></span>
+      </div>
+      <div class="card-b">
+        <div class="idgrid">
+          <div>
+            <label class="fld" for="sId1">Student ID</label>
+            <input type="text" id="sId1" inputmode="numeric" placeholder="e.g. 20261234">
+          </div>
+        </div>
+        <p class="hint" id="idHint1"></p>
+      </div>
+      <div class="scorebar" id="scorebar1" hidden>
+        <div>
+          <div class="scorenum" id="scoreNum1">&mdash;</div>
+          <div class="vcode" style="margin-top:4px" id="whoLine1">&mdash;</div>
+        </div>
+        <div style="flex:1 1 300px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="solid" id="sendBtn1" type="button" hidden>Submit to the course</button>
+            <button class="ghost" id="dlBtn1" type="button">Download my result</button>
+          </div>
+          <p class="hint" id="dlHint1" style="margin-top:8px">Download the file and hand it in as your instructor directs.</p>
+        </div>
+      </div>
+    </div>
+    <div class="quiz" id="quiz1"></div>
+  </section>
+
+  <section class="panel" id="p-quiz2" role="tabpanel" aria-labelledby="t-quiz2" hidden>
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h">
+        <h2>Concept check 2 &middot; Butler&ndash;Volmer and Tafel</h2>
+        <span class="note">six questions on the last two tabs &mdash; answer once per question; the reasoning appears immediately</span>
+        <span class="tally" style="margin-left:auto" id="tally2"></span>
+      </div>
+      <div class="card-b">
+        <div class="idgrid">
+          <div>
+            <label class="fld" for="sId2">Student ID</label>
+            <input type="text" id="sId2" inputmode="numeric" placeholder="e.g. 20261234">
+          </div>
+        </div>
+        <p class="hint" id="idHint2"></p>
+      </div>
+      <div class="scorebar" id="scorebar2" hidden>
+        <div>
+          <div class="scorenum" id="scoreNum2">&mdash;</div>
+          <div class="vcode" style="margin-top:4px" id="whoLine2">&mdash;</div>
+        </div>
+        <div style="flex:1 1 300px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="solid" id="sendBtn2" type="button" hidden>Submit to the course</button>
+            <button class="ghost" id="dlBtn2" type="button">Download my result</button>
+          </div>
+          <p class="hint" id="dlHint2" style="margin-top:8px">Download the file and hand it in as your instructor directs.</p>
+        </div>
+      </div>
+    </div>
+    <div class="quiz" id="quiz2"></div>
+  </section>
+
+  <footer>
+    The transition-state picture, k&deg;, i<sub>0</sub> and Butler&ndash;Volmer with mass transfer as in Bard &amp; Faulkner, <i>Electrochemical Methods</i>, chapter 3 &middot;
+    the two wells are parabolas scaled so that the zero-overpotential barrier is 0.25 eV, with their curvature ratio set from the &alpha; chosen
+    (at &alpha; = &frac12;, Marcus parabolas of &lambda; = 1.0 eV); &alpha; read from the slopes at the crossing as in Bard &amp; Faulkner, Fig. 3.3.3 &middot;
+    &alpha; drifting with &eta; seen over a volt of driving force: C. E. D. Chidsey, <i>Science</i> 251 (1991) 919 &middot;
+    Pt(hkl) exchange currents and Tafel slopes for HOR/HER at 60 &deg;C from Markovi&#263; et al., <i>J. Phys. Chem. B</i> 101 (1997) 5405 &middot;
+    OER Tafel slopes from Y. Kim, &hellip;, H. R. Byon, <i>J. Mater. Chem. A</i> 10 (2022) 10967 &middot;
+    hydrogen on Pt without the disk&rsquo;s transport limit: W. Sheng, H. A. Gasteiger &amp; Y. Shao-Horn, <i>J. Electrochem. Soc.</i> 157 (2010) B1529;
+    J. Durst et al., <i>Energy Environ. Sci.</i> 7 (2014) 2255 &middot;
+    the Volmer&ndash;Heyrovsky&ndash;Tafel slopes are the classical low-coverage values (e.g. Shinagawa, Garcia-Esparza &amp; Takanabe, <i>Sci. Rep.</i> 5 (2015) 13801) &middot;
+    every point on the Tafel tab is synthetic, generated from those numbers &middot; activity coefficients are 1 throughout<br>
+    CH40051 Electroanalytical Chemistry &middot; Fall 2026 &mdash; companion to Lecture 11
+  </footer>
+</div>
+<script>
+(function(){
+"use strict";
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function el(id){ return document.getElementById(id); }
+
+/* ---------------- tabs ---------------- */
+var tabs=[].slice.call(document.querySelectorAll(".tab"));
+tabs.forEach(function(t){
+  t.addEventListener("click",function(){
+    tabs.forEach(function(o){
+      var on=(o===t);
+      o.setAttribute("aria-selected",on?"true":"false");
+      document.getElementById(o.getAttribute("aria-controls")).hidden=!on;
+    });
+  });
+});
+
+/* ================= SHARED CONSTANTS AND HELPERS =========================
+   Currents in A/cm2 (A = 1 cm2, so every current is a current density),
+   potentials in V, rate constants in cm/s, concentrations in mM on the
+   sliders and mol/cm3 in the arithmetic.                                */
+var QE = 1.602176634e-19, KB = 1.380649e-23, NA = 6.02214076e23;
+var FARADAY = QE * NA, RGAS = KB * NA, T25 = 298.15;
+var RTF = RGAS * T25 / FARADAY;            /* 0.025693 V                 */
+var DEC = RTF * Math.LN10;                 /* 0.059159 V per decade      */
+var MONO = 'font-family="IBM Plex Mono,monospace"';
+
+function pillGroup(id, cb){
+  var wrap = document.getElementById(id);
+  wrap.addEventListener("click", function(e){
+    var b = e.target.closest("button.pill");
+    if(!b) return;
+    [].slice.call(wrap.querySelectorAll("button.pill")).forEach(function(o){
+      o.setAttribute("aria-pressed", o === b ? "true" : "false");
+    });
+    cb(b.getAttribute("data-s"));
+  });
+}
+function pillSet(id, val){
+  [].slice.call(document.querySelectorAll("#" + id + " button.pill")).forEach(function(o){
+    o.setAttribute("aria-pressed", o.getAttribute("data-s") === val ? "true" : "false");
+  });
+}
+
+/* ---- one requestAnimationFrame loop; a picture only ticks while shown -- */
+var REDUCED = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+var ANIM = [], animLast = 0;
+function animLoop(ts){
+  if(ts - animLast > 32){
+    animLast = ts;
+    ANIM.forEach(function(a){ if(!document.getElementById(a.panel).hidden) a.tick(ts); });
+  }
+  window.requestAnimationFrame(animLoop);
+}
+
+/* x as "1.84 × 10<sup>−7</sup>", and the same with a tspan for inside an SVG */
+function sciParts(x, d){
+  var e = Math.floor(Math.log10(Math.abs(x))), m = x / Math.pow(10, e);
+  if(Math.abs(+m.toFixed(d - 1)) >= 10){ m /= 10; e++; }
+  return {m: m.toFixed(d - 1).replace("-", "−"), e: (e < 0 ? "−" + (-e) : String(e))};
+}
+function sciH(x, d){
+  if(x === 0) return "0";
+  var p = sciParts(x, d);
+  return p.m + " × 10<sup>" + p.e + "</sup>";
+}
+function sciSvg(x, d){
+  if(x === 0) return "0";
+  var p = sciParts(x, d);
+  return p.m + ' × 10<tspan baseline-shift="super" font-size="7.5">' + p.e + '</tspan>';
+}
+function pow10Svg(n){
+  return '10<tspan baseline-shift="super" font-size="7">' + (n < 0 ? "−" + (-n) : n) + '</tspan>';
+}
+/* a current density, in whatever unit keeps it readable; HTML, so it is
+   always written with innerHTML                                          */
+function fmtJ(j){
+  var a = Math.abs(j);
+  if(a === 0) return "0";
+  var s = j < 0 ? "−" : "";
+  if(a >= 1) return s + a.toFixed(2) + " A/cm²";
+  if(a >= 1e-3) return s + (a * 1e3).toFixed(2) + " mA/cm²";
+  if(a >= 1e-6) return s + (a * 1e6).toFixed(2) + " µA/cm²";
+  if(a >= 1e-9) return s + (a * 1e9).toFixed(2) + " nA/cm²";
+  return sciH(j, 2) + " A/cm²";
+}
+/* the same, plain text, for inside an SVG */
+function fmtJs(j){
+  var a = Math.abs(j);
+  if(a === 0) return "0";
+  var s = j < 0 ? "−" : "";
+  if(a >= 1) return s + a.toFixed(2) + " A/cm²";
+  if(a >= 1e-3) return s + (a * 1e3).toPrecision(3) + " mA/cm²";
+  if(a >= 1e-6) return s + (a * 1e6).toPrecision(3) + " µA/cm²";
+  if(a >= 1e-9) return s + (a * 1e9).toPrecision(3) + " nA/cm²";
+  if(a >= 1e-12) return s + (a * 1e12).toPrecision(3) + " pA/cm²";
+  return sciSvg(j, 2) + " A/cm²";
+}
+function fmtR(r){
+  if(!isFinite(r)) return "∞";
+  if(r >= 1e9) return sciH(r, 2) + " Ω cm²";
+  if(r >= 1e6) return (r / 1e6).toFixed(2) + " MΩ cm²";
+  if(r >= 1e3) return (r / 1e3).toFixed(2) + " kΩ cm²";
+  if(r >= 1) return r.toFixed(2) + " Ω cm²";
+  return (r * 1000).toFixed(1) + " mΩ cm²";
+}
+/* a signed potential difference in mV */
+function fmtmV(v, d){
+  var x = v * 1000, s = x > 0.0001 ? "+" : x < -0.0001 ? "−" : "";
+  return s + Math.abs(x).toFixed(d === undefined ? 0 : d) + " mV";
+}
+/* a fraction as a percentage, with enough digits that a small one is not "0.00 %" */
+function pcSmall(x){
+  var p = x * 100;
+  if(p >= 10) return p.toFixed(0) + " %";
+  if(p >= 0.1) return p.toFixed(1) + " %";
+  if(p >= 0.001) return p.toPrecision(2) + " %";
+  return "under 0.001 %";
+}
+/* a factor, as a plain number while it is small and in powers of ten after */
+function fmtX(x){
+  if(x < 1000) return x.toPrecision(3);
+  return sciH(x, 2);
+}
+function clamp(v, a, b){ return v < a ? a : v > b ? b : v; }
+
+/* ---- the small SVG vocabulary every picture on this page is drawn in --- */
+function ln(x1, y1, x2, y2, col, w, dash, op){
+  return '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + x2.toFixed(1)
+       + '" y2="' + y2.toFixed(1) + '" stroke="' + col + '" stroke-width="' + (w || 1) + '"'
+       + (dash ? ' stroke-dasharray="' + dash + '"' : "")
+       + (op !== undefined ? ' opacity="' + op + '"' : "") + '/>';
+}
+function tx(x, y, s, col, size, anchor, weight){
+  return '<text x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" fill="' + col + '" ' + MONO
+       + ' font-size="' + (size || 10.5) + '"'
+       + (anchor ? ' text-anchor="' + anchor + '"' : "")
+       + (weight ? ' font-weight="' + weight + '"' : "") + '>' + s + '</text>';
+}
+/* the same, with a halo: for a label that has to sit on top of a curve */
+function txh(x, y, str, col, size, anchor, weight){
+  return tx(x, y, str, col, size, anchor, weight)
+    .replace("<text", '<text paint-order="stroke" stroke="var(--surface)" '
+           + 'stroke-width="4" stroke-linejoin="round" stroke-opacity="0.95"');
+}
+function pth(d, col, w, fill, op, dash){
+  if(!d) return "";
+  return '<path d="' + d + '" fill="' + (fill || "none") + '" stroke="' + (col || "none")
+       + '" stroke-width="' + (w || 2) + '"'
+       + (dash ? ' stroke-dasharray="' + dash + '"' : "")
+       + (op !== undefined ? ' opacity="' + op + '"' : "") + ' stroke-linejoin="round"/>';
+}
+function rc(x, y, w, h, col, op, rx){
+  if(w <= 0 || h <= 0) return "";
+  return '<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + w.toFixed(1)
+       + '" height="' + h.toFixed(1) + '" fill="' + col + '"'
+       + (rx ? ' rx="' + rx + '"' : "")
+       + (op !== undefined ? ' opacity="' + op + '"' : "") + '/>';
+}
+function cir(x, y, r, col, op){
+  return '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + r.toFixed(2)
+       + '" fill="' + col + '"' + (op !== undefined ? ' opacity="' + op + '"' : "") + '/>';
+}
+function ring(x, y, r, col, w){
+  return '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + r.toFixed(2)
+       + '" fill="var(--surface)" stroke="' + col + '" stroke-width="' + (w || 1.6) + '"/>';
+}
+/* axis labels. A plot that does not say what it is plotting is a decoration,
+   so these are not optional: axX goes under the box, axY rotated beside it. */
+function axX(X0, X1, Y, lab){
+  return tx((X0 + X1) / 2, Y, lab, "var(--ink-2)", 10.5, "middle", 600);
+}
+function axY(X, Y0, Y1, lab){
+  var cy = (Y0 + Y1) / 2;
+  return tx(X, cy, lab, "var(--ink-2)", 10.5, "middle", 600)
+    .replace("<text", '<text transform="rotate(-90 ' + X.toFixed(1) + ' ' + cy.toFixed(1) + ')"');
+}
+/* the same measure, lying down */
+function arrowH(x1, x2, y, col, lab){
+  if(Math.abs(x2 - x1) < 6) return "";
+  var s = ln(x1, y, x2, y, col, 1.6);
+  var d = x2 > x1 ? 1 : -1;
+  s += '<polygon points="' + x2 + ',' + y + ' ' + (x2 - 5 * d) + ',' + (y - 3) + ' '
+     + (x2 - 5 * d) + ',' + (y + 3) + '" fill="' + col + '"/>';
+  s += '<polygon points="' + x1 + ',' + y + ' ' + (x1 + 5 * d) + ',' + (y - 3) + ' '
+     + (x1 + 5 * d) + ',' + (y + 3) + '" fill="' + col + '"/>';
+  if(lab) s += txh((x1 + x2) / 2, y - 6, lab, col, 10, "middle", 600);
+  return s;
+}
+/* a two-headed measure, used for every "this much" on the page */
+function arrowV(x, y1, y2, col, lab, side){
+  var s = ln(x, y1, x, y2, col, 1.6);
+  var d = y2 > y1 ? 1 : -1;
+  s += '<polygon points="' + x + ',' + y2 + ' ' + (x - 3) + ',' + (y2 - 4 * d) + ' ' + (x + 3) + ',' + (y2 - 4 * d) + '" fill="' + col + '"/>';
+  s += '<polygon points="' + x + ',' + y1 + ' ' + (x - 3) + ',' + (y1 + 4 * d) + ' ' + (x + 3) + ',' + (y1 + 4 * d) + '" fill="' + col + '"/>';
+  if(lab) s += tx(x + (side === "l" ? -6 : 6), (y1 + y2) / 2 + 3.5, lab, col, 10, side === "l" ? "end" : "start", 600);
+  return s;
+}
+/* a path through f(x) for x from a to b, broken wherever the value leaves
+   [lo, hi]: a curve that leaves the frame leaves it at the edge, rather
+   than flattening along it or stopping a sample short                    */
+function curveD(a, b, n, f, px, py, lo, hi){
+  var d = "", on = false, xp = 0, vp = NaN;
+  for(var i = 0; i <= n; i++){
+    var x = a + (b - a) * i / n, v = f(x);
+    var ok = isFinite(v) && v >= lo && v <= hi;
+    if(ok){
+      if(!on){
+        if(isFinite(vp)){
+          var e = vp > hi ? hi : lo, xe = xp + (x - xp) * (e - vp) / (v - vp);
+          d += "M" + px(xe).toFixed(1) + " " + py(e).toFixed(1) + " L";
+        }else d += "M";
+      }else d += "L";
+      d += px(x).toFixed(1) + " " + py(v).toFixed(1) + " ";
+      on = true;
+    }else{
+      if(on && isFinite(v)){
+        var e2 = v > hi ? hi : lo, xe2 = xp + (x - xp) * (e2 - vp) / (v - vp);
+        d += "L" + px(xe2).toFixed(1) + " " + py(e2).toFixed(1) + " ";
+      }
+      on = false;
+    }
+    xp = x; vp = v;
+  }
+  return d;
+}
+/* a straight line in data coordinates, cut to the frame (Liang-Barsky) */
+function clipSeg(x1, y1, x2, y2, xa, xb, ya, yb){
+  var t0 = 0, t1 = 1, dx = x2 - x1, dy = y2 - y1;
+  var p = [-dx, dx, -dy, dy], q = [x1 - xa, xb - x1, y1 - ya, yb - y1];
+  for(var i = 0; i < 4; i++){
+    if(p[i] === 0){ if(q[i] < 0) return null; }
+    else{
+      var r = q[i] / p[i];
+      if(p[i] < 0){ if(r > t1) return null; if(r > t0) t0 = r; }
+      else{ if(r < t0) return null; if(r < t1) t1 = r; }
+    }
+  }
+  return [x1 + t0 * dx, y1 + t0 * dy, x1 + t1 * dx, y1 + t1 * dy];
+}
+function segD(x1, y1, x2, y2, fr){
+  var c = clipSeg(x1, y1, x2, y2, fr.xl, fr.xr, fr.lb, fr.lt);
+  if(!c) return "";
+  return "M" + fr.px(c[0]).toFixed(1) + " " + fr.py(c[1]).toFixed(1)
+       + " L" + fr.px(c[2]).toFixed(1) + " " + fr.py(c[3]).toFixed(1);
+}
+/* a frame with a log axis: a rule every decade, a label every `every`,
+   potential ticks in mV along the bottom, and both axes named           */
+function logFrame(o){
+  function px(x){ return o.X0 + (x - o.xl) / (o.xr - o.xl) * (o.X1 - o.X0); }
+  function py(l){ return o.Y1 - (l - o.lb) / (o.lt - o.lb) * (o.Y1 - o.Y0); }
+  var s = rc(o.X0, o.Y0, o.X1 - o.X0, o.Y1 - o.Y0, "var(--surface-2)", 0.5, 4);
+  for(var g = Math.ceil(o.lb - 1e-9); g <= Math.floor(o.lt + 1e-9); g++){
+    /* no label on a rule that sits on the bottom edge: it would collide
+       with the first potential tick under the corner                     */
+    var lab = ((g % o.every) + o.every) % o.every === 0 && py(g) < o.Y1 - 6;
+    s += ln(o.X0, py(g), o.X1, py(g), "var(--line-2)", 0.5, "2 4", lab ? 0.9 : 0.4);
+    if(lab) s += tx(o.X0 - 5, py(g) + 3.5, pow10Svg(g), "var(--muted)", 9, "end");
+  }
+  o.xt.forEach(function(v){
+    s += ln(px(v / 1000), o.Y0, px(v / 1000), o.Y1, "var(--line-2)", v === 0 ? 1.2 : 0.5, v === 0 ? null : "2 4");
+    s += tx(px(v / 1000), o.Y1 + 13, (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v), "var(--muted)", 9, "middle");
+  });
+  s += axX(o.X0, o.X1, o.Y1 + 31, o.xlab);
+  s += axY(14, o.Y0, o.Y1, o.ylab);
+  return {s: s, px: px, py: py, xl: o.xl, xr: o.xr, lb: o.lb, lt: o.lt};
+}
+function lg(x){ return Math.log10(Math.max(Math.abs(x), 1e-300)); }
+/* labels that have to share a picture. Each one is placed only where its
+   box clears every label already down; the width is estimated from the
+   monospace advance, 0.6 em, which is close for IBM Plex Mono.          */
+function Labels(){ this.b = []; }
+Labels.prototype.box = function(x, y, str, size, anchor){
+  var w = String(str).replace(/<[^>]*>/g, "").length * 0.6 * size;
+  var x0 = anchor === "end" ? x - w : anchor === "middle" ? x - w / 2 : x;
+  /* an exponent raised by baseline-shift sticks up above the capitals */
+  var up = /baseline-shift="super"/.test(String(str)) ? 3.5 : 0;
+  return [x0 - 2, y - 0.8 * size - 1 - up, x0 + w + 2, y + 0.25 * size + 1];
+};
+Labels.prototype.free = function(r){
+  return this.b.every(function(q){ return r[2] <= q[0] || r[0] >= q[2] || r[3] <= q[1] || r[1] >= q[3]; });
+};
+Labels.prototype.hold = function(x, y, str, size, anchor){ this.b.push(this.box(x, y, str, size, anchor)); };
+/* try each [x, y, anchor] in turn; the last one is used regardless if
+   `must`, and otherwise the label is left out                            */
+/* the same, but only at spots whose box stays inside B = [x0, y0, x1, y1];
+   when none is both inside and free, the first one inside is used        */
+/* the first spot inside B that is free, or "" with nothing held */
+Labels.prototype.tryIn = function(spots, str, col, size, weight, B){
+  for(var k = 0; k < spots.length; k++){
+    var r = this.box(spots[k][0], spots[k][1], str, size, spots[k][2]);
+    if(r[0] >= B[0] && r[1] >= B[1] && r[2] <= B[2] && r[3] <= B[3] && this.free(r)){
+      this.b.push(r);
+      return txh(spots[k][0], spots[k][1], str, col, size, spots[k][2], weight);
+    }
+  }
+  return "";
+};
+Labels.prototype.putIn = function(spots, str, col, size, weight, B){
+  var self = this, ins = spots.filter(function(sp){
+    var r = self.box(sp[0], sp[1], str, size, sp[2]);
+    return r[0] >= B[0] && r[1] >= B[1] && r[2] <= B[2] && r[3] <= B[3];
+  });
+  if(!ins.length) ins = spots;
+  var pick = ins[0];
+  for(var k = 0; k < ins.length; k++){
+    if(this.free(this.box(ins[k][0], ins[k][1], str, size, ins[k][2]))){ pick = ins[k]; break; }
+  }
+  this.b.push(this.box(pick[0], pick[1], str, size, pick[2]));
+  return txh(pick[0], pick[1], str, col, size, pick[2], weight);
+};
+Labels.prototype.put = function(spots, str, col, size, weight, must){
+  for(var k = 0; k < spots.length; k++){
+    var r = this.box(spots[k][0], spots[k][1], str, size, spots[k][2]);
+    if(this.free(r) || (must && k === spots.length - 1)){
+      this.b.push(r);
+      return txh(spots[k][0], spots[k][1], str, col, size, spots[k][2], weight);
+    }
+  }
+  return "";
+};
+
+
+/* ================= THE TILTING BARRIER =================================
+   Two parabolas in a reaction coordinate x, O + e- at x = 0 and R at x = 1.
+   They are scaled so that the barrier at zero overpotential is 0.25 eV
+   whatever alpha is, and alpha is carried by their curvature ratio alone,
+   through alpha_c = 1/(1 + sqrt(a_R/a_O)) -- so the picture is derived from
+   the number rather than drawn to look like it. As on Bard & Faulkner's
+   Fig. 3.3.2, the potential moves the O + e- well (the electron is in the
+   metal) and R stays put: O + e- at a_O x^2 - F eta, R at a_R (x - 1)^2.  */
+var AC = {sweep: false, sweepA: false, t0: 0, tA: 0, ph0: 0, hops: [], lastSpawn: 0};
+
+function acAc(){ return +el("acA").value; }
+function acEta(){ return +el("acE").value / 1000; }
+
+/* the pair, with the barrier pinned at 0.25 eV. Energies in eV per electron */
+function acWells(ac){
+  return {aO: 0.25 / ((1 - ac) * (1 - ac)), aR: 0.25 / (ac * ac)};
+}
+/* where the two curves meet, a_O x^2 - D = a_R (x - 1)^2 with D = eta in eV.
+   Two parabolas of different curvature meet twice; the root taken here is
+   the one that sits at 1 - alpha_c when D = 0 and moves continuously from
+   there. The other lies out beyond one of the wells and is not a barrier
+   (a scan from the left used to find it first once alpha_c passed 0.73).
+   Written as (a_R + D)/(a_R + sqrt(...)) it needs no special case when the
+   curvatures are equal. Over the sliders' range the root is real.         */
+function acCross(w, D){
+  var disc = w.aO * w.aR + D * (w.aO - w.aR);
+  return (w.aR + D) / (w.aR + Math.sqrt(Math.max(disc, 0)));
+}
+/* the slope construction at the crossing: the share of a small shift of
+   the O + e- well that reaches the transition state, from the two slopes  */
+function acLocal(w, xs){
+  var sO = 2 * w.aO * xs, sR = 2 * w.aR * (1 - xs);
+  if(sO <= 0 || sR <= 0) return NaN;
+  return sO / (sO + sR);
+}
+/* everything the pictures and the numbers need, in one place */
+function acState(){
+  var ac = acAc(), eta = acEta(), w = acWells(ac), D = eta;
+  var xs = acCross(w, D), gC = w.aO * xs * xs, Gs = gC - D;
+  return {ac: ac, aa: 1 - ac, eta: eta, w: w, D: D, xs: xs, gC: gC, gA: Gs, Gs: Gs};
+}
+/* a factor as "×7.03" or "÷7.03", HTML */
+function fmtFac(x){ return x >= 1 ? "×" + fmtX(x) : "÷" + fmtX(1 / x); }
+
+function acDrawBarrier(ts){
+  var svg = el("acbar");
+  if(!svg) return;
+  var S = acState(), w = S.w, D = S.D, xs = S.xs, Gs = S.Gs, x0 = 1 - S.ac;
+  var moved = Math.abs(D) > 0.004;
+  /* the frame follows the width on offer: wide and short next to the
+     readouts, the taller one once the grid has collapsed to one column */
+  var wide = svg.clientWidth >= 420;
+  var VW = wide ? 460 : 340, VH = wide ? 246 : 300;
+  if(svg.getAttribute("viewBox") !== "0 0 " + VW + " " + VH)
+    svg.setAttribute("viewBox", "0 0 " + VW + " " + VH);
+  var X0 = wide ? 44 : 40, X1 = wide ? 448 : 326;
+  var Y0 = wide ? 24 : 30, Y1 = wide ? 204 : 246;
+  var rx0 = -0.42, rx1 = 1.42;
+  var gmin = Math.min(0, -D) - 0.22, gmax = Math.max(Gs, 0.25, 0, -D) + 0.26;
+  function px(x){ return X0 + (x - rx0) / (rx1 - rx0) * (X1 - X0); }
+  function py(g){ return Y1 - (g - gmin) / (gmax - gmin) * (Y1 - Y0); }
+  function gO(x){ return w.aO * x * x - D; }
+  function gR(x){ return w.aR * (x - 1) * (x - 1); }
+  var s = rc(X0, Y0, X1 - X0, Y1 - Y0, "var(--surface-2)", 0.5, 4);
+  /* the barrier tops: where it was at eta = 0, faintly, and where it is now.
+     Both arrows end on the second line, which is the point: one top, two
+     barriers measured to it from two different floors                     */
+  if(moved) s += ln(X0, py(0.25), X1, py(0.25), "var(--muted)", 1, "2 4", 0.7);
+  s += ln(X0, py(Gs), X1, py(Gs), "var(--ion-k)", 1.1, "5 3", 0.85);
+  /* the well floors */
+  s += ln(X0, py(0), X1, py(0), "var(--line-2)", 1, "3 3");
+  if(moved) s += ln(X0, py(-D), X1, py(-D), "var(--line-2)", 1, "3 3");
+  /* where O + e- sat at eta = 0, dashed, as in the textbook figure */
+  if(moved) s += pth(curveD(rx0, rx1, 120, function(x){ return w.aO * x * x; }, px, py, gmin, gmax),
+                     "var(--red-)", 1.3, null, 0.45, "4 3");
+  s += pth(curveD(rx0, rx1, 120, gO, px, py, gmin, gmax), "var(--red-)", 2, null, 0.9);
+  s += pth(curveD(rx0, rx1, 120, gR, px, py, gmin, gmax), "var(--ox)", 2, null, 0.9);
+  /* the adiabatic path, which is what a reacting molecule follows */
+  s += pth(curveD(rx0, rx1, 160, function(x){ return x < xs ? gO(x) : gR(x); }, px, py, gmin, gmax),
+           "var(--ink)", 1, null, 0.28);
+  /* the crossing now, and the one at eta = 0 */
+  s += ln(px(xs), py(Gs), px(xs), Y1, "var(--ion-k)", 1, "2 3", 0.7);
+  if(moved) s += ring(px(x0), py(0.25), 3.2, "var(--muted)", 1.3);
+  s += cir(px(xs), py(Gs), 3.4, "var(--ion-k)");
+  /* the two measures, kept inside the box even when the crossing leaves it */
+  var mL = clamp(px(xs) - 26, X0 + 48, X1 - 90), mR = clamp(px(xs) + 26, X0 + 90, X1 - 48);
+  var L = new Labels(), lc = S.gC.toFixed(2) + " eV", la = S.gA.toFixed(2) + " eV";
+  s += arrowV(mL, py(-D), py(Gs), "var(--red-)", lc, "l");
+  s += arrowV(mR, py(0), py(Gs), "var(--ox)", la, "r");
+  L.hold(mL - 6, (py(-D) + py(Gs)) / 2 + 3.5, lc, 10, "end");
+  L.hold(mR + 6, (py(0) + py(Gs)) / 2 + 3.5, la, 10, "start");
+  s += tx(px(0), py(-D) + 17, "O + e⁻", "var(--red-)", 10.5, "middle", 600);
+  s += tx(px(1), py(0) + 17, "R", "var(--ox)", 10.5, "middle", 600);
+  L.hold(px(0), py(-D) + 17, "O + e⁻", 10.5, "middle");
+  L.hold(px(1), py(0) + 17, "R", 10.5, "middle");
+  s += tx(clamp(px(xs), X0 + 44, X1 - 44), Y1 + 14, "crossing at " + xs.toFixed(2),
+          "var(--ion-k)", 9.5, "middle");
+  s += tx(X0 + 4, Y0 + 12, "ΔG‡c (reduction)", "var(--red-)", 9.5);
+  s += tx(X1 - 4, Y0 + 12, "ΔG‡a (oxidation)", "var(--ox)", 9.5, "end");
+  if(moved){
+    /* how far the O + e- well moved: beside its arrow if there is room,
+       else under the lower floor's name, else over the upper floor        */
+    var fl = "−Fη = " + (-D > 0 ? "+" : "−") + Math.abs(D * 1000).toFixed(0) + " meV";
+    var lo = py(Math.min(0, -D)), hi = py(Math.max(0, -D));
+    s += arrowV(X0 + 12, py(0), py(-D), "var(--ink-2)", "", "r");
+    s += L.put([[X0 + 18, (lo + hi) / 2 + 3.5, "start"], [X0 + 18, lo + 31, "start"], [X0 + 18, hi - 7, "start"]],
+               fl, "var(--ink-2)", 9.5, null, true);
+  }
+  /* hopping dots: the balance of the two directions, straight from the two
+     barriers -- rate goes as exp(-dG/kT), and kT in eV is RT/F            */
+  var pC = 1 / (1 + Math.exp(-(S.gA - S.gC) / RTF));
+  if(!REDUCED && ts - AC.lastSpawn > 150){
+    AC.lastSpawn = ts;
+    var dir = Math.random() < pC ? 1 : -1;      /* +1 = O to R (reduction) */
+    AC.hops.push({d: dir, u: 0});
+    if(AC.hops.length > 14) AC.hops.shift();
+  }
+  AC.hops = AC.hops.filter(function(h){ h.u += 0.028; return h.u < 1; });
+  AC.hops.forEach(function(h){
+    var x = h.d > 0 ? h.u : 1 - h.u;
+    var g = x < xs ? gO(x) : gR(x);
+    if(g > gmax || g < gmin) return;
+    s += cir(px(x), py(g) - 5, 3.2, h.d > 0 ? "var(--red-)" : "var(--ox)", 0.9);
+  });
+  var fr = (pC * 100).toFixed(0), fo = ((1 - pC) * 100).toFixed(0);
+  var fa = "α_c = " + S.ac.toFixed(2) + " from a_R/a_O = " + (w.aR / w.aO).toFixed(2);
+  if(wide){
+    s += tx(X0, Y1 + 32, "hops: " + fr + " % reduction · " + fo + " % oxidation · " + fa,
+            "var(--muted)", 9.5);
+  } else {
+    s += tx(X0, Y1 + 32, "reduction " + fr + " % of the hops · oxidation " + fo + " %",
+            "var(--muted)", 9.5);
+    s += tx(X0, Y1 + 46, fa, "var(--muted)", 9.5);
+  }
+  svg.innerHTML = s;
+}
+
+/* The crossing magnified until both curves are straight -- Bard & Faulkner's
+   Fig. 3.3.3. The slopes are the parabolas' own at the eta = 0 crossing,
+   0.5/(1 - alpha_c) and 0.5/alpha_c eV per unit x, so their ratio is the
+   alpha set above. The step drawn is fixed at 0.12 eV so that the geometry
+   changes with alpha alone; the meV printed are for the eta set above.   */
+function acDrawZoom(){
+  var svg = el("aczoom");
+  if(!svg) return;
+  var ac = acAc(), aa = 1 - ac, eta = acEta();
+  var sO = 0.5 / (1 - ac), sR = 0.5 / ac;
+  var sg = eta < 0 ? 1 : -1, dl = 0.12;
+  var us = -sg * dl / (sO + sR), Gs = sg * aa * dl;
+  /* the frame, and a margin on its right for the split */
+  var X0 = 16, X1 = 250, Y0 = 40, Y1 = 214, U = 0.12, V = 0.15;
+  var uc = us / 2, gc = sg * dl / 2;
+  function px(u){ return (X0 + X1) / 2 + (u - uc) / U * (X1 - X0) / 2; }
+  function py(g){ return (Y0 + Y1) / 2 - (g - gc) / V * (Y1 - Y0) / 2; }
+  var fr = {xl: uc - U, xr: uc + U, lb: gc - V, lt: gc + V, px: px, py: py};
+  var s = rc(X0, Y0, X1 - X0, Y1 - Y0, "var(--surface-2)", 0.5, 4);
+  var xa = X1 + 12;
+  /* the three levels: the old top, the new top, and the moved well's line
+     at the old crossing's x; run out to the split arrows                 */
+  [0, Gs, sg * dl].forEach(function(g, k){
+    s += ln(X0, py(g), xa, py(g), k === 1 ? "var(--ion-k)" : "var(--line-2)", 1, "4 3", k === 1 ? 0.8 : 1);
+  });
+  s += pth(segD(uc - U, -sR * (uc - U), uc + U, -sR * (uc + U), fr), "var(--ox)", 2.2);
+  s += pth(segD(uc - U, sO * (uc - U), uc + U, sO * (uc + U), fr), "var(--red-)", 1.5, null, 0.55, "5 3");
+  s += pth(segD(uc - U, sO * (uc - U) + sg * dl, uc + U, sO * (uc + U) + sg * dl, fr), "var(--red-)", 2.2);
+  var L = new Labels();
+  /* the angles, at the new crossing, from the horizontal through it */
+  var cx = px(us), cy = py(Gs);
+  var kx = (X1 - X0) / (2 * U), ky = (Y1 - Y0) / (2 * V);
+  var th = Math.atan(sO * ky / kx), ph = Math.atan(sR * ky / kx), r1 = 24, r2 = 34;
+  s += pth("M" + (cx + r1).toFixed(1) + " " + cy.toFixed(1) + " A" + r1 + " " + r1 + " 0 0 0 "
+           + (cx + r1 * Math.cos(th)).toFixed(1) + " " + (cy - r1 * Math.sin(th)).toFixed(1), "var(--red-)", 1.4);
+  s += pth("M" + (cx - r2).toFixed(1) + " " + cy.toFixed(1) + " A" + r2 + " " + r2 + " 0 0 1 "
+           + (cx - r2 * Math.cos(ph)).toFixed(1) + " " + (cy - r2 * Math.sin(ph)).toFixed(1), "var(--ox)", 1.4);
+  s += L.put([[cx + (r1 + 7) * Math.cos(th / 2), cy - (r1 + 7) * Math.sin(th / 2) + 4, "start"]], "θ", "var(--red-)", 12, 600, true);
+  s += L.put([[cx - (r2 + 7) * Math.cos(ph / 2), cy - (r2 + 7) * Math.sin(ph / 2) + 4, "end"]], "φ", "var(--ox)", 12, 600, true);
+  s += ring(px(0), py(0), 3.4, "var(--muted)", 1.4);
+  s += cir(cx, cy, 3.6, "var(--ion-k)");
+  /* how the step splits, in the margin: two lines each, name then meV */
+  var mag = Math.abs(eta) >= 0.0005;
+  s += arrowV(xa, py(0), py(Gs), "var(--ox)", "", "r");
+  s += arrowV(xa, py(Gs), py(sg * dl), "var(--red-)", "", "r");
+  [[py(Gs / 2), "α_a F|η|", aa, "var(--ox)"], [py((Gs + sg * dl) / 2), "α_c F|η|", ac, "var(--red-)"]].forEach(function(q){
+    var y = mag ? q[0] - 2.5 : q[0] + 3.5;
+    s += txh(xa + 6, y, q[1], q[3], 9.5, "start", 600);
+    L.hold(xa + 6, y, q[1], 9.5, "start");
+    if(mag){
+      s += txh(xa + 6, y + 12.5, "= " + (q[2] * Math.abs(eta) * 1000).toFixed(0) + " meV", q[3], 9.5, "start", 600);
+      L.hold(xa + 6, y + 12.5, "= 000 meV", 9.5, "start");
+    }
+  });
+  /* the step itself, at the old crossing's x; its label wherever it fits */
+  var fl = "F|η|" + (mag ? " = " + (Math.abs(eta) * 1000).toFixed(0) + " meV" : "");
+  var x0 = px(0), ym = py(sg * dl / 2) + 3.5, yt = py(sg * dl) + (sg > 0 ? -6 : 14);
+  s += arrowV(x0, py(0), py(sg * dl), "var(--ink-2)", "", "r");
+  s += L.put([[x0 + 6, ym, "start"], [x0 - 6, ym, "end"], [x0 + 6, yt, "start"], [x0 - 6, yt, "end"]], fl, "var(--ink-2)", 9.5, 600, true);
+  /* how far the crossing slid */
+  var yb = Y1 - 9;
+  s += ln(cx, cy, cx, yb, "var(--ion-k)", 0.8, "2 3", 0.7) + ln(x0, py(0), x0, yb, "var(--muted)", 0.8, "2 3", 0.7);
+  s += arrowH(Math.min(cx, x0), Math.max(cx, x0), yb, "var(--ion-k)", "");
+  s += txh(Math.max(cx, x0) + 5, yb + 3.5, "Δx", "var(--ion-k)", 10, "start", 600);
+  s += tx(X0, 14, "tanθ : tanφ = α_c : α_a = " + ac.toFixed(2) + " : " + aa.toFixed(2), "var(--ink-2)", 10, null, 600);
+  s += tx(X0, 30, "α_c = tanθ/(tanθ + tanφ) = " + ac.toFixed(2), "var(--ink-2)", 10, null, 600);
+  s += tx(X0, Y1 + 18, "step drawn to a fixed size · meV for η = " + fmtmV(eta), "var(--muted)", 9.5);
+  s += tx(X0, Y1 + 32, "ring: the crossing before · dot: after", "var(--muted)", 9.5);
+  svg.innerHTML = s;
+}
+
+/* the two barriers against eta: the parabolas' (solid) and the straight
+   lines Butler-Volmer assumes (dashed), which pivot about 0.25 eV         */
+function acDrawLines(){
+  var svg = el("aclines");
+  if(!svg) return;
+  var S = acState(), w = S.w, ac = S.ac, aa = S.aa, eta = S.eta;
+  var X0 = 48, X1 = 326, Y0 = 14, Y1 = 206, xl = -0.4, xr = 0.4, gl = 0, gt = 0.6;
+  function px(e){ return X0 + (e - xl) / (xr - xl) * (X1 - X0); }
+  function py(g){ return Y1 - (g - gl) / (gt - gl) * (Y1 - Y0); }
+  var fr = {xl: xl, xr: xr, lb: gl, lt: gt, px: px, py: py};
+  function gc(e){ var x = acCross(w, e); return w.aO * x * x; }
+  function ga(e){ return gc(e) - e; }
+  var s = rc(X0, Y0, X1 - X0, Y1 - Y0, "var(--surface-2)", 0.5, 4);
+  [0.1, 0.2, 0.3, 0.4, 0.5].forEach(function(g){ s += ln(X0, py(g), X1, py(g), "var(--line-2)", 0.5, "2 4"); });
+  [0.2, 0.4, 0.6].forEach(function(g){ s += tx(X0 - 5, py(g) + 3.5, g.toFixed(1), "var(--muted)", 9, "end"); });
+  [-400, -200, 0, 200, 400].forEach(function(v){
+    s += ln(px(v / 1000), Y0, px(v / 1000), Y1, "var(--line-2)", v === 0 ? 1.2 : 0.5, v === 0 ? null : "2 4");
+    s += tx(px(v / 1000), Y1 + 13, (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v), "var(--muted)", 9, "middle");
+  });
+  s += axX(X0, X1, Y1 + 30, "η   /mV");
+  s += axY(12, Y0, Y1, "ΔG‡   /eV");
+  s += pth(segD(xl, 0.25 + ac * xl, xr, 0.25 + ac * xr, fr), "var(--red-)", 1.5, null, 0.85, "6 3");
+  s += pth(segD(xl, 0.25 - aa * xl, xr, 0.25 - aa * xr, fr), "var(--ox)", 1.5, null, 0.85, "6 3");
+  s += pth(curveD(xl, xr, 200, gc, px, py, gl, gt), "var(--red-)", 2.2);
+  s += pth(curveD(xl, xr, 200, ga, px, py, gl, gt), "var(--ox)", 2.2);
+  s += ring(px(0), py(0.25), 3.6, "var(--ink-2)", 1.4);
+  var L = new Labels();
+  L.hold(px(0) + 7, py(0.25) - 7, "ΔG‡0", 9.5, "start");
+  s += txh(px(0) + 7, py(0.25) - 7, "ΔG‡0", "var(--ink-2)", 9.5, "start", 600);
+  /* the marker at the eta set above */
+  var yc = gc(eta), ya = ga(eta);
+  s += ln(px(eta), Y0, px(eta), Y1, "var(--ion-k)", 1.2, "3 3", 0.8);
+  if(yc <= gt) s += cir(px(eta), py(yc), 3.6, "var(--red-)");
+  if(ya <= gt) s += cir(px(eta), py(ya), 3.6, "var(--ox)");
+  /* the names and the slopes, wherever they fit */
+  var e1 = 0.3, e2 = -0.3;
+  if(gc(e1) < gt - 0.03) s += L.put([[px(e1), py(gc(e1)) - 9, "end"], [px(e1), py(gc(e1)) + 16, "start"]],
+                                    "ΔG‡c, slope +α_c", "var(--red-)", 9.5, 600);
+  if(ga(e2) < gt - 0.03) s += L.put([[px(e2), py(ga(e2)) - 9, "start"], [px(e2), py(ga(e2)) + 16, "end"]],
+                                    "ΔG‡a, slope −α_a", "var(--ox)", 9.5, 600);
+  var loc = acLocal(w, acCross(w, eta));
+  s += tx(X0, Y1 + 46, "η = " + fmtmV(eta) + ": local α_c " + (isFinite(loc) ? loc.toFixed(3) : "—")
+          + " · BV keeps " + ac.toFixed(2), "var(--muted)", 9.5);
+  svg.innerHTML = s;
+}
+
+function acNumbers(){
+  var S = acState(), ac = S.ac, aa = S.aa, eta = S.eta, D = S.D;
+  el("acAv").textContent = ac.toFixed(2);
+  el("acEv").textContent = (eta * 1000).toFixed(0) + " mV";
+  el("acRa").textContent = ac.toFixed(2) + " / " + aa.toFixed(2);
+  el("acRx").textContent = S.xs.toFixed(3);
+  el("acRd").textContent = (Math.abs(D) < 0.0005 ? "" : -D > 0 ? "+" : "−") + Math.abs(D * 1000).toFixed(0) + " meV";
+  el("acRg").textContent = S.gC.toFixed(3) + " / " + S.gA.toFixed(3) + " eV";
+  el("acRkc").innerHTML = fmtFac(Math.exp(-(S.gC - 0.25) / RTF)) + " / " + fmtFac(Math.exp(-ac * eta / RTF));
+  el("acRka").innerHTML = fmtFac(Math.exp(-(S.gA - 0.25) / RTF)) + " / " + fmtFac(Math.exp(aa * eta / RTF));
+  var loc = acLocal(S.w, S.xs);
+  el("acRloc").textContent = isFinite(loc) ? loc.toFixed(3) : "— (past the well)";
+  var pC = 1 / (1 + Math.exp(-(S.gA - S.gC) / RTF));
+  el("acRp").textContent = (pC * 100).toFixed(1) + " %";
+  el("acRb").textContent = (DEC / ac * 1000).toFixed(0) + " / " + (DEC / aa * 1000).toFixed(0) + " mV/dec";
+  el("acWho").textContent = "α_c = " + ac.toFixed(2) + ", η = " + (eta * 1000).toFixed(0) + " mV";
+  var v = el("acVerdict"), m = Math.abs(D * 1000).toFixed(0);
+  if(S.xs <= 0 || S.xs >= 1){
+    var red = S.xs <= 0;
+    v.className = "verdict mixv";
+    v.innerHTML = "<b>Past the bottom of the well.</b> The step is so large that the crossing now lies beyond the floor of the "
+      + (red ? "O + e<sup>−</sup>" : "R") + " well (x* = " + S.xs.toFixed(3) + "): " + (red ? "reduction" : "oxidation")
+      + " has almost no barrier left (" + (red ? S.gC : S.gA).toFixed(3) + " eV), and a larger step would raise it again "
+      + "&mdash; Marcus&rsquo;s inverted region. Butler&ndash;Volmer, with α fixed, would have put it at 0.25 − "
+      + (red ? ac : aa).toFixed(2) + " × " + (m / 1000).toFixed(3) + " = " + (0.25 - (red ? ac : aa) * Math.abs(D)).toFixed(3)
+      + " eV. At a metal the rate levels off instead, because electrons can come from or go to levels across the whole band.";
+  }else if(Math.abs(eta) < 0.004){
+    v.className = "verdict flat";
+    v.innerHTML = "<b>Equilibrium.</b> The two wells sit at the same height and the two barriers are "
+      + "equal, so the hops cross in both directions at the same rate. That rate is i<sub>0</sub>, "
+      + "and it is why an electrode at equilibrium is busy rather than idle.";
+  }else if(eta < 0){
+    v.className = "verdict cav";
+    v.innerHTML = "<b>Driven cathodic.</b> The O + e<sup>−</sup> well has risen by " + m
+      + " meV, but the top of the barrier has risen by only " + ((S.Gs - 0.25) * 1000).toFixed(0)
+      + " meV &mdash; about α<sub>a</sub> = " + aa.toFixed(2) + " of it. So the reduction barrier, measured from the well that rose, "
+      + "is down by " + ((0.25 - S.gC) * 1000).toFixed(0) + " meV, about α<sub>c</sub> = " + ac.toFixed(2)
+      + " of the step, and the oxidation barrier is up by the rest. That split is the whole of the Tafel slope.";
+  }else{
+    v.className = "verdict anv";
+    v.innerHTML = "<b>Driven anodic.</b> The O + e<sup>−</sup> well has dropped by " + m
+      + " meV and the top of the barrier has followed it down by " + ((0.25 - S.Gs) * 1000).toFixed(0)
+      + " meV &mdash; about α<sub>a</sub> = " + aa.toFixed(2) + " of it. That lowers the oxidation barrier, measured from R, by the same "
+      + "amount; the reduction barrier, measured from the well that dropped, is up by the rest, "
+      + ((S.gC - 0.25) * 1000).toFixed(0) + " meV.";
+  }
+  acDrawZoom();
+  acDrawLines();
+}
+
+function acSweepLabels(){
+  el("acSweep").innerHTML = AC.sweep ? "&#10073;&#10073; Pause the &eta; sweep" : "&#9654; Sweep &eta; back and forth";
+  el("acSweepA").innerHTML = AC.sweepA ? "&#10073;&#10073; Pause the &alpha; animation" : "&#9654; Animate &alpha; from 0.2 to 0.8";
+}
+/* moving a slider by hand takes it back from its animation */
+el("acA").addEventListener("input", function(){ AC.sweepA = false; acSweepLabels(); acNumbers(); });
+el("acE").addEventListener("input", function(){ AC.sweep = false; acSweepLabels(); acNumbers(); });
+el("acSweep").addEventListener("click", function(){
+  AC.sweep = !AC.sweep; AC.t0 = 0;
+  if(AC.sweep) AC.sweepA = false;
+  acSweepLabels();
+});
+el("acSweepA").addEventListener("click", function(){
+  AC.sweepA = !AC.sweepA; AC.tA = 0;
+  /* start the cycle from where the slider is, not from a jump */
+  AC.ph0 = Math.asin(clamp((acAc() - 0.5) / 0.3, -1, 1));
+  if(AC.sweepA) AC.sweep = false;
+  acSweepLabels();
+});
+function acPreset(a, e){
+  el("acA").value = a;
+  el("acE").value = e;
+  AC.sweep = false; AC.sweepA = false;
+  acSweepLabels();
+  acNumbers();
+}
+el("acP1").addEventListener("click", function(){ acPreset(0.5, 0); });
+el("acP3").addEventListener("click", function(){ acPreset(0.25, -200); });
+
+ANIM.push({panel: "p-bar", tick: function(ts){
+  if(AC.sweep){
+    if(!AC.t0) AC.t0 = ts;
+    var ph = ((ts - AC.t0) / 4200) % 1;
+    el("acE").value = Math.round(300 * Math.sin(2 * Math.PI * ph) / 5) * 5;
+    acNumbers();
+  }else if(AC.sweepA){
+    if(!AC.tA) AC.tA = ts;
+    var pa = ((ts - AC.tA) / 7000) % 1;
+    el("acA").value = (Math.round((0.5 + 0.3 * Math.sin(2 * Math.PI * pa + AC.ph0)) * 100) / 100).toFixed(2);
+    acNumbers();
+  }
+  acDrawBarrier(ts);
+}});
+
+
+/* ================= k0, k AND i0 =========================================
+   O + e- = R, n = 1, A = 1 cm2. The surface sees the bulk: this tab has no
+   mass transport. Potentials are measured from
+   E0', which is what k0 is defined against; eta, measured from E_eq, is
+   worked out from it.                                                   */
+var KK_XL = -0.4, KK_XR = 0.4;
+
+function kkState(){
+  var k0 = Math.pow(10, +el("kkK").value), a = +el("kkA").value;
+  var cO = Math.pow(10, +el("kkO").value), cR = Math.pow(10, +el("kkR").value);
+  var E = +el("kkE").value / 1000;
+  var CO = cO * 1e-6, CR = cR * 1e-6;                 /* mM to mol/cm3 */
+  var kc = k0 * Math.exp(-a * E / RTF), ka = k0 * Math.exp((1 - a) * E / RTF);
+  var ia = FARADAY * ka * CR, ic = FARADAY * kc * CO;
+  var Eeq = RTF * Math.log(cO / cR);
+  var i0 = FARADAY * k0 * Math.pow(CO, 1 - a) * Math.pow(CR, a);
+  return {k0: k0, a: a, cO: cO, cR: cR, CO: CO, CR: CR, E: E, kc: kc, ka: ka,
+          ia: ia, ic: ic, i: ia - ic, Eeq: Eeq, i0: i0, eta: E - Eeq};
+}
+function fmtMM(c){ return (c >= 10 ? c.toFixed(1) : c >= 1 ? c.toFixed(2) : c.toFixed(3)) + " mM"; }
+
+/* both plots share one frame, so the potentials line up from one to the other */
+var KK_Y0 = 18, KK_Y1 = 186;
+/* a label manager that already knows where the axis numbers are */
+function kkTicks(fr, Y1, every){
+  var L = new Labels();
+  [-400, -200, 0, 200, 400].forEach(function(v){
+    L.hold(fr.px(v / 1000), Y1 + 13, (v ? "+" : "") + Math.abs(v), 9, "middle");
+  });
+  for(var g = Math.ceil(fr.lb - 1e-9); g <= Math.floor(fr.lt + 1e-9); g++){
+    if(((g % every) + every) % every === 0 && fr.py(g) < Y1 - 6) L.hold(58 - 5, fr.py(g) + 3.5, "10" + g, 9, "end");
+  }
+  return L;
+}
+function kkDrawK(){
+  var s = kkState(), Y0 = KK_Y0, Y1 = KK_Y1;
+  var fr = logFrame({X0: 58, X1: 452, Y0: Y0, Y1: Y1, xl: KK_XL, xr: KK_XR, lb: -13, lt: 5, every: 3,
+                     xt: [-400, -200, 0, 200, 400], xlab: "E − E°′   /mV", ylab: "k   /cm s⁻¹"});
+  var o = fr.s, l0 = Math.log10(s.k0);
+  function lc(E){ return l0 - s.a * E / DEC; }
+  function la(E){ return l0 + (1 - s.a) * E / DEC; }
+  var L = kkTicks(fr, Y1, 3), B = [58, Y0, 452, Y1];
+  /* E_eq, faintly, so that the eye can follow it down to the currents */
+  if(Math.abs(s.Eeq) > 0.002 && Math.abs(s.Eeq) < KK_XR) o += ln(fr.px(s.Eeq), Y0, fr.px(s.Eeq), Y1, "var(--go)", 1.1, "5 3", 0.55);
+  o += pth(segD(KK_XL, lc(KK_XL), KK_XR, lc(KK_XR), fr), "var(--red-)", 2.2);
+  o += pth(segD(KK_XL, la(KK_XL), KK_XR, la(KK_XR), fr), "var(--ox)", 2.2);
+  /* the potential the electrode is held at. Its labels go on the side away
+     from E0', unless that runs them off the frame */
+  var xE = fr.px(s.E), side = s.E < 0 ? -1 : 1;
+  if(xE + side * 118 < 58 || xE + side * 118 > 452) side = -side;
+  o += ln(xE, Y0, xE, Y1, "var(--ion-k)", 1.4, "4 3");
+  var pc = lc(s.E), pa = la(s.E), an = side > 0 ? "start" : "end";
+  /* k_c falls to the right and k_a rises, so on a given side one line climbs
+     away above its dot and the other below it: each label goes on the open
+     side. Two passes: the two values take a free spot if they can, then k0
+     chooses among its own, and a value still without one takes the best left */
+  var x0 = fr.px(0), y0 = fr.py(l0), ks = "k° = " + sciSvg(s.k0, 2) + " cm/s", later = [];
+  [[pc, "var(--red-)", "k_c = " + sciSvg(s.kc, 2), 1], [pa, "var(--ox)", "k_a = " + sciSvg(s.ka, 2), -1]].forEach(function(q){
+    if(q[0] < -13 || q[0] > 5) return;
+    var y = fr.py(q[0]), below = q[3] * side < 0, ob = -q[3] * side < 0, bn = side > 0 ? "end" : "start";
+    o += cir(xE, y, 3.6, q[1]);
+    var sp = [[xE + 7 * side, y + (below ? 15 : -8), an], [xE + 7 * side, y + (below ? 27 : -20), an],
+              [xE - 7 * side, y + (ob ? 15 : -8), bn], [xE - 7 * side, y + (ob ? 27 : -20), bn],
+              [xE + 7 * side, y + (below ? -8 : 15), an], [xE - 7 * side, y + (ob ? -8 : 15), bn],
+              [xE - 7 * side, y + (ob ? 39 : -32), bn], [xE + 7 * side, y + (below ? 39 : -32), an]];
+    var t = L.tryIn(sp, q[2], q[1], 9.5, 600, B);
+    if(t) o += t; else later.push([sp, q[2], q[1]]);
+  });
+  /* E0' and k0: the open wedge between the two lines is straight above or below the crossing */
+  o += cir(x0, y0, 4.2, "var(--ink-2)");
+  o += L.putIn([[x0, y0 - 14, "middle"], [x0, y0 + 22, "middle"], [x0, y0 - 26, "middle"], [x0, y0 + 34, "middle"],
+                [x0 - 8 * side, y0 - 9, side > 0 ? "end" : "start"], [x0 - 8 * side, y0 + 17, side > 0 ? "end" : "start"],
+                [x0 + 8 * side, y0 - 9, side > 0 ? "start" : "end"], [x0 + 8 * side, y0 + 17, side > 0 ? "start" : "end"]],
+                ks, "var(--ink-2)", 10, 600, B);
+  later.forEach(function(q){ o += L.putIn(q[0], q[1], q[2], 9.5, 600, B); });
+  /* and the names of things, wherever they still fit */
+  o += L.put([[x0 + 4, Y0 + 12, "start"], [x0 - 4, Y0 + 12, "end"], [x0 + 4, Y1 - 6, "start"], [x0 - 4, Y1 - 6, "end"]], "E°′", "var(--ink-2)", 10, 600);
+  var yL = lc(-0.36), yR = la(0.36);
+  if(yL < 4.4 && yL > -12.6) o += L.put([[fr.px(-0.36), fr.py(yL) - 7, "start"], [fr.px(-0.36), fr.py(yL) + 15, "start"]], "k_c", "var(--red-)", 10.5, 600);
+  if(yR < 4.4 && yR > -12.6) o += L.put([[fr.px(0.36), fr.py(yR) - 7, "end"], [fr.px(0.36), fr.py(yR) + 15, "end"]], "k_a", "var(--ox)", 10.5, 600);
+  o += tx(58, 234, "k_c / k_a = e^(−f(E−E°′)) = " + fmtX(s.kc / s.ka).replace(/<sup>(.*?)<\/sup>/, '<tspan baseline-shift="super" font-size="7.5">$1</tspan>')
+          + "   whatever k° and α are", "var(--muted)", 9.5);
+  el("kkk").innerHTML = o;
+}
+
+function kkDrawI(){
+  var s = kkState(), Y0 = KK_Y0, Y1 = KK_Y1;
+  var LB = -15, LT = 5;
+  var fr = logFrame({X0: 58, X1: 452, Y0: Y0, Y1: Y1, xl: KK_XL, xr: KK_XR, lb: LB, lt: LT, every: 5,
+                     xt: [-400, -200, 0, 200, 400], xlab: "E − E°′   /mV", ylab: "|i|   /A cm⁻²"});
+  var o = fr.s;
+  var lA0 = Math.log10(FARADAY * s.k0 * s.CR), lC0 = Math.log10(FARADAY * s.k0 * s.CO);
+  function la(E){ return lA0 + (1 - s.a) * E / DEC; }
+  function lc(E){ return lC0 - s.a * E / DEC; }
+  /* E_eq, and the two crossings: the rate constants' at E0', the currents' at E_eq */
+  var xEq = fr.px(s.Eeq), x0 = fr.px(0);
+  o += ln(xEq, Y0, xEq, Y1, "var(--go)", 1.4, "5 3");
+  o += pth(segD(KK_XL, la(KK_XL), KK_XR, la(KK_XR), fr), "var(--ox)", 2.2);
+  o += pth(segD(KK_XL, lc(KK_XL), KK_XR, lc(KK_XR), fr), "var(--red-)", 2.2);
+  o += pth(curveD(KK_XL, KK_XR, 400, function(E){
+          return lg(FARADAY * s.k0 * (s.CR * Math.exp((1 - s.a) * E / RTF) - s.CO * Math.exp(-s.a * E / RTF)));
+        }, fr.px, fr.py, LB, LT), "var(--ink)", 1.6, null, 0.85);
+  var L = kkTicks(fr, Y1, 5), B = [58, Y0, 452, Y1];
+  /* the Nernst shift from E0' to E_eq, and eta from E_eq to E: their own
+     labels go down first, since they are the point of the picture       */
+  var yN = fr.py(LB + 1.4), yE = fr.py(LB + 3.6);
+  var nl = "(RT/F)ln(C_O*/C_R*) = " + fmtmV(s.Eeq), el2 = "η = " + fmtmV(s.eta);
+  if(Math.abs(xEq - x0) >= 6){ o += arrowH(x0, xEq, yN, "var(--go)", nl); L.hold((x0 + xEq) / 2, yN - 6, nl, 10, "middle"); }
+  else o += L.put([[x0 + 6, yN + 4, "start"], [x0 - 6, yN + 4, "end"]], "C_O* = C_R*: E_eq = E°′", "var(--go)", 10, 600, true);
+  var xE = fr.px(s.E);
+  o += ln(xE, Y0, xE, Y1, "var(--ion-k)", 1.4, "4 3");
+  if(Math.abs(xE - xEq) >= 6){ o += arrowH(xEq, xE, yE, "var(--ion-k)", el2); L.hold((xEq + xE) / 2, yE - 6, el2, 10, "middle"); }
+  var ln0 = lg(s.i);
+  if(ln0 > LB && ln0 < LT){
+    o += cir(xE, fr.py(ln0), 3.6, "var(--ink)");
+  }
+  var l0 = Math.log10(s.i0), y0 = fr.py(l0), i0s = "i₀ = " + fmtJs(s.i0);
+  o += cir(xEq, y0, 4.6, "var(--go)");
+  var sEq = s.Eeq > 0.12 ? -1 : 1, aq = sEq > 0 ? "start" : "end", aq2 = sEq > 0 ? "end" : "start";
+  o += L.putIn([[xEq, y0 - 14, "middle"], [xEq, y0 - 26, "middle"], [xEq + 8 * sEq, y0 + 17, aq],
+                [xEq - 8 * sEq, y0 + 17, aq2], [xEq, y0 + 22, "middle"], [xEq + 8 * sEq, y0 - 9, aq]], i0s, "var(--go)", 10, 600, B);
+  o += L.put([[xEq + 4, Y0 + 12, "start"], [xEq - 4, Y0 + 12, "end"], [xEq + 4, Y0 + 26, "start"], [xEq - 4, Y0 + 26, "end"]], "E_eq", "var(--go)", 10, 600);
+  var yL = lc(-0.36), yR = la(0.36);
+  if(yL < LT - 0.6 && yL > LB + 0.6) o += L.put([[fr.px(-0.36), fr.py(yL) - 7, "start"], [fr.px(-0.36), fr.py(yL) + 15, "start"]], "|i_c| = Fk_cC_O*", "var(--red-)", 10, 600);
+  if(yR < LT - 0.6 && yR > LB + 0.6) o += L.put([[fr.px(0.36), fr.py(yR) - 7, "end"], [fr.px(0.36), fr.py(yR) + 15, "end"]], "i_a = Fk_aC_R*", "var(--ox)", 10, 600);
+  o += tx(58, 234, "net i at E: " + fmtJs(s.i) + (s.i < 0 ? " (cathodic)" : s.i > 0 ? " (anodic)" : ""), "var(--muted)", 9.5);
+  el("kki").innerHTML = o;
+}
+
+function kkNumbers(){
+  var s = kkState();
+  el("kkKv").innerHTML = sciH(s.k0, 2) + " cm/s";
+  el("kkAv").textContent = s.a.toFixed(2);
+  el("kkOv").textContent = fmtMM(s.cO);
+  el("kkRv").textContent = fmtMM(s.cR);
+  el("kkEv").textContent = fmtmV(s.E);
+  el("kkRkc").innerHTML = sciH(s.kc, 3) + " cm/s";
+  el("kkRka").innerHTML = sciH(s.ka, 3) + " cm/s";
+  el("kkRrat").innerHTML = fmtX(s.kc / s.ka);
+  el("kkReq").textContent = fmtmV(s.Eeq, 1);
+  el("kkReta").textContent = fmtmV(s.eta, 1);
+  el("kkRi0").innerHTML = fmtJ(s.i0);
+  el("kkRiac").innerHTML = fmtJ(s.ia) + " / " + fmtJ(-s.ic);
+  el("kkRi").innerHTML = fmtJ(s.i);
+  el("kkRord").textContent = (1 - s.a).toFixed(2) + " / " + s.a.toFixed(2);
+  el("kkWho").textContent = "α = " + s.a.toFixed(2) + ", C_O*/C_R* = " + (s.cO / s.cR).toPrecision(3);
+  var v = el("kkVerdict"), eta = s.eta, f = 1 / RTF;
+  if(Math.abs(eta) < 0.0005){
+    v.className = "verdict go";
+    v.innerHTML = "<b>At equilibrium.</b> Both partial currents are i<sub>0</sub> = " + fmtJ(s.i0)
+      + " and the net is zero. E<sub>eq</sub> sits " + fmtmV(s.Eeq, 1) + " from E°′ &mdash; the Nernst equation, "
+      + "which nobody put in: it fell out of setting the two rates equal.";
+  }else if(eta < 0){
+    v.className = "verdict cav";
+    v.innerHTML = "<b>Driven cathodic, η = " + fmtmV(eta, 1) + ".</b> From E<sub>eq</sub>, k<sub>c</sub> has risen by "
+      + "e<sup>αf|η|</sup> = &times;" + fmtX(Math.exp(-s.a * f * eta)) + " and k<sub>a</sub> has fallen by e<sup>(1−α)f|η|</sup> = "
+      + "&divide;" + fmtX(Math.exp(-(1 - s.a) * f * eta)) + ". Reduction now outruns oxidation by e<sup>f|η|</sup> = "
+      + fmtX(Math.exp(-f * eta)) + ", whatever α is. Net: " + fmtJ(s.i) + ".";
+  }else{
+    v.className = "verdict anv";
+    v.innerHTML = "<b>Driven anodic, η = " + fmtmV(eta, 1) + ".</b> From E<sub>eq</sub>, k<sub>a</sub> has risen by "
+      + "e<sup>(1−α)fη</sup> = &times;" + fmtX(Math.exp((1 - s.a) * f * eta)) + " and k<sub>c</sub> has fallen by e<sup>αfη</sup> = "
+      + "&divide;" + fmtX(Math.exp(s.a * f * eta)) + ". Oxidation now outruns reduction by e<sup>fη</sup> = "
+      + fmtX(Math.exp(f * eta)) + ", whatever α is. Net: " + fmtJ(s.i) + ".";
+  }
+}
+function kkAll(){ kkNumbers(); kkDrawK(); kkDrawI(); }
+["kkK", "kkA", "kkO", "kkR", "kkE"].forEach(function(id){ el(id).addEventListener("input", kkAll); });
+function kkPreset(k, a, o, r, eq){
+  el("kkK").value = k; el("kkA").value = a; el("kkO").value = o; el("kkR").value = r;
+  /* put the electrode at the new equilibrium, rounded to the slider's 1 mV */
+  if(eq) el("kkE").value = Math.round(RTF * Math.log(Math.pow(10, o) / Math.pow(10, r)) * 1000);
+  kkAll();
+}
+el("kkP1").addEventListener("click", function(){ kkPreset(-3, 0.5, 0, 0, true); });
+el("kkP2").addEventListener("click", function(){ kkPreset(-3, 0.5, 1, -1, true); });
+el("kkP3").addEventListener("click", function(){ kkPreset(-5, 0.5, 1, -1, true); });
+el("kkP4").addEventListener("click", function(){ kkPreset(-3, 0.25, 1, -1, false); el("kkE").value = 0; kkAll(); });
+
+
+/* ================= BUTLER-VOLMER ========================================
+   With mass transfer in the Nernst-layer picture, both limiting currents
+   equal (C_O* = C_R*, equal m), anodic positive:
+       C_O(0)/C* = 1 + i/i_l ,   C_R(0)/C* = 1 - i/i_l
+       i = i0 (ea - ec) / (1 + (i0/i_l)(ea + ec))
+   with ea = exp(alpha_a f eta) and ec = exp(-alpha_c f eta). i_l = Infinity
+   is no mass transport at all.                         */
+var BV = {mt: false, ys: 0};
+var BV_YS = [{top: 1e-5, u: 1e-6, lab: "µA cm⁻²"}, {top: 1e-3, u: 1e-3, lab: "mA cm⁻²"},
+             {top: 0.1, u: 1e-3, lab: "mA cm⁻²"}];
+var BV_W = 0.4;
+
+function bvCalc(eta, i0, aa, ac, il, f){
+  f = f || 1 / RTF;
+  var ea = Math.exp(aa * f * eta), ec = Math.exp(-ac * f * eta);
+  var m = isFinite(il) ? i0 / il : 0;
+  var i = i0 * (ea - ec) / (1 + m * (ea + ec));
+  var crS = isFinite(il) ? 1 - i / il : 1, coS = isFinite(il) ? 1 + i / il : 1;
+  return {i: i, ia: i0 * crS * ea, ic: i0 * coS * ec, coS: coS, crS: crS};
+}
+function bvI0(){ return Math.pow(10, +el("bvI").value); }
+function bvAc(){ return +el("bvA").value; }
+function bvIL(){ return BV.mt ? Math.pow(10, +el("bvL").value) / 1000 : Infinity; }
+function bvEta(){ return +el("bvE").value / 1000; }
+
+/* the three regions, per side. Ohmic: i0 f eta within 5 % of the full
+   answer. Tafel: back reaction under 1 % of the forward one and the surface
+   under 10 % depleted. Mass transfer: depleted by more than 10 %.         */
+function bvRegions(i0, aa, ac, il){
+  var r = {lin: [0, 0], taf: [null, null], mt: [null, null]};
+  [1, -1].forEach(function(sg, k){
+    var lim = 0;
+    for(var n = 1; n <= 4000; n++){
+      var x = sg * n * 1e-4, b = bvCalc(x, i0, aa, ac, il);
+      if(Math.abs(i0 * x / RTF - b.i) > 0.05 * Math.abs(b.i)) break;
+      lim = n * 1e-4;
+    }
+    r.lin[k] = lim;
+    var st = null, en = null, mt = null;
+    for(var m = 1; m <= 800; m++){
+      var e = m * 5e-4, b2 = bvCalc(sg * e, i0, aa, ac, il);
+      var back = sg > 0 ? b2.ic / b2.ia : b2.ia / b2.ic;
+      var dep = isFinite(il) ? Math.abs(b2.i) / il : 0;
+      if(dep > 0.1){ if(mt === null) mt = e; break; }
+      if(back <= 0.01){ if(st === null) st = e; en = e; }
+    }
+    r.taf[k] = st === null ? null : [st, en];
+    r.mt[k] = mt;
+  });
+  return r;
+}
+
+function bvDrawJV(){
+  var i0 = bvI0(), ac = bvAc(), aa = 1 - ac, il = bvIL(), eta = bvEta(), Y = BV_YS[BV.ys];
+  var X0 = 58, X1 = 452, Y0 = 20, Y1 = 232, YM = (Y0 + Y1) / 2, W = BV_W;
+  function px(e){ return X0 + (e + W) / (2 * W) * (X1 - X0); }
+  function py(i){ return YM - i / Y.top * (Y1 - Y0) / 2; }
+  var s = rc(X0, Y0, X1 - X0, Y1 - Y0, "var(--surface-2)", 0.5, 4);
+  [-0.5, 0.5].forEach(function(g){ s += ln(X0, py(g * Y.top), X1, py(g * Y.top), "var(--line-2)", 0.5, "2 4"); });
+  [-0.2, 0.2].forEach(function(g){ s += ln(px(g), Y0, px(g), Y1, "var(--line-2)", 0.5, "2 4"); });
+  s += ln(X0, YM, X1, YM, "var(--line-2)", 1.2);
+  s += ln(px(0), Y0, px(0), Y1, "var(--line-2)", 1.2);
+  /* three reference electrodes, faint, at the alpha and i_l chosen */
+  [1e-3, 1e-6, 1e-9].forEach(function(g){
+    if(Math.abs(Math.log10(g) - Math.log10(i0)) < 0.02) return;
+    s += pth(curveD(-W, W, 500, function(e){ return bvCalc(e, g, aa, ac, il).i; }, px, py, -Y.top, Y.top),
+             "var(--muted)", 1.3, null, 0.4);
+  });
+  if(isFinite(il) && il <= Y.top){
+    s += ln(X0, py(il), X1, py(il), "var(--ion-k)", 1.2, "4 3", 0.85);
+    s += ln(X0, py(-il), X1, py(-il), "var(--ion-k)", 1.2, "4 3", 0.85);
+    /* each label on the side of its line away from the frame edge */
+    s += txh(X0 + 6, py(il) - Y0 < 14 ? py(il) + 13 : py(il) - 5, "+i_l", "var(--ion-k)", 10, "start", 600);
+    s += txh(X1 - 6, Y1 - py(-il) < 16 ? py(-il) - 5 : py(-il) + 13, "−i_l", "var(--ion-k)", 10, "end", 600);
+  }
+  s += pth(curveD(-W, W, 500, function(e){ return bvCalc(e, i0, aa, ac, il).ia; }, px, py, -Y.top, Y.top),
+           "var(--ox)", 1.6, null, 0.85, "5 3");
+  s += pth(curveD(-W, W, 500, function(e){ return -bvCalc(e, i0, aa, ac, il).ic; }, px, py, -Y.top, Y.top),
+           "var(--red-)", 1.6, null, 0.85, "5 3");
+  s += pth(curveD(-W, W, 600, function(e){ return bvCalc(e, i0, aa, ac, il).i; }, px, py, -Y.top, Y.top),
+           "var(--ink)", 2.4);
+  /* the eta marked */
+  var b = bvCalc(eta, i0, aa, ac, il);
+  s += ln(px(eta), Y0, px(eta), Y1, "var(--ion-k)", 1.2, "3 3", 0.8);
+  if(Math.abs(b.i) <= Y.top) s += cir(px(eta), py(b.i), 4, "var(--ink)");
+  [1, 0.5, 0, -0.5, -1].forEach(function(g){
+    var v = Math.round(g * Y.top / Y.u * 1000) / 1000;
+    s += tx(X0 - 5, py(g * Y.top) + (g === -1 ? 0.5 : 3.5), (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v), "var(--muted)", 9, "end");
+  });
+  [-400, -200, 0, 200, 400].forEach(function(v){
+    s += tx(px(v / 1000), Y1 + 13, (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v), "var(--muted)", 9, "middle");
+  });
+  s += tx(X1 - 4, Y0 + 13, "anodic", "var(--ox)", 9.5, "end", 600);
+  s += tx(X0 + 4, Y1 - 6, "cathodic", "var(--red-)", 9.5, "start", 600);
+  s += axX(X0, X1, Y1 + 31, "η = E − E_eq   /mV");
+  s += axY(14, Y0, Y1, "i   /" + Y.lab);
+  s += tx(X0, 282, "at η = " + fmtmV(eta) + ":  i = " + fmtJs(b.i) + (Math.abs(b.i) > Y.top ? "  (off this axis)" : ""), "var(--muted)", 9.5);
+  el("bvjv").innerHTML = s;
+  el("bvJVn").textContent = "±400 mV, ±" + Math.round(Y.top / Y.u) + " " + Y.lab.replace(" cm⁻²", "/cm²") + ", fixed";
+}
+
+function bvDrawTafel(){
+  var i0 = bvI0(), ac = bvAc(), aa = 1 - ac, il = bvIL(), eta = bvEta(), W = BV_W;
+  var LB = -11, LT = 0;
+  var fr = logFrame({X0: 58, X1: 452, Y0: 20, Y1: 232, xl: -W, xr: W, lb: LB, lt: LT, every: 2,
+                     xt: [-400, -200, 0, 200, 400], xlab: "η = E − E_eq   /mV", ylab: "|i|   /A cm⁻²"});
+  var o = fr.s, R = bvRegions(i0, aa, ac, il), H = 232 - 20;
+  /* the regions, under the curves */
+  o += rc(fr.px(-R.lin[1]), 20, fr.px(R.lin[0]) - fr.px(-R.lin[1]), H, "var(--stop)", 0.2);
+  R.taf.forEach(function(t, k){
+    if(!t) return;
+    var a = k === 0 ? t[0] : -t[1], b = k === 0 ? t[1] : -t[0];
+    o += rc(fr.px(a), 20, fr.px(b) - fr.px(a), H, "var(--go)", 0.16);
+  });
+  R.mt.forEach(function(m, k){
+    if(m === null) return;
+    var a = k === 0 ? m : -W, b = k === 0 ? W : -m;
+    o += rc(fr.px(a), 20, fr.px(b) - fr.px(a), H, "var(--ion-k)", 0.14);
+  });
+  /* labels for the regions, where there is room for them */
+  var linW = fr.px(R.lin[0]) - fr.px(-R.lin[1]);
+  if(linW > 26) o += txh(fr.px(0), 33, "ohmic", "var(--stop)", 9.5, "middle", 600);
+  R.taf.forEach(function(t, k){
+    if(!t) return;
+    var c = k === 0 ? (t[0] + t[1]) / 2 : -(t[0] + t[1]) / 2;
+    if(fr.px(t[1]) - fr.px(t[0]) > 34) o += txh(fr.px(c), 33, "Tafel", "var(--go)", 9.5, "middle", 600);
+  });
+  /* i_l's name goes down first, on whichever side of its line is free;
+     "mass transfer" then steps down out of its way if it has to          */
+  var L = new Labels();
+  if(isFinite(il) && Math.log10(il) < LT && Math.log10(il) > LB){
+    var yil = fr.py(Math.log10(il));
+    o += ln(58, yil, 452, yil, "var(--ion-k)", 1.2, "4 3", 0.85);
+    o += L.put([[448, yil - 5, "end"], [448, yil + 13, "end"]], "i_l", "var(--ion-k)", 10, 600, true);
+  }
+  R.mt.forEach(function(m, k){
+    if(m === null) return;
+    var c = fr.px(k === 0 ? (m + W) / 2 : -(m + W) / 2);
+    if(fr.px(W) - fr.px(m) > 60) o += L.put([[c, 46, "middle"], [c, 60, "middle"], [c, 74, "middle"]],
+                                             "mass transfer", "var(--ion-k)", 9.5, 600, true);
+  });
+  /* the two Tafel lines, from i0 outward, and the linear approximation */
+  var l0 = Math.log10(i0);
+  o += pth(segD(0, l0, W, l0 + aa * W / DEC, fr), "var(--ox)", 1.5, null, 0.9, "6 3");
+  o += pth(segD(0, l0, -W, l0 + ac * W / DEC, fr), "var(--red-)", 1.5, null, 0.9, "6 3");
+  o += pth(curveD(-W, W, 500, function(e){ return lg(i0 * e / RTF); }, fr.px, fr.py, LB, LT),
+           "var(--stop)", 1.7, null, 0.95, "1.5 2.5");
+  o += pth(curveD(-W, W, 800, function(e){ return lg(bvCalc(e, i0, aa, ac, il).i); }, fr.px, fr.py, LB, LT),
+           "var(--ink)", 2.3);
+  if(l0 > LB && l0 < LT){
+    o += cir(fr.px(0), fr.py(l0), 4.4, "var(--go)");
+    o += txh(fr.px(0) + 8, fr.py(l0) + 15, "i₀", "var(--go)", 10.5, "start", 600);
+  }
+  var b = bvCalc(eta, i0, aa, ac, il), lb = lg(b.i);
+  o += ln(fr.px(eta), 20, fr.px(eta), 232, "var(--ion-k)", 1.2, "3 3", 0.8);
+  if(lb > LB && lb < LT) o += cir(fr.px(eta), fr.py(lb), 3.8, "var(--ink)");
+  o += tx(58, 282, "b_a = " + (DEC / aa * 1000).toFixed(0) + " mV/dec   ·   b_c = " + (DEC / ac * 1000).toFixed(0)
+        + " mV/dec   ·   25 °C", "var(--muted)", 9.5);
+  el("bvtf").innerHTML = o;
+  return R;
+}
+
+/* the Nernst layer, linear inside and bulk beyond, as a strip over the
+   i-eta plot: its frame spans the same 58-452 as the plot beneath it     */
+function bvDrawProfile(){
+  var i0 = bvI0(), ac = bvAc(), aa = 1 - ac, il = bvIL(), eta = bvEta();
+  var b = bvCalc(eta, i0, aa, ac, il);
+  var X0 = 58, X1 = 452, Y0 = 8, Y1 = 80, xd = X0 + 0.55 * (X1 - X0);
+  function py(c){ return Y1 - c / 2 * (Y1 - Y0); }
+  var s = "";
+  s += rc(X0 - 16, Y0 - 4, 16, Y1 - Y0 + 8, "var(--elec)", 0.85, 2);
+  s += tx(X0 - 8, Y1 + 15, "electrode", "var(--muted)", 8.5, "middle");
+  s += rc(X0, Y0, X1 - X0, Y1 - Y0, "var(--surface-2)", 0.5);
+  s += rc(X0, Y0, xd - X0, Y1 - Y0, "var(--red-soft)", 0.6);
+  s += ln(xd, Y0, xd, Y1, "var(--line-2)", 1, "3 3");
+  s += tx(xd, Y1 + 15, "δ", "var(--ink-2)", 10.5, "middle", 600);
+  s += tx((X0 + xd) / 2, Y1 + 15, "diffusion layer", "var(--muted)", 9, "middle");
+  s += tx((xd + X1) / 2, Y1 + 15, "bulk", "var(--muted)", 9, "middle");
+  [0, 1, 2].forEach(function(c){
+    s += ln(X0, py(c), X1, py(c), "var(--line-2)", c === 1 ? 1 : 0.5, c === 1 ? null : "2 4");
+    s += tx(X0 - 20, py(c) + 3.5, c === 1 ? "C*" : String(c), "var(--muted)", 8.5, "end");
+  });
+  s += pth("M" + X0 + " " + py(b.coS).toFixed(1) + " L" + xd.toFixed(1) + " " + py(1).toFixed(1) + " L" + X1 + " " + py(1).toFixed(1),
+           "var(--red-)", 2.2);
+  s += pth("M" + X0 + " " + py(b.crS).toFixed(1) + " L" + xd.toFixed(1) + " " + py(1).toFixed(1) + " L" + X1 + " " + py(1).toFixed(1),
+           "var(--ox)", 2.2, null, 0.95, "6 3");
+  s += cir(X0, py(b.coS), 3.6, "var(--red-)");
+  s += cir(X0, py(b.crS), 3.6, "var(--ox)");
+  var yo = py(b.coS), yr = py(b.crS);
+  if(Math.abs(yo - yr) < 12){ yo += yo >= yr ? 6 : -6; yr += yr > yo ? 6 : -6; }
+  s += txh(X0 + 8, yo + 4, "O  " + (b.coS * 100).toFixed(0) + " %", "var(--red-)", 9.5, "start", 600);
+  s += txh(X0 + 8, yr + 4, "R  " + (b.crS * 100).toFixed(0) + " %", "var(--ox)", 9.5, "start", 600);
+  var lo = Math.min(b.coS, b.crS), reg, col;
+  if(!isFinite(il)){ reg = "mass transport off: surface = bulk"; col = "var(--muted)"; }
+  else if(lo > 0.9){ reg = "electron-transfer-limited"; col = "var(--go)"; }
+  else if(lo > 0.1){ reg = "mixed control"; col = "var(--stop)"; }
+  else{ reg = "mass-transfer-limited"; col = "var(--ion-k)"; }
+  s += txh(X1 - 6, Y0 + 13, reg, col, 10, "end", 600);
+  s += tx(X1, Y1 + 15, "η = " + fmtmV(eta), "var(--ion-k)", 9, "end");
+  el("bvpr").innerHTML = s;
+}
+
+function bvNumbers(R){
+  var i0 = bvI0(), ac = bvAc(), aa = 1 - ac, il = bvIL(), eta = bvEta();
+  var b = bvCalc(eta, i0, aa, ac, il);
+  el("bvIv").innerHTML = sciH(i0, 2);
+  el("bvAv").textContent = ac.toFixed(2);
+  el("bvEv").textContent = fmtmV(eta);
+  el("bvLv").innerHTML = BV.mt ? fmtJ(il) : "—";
+  el("bvRb").textContent = (DEC / aa * 1000).toFixed(0) + " / " + (DEC / ac * 1000).toFixed(0) + " mV/dec";
+  var rct = RTF / i0, rmt = isFinite(il) ? 2 * RTF / il : 0;
+  el("bvRct").innerHTML = fmtR(rct);
+  el("bvRtot").innerHTML = fmtR(rct + rmt) + (BV.mt ? " <small style=\"color:var(--muted)\">(" + Math.round(rct / (rct + rmt) * 100) + " % R<sub>ct</sub>)</small>" : "");
+  el("bvRi").innerHTML = fmtJ(b.i);
+  var back = eta === 0 ? 1 : (eta > 0 ? b.ic / b.ia : b.ia / b.ic);
+  el("bvRback").textContent = (back * 100).toFixed(back < 0.001 ? 4 : back < 0.1 ? 2 : 1) + " %";
+  var elin = eta === 0 ? 0 : (i0 * eta / RTF - b.i) / b.i;
+  var etaf = eta === 0 ? Infinity : ((eta > 0 ? i0 * Math.exp(aa * eta / RTF) : -i0 * Math.exp(-ac * eta / RTF)) - b.i) / b.i;
+  function pc(x){ return !isFinite(x) ? "∞" : (x > 0 ? "+" : x < 0 ? "−" : "") + Math.abs(x * 100).toFixed(Math.abs(x) < 0.1 ? 1 : 0) + " %"; }
+  el("bvRerr").textContent = pc(elin) + " / " + pc(etaf);
+  el("bvRcs").textContent = BV.mt ? (b.coS * 100).toFixed(1) + " % / " + (b.crS * 100).toFixed(1) + " %" : "100 % / 100 %";
+  el("bvRlinw").textContent = Math.max(R.lin[0], R.lin[1]) < 0.0005 ? "none: mass transport sets the slope"
+    : "−" + (R.lin[1] * 1000).toFixed(1) + " to +" + (R.lin[0] * 1000).toFixed(1) + " mV";
+  function tw(t, sg){
+    if(!t) return "none";
+    var d = Math.log10(Math.abs(bvCalc(sg * t[1], i0, aa, ac, il).i) / Math.abs(bvCalc(sg * t[0], i0, aa, ac, il).i));
+    var open = !isFinite(il) || t[1] >= BV_W - 1e-9;
+    return (sg < 0 ? "−" : "+") + (t[0] * 1000).toFixed(0) + (open && t[1] >= BV_W - 1e-9 ? " mV onward" : " to " + (sg < 0 ? "−" : "+") + (t[1] * 1000).toFixed(0) + " mV")
+      + (isFinite(il) ? ", " + d.toFixed(1) + " dec" : "");
+  }
+  el("bvRtc").textContent = tw(R.taf[1], -1);
+  el("bvRta").textContent = tw(R.taf[0], 1);
+  el("bvWho").innerHTML = "i<sub>0</sub> = " + sciH(i0, 2) + " A/cm²" + (BV.mt ? ", i<sub>l</sub> = " + fmtJ(il) : "");
+  var v = el("bvVerdict"), a = Math.abs(eta), k = eta >= 0 ? 0 : 1;
+  var lo = Math.min(b.coS, b.crS);
+  if(BV.mt && lo <= 0.1){
+    v.className = "verdict mixv";
+    v.innerHTML = "<b>Mass-transfer-limited.</b> The surface is " + ((1 - lo) * 100).toFixed(0) + " % depleted, and the current, "
+      + fmtJ(b.i) + ", is within " + ((1 - Math.abs(b.i) / il) * 100).toFixed(0) + " % of i<sub>l</sub>. More potential buys almost nothing: "
+      + "this is the plateau, and the region a Tafel fit must stay out of.";
+  }else if(a <= R.lin[k] && a > 0){
+    v.className = "verdict stop";
+    v.innerHTML = "<b>Ohmic region.</b> At " + fmtmV(eta) + " both directions still run at comparable rates (back reaction "
+      + (back * 100).toFixed(0) + " % of forward), and i ≈ i<sub>0</sub>fη to " + Math.abs(elin * 100).toFixed(1)
+      + " %. The slope here is 1/R<sub>ct</sub>, so i<sub>0</sub> = RT/(F R<sub>ct</sub>)"
+      + (BV.mt ? " &mdash; provided R<sub>ct</sub> is most of the measured slope; here it is " + Math.round(rct / (rct + rmt) * 100) + " %." : ".");
+  }else if(a === 0){
+    v.className = "verdict go";
+    v.innerHTML = "<b>Equilibrium.</b> Net zero; both partial currents are i<sub>0</sub> = " + fmtJ(i0) + ".";
+  }else if(R.taf[k] && a >= R.taf[k][0] - 1e-9 && a <= R.taf[k][1] + 1e-9){
+    v.className = "verdict go";
+    v.innerHTML = "<b>Tafel region.</b> The back reaction is down to " + pcSmall(back) + " and the surface is "
+      + (BV.mt ? pcSmall(1 - lo) + " depleted" : "undepleted")
+      + ", so log|i| is a straight line in η to within " + pcSmall(Math.abs(etaf)) + ". Here, and only here, the slope gives α and "
+      + "the line runs back to i<sub>0</sub>.";
+  }else if(R.taf[k] === null && BV.mt){
+    v.className = "verdict mixv";
+    v.innerHTML = "<b>No Tafel region on this side.</b> By the time the back reaction has fallen below 1 %, the surface is already "
+      + "more than 10 % depleted: i<sub>0</sub> is too close to i<sub>l</sub>. The curve goes straight from the ohmic region into the plateau "
+      + "&mdash; the near-reversible case &mdash; and no window on a Tafel plot gives α or i<sub>0</sub>.";
+  }else{
+    v.className = "verdict flat";
+    v.innerHTML = "<b>In between.</b> At " + fmtmV(eta) + " the back reaction is still " + (back * 100).toFixed(1)
+      + " % of the forward one" + (BV.mt ? " and the surface " + ((1 - lo) * 100).toFixed(1) + " % depleted" : "")
+      + ": neither the linear nor the Tafel form is good to better than "
+      + (Math.min(Math.abs(elin), Math.abs(etaf)) * 100).toFixed(0) + " %. Only the full equation describes this stretch.";
+  }
+}
+function bvAll(){ var R = bvDrawTafel(); bvNumbers(R); bvDrawJV(); bvDrawProfile(); }
+["bvI", "bvA", "bvE", "bvL"].forEach(function(id){
+  el(id).addEventListener("input", function(){
+    if(id === "bvI") pillSet("bvP", ["-3", "-6", "-9"].indexOf(String(+el("bvI").value)) >= 0 ? String(+el("bvI").value) : "");
+    bvAll();
+  });
+});
+pillGroup("bvP", function(v){ el("bvI").value = v; bvAll(); });
+pillGroup("bvM", function(v){ BV.mt = (v === "on"); el("bvL").disabled = !BV.mt; bvAll(); });
+pillGroup("bvY", function(v){ BV.ys = +v; bvAll(); });
+function bvPreset(i0log, illog, ys, eta){
+  el("bvI").value = i0log; el("bvL").value = illog; el("bvE").value = eta; el("bvA").value = 0.5;
+  BV.mt = true; el("bvL").disabled = false; pillSet("bvM", "on");
+  BV.ys = ys; pillSet("bvY", String(ys));
+  pillSet("bvP", ["-3", "-6", "-9"].indexOf(String(i0log)) >= 0 ? String(i0log) : "");
+  bvAll();
+}
+el("bvQ1").addEventListener("click", function(){ bvPreset(-3, 0, 1, -60); });
+el("bvQ2").addEventListener("click", function(){ bvPreset(-6, 0, 1, -180); });
+el("bvQ3").addEventListener("click", function(){ bvPreset(-7, 0, 1, -300); });
+
+
+/* ================= TAFEL ANALYSIS =======================================
+   Synthetic data: the Butler-Volmer form with each system's i0 and Tafel
+   slopes, sampled on a fixed grid, times (1 + sigma g) where g is a fixed
+   Gaussian sequence per system -- so moving sigma scales the scatter
+   without reshuffling it, and moving alpha reshapes the curve under the
+   same scatter. Markovic et al. give one b for HOR and HER on Pt(110);
+   the two branches are drawn symmetric, as they report them.            */
+var TF_SYS = {
+  p110: {lab: "Pt(110), HOR/HER", T: 333.15, i0: 1.35e-3, b: 0.033, span: 0.1, step: 0.001, near: 0.015, seed: 110},
+  one:  {lab: "one electron", T: 298.15, i0: 1e-6, span: 0.3, step: 0.0025, near: 0.04, seed: 5}
+};
+function tfF(s){ return FARADAY / (RGAS * s.T); }          /* f  = F/RT       */
+function tfFp(s){ return tfF(s) / Math.LN10; }            /* f' = F/2.303RT  */
+/* the window comes from the last button pressed: "def", the defensible one,
+   worked out again whenever the system, alpha or i_l changes, or "near",
+   the first few tens of millivolts. The scatter is fixed at 2 %.         */
+var TF = {sys: "p110", mt: false, mode: "def"}, TF_SIG = 0.02;
+
+function mulberry32(a){
+  return function(){
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    var t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function gauss(r){
+  var u = 1 - r(), v = r();
+  return clamp(Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v), -3, 3);
+}
+/* the system, with its transfer coefficients and Tafel slopes filled in:
+   Pt(110)'s from its one published b, the couple's from the slider      */
+function tfSys(){
+  var s = TF_SYS[TF.sys];
+  if(s.b){ s.aa = s.ac = 1 / (s.b * tfFp(s)); }
+  else{ s.ac = +el("tfA").value; s.aa = 1 - s.ac; s.lab = "one electron, α_c = " + s.ac.toFixed(2); }
+  s.ba = 1 / (s.aa * tfFp(s)); s.bc = 1 / (s.ac * tfFp(s));
+  return s;
+}
+function tfIL(){ return TF.mt ? Math.pow(10, +el("tfL").value) / 1000 : Infinity; }
+function tfData(){
+  var s = tfSys(), f = tfF(s), il = tfIL(), sig = TF_SIG;
+  var rnd = mulberry32(s.seed), pts = [], n = Math.round(s.span / s.step);
+  for(var k = -n; k <= n; k++){
+    var g = gauss(rnd);
+    if(k === 0) continue;
+    var e = k * s.step, it = bvCalc(e, s.i0, s.aa, s.ac, il, f).i;
+    pts.push({e: e, i: it * (1 + sig * g), t: it});
+  }
+  return pts;
+}
+function linfit(xs, ys){
+  var n = xs.length;
+  if(n < 3) return null;
+  var mx = 0, my = 0;
+  for(var i = 0; i < n; i++){ mx += xs[i]; my += ys[i]; }
+  mx /= n; my /= n;
+  var sxx = 0, sxy = 0;
+  for(var j = 0; j < n; j++){ sxx += (xs[j] - mx) * (xs[j] - mx); sxy += (xs[j] - mx) * (ys[j] - my); }
+  if(sxx === 0) return null;
+  var m = sxy / sxx;
+  return {m: m, c: my - m * mx, n: n};
+}
+/* a defensible window: it opens where the back reaction falls below 1 % of
+   the forward one, and closes where either side's surface passes 10 %
+   depletion, or where the data stop                                      */
+function tfRecommend(){
+  var s = tfSys(), f = tfF(s), il = tfIL();
+  var start = Math.log(100) / ((s.aa + s.ac) * f), end = s.span;
+  if(isFinite(il)){
+    [1, -1].forEach(function(sg){
+      for(var e = s.step; e <= s.span + 1e-9; e += s.step / 4){
+        if(Math.abs(bvCalc(sg * e, s.i0, s.aa, s.ac, il, f).i) / il > 0.1){ end = Math.min(end, e - s.step / 4); break; }
+      }
+    });
+  }
+  /* defensible only if the window, rounded to the millivolt as it is used,
+     holds at least three data points on each side                        */
+  var a = Math.ceil(start * 1000) / 1000, b = Math.floor(end * 1000) / 1000;
+  var npts = Math.floor(b / s.step + 1e-9) - Math.ceil(a / s.step - 1e-9) + 1;
+  return {start: start, end: end, ok: npts >= 3};
+}
+/* to the millivolt, inside the defensible range; with no defensible range,
+   from where the back reaction dies to the end of the data              */
+function tfWin(){
+  var s = tfSys();
+  if(TF.mode === "near") return {a: s.step, b: s.near};
+  var R = tfRecommend();
+  return {a: Math.ceil(R.start * 1000) / 1000, b: R.ok ? Math.floor(R.end * 1000) / 1000 : s.span};
+}
+function tfFit(pts, w){
+  var xa = [], ya = [], xc = [], yc = [];
+  pts.forEach(function(p){
+    var a = Math.abs(p.e);
+    if(a < w.a - 1e-9 || a > w.b + 1e-9) return;
+    if(p.e > 0 && p.i > 0){ xa.push(p.e); ya.push(Math.log10(p.i)); }
+    if(p.e < 0 && p.i < 0){ xc.push(p.e); yc.push(Math.log10(-p.i)); }
+  });
+  return {a: linfit(xa, ya), c: linfit(xc, yc)};
+}
+
+function tfDraw(pts, F, R){
+  var s = tfSys(), w = tfWin(), W = s.span, il = tfIL();
+  /* the vertical range comes from the noise-free curve without mass
+     transport, so turning either on moves the points and not the frame */
+  var lmin = Infinity, lmax = -Infinity;
+  for(var k = 1; k <= 40; k++){
+    var e = k * W / 40;
+    [e, -e].forEach(function(x){
+      var l = lg(bvCalc(x, s.i0, s.aa, s.ac, Infinity, tfF(s)).i);
+      lmin = Math.min(lmin, l); lmax = Math.max(lmax, l);
+    });
+  }
+  var lb0 = lg(bvCalc(s.step, s.i0, s.aa, s.ac, Infinity, tfF(s)).i);
+  var LB = Math.floor(Math.min(lmin, lb0) - 0.3), LT = Math.ceil(lmax + 0.2);
+  var xt = W <= 0.1 ? [-100, -50, 0, 50, 100] : [-300, -200, -100, 0, 100, 200, 300];
+  var fr = logFrame({X0: 60, X1: 506, Y0: 20, Y1: 238, xl: -W, xr: W, lb: LB, lt: LT, every: 1,
+                     xt: xt, xlab: "η = E − E_eq   /mV", ylab: "|i|   /A cm⁻²"});
+  var o = fr.s;
+  /* the window chosen, on both sides */
+  [1, -1].forEach(function(sg){
+    var a = fr.px(sg > 0 ? w.a : -w.b), b = fr.px(sg > 0 ? w.b : -w.a);
+    o += rc(a, 20, b - a, 218, "var(--go)", 0.15);
+  });
+  /* the defensible one, as a bar along the top */
+  if(R.ok){
+    [1, -1].forEach(function(sg){
+      var a = fr.px(sg > 0 ? R.start : -R.end), b = fr.px(sg > 0 ? R.end : -R.start);
+      o += ln(a, 24, b, 24, "var(--ion-k)", 3);
+      o += ln(a, 20, a, 28, "var(--ion-k)", 1.4) + ln(b, 20, b, 28, "var(--ion-k)", 1.4);
+    });
+  }
+  /* the true curve the points came from, faintly */
+  o += pth(curveD(-W, W, 600, function(x){ return lg(bvCalc(x, s.i0, s.aa, s.ac, il, tfF(s)).i); }, fr.px, fr.py, LB, LT),
+           "var(--ink)", 1.2, null, 0.35);
+  /* the points */
+  pts.forEach(function(p){
+    var l = lg(p.i);
+    if(l < LB || l > LT) return;
+    var a = Math.abs(p.e), inw = a >= w.a - 1e-9 && a <= w.b + 1e-9;
+    if(inw) o += cir(fr.px(p.e), fr.py(l), 2.3, p.e > 0 ? "var(--ox)" : "var(--red-)", 0.95);
+    else o += cir(fr.px(p.e), fr.py(l), 1.7, "var(--muted)", 0.55);
+  });
+  /* the fitted lines: solid where they were fitted, dashed back to eta = 0 */
+  if(F.a){
+    o += pth(segD(w.a, F.a.c + F.a.m * w.a, w.b, F.a.c + F.a.m * w.b, fr), "var(--ox)", 2);
+    o += pth(segD(0, F.a.c, w.a, F.a.c + F.a.m * w.a, fr), "var(--ox)", 1.5, null, 0.9, "5 3");
+  }
+  if(F.c){
+    o += pth(segD(-w.a, F.c.c - F.c.m * w.a, -w.b, F.c.c - F.c.m * w.b, fr), "var(--red-)", 2);
+    o += pth(segD(0, F.c.c, -w.a, F.c.c - F.c.m * w.a, fr), "var(--red-)", 1.5, null, 0.9, "5 3");
+  }
+  var l0 = Math.log10(s.i0);
+  o += cir(fr.px(0), fr.py(l0), 4.6, "var(--go)");
+  if(F.a && F.a.c > LB && F.a.c < LT) o += ring(fr.px(0) + 6, fr.py(F.a.c), 4.2, "var(--ox)");
+  if(F.c && F.c.c > LB && F.c.c < LT) o += ring(fr.px(0) - 6, fr.py(F.c.c), 4.2, "var(--red-)");
+  o += txh(fr.px(0) + 14, fr.py(l0) + 16, "true i₀", "var(--go)", 10, "start", 600);
+  o += tx(60, 290, s.lab + "   ·   " + (s.T - 273.15).toFixed(0) + " °C   ·   f′ = " + tfFp(s).toFixed(2)
+        + " V⁻¹   ·   " + pts.length + " points", "var(--muted)", 9.5);
+  el("tfplot").innerHTML = o;
+}
+
+function tfNumbers(pts, F, R){
+  var s = tfSys(), w = tfWin(), fp = tfFp(s), f = tfF(s), il = tfIL();
+  el("tfLv").innerHTML = TF.mt ? fmtJ(il) : "—";
+  function wmv(x){ var m = x * 1000; return Math.abs(m - Math.round(m)) < 1e-6 ? m.toFixed(0) : m.toFixed(1); }
+  el("tfRwin").textContent = wmv(w.a) + "–" + wmv(w.b) + " mV  ·  "
+    + (F.a ? F.a.n : 0) + " + " + (F.c ? F.c.n : 0) + " pts";
+  function mv(b){ return (b * 1000).toFixed(1); }
+  var ba = F.a ? 1 / F.a.m : NaN, bc = F.c ? -1 / F.c.m : NaN;
+  function bstr(b, tr){ return (isFinite(b) && b > 0 ? mv(b) : "—") + " / " + mv(tr) + " mV/dec"; }
+  el("tfRba").textContent = bstr(ba, s.ba);
+  el("tfRbc").textContent = bstr(bc, s.bc);
+  el("tfRaa").textContent = (isFinite(ba) && ba > 0 ? (1 / (ba * fp)).toFixed(2) : "—") + " / " + s.aa.toFixed(2);
+  el("tfRac").textContent = (isFinite(bc) && bc > 0 ? (1 / (bc * fp)).toFixed(2) : "—") + " / " + s.ac.toFixed(2);
+  var i0a = F.a ? Math.pow(10, F.a.c) : NaN, i0c = F.c ? Math.pow(10, F.c.c) : NaN;
+  function off(x){ var r = x / s.i0; return r >= 1 ? "×" + r.toPrecision(3) : "÷" + (1 / r).toPrecision(3); }
+  el("tfRi0a").innerHTML = isFinite(i0a) ? fmtJ(i0a) + " <small style=\"color:var(--muted)\">" + off(i0a) + "</small>" : "too few points";
+  el("tfRi0c").innerHTML = isFinite(i0c) ? fmtJ(i0c) + " <small style=\"color:var(--muted)\">" + off(i0c) + "</small>" : "too few points";
+  el("tfRtrue").innerHTML = fmtJ(s.i0);
+  el("tfRrec").textContent = R.ok ? (R.start * 1000).toFixed(0) + "–" + (R.end * 1000).toFixed(0) + " mV" : "none";
+  el("tfAv").textContent = TF.sys === "one" ? s.ac.toFixed(2) + " / " + s.aa.toFixed(2) : "—";
+  el("tfNote").textContent = s.lab + (TF.sys === "one" ? " · synthetic, i₀ = 1 µA/cm²" : " · i₀ and b from Marković et al.");
+  /* what the window did */
+  var v = el("tfVerdict"), probs = [];
+  if(!F.a || !F.c){
+    v.className = "verdict stop";
+    v.innerHTML = "<b>Too few points.</b> Each side needs at least three inside the window.";
+    return;
+  }
+  var ea0 = Math.abs(Math.log10(i0a / s.i0)), ec0 = Math.abs(Math.log10(i0c / s.i0));
+  if(TF.mode === "def" && !R.ok){
+    v.className = "verdict mixv";
+    var iStart = Math.max(Math.abs(bvCalc(R.start, s.i0, s.aa, s.ac, Infinity, f).i), Math.abs(bvCalc(-R.start, s.i0, s.aa, s.ac, Infinity, f).i));
+    v.innerHTML = "<b>No defensible window.</b> The back reaction falls below 1 % only at " + (R.start * 1000).toFixed(0)
+      + " mV, where the current is already " + fmtJ(iStart) + "; the surface stays less than 10 % depleted only below 0.1 i<sub>l</sub> = "
+      + fmtJ(0.1 * il) + ". There is no stretch that satisfies both. The fit shown runs from " + (R.start * 1000).toFixed(0)
+      + " mV to the end of the data and "
+      + "inherits the bend toward i<sub>l</sub>: i<sub>0</sub> comes out wrong by up to a factor of "
+      + Math.pow(10, Math.max(ea0, ec0)).toPrecision(2) + ". Raise i<sub>l</sub> (stir, rotate) or take i<sub>0</sub> "
+      + "from the small-η slope.";
+    return;
+  }
+  var backAt = Math.exp(-(s.aa + s.ac) * f * w.a);
+  if(w.a < R.start - s.step){
+    probs.push("it starts at " + wmv(w.a) + " mV, where the back reaction is still "
+      + (backAt * 100).toFixed(backAt < 0.1 ? 1 : 0) + " % of the forward one &mdash; log|i| plunges toward η = 0 there and tilts the line");
+  }
+  if(isFinite(il) && w.b > R.end + s.step){
+    var dmax = Math.max(Math.abs(bvCalc(w.b, s.i0, s.aa, s.ac, il, f).i), Math.abs(bvCalc(-w.b, s.i0, s.aa, s.ac, il, f).i)) / il;
+    probs.push("it runs to " + (w.b * 1000).toFixed(0) + " mV, where the surface is " + (dmax * 100).toFixed(0)
+      + " % depleted and the current is bending over toward i<sub>l</sub>");
+  }
+  var ea = Math.abs(Math.log10(i0a / s.i0)), ec = Math.abs(Math.log10(i0c / s.i0)), worst = Math.pow(10, Math.max(ea, ec));
+  var berr = Math.max(Math.abs(ba / s.ba - 1), Math.abs(bc / s.bc - 1));
+  if(probs.length){
+    v.className = "verdict stop";
+    v.innerHTML = "<b>This window is not defensible:</b> " + probs.join("; and ") + ". The slopes come out "
+      + (berr * 100).toFixed(0) + " % off and i<sub>0</sub> is wrong by up to a factor of " + worst.toPrecision(2)
+      + ". The violet bar marks where these data obey Tafel.";
+  }else if(w.b - w.a < 0.02 * (s.span / 0.1)){
+    v.className = "verdict flat";
+    v.innerHTML = "<b>Defensible, but short.</b> Nothing systematic is wrong with " + (w.a * 1000).toFixed(0) + "–" + (w.b * 1000).toFixed(0)
+      + " mV, but a line through so few points is at the mercy of the scatter: slopes " + (berr * 100).toFixed(0)
+      + " % off, i<sub>0</sub> within a factor of " + worst.toPrecision(2) + ". A decade of current is the usual minimum.";
+  }else{
+    v.className = "verdict go";
+    v.innerHTML = "<b>A defensible window.</b> It opens after the back reaction has died ("
+      + (backAt * 100).toFixed(2) + " % at " + (w.a * 1000).toFixed(0) + " mV)" + (isFinite(il) ? " and closes before the surface runs short" : "")
+      + ". Slopes within " + (berr * 100).toFixed(1) + " % and i<sub>0</sub> within a factor of " + worst.toPrecision(3)
+      + " of the numbers that made the data; what is left is scatter.";
+  }
+}
+
+function tfAll(){
+  var pts = tfData(), R = tfRecommend(), F = tfFit(pts, tfWin());
+  tfDraw(pts, F, R);
+  tfNumbers(pts, F, R);
+}
+pillGroup("tfS", function(v){
+  TF.sys = v;
+  el("tfA").disabled = (v !== "one");
+  tfAll();
+});
+pillGroup("tfM", function(v){ TF.mt = (v === "on"); el("tfL").disabled = !TF.mt; tfAll(); });
+["tfL", "tfA"].forEach(function(id){ el(id).addEventListener("input", tfAll); });
+el("tfB2").addEventListener("click", function(){ TF.mode = "near"; tfAll(); });
+el("tfB3").addEventListener("click", function(){ TF.mode = "def"; tfAll(); });
+
+/* the two tables, worked out here so they cannot disagree with the plot */
+(function tfTables(){
+  var f25 = FARADAY / (RGAS * 298.15) / Math.LN10, f60 = FARADAY / (RGAS * 333.15) / Math.LN10;
+  /* apparent alpha_c and alpha_a of the same steps at low coverage; they add to n/nu */
+  var M = [["Volmer is the slow step", 0.5, "0.5"], ["Heyrovsky is slow, Volmer fast", 1.5, "0.5"], ["Tafel is slow, Volmer fast", 2.0, "0"]];
+  el("tfMech").innerHTML = M.map(function(m){
+    return "<tr><td class=\"wr\">" + m[0] + "</td><td class=\"num\">" + m[1].toFixed(1) + "</td><td class=\"num\">" + m[2] + "</td><td class=\"num\">"
+      + (1000 / (m[1] * f25)).toFixed(0) + " mV</td><td class=\"num\">" + (1000 / (m[1] * f60)).toFixed(0) + " mV</td></tr>";
+  }).join("");
+  var L = [["Pt(110), HOR/HER", 33, 333.15, "hi"], ["Pt(100), HOR/HER", 44, 333.15, ""], ["Pt(111), HOR/HER", 66, 333.15, ""],
+           ["n-LCO in LiOH, OER", 80.8, 298.15, "sep"], ["n-LCO in NaOH, OER", 66.2, 298.15, ""],
+           ["n-LCO in KOH, OER", 60.0, 298.15, ""], ["n-LCO in CsOH, OER", 47.1, 298.15, "hi"]];
+  el("tfLit").innerHTML = L.map(function(r){
+    var fp = FARADAY / (RGAS * r[2]) / Math.LN10;
+    return "<tr class=\"" + r[3] + "\"><td>" + r[0] + "</td><td class=\"num\">" + r[1].toFixed(r[2] > 300 ? 0 : 1)
+      + "</td><td class=\"num\">" + (r[2] - 273.15).toFixed(0) + " °C</td><td class=\"num\">" + (1 / (r[1] / 1000 * fp)).toFixed(2) + "</td></tr>";
+  }).join("");
+})();
+
+
+/* ================= CONCEPT CHECK QUESTIONS =============================
+   Check 1: the barrier, k0 and i0. Check 2: Butler-Volmer and Tafel.     */
+var QZ1 = [
+  {q:"For O + e⁻ ⇌ R with α = 0.5, the electrode is made 100 mV more negative. What happens to the two activation barriers?",
+   o:["The reduction barrier falls by 100 meV and the oxidation barrier is unchanged",
+      "The reduction barrier falls by 50 meV (4.8 kJ/mol) and the oxidation barrier rises by 50 meV, so k<sub>c</sub> grows and k<sub>a</sub> shrinks by the same factor, about 7",
+      "Both barriers fall by 50 meV, so both directions speed up",
+      "Neither barrier changes; only the equilibrium constant does"],
+   a:1,
+   w:"Making the electrode 100 mV more negative raises the energy of the electron in the metal by 100 meV, so the O + e⁻ well moves up by 100 meV while R stays put. The top of the barrier follows by only α<sub>a</sub> of that, 50 meV. Measured from the well that rose, the reduction barrier ΔG<sup>‡</sup><sub>c</sub> = ΔG<sup>‡</sup><sub>0</sub> + α<sub>c</sub>Fη falls by 0.5 × 100 = 50 meV; measured from R, the oxidation barrier ΔG<sup>‡</sup><sub>a</sub> = ΔG<sup>‡</sup><sub>0</sub> − α<sub>a</sub>Fη rises by the other 50 meV &mdash; 0.050 × 96.485 = 4.8 kJ/mol each way. Since k = A<sub>f</sub> exp(−ΔG<sup>‡</sup>/RT), k<sub>c</sub> rises by e<sup>0.050/0.02569</sup> = 7.0 and k<sub>a</sub> falls by the same 7.0, so their ratio changes by 49 = e<sup>FΔE/RT</sup> &mdash; exactly what thermodynamics requires, and independent of α. α only decides how that factor of 49 is shared between the two directions. (A) is α<sub>c</sub> = 1; (C) forgets that the two barriers share one top, so what one loses the other gains."},
+
+  {q:"Where the two free-energy curves cross, the R curve is three times as steep as the O + e⁻ curve (tan φ = 3 tan θ). What is α<sub>c</sub>, and what does it mean for the Tafel slopes at 25 °C?",
+   o:["α<sub>c</sub> = 0.75, because the crossing then lies close to R and the transition state resembles the product",
+      "α<sub>c</sub> = 0.5, because a one-electron step is always symmetric",
+      "α<sub>c</sub> = 0.25: only a quarter of a shift of the O + e⁻ well reaches the reduction barrier, so b<sub>c</sub> = 237 mV/dec while b<sub>a</sub> = 79 mV/dec",
+      "α<sub>c</sub> = 0.25, so b<sub>c</sub> = 15 mV/dec: the reduction current climbs four times faster than at α = 0.5"],
+   a:2,
+   w:"α<sub>c</sub> = tanθ/(tanθ + tanφ) = 1/(1 + 3) = 0.25. When the O + e⁻ well moves by δ, the crossing slides along the steep R curve and moves with it by (1 − α<sub>c</sub>)δ = 0.75δ, so the reduction barrier &mdash; the gap between the well and the top &mdash; changes by only 0.25δ. The Tafel slopes follow from b = 2.303RT/αF: 59.2/0.25 = 237 mV/dec for reduction and 59.2/0.75 = 79 mV/dec for oxidation, so the anodic branch of this couple is three times steeper than the cathodic one. (A) reads α from the position: on the barrier tab this lopsided pair does cross at x* = 0.75, near R, and α<sub>c</sub> is still 0.25 &mdash; α comes from the slopes, not from where the crossing sits. (B) holds only when the two curves are equally steep. (D) inverts the formula: a small α makes b larger, not smaller."},
+
+  {q:"Two couples have the same k°, one with α = 0.3 and one with α = 0.7. Each electrode is moved from E°′ to 118 mV negative of it. Which statement is right?",
+   o:["k<sub>c</sub>/k<sub>a</sub> rises by the same factor, about 100, for both. For α = 0.7, k<sub>c</sub> rises ×25 and k<sub>a</sub> falls ÷4; for α = 0.3 it is the other way round, k<sub>c</sub> ×4 and k<sub>a</sub> ÷25",
+      "k<sub>c</sub>/k<sub>a</sub> rises by 10<sup>2α</sup>: ×25 for α = 0.7 but only ×4 for α = 0.3",
+      "Both rate constants rise, k<sub>c</sub> more than k<sub>a</sub>",
+      "Nothing changes for the α = 0.3 couple, because its k<sub>c</sub> is set by k° alone"],
+   a:0,
+   w:"k<sub>c</sub> = k° e<sup>−αf(E−E°′)</sup> and k<sub>a</sub> = k° e<sup>(1−α)f(E−E°′)</sup>, so k<sub>c</sub>/k<sub>a</sub> = e<sup>−f(E−E°′)</sup> &mdash; no α in it. At 118 mV that is e<sup>4.6</sup> ≈ 100, two decades, for any couple: it is how the equilibrium constant depends on potential, and thermodynamics fixes it. α only shares the factor of 100 out: k<sub>c</sub> rises by 10<sup>2α</sup> and k<sub>a</sub> falls by 10<sup>2(1−α)</sup>, that is 10<sup>1.4</sup> = 25 and 10<sup>0.6</sup> = 4.0 for α = 0.7, and the reverse for α = 0.3. On the k°, k and i<sub>0</sub> tab, change α and watch the two lines tilt about the k° point: the vertical gap between them at any E never changes. (B) multiplies k<sub>c</sub> and forgets k<sub>a</sub>; (C) forgets that k<sub>a</sub> falls; (D) confuses k°, which is fixed, with k<sub>c</sub>, which is not."},
+
+  {q:"The same couple, in the same solution with C<sub>O</sub>* = C<sub>R</sub>*, on two electrodes: k° = 10⁻² cm/s on A and 10⁻⁵ cm/s on B. Which statement is right?",
+   o:["A has the more positive equilibrium potential, because its reaction is faster",
+      "At E = E°′ the net current on A is a thousand times larger than on B",
+      "k° cannot be compared between electrodes, because it depends on the applied potential",
+      "Both electrodes sit at the same E<sub>eq</sub>, because that is set by thermodynamics; but the exchange current on A is a thousand times larger, so A needs far less overpotential for any given current"],
+   a:3,
+   w:"Set i = 0 in i = nFA[k<sub>a</sub>C<sub>R</sub>(0,t) − k<sub>c</sub>C<sub>O</sub>(0,t)] and k° cancels: what is left is the Nernst equation, E<sub>eq</sub> = E°′ + (RT/nF) ln(C<sub>O</sub>*/C<sub>R</sub>*). The equilibrium potential knows nothing about how fast the electrode is. What k° does set is the size of the two balanced partial currents at equilibrium, i<sub>0</sub> = nFAk°C<sub>O</sub>*<sup>1−α</sup>C<sub>R</sub>*<sup>α</sup> &mdash; here a thousand times larger on A. A large i<sub>0</sub> means a small overpotential buys a large current (a &lsquo;reversible&rsquo; electrode); a small one means a large η is required (&lsquo;irreversible&rsquo;). (B) misses that with C<sub>O</sub>* = C<sub>R</sub>*, E°′ <em>is</em> E<sub>eq</sub>, where the net current is zero on both. (C) confuses k° with k: k° is the potential-independent value that k<sub>c</sub> and k<sub>a</sub> share at E°′ &mdash; precisely the number that can be compared between electrode materials."},
+
+  {q:"C<sub>O</sub>* = 10 mM and C<sub>R</sub>* = 0.1 mM (α = 0.5, 25 °C, surface = bulk). The electrode is held at E°′, where k<sub>c</sub> = k<sub>a</sub> = k°. What flows?",
+   o:["Nothing: at E°′ the two rate constants are equal, so the two directions balance",
+      "A net cathodic current. The rate constants are equal, but there is 100 times more O than R, so the cathodic partial current is 100 times the anodic one; E°′ lies 118 mV negative of E<sub>eq</sub>, so η = −118 mV",
+      "A net anodic current, because E°′ lies positive of E<sub>eq</sub>",
+      "It cannot be said without knowing k°"],
+   a:1,
+   w:"Each partial current is a rate constant times what there is to react: |i<sub>c</sub>| = Fk<sub>c</sub>C<sub>O</sub>* and i<sub>a</sub> = Fk<sub>a</sub>C<sub>R</sub>*. At E°′, k<sub>c</sub> = k<sub>a</sub> = k°, so |i<sub>c</sub>|/i<sub>a</sub> = C<sub>O</sub>*/C<sub>R</sub>* = 100 and reduction wins. The same thing from the potentials: E<sub>eq</sub> = E°′ + (RT/F) ln 100 = E°′ + 118 mV, so an electrode held at E°′ is at η = −118 mV &mdash; cathodic, and just where the back reaction has fallen to 1 % of the forward one. k° and E°′ belong to the couple; η is measured from E<sub>eq</sub>, which belongs to the solution as well. These are the two zeros of potential on the k°, k and i<sub>0</sub> tab (preset 2 puts the two crossings 118 mV apart). (A) reads k<sub>c</sub> = k<sub>a</sub> as equilibrium; (C) has the Nernst shift the wrong way round; (D): k° sets how large the net current is, not which way it flows."},
+
+  {q:"At fixed C<sub>R</sub>*, the concentration of O is doubled (α = 0.5, 25 °C, surface = bulk). What happens to E<sub>eq</sub> and to i<sub>0</sub>?",
+   o:["E<sub>eq</sub> is unchanged and i<sub>0</sub> doubles",
+      "E<sub>eq</sub> moves up by 17.8 mV and i<sub>0</sub> is unchanged, because k° is unchanged",
+      "E<sub>eq</sub> moves up by 17.8 mV and i<sub>0</sub> rises by a factor of 2<sup>1−α</sup> = 1.41",
+      "E<sub>eq</sub> moves up by 59 mV and i<sub>0</sub> doubles"],
+   a:2,
+   w:"Nernst: ΔE<sub>eq</sub> = (RT/F) ln 2 = 25.69 mV × 0.693 = 17.8 mV; 59 mV would take a tenfold change. And i<sub>0</sub> = nFAk°C<sub>O</sub>*<sup>1−α</sup>C<sub>R</sub>*<sup>α</sup> is not a constant of the electrode: it carries the concentrations, with reaction order 1 − α in O and α in R. Two things happen at once. The cathodic partial current at a fixed potential doubles with C<sub>O</sub>*; but E<sub>eq</sub> has moved 17.8 mV positive, and there k<sub>c</sub> is smaller by e<sup>−αf·ΔE<sub>eq</sub></sup> = 2<sup>−α</sup>. The net is 2<sup>1−α</sup> = 1.41. That is also a way to measure α with no Tafel plot at all: at fixed C<sub>R</sub>*, the slope of log i<sub>0</sub> against log C<sub>O</sub>* is 1 − α. (B) is the commonest slip in this lecture: k° belongs to the electrode and the couple; i<sub>0</sub> to the electrode, the couple <em>and the solution</em>."}
+];
+
+var QZ2 = [
+  {q:"A slow negative-going sweep through a reduction. The current first rises steeply, a little more for every millivolt, then stops rising and even falls although the potential keeps going. What limits the current in each part?",
+   o:["The rising part is limited by mass transfer and the plateau by electron transfer",
+      "Both parts are limited by electron transfer; the current stops rising because k<sub>c</sub> reaches its maximum value",
+      "The rising part is limited by electron transfer: k<sub>c</sub> grows exponentially with potential while the solution can still replace what the surface uses. Past the turn the surface concentration is close to zero, and the current is set by how fast diffusion brings more in, which no potential can hurry",
+      "The turn-over is double-layer charging, which stops once the double layer is full"],
+   a:2,
+   w:"Electron transfer and mass transfer are two steps in series, and the slower one sets the current. Near E°′ the rate constant is small and every millivolt raises it by the same factor &mdash; for α = 0.5, tenfold every 118 mV &mdash; while the reactant is used slowly enough for diffusion to keep the surface stocked: C<sub>O</sub>(0,t) ≈ C<sub>O</sub>*. That is the electron-transfer-limited region. Further on, k<sub>c</sub> is so large that every O reaching the electrode is reduced at once, C<sub>O</sub>(0,t) → 0, and the current is nF times the diffusion flux, D C<sub>O</sub>*/δ &mdash; independent of potential. In a still solution δ keeps growing as the depletion spreads, so the current falls after the peak; in a stirred one it holds at a plateau, i<sub>l</sub> (the Butler&ndash;Volmer tab with mass transport on; the strip above its i&ndash;η plot shows the surface running dry). (B) is the misconception Butler&ndash;Volmer rules out: k has no maximum, it is exponential in η without limit. (D) confuses the faradaic current with the small non-faradaic one that flows before any reaction starts."},
+
+  {q:"Close to E<sub>eq</sub>, a one-electron electrode with i<sub>0</sub> = 1 mA/cm² gives i ≈ i<sub>0</sub>fη. What does the slope of that line give you?",
+   o:["The charge-transfer resistance R<sub>ct</sub> = RT/(Fi<sub>0</sub>) = 25.7 Ω cm², and from it i<sub>0</sub> &mdash; without knowing α, because to first order the two α&rsquo;s add to one and drop out",
+      "α, from the slope; i<sub>0</sub> needs a Tafel plot",
+      "R<sub>ct</sub> = RT/(αFi<sub>0</sub>), so i<sub>0</sub> can only be found once α is known",
+      "Nothing: near E<sub>eq</sub> the current is exponential in η, so the slope changes from one point to the next"],
+   a:0,
+   w:"Expand both exponentials for small η: i = i<sub>0</sub>[e<sup>α<sub>a</sub>fη</sup> − e<sup>−α<sub>c</sub>fη</sup>] ≈ i<sub>0</sub>(α<sub>a</sub> + α<sub>c</sub>)fη = i<sub>0</sub>fη, since α<sub>a</sub> + α<sub>c</sub> = 1 for one step. So di/dη = i<sub>0</sub>F/RT, and its reciprocal is the charge-transfer resistance R<sub>ct</sub> = RT/(Fi<sub>0</sub>) = 0.02569 V / 10⁻³ A cm⁻² = 25.7 Ω cm². α has dropped out: the linear region measures i<sub>0</sub> without it, which is what is wrong with (C), and says nothing about α, which is what is wrong with (B). The form holds only while |η| is small &mdash; within 5 % up to about 29 mV at α = ½, but only about 5 mV at α = ¼, because a lopsided barrier bends the curve sooner. With mass transport the measured slope also carries the mass-transfer resistance, 2RT/(Fi<sub>l</sub>) for equal limiting currents, which has to be subtracted; the Butler&ndash;Volmer tab reports both. (D): close enough to E<sub>eq</sub> any smooth curve is straight."},
+
+  {q:"For a one-electron step at 25 °C, how far from E<sub>eq</sub> must you go before the back reaction is under 1 % of the forward one?",
+   o:["118 mV at α = ½, but 236 mV at α = ¼, because that branch is shallower",
+      "59 mV: one decade of current",
+      "As far as it takes for the current to reach 1 % of i<sub>l</sub>",
+      "118 mV whatever α is: the ratio of the two partial currents is e<sup>−F|η|/RT</sup>, which contains no α"],
+   a:3,
+   w:"Divide the two terms of Butler&ndash;Volmer. On the anodic side back/forward = e<sup>−α<sub>c</sub>fη</sup>/e<sup>α<sub>a</sub>fη</sup> = e<sup>−(α<sub>a</sub> + α<sub>c</sub>)fη</sup> = e<sup>−fη</sup> for one step, and the same on the cathodic side. 1 % needs f|η| = ln 100 = 4.61, |η| = 118 mV at 25 °C. α decides how much current has flowed by then &mdash; 10 i<sub>0</sub> at α = ½; at α<sub>c</sub> = ¼, 3.2 i<sub>0</sub> on the cathodic side and 32 i<sub>0</sub> on the anodic &mdash; but not where the back reaction dies. It is the same e<sup>fη</sup> that left the share of hops unchanged when α was animated on the barrier tab. So a Tafel window should open at about 118 mV on both sides, however lopsided the barrier. (A) scales the distance with α; (B) mistakes a decade of current for two decades of back reaction; (C) brings in mass transport, which decides where a window must close, not where it opens."},
+
+  {q:"A couple with i<sub>0</sub> = 0.1 mA/cm² is measured with a limiting current of 1 mA/cm² on both sides (α = ½, 25 °C). Where on the Tafel plot do you fit?",
+   o:["From 120 to 240 mV, as for any one-electron couple",
+      "Nowhere. The back reaction falls below 1 % only once |i| ≈ 10 i<sub>0</sub> = 1 mA/cm², but the surface stays less than 10 % depleted only while |i| &lt; 0.1 i<sub>l</sub> = 0.1 mA/cm². Raise i<sub>l</sub> by stirring or rotating faster, or take i<sub>0</sub> from the small-η slope instead",
+      "On the anodic side only, where the reactant cannot run short",
+      "As far out as the data go, toward the plateau, where the current is largest and the scatter matters least"],
+   a:1,
+   w:"A clean Tafel stretch needs both conditions at once: back reaction under 1 % (|η| ≥ 118 mV, where at α = ½ the current is already 10 i<sub>0</sub>) and depletion under 10 % (|i| &lt; 0.1 i<sub>l</sub>). At α = ½ its length is log(i<sub>l</sub>/i<sub>0</sub>) − 2 decades; here log 10 − 2 = −1, so there is none &mdash; the curve goes straight from the linear region into the plateau (the &lsquo;i<sub>0</sub> = i<sub>l</sub>&rsquo; preset on the Butler&ndash;Volmer tab is the extreme case). The fixes are experimental: raise i<sub>l</sub>, or use the small-η slope, which here is 1/(R<sub>ct</sub> + R<sub>mt</sub>) with R<sub>mt</sub> = 2RT/(Fi<sub>l</sub>) = 51.4 Ω cm²; subtract it to leave R<sub>ct</sub> = RT/(Fi<sub>0</sub>) = 257 Ω cm². (A) ignores i<sub>l</sub>. (C) forgets that each side has its own reactant to run short of &mdash; R on the anodic side. (D) fits the bend toward the plateau, which makes b too large and i<sub>0</sub> too large with it."},
+
+  {q:"For a one-electron couple with i<sub>0</sub> = 1 µA/cm², α = 0.5 and a limiting current of 1 mA/cm² on both sides, which fitting window on a Tafel plot gives a defensible i<sub>0</sub>?",
+   o:["|η| up to 40 mV: closest to η = 0, so the shortest extrapolation",
+      "|η| from about 120 to 240 mV",
+      "|η| from 240 to 400 mV, where the current is largest and the scatter matters least",
+      "Any window: a straight line on a log plot has the same slope everywhere"],
+   a:1,
+   w:"Two corrections bend the Tafel line, one at each end. Near equilibrium the back reaction is not negligible: it is e<sup>−F|η|/RT</sup> of the forward one &mdash; 14 % at 50 mV, 2 % at 100 mV, and 1 % only at 118 mV. Far out, the reactant runs short: the surface is depleted by |i|/i<sub>l</sub>, which passes 10 % once the current passes 0.1 mA/cm², at about 240 mV here. Between the two lies one clean decade, from 10 to 100 µA/cm². At α = ½ the clean stretch is log(i<sub>l</sub>/i<sub>0</sub>) − 2 decades long, so a Tafel line needs i<sub>0</sub> at least a thousand times below i<sub>l</sub> to show a single decade. Sampled every 2.5 mV without scatter, the first 40 mV give b = 36 mV/dec and i<sub>0</sub> = 0.17 µA/cm², six times too small, because log|i| plunges toward η = 0 there; 240&ndash;400 mV give b = 183 mV/dec and i<sub>0</sub> = 5.4 µA/cm², five times too large, because the current is bending over toward i<sub>l</sub>; 120&ndash;240 mV give 122 mV/dec and 1.08 µA/cm². The lecture&rsquo;s zinc electrode shows the same disease in real data: four windows, four exchange currents spanning a factor of almost 30. On the Tafel analysis tab &mdash; the one-electron couple at α<sub>c</sub> = 0.50, mass transport on, i<sub>l</sub> at 1 mA/cm² &mdash; &lsquo;near equilibrium only&rsquo; reproduces the first of these and &lsquo;a defensible one&rsquo; the last."},
+
+  {q:"Hydrogen oxidation and evolution on Pt(110) at 60 °C give a Tafel slope of 33 mV/decade. Reading it as α = 2.303RT/(bF) gives α ≈ 2. What does a value above 1 tell you?",
+   o:["That the measurement must be wrong: α is a symmetry factor and has to lie between 0 and 1",
+      "That two electrons cross a single barrier together, each with a symmetry factor of 1",
+      "That the reaction is mass-transport limited at 33 mV/decade",
+      "That α here is an apparent transfer coefficient of a multi-step reaction, not the symmetry of one barrier: 2.303RT/2F is the slope expected when the slow step comes after the electron transfers &mdash; classically read as the recombination 2H<sub>ad</sub> → H<sub>2</sub>"],
+   a:3,
+   w:"At 60 °C, f′ = F/(2.303RT) = 15.1 V⁻¹, so α = 1/(bf′) = 1/(0.033 × 15.1) = 2.0; Pt(100)&rsquo;s 44 mV/dec gives 1.5 and Pt(111)&rsquo;s 66 gives 1.0. A single one-electron step cannot produce 2: its α is the fraction of the potential that reaches the transition state, between 0 and 1. A measured slope is the potential dependence of the whole sequence. For hydrogen the classic steps are Volmer (H⁺ + e⁻ → H<sub>ad</sub>), Heyrovsky (H<sub>ad</sub> + H⁺ + e⁻ → H<sub>2</sub>) and Tafel (2H<sub>ad</sub> → H<sub>2</sub>). If Volmer is fast and stays at equilibrium, the coverage of H<sub>ad</sub> grows as e<sup>F|η|/RT</sup>, and a recombination that needs two of them speeds up as e<sup>2F|η|/RT</sup>: b = 2.303RT/2F, which is 30 mV/dec at 25 °C and 33 at 60 °C. A slow Heyrovsky step gives 2.303RT/1.5F (39 and 44 mV/dec) and a slow Volmer step 2.303RT/0.5F (118 and 132). That is why such an α is called <b>apparent</b>: it describes how the overall rate depends on potential, not the symmetry of one barrier. A matching slope is evidence for a mechanism, not proof of one &mdash; and on Pt in acid the same 2.303RT/2F is also what H<sub>2</sub> diffusion alone produces on the evolution side, which is why later measurements without the rotating disk&rsquo;s transport limit read the kinetics differently (the Tafel analysis tab has the references). (C) has it backwards: mass transport bends a Tafel plot over and makes b <em>larger</em>."}
+];
+
+acNumbers();
+kkAll();
+bvAll();
+pillSet("tfS", "p110");
+tfAll();
+window.requestAnimationFrame(animLoop);
+
+/* ================= CONCEPT CHECKS =======================================
+   Two checks, each a separate attempt with its own student-ID lock,
+   storage key, receipt and submission label. The keys differ from the one
+   an older draft of the Lecture 13 page still uses, "ch40051-l11-check-v1",
+   so two pages cannot load each other's answers on the same browser.     */
+var LETTERS = "ABCD";
+var SUBMIT_URL = "https://script.google.com/macros/s/AKfycbxPm7WrbttFu6-gnTi__IcUPt-816GthK0eI8TPuwOZyYlcRW3RAWJlmsr791moxBc5GA/exec";
+
+function code(str){
+  var h=0x811c9dc5;
+  for(var i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=(h+((h<<1)+(h<<4)+(h<<7)+(h<<8)+(h<<24)))>>>0; }
+  return ("0000000"+h.toString(16).toUpperCase()).slice(-8);
+}
+
+/* n: 1 or 2, the suffix on every element id of that check's panel */
+function makeQuiz(n, QZ, label, STORE){
+  function E(id){ return document.getElementById(id + n); }
+  var picks=new Array(QZ.length).fill(-1);
+  var sId=E("sId"), elTally=E("tally"), elBar=E("scorebar"), elScore=E("scoreNum"),
+      elWho=E("whoLine"), elIdHint=E("idHint"), dlBtn=E("dlBtn"), dlHint=E("dlHint"),
+      sendBtn=E("sendBtn"), root=E("quiz");
+  var startedAt=null, finishedAt=null;
+
+  function save(){
+    try{ localStorage.setItem(STORE,JSON.stringify({i:sId.value,p:picks,s:startedAt,t:finishedAt})); }catch(e){}
+  }
+  function loadState(){
+    try{
+      var d=JSON.parse(localStorage.getItem(STORE)||"null");
+      if(d){ sId.value=d.i||""; if(Array.isArray(d.p)&&d.p.length===QZ.length) picks=d.p.slice();
+             startedAt=d.s||null; finishedAt=d.t||null; }
+    }catch(e){}
+  }
+  function started(){ return picks.some(function(p){return p>=0;}); }
+  function scoreOf(){ var s=0; for(var i=0;i<QZ.length;i++) if(picks[i]===QZ[i].a) s++; return s; }
+  function answered(){ return picks.filter(function(p){return p>=0;}).length; }
+
+  function receipt(){
+    var s=scoreOf(), pct=Math.round(s/QZ.length*100), id=(sId.value||"").trim();
+    var stamp=finishedAt||new Date().toISOString();
+    var vc=code(id+"|"+stamp+"|"+picks.join(""));
+    var head=["lecture","student_id","completed_utc","score","total","percent","verification"];
+    var row=[label,id,stamp,s,QZ.length,pct,vc];
+    for(var i=0;i<QZ.length;i++){ head.push("a"+(i+1)); row.push(picks[i]>=0?LETTERS[picks[i]]:"-"); }
+    for(var j=0;j<QZ.length;j++){ head.push("ok"+(j+1)); row.push(picks[j]===QZ[j].a?1:0); }
+    function cell(v){ v=String(v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
+    return {csv:head.join(",")+"\n"+row.map(cell).join(",")+"\n", vcode:vc, score:s, pct:pct, id:id};
+  }
+
+  function render(){
+    var done=answered(), all=(done===QZ.length);
+    elTally.textContent=done+" / "+QZ.length+" answered";
+    elBar.hidden=!all;
+    sId.readOnly=started();
+    elIdHint.innerHTML = all
+      ? "<strong>Attempt complete.</strong> Your answers are final. Every question now shows the correct answer and why — read them before you close this page."
+      : started() ? "<strong>Attempt in progress.</strong><span class=\"locked\">ID locked</span><br>Each answer is final."
+                  : "<strong>One attempt.</strong> Enter your student ID before you begin — it locks once you answer the first question.";
+    if(all){
+      if(!finishedAt){ finishedAt=new Date().toISOString(); save(); }
+      var r=receipt();
+      elScore.innerHTML=r.score+' <small>/ '+QZ.length+'  ·  '+r.pct+' %</small>';
+      elWho.innerHTML="Student ID <b>"+esc(r.id||"—")+"</b> &nbsp;·&nbsp; Verification <b>"+r.vcode+"</b>";
+    }
+    for(var i=0;i<QZ.length;i++){
+      var box=root.querySelector('.opts[data-q="'+i+'"]');
+      var kids=[].slice.call(box.children), why=box.parentNode.querySelector(".why");
+      if(picks[i]<0){ kids.forEach(function(o){o.disabled=false;o.className="opt";}); why.hidden=true; }
+      else{
+        (function(qi){ kids.forEach(function(o,j){
+          o.disabled=true;
+          o.className="opt"+(j===QZ[qi].a?" right":(j===picks[qi]?" wrong":""));
+        }); })(i);
+        var _note=(picks[i]!==QZ[i].a)
+          ? '<span class="misc">You chose <b>'+LETTERS[picks[i]]+'</b>. '
+            + 'The correct answer is <b>'+LETTERS[QZ[i].a]+'</b>.</span>'
+          : "";
+        why.innerHTML=_note+QZ[i].w; why.hidden=false;
+      }
+    }
+  }
+
+  root.innerHTML=QZ.map(function(item,i){
+    return '<div class="card q"><div class="card-b">'
+      +'<p class="stem"><b style="font-family:IBM Plex Mono,monospace;color:var(--muted);font-size:12px">Q'+(i+1)+'</b>  '+item.q+'</p>'
+      +'<div class="opts" data-q="'+i+'">'+item.o.map(function(o,j){
+          return '<button class="opt" data-i="'+j+'"><span class="ltr">'+LETTERS[j]+'</span><span>'+o+'</span></button>';
+        }).join("")+'</div><p class="why" hidden></p></div></div>';
+  }).join("");
+
+  [].slice.call(root.querySelectorAll(".opts")).forEach(function(box){
+    box.addEventListener("click",function(ev){
+      var b=ev.target.closest(".opt");
+      if(!b||b.disabled) return;
+      var qi=+box.getAttribute("data-q");
+      if(picks[qi]>=0) return;
+      if(!(sId.value||"").trim()){
+        elIdHint.innerHTML="<strong style=\"color:var(--stop)\">Enter your student ID first.</strong> It is written into the result file you submit.";
+        sId.focus(); return;
+      }
+      if(!startedAt) startedAt=new Date().toISOString();
+      picks[qi]=+b.getAttribute("data-i");
+      save(); render();
+    });
+  });
+  sId.addEventListener("input",save);
+
+  dlBtn.addEventListener("click",function(){
+    var id=(sId.value||"").trim();
+    if(!id){ dlHint.textContent="Enter your student ID first — it goes into the file."; return; }
+    var r=receipt();
+    try{
+      var blob=new Blob([r.csv],{type:"text/csv;charset=utf-8"});
+      var url=URL.createObjectURL(blob);
+      var a=document.createElement("a");
+      a.href=url; a.download="CH40051-"+label+"-check_"+id.replace(/[^A-Za-z0-9_-]/g,"")+".csv";
+      a.style.display="none";
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(function(){URL.revokeObjectURL(url);},1000);
+      dlHint.textContent="Saved. Hand it in as your instructor directs.";
+    }catch(e){
+      dlHint.textContent="Your browser blocked the download. Screenshot this panel and submit that instead.";
+    }
+  });
+
+  /* ---- submit straight to the course sheet -------------------------------- */
+  if(SUBMIT_URL){
+    sendBtn.hidden=false;
+    dlHint.textContent="Press Submit to send your result to the course. The download is a backup.";
+  }
+  sendBtn.addEventListener("click",function(){
+    var id=(sId.value||"").trim();
+    if(!id){ dlHint.textContent="Enter your student ID first."; return; }
+    var r=receipt();
+    var payload={
+      lecture:label, student_id:id, completed_utc:finishedAt||new Date().toISOString(),
+      score:r.score, total:QZ.length, percent:r.pct, verification:r.vcode,
+      answers:picks.map(function(p){ return p>=0?LETTERS[p]:"-"; }),
+      ok:picks.map(function(p,i){ return p===QZ[i].a?1:0; })
+    };
+    sendBtn.disabled=true;
+    dlHint.textContent="Sending...";
+    fetch(SUBMIT_URL,{
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(payload)
+    })
+    .then(function(res){ return res.json(); })
+    .then(function(j){
+      if(j && j.ok){
+        sendBtn.textContent="Submitted ✓";
+        dlHint.textContent="Recorded for student ID "+id+". You can close this page.";
+      }else{
+        sendBtn.disabled=false;
+        sendBtn.textContent="Submit to the course";
+        dlHint.textContent="Not recorded — "+((j && j.error) || "the course sheet refused it.")
+          + " Keep the downloaded file and tell your instructor if this looks wrong.";
+      }
+    })
+    .catch(function(){
+      fetch(SUBMIT_URL,{method:"POST",mode:"no-cors",
+        headers:{"Content-Type":"text/plain;charset=utf-8"},
+        body:JSON.stringify(payload)}).catch(function(){});
+      sendBtn.disabled=false;
+      sendBtn.textContent="Submit to the course";
+      dlHint.textContent="Sent, but the confirmation did not come back. "
+        + "Download the file as well and keep it - it is your proof of submission.";
+    });
+  });
+
+  loadState();
+  render();
+}
+makeQuiz(1, QZ1, "L11-1", "ch40051-l11-check1-v1");
+makeQuiz(2, QZ2, "L11-2", "ch40051-l11-check2-v1");
+
+})();
+</script>
+</body>
+</html>
