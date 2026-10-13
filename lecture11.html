@@ -536,7 +536,10 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
             transfer&rsquo;s. Once C(0) heads for zero the rate is whatever diffusion across the layer can deliver,
             i<sub>l</sub> = nFm C*, and the potential has nothing more to say.</p>
           <p class="hint"><b>Which limit comes first</b> is the ratio <b>i<sub>0</sub>/i<sub>l</sub></b>. A Tafel line needs back
-            reaction &lt; 1 % (|&eta;| &gt; 118 mV, whatever &alpha; is) and depletion &lt; 10 % (|i| &lt; 0.1 i<sub>l</sub>). At
+            reaction &lt; 1 % and depletion &lt; 10 % (|i| &lt; 0.1 i<sub>l</sub>). The first is |&eta;| &gt; 118 mV
+            <b>for a one-electron step at 25 &deg;C</b> &mdash; whatever &alpha; is, because back/forward =
+            e<sup>&minus;(&alpha;<sub>a</sub> + &alpha;<sub>c</sub>)f&eta;</sup> and the two shares add to one. The mark is
+            (RT/nF) ln 100 in general: 59 mV if two electrons cross in the step, and 132 mV at 60 &deg;C. At
             &alpha; = &frac12; the current at 118 mV is 10 i<sub>0</sub>, so the clean stretch is log(i<sub>l</sub>/i<sub>0</sub>) &minus; 2
             decades long; on a branch with transfer coefficient &alpha; it is log(i<sub>l</sub>/i<sub>0</sub>) &minus; 1 &minus; 2&alpha;.</p>
         </div>
@@ -2382,9 +2385,9 @@ window.requestAnimationFrame(animLoop);
 
 /* ================= CONCEPT CHECKS =======================================
    Two checks, each a separate attempt with its own student-ID lock,
-   storage key, receipt and submission label. The keys differ from the one
-   an older draft of the Lecture 13 page still uses, "ch40051-l11-check-v1",
-   so two pages cannot load each other's answers on the same browser.     */
+   storage key, receipt and submission label. The keys differ from the
+   Lecture 13 page's, so two pages cannot load each other's answers on
+   the same browser.                                                      */
 var LETTERS = "ABCD";
 var SUBMIT_URL = "https://script.google.com/macros/s/AKfycbxPm7WrbttFu6-gnTi__IcUPt-816GthK0eI8TPuwOZyYlcRW3RAWJlmsr791moxBc5GA/exec";
 
