@@ -734,47 +734,20 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
       </div>
     </div>
 
-    <div class="pairfig">
-      <div class="card">
-        <div class="card-h"><h2>What a slope can tell you</h2><span class="note">an apparent &alpha; is not a symmetry factor</span></div>
-        <div class="card-b stack" style="gap:12px">
-          <div class="scrollx">
-            <table class="ions">
-              <thead><tr><th>hydrogen, if&hellip;</th><th><span class="nt">&alpha;<sub>c</sub></span></th><th><span class="nt">&alpha;<sub>a</sub></span></th><th><span class="nt">b<sub>c</sub></span> at 25 &deg;C</th><th><span class="nt">b<sub>c</sub></span> at 60 &deg;C</th></tr></thead>
-              <tbody id="tfMech"></tbody>
-            </table>
-          </div>
-          <p class="hint" style="margin:0">Volmer H<sup>+</sup> + e<sup>&minus;</sup> &rarr; H<sub>ad</sub>; Heyrovsky H<sub>ad</sub> + H<sup>+</sup> +
-            e<sup>&minus;</sup> &rarr; H<sub>2</sub>; Tafel 2H<sub>ad</sub> &rarr; H<sub>2</sub>. If the Volmer step is fast and stays at
-            equilibrium, H<sub>ad</sub> builds up as e<sup>F|&eta;|/RT</sup>, and a later step that consumes it inherits that potential
-            dependence: once for Heyrovsky (plus half its own electron), twice for the purely chemical Tafel step. Classic
-            low-coverage values with a symmetry factor of 0.5. <b>An &alpha; above 1 is therefore not a broken
-            symmetry factor</b> &mdash; it says the slow step comes after one or more electrons have already been transferred.
-            A matching slope is evidence for a mechanism, not proof of one.</p>
-          <p class="hint" style="margin:0">With one slow step the two add to <b>&alpha;<sub>a</sub> + &alpha;<sub>c</sub> = n/&nu;</b>
-            (Parsons): n = 2 electrons per H<sub>2</sub>, and the slow step runs &nu; times per H<sub>2</sub> &mdash; twice for Volmer,
-            once for Heyrovsky or Tafel. For a slow Tafel step the oxidation side has &alpha;<sub>a</sub> = 0: it levels off at a kinetic
-            limit instead of climbing. So a fit with 33 mV/dec on <em>both</em> branches, &alpha;<sub>a</sub> = &alpha;<sub>c</sub> = 2,
-            describes the data near &eta; = 0 but cannot come from one slow step &mdash; the Pt(110) data on this tab reproduce that fit
-            as reported. A further caution: 2.303RT/2F is also the slope that H<sub>2</sub> diffusion alone gives on the evolution side of
-            a reversible electrode, and measurements free of the rotating disk&rsquo;s transport limit find hydrogen on Pt in acid far
-            faster than the disk shows (Sheng, Gasteiger &amp; Shao-Horn, 2010; Durst et al., 2014).</p>
+    <div class="card" style="margin-top:16px">
+      <div class="card-h"><h2>Three ways to get &alpha;</h2><span class="note" id="tawNote">three routes to one number &mdash; which is what makes it checkable</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="btnrow" style="margin:0">
+          <button class="ghost" id="tawRun" type="button">&#9654; Measure &alpha; three ways</button>
+          <button class="ghost" id="tawStep" type="button">Step through them</button>
         </div>
-      </div>
-      <div class="card">
-        <div class="card-h"><h2>Reading published slopes</h2><span class="note">&alpha; = 2.303RT/bF</span></div>
-        <div class="card-b stack" style="gap:12px">
-          <div class="scrollx">
-            <table class="ions">
-              <thead><tr><th>system</th><th><span class="nt">b / mV dec<sup>&minus;1</sup></span></th><th><span class="nt">T</span></th><th><span class="nt">&alpha;</span>, apparent</th></tr></thead>
-              <tbody id="tfLit"></tbody>
-            </table>
-          </div>
-          <p class="hint" style="margin:0">Pt(hkl): HOR/HER in 0.05 M H<sub>2</sub>SO<sub>4</sub> (Markovi&#263; et al., 1997).
-            OER on layered LiCoO<sub>2</sub> in 0.1 M alkali hydroxides (Kim et al., 2022), read here at 25 &deg;C. A smaller b
-            means the current climbs a decade for fewer millivolts &mdash; a steeper Tafel line, faster kinetics. It says nothing
-            about i<sub>0</sub> by itself: two catalysts with different b and i<sub>0</sub> can cross, and which one is better then
-            depends on the current you need.</p>
+        <svg id="taw" viewBox="0 0 540 212" style="display:block;width:100%;height:auto" role="img" aria-label="Three measurements of the same transfer coefficient, side by side. On the left a Tafel plot of one branch with the fitted line, in the middle the logarithm of the exchange current against the logarithm of the bulk concentration of O with three points and a line through them, on the right both branches of the Tafel plot with their two slopes. Each panel prints the alpha it gives, under the alpha the data were made with."></svg>
+        <div id="tawVerdict" class="verdict flat" style="margin:0">&mdash;</div>
+        <div class="glegend g2">
+          <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="2" y1="12" x2="24" y2="3" stroke="var(--ox)" stroke-width="2"/></svg><span><b>1 &middot; the slope.</b> Needs |&eta;| &ge; 118 mV and a window that closes before depletion &mdash; the fit above, with whatever window you chose.</span></span>
+          <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><circle cx="5" cy="11" r="2.4" fill="var(--go)"/><circle cx="13" cy="7.5" r="2.4" fill="var(--go)"/><circle cx="21" cy="4" r="2.4" fill="var(--go)"/></svg><span><b>2 &middot; the reaction order</b>, &part;log i<sub>0</sub>/&part;log C<sub>O</sub>* = 1 &minus; &alpha;<sub>c</sub>. i<sub>0</sub> read from R<sub>ct</sub> = RT/nFi<sub>0</sub> at three values of C<sub>O</sub>*, all within &plusmn;10 mV of E<sub>eq</sub>: no Tafel window to argue about, no iR correction, no time to change the surface.</span></span>
+          <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="2" y1="3" x2="13" y2="11" stroke="var(--red-)" stroke-width="2"/><line x1="13" y1="11" x2="24" y2="5" stroke="var(--ox)" stroke-width="2"/></svg><span><b>3 &middot; the two slopes against each other.</b> b<sub>a</sub>/b<sub>c</sub> = &alpha;<sub>c</sub>/&alpha;<sub>a</sub> &mdash; one plot, no extrapolation, and no f&prime; or temperature in it at all.</span></span>
+          <span style="display:block;color:var(--muted)"><b>If the three disagree</b>, it is the one-step one-electron picture that is wrong, not the measurement. An &alpha; above 1 says electrons crossed in a fast pre-equilibrium before the slow step; an &alpha; that drifts with &eta; says the surface is changing under you. Before comparing with a paper, check which &alpha; it means &mdash; some texts call the anodic coefficient &alpha;, which swaps the two reaction orders.</span>
         </div>
       </div>
     </div>
@@ -870,12 +843,16 @@ function el(id){ return document.getElementById(id); }
 
 /* ---------------- tabs ---------------- */
 var tabs=[].slice.call(document.querySelectorAll(".tab"));
+/* a panel drawn while it was hidden measured 0 px wide, so the figures that
+   pick their frame from the width need a redraw when the panel is shown */
+var PANEL_SHOW = {};
 tabs.forEach(function(t){
   t.addEventListener("click",function(){
     tabs.forEach(function(o){
-      var on=(o===t);
+      var on=(o===t), id=o.getAttribute("aria-controls");
       o.setAttribute("aria-selected",on?"true":"false");
-      document.getElementById(o.getAttribute("aria-controls")).hidden=!on;
+      document.getElementById(id).hidden=!on;
+      if(on && PANEL_SHOW[id]) PANEL_SHOW[id]();
     });
   });
 });
@@ -1725,7 +1702,25 @@ el("kkP4").addEventListener("click", function(){ kkPreset(-3, 0.25, 1, -1, false
 var BV = {mt: false, ys: 0};
 var BV_YS = [{top: 1e-5, u: 1e-6, lab: "µA cm⁻²"}, {top: 1e-3, u: 1e-3, lab: "mA cm⁻²"},
              {top: 0.1, u: 1e-3, lab: "mA cm⁻²"}];
-var BV_W = 0.4;
+var BV_W0 = 0.4;                 /* with no i_l there is no ratio to follow */
+/* the frame the two plots share. A Tafel line runs log(i_l/i0) decades
+   before the plateau takes it, and each decade costs b mV, so that plus a
+   margin is the width worth showing. Clamped so the frame never collapses
+   or runs past the slider's reach.                                      */
+function bvW(){
+  var il = bvIL();
+  if(!isFinite(il)) return BV_W0;
+  var b = RTF * Math.LN10 / bvAc();
+  return clamp(b * (Math.max(Math.log10(il / bvI0()), 0) + 0.75), 0.05, 1.2);
+}
+/* round ticks, as many as the frame has room for */
+function bvTicks(W){
+  var mv = W * 1000;
+  var st = mv <= 80 ? 25 : mv <= 150 ? 50 : mv <= 350 ? 100 : mv <= 700 ? 200 : 300;
+  var out = [];
+  for(var k = -Math.floor(mv / st + 1e-9); k <= Math.floor(mv / st + 1e-9); k++) out.push(k * st);
+  return out;
+}
 
 function bvCalc(eta, i0, aa, ac, il, f){
   f = f || 1 / RTF;
@@ -1754,8 +1749,8 @@ function bvRegions(i0, aa, ac, il){
     }
     r.lin[k] = lim;
     var st = null, en = null, mt = null;
-    for(var m = 1; m <= 800; m++){
-      var e = m * 5e-4, b2 = bvCalc(sg * e, i0, aa, ac, il);
+    for(var m = 1; m <= 4000; m++){
+      var e = m * 1e-4, b2 = bvCalc(sg * e, i0, aa, ac, il);
       var back = sg > 0 ? b2.ic / b2.ia : b2.ia / b2.ic;
       var dep = isFinite(il) ? Math.abs(b2.i) / il : 0;
       if(dep > 0.1){ if(mt === null) mt = e; break; }
@@ -1769,7 +1764,7 @@ function bvRegions(i0, aa, ac, il){
 
 function bvDrawJV(){
   var i0 = bvI0(), ac = bvAc(), aa = 1 - ac, il = bvIL(), eta = bvEta(), Y = BV_YS[BV.ys];
-  var X0 = 58, X1 = 452, Y0 = 20, Y1 = 232, YM = (Y0 + Y1) / 2, W = BV_W;
+  var X0 = 58, X1 = 452, Y0 = 20, Y1 = 232, YM = (Y0 + Y1) / 2, W = bvW();
   function px(e){ return X0 + (e + W) / (2 * W) * (X1 - X0); }
   function py(i){ return YM - i / Y.top * (Y1 - Y0) / 2; }
   var s = rc(X0, Y0, X1 - X0, Y1 - Y0, "var(--surface-2)", 0.5, 4);
@@ -1817,10 +1812,10 @@ function bvDrawJV(){
 }
 
 function bvDrawTafel(){
-  var i0 = bvI0(), ac = bvAc(), aa = 1 - ac, il = bvIL(), eta = bvEta(), W = BV_W;
+  var i0 = bvI0(), ac = bvAc(), aa = 1 - ac, il = bvIL(), eta = bvEta(), W = bvW();
   var LB = -11, LT = 0;
   var fr = logFrame({X0: 58, X1: 452, Y0: 20, Y1: 232, xl: -W, xr: W, lb: LB, lt: LT, every: 2,
-                     xt: [-400, -200, 0, 200, 400], xlab: "η = E − E_eq   /mV", ylab: "|i|   /A cm⁻²"});
+                     xt: bvTicks(W), xlab: "η = E − E_eq   /mV", ylab: "|i|   /A cm⁻²"});
   var o = fr.s, R = bvRegions(i0, aa, ac, il), H = 232 - 20;
   /* the regions, under the curves */
   o += rc(fr.px(-R.lin[1]), 20, fr.px(R.lin[0]) - fr.px(-R.lin[1]), H, "var(--stop)", 0.2);
@@ -1941,8 +1936,8 @@ function bvNumbers(R){
   function tw(t, sg){
     if(!t) return "none";
     var d = Math.log10(Math.abs(bvCalc(sg * t[1], i0, aa, ac, il).i) / Math.abs(bvCalc(sg * t[0], i0, aa, ac, il).i));
-    var open = !isFinite(il) || t[1] >= BV_W - 1e-9;
-    return (sg < 0 ? "−" : "+") + (t[0] * 1000).toFixed(0) + (open && t[1] >= BV_W - 1e-9 ? " mV onward" : " to " + (sg < 0 ? "−" : "+") + (t[1] * 1000).toFixed(0) + " mV")
+    var W = bvW(), open = !isFinite(il) || t[1] >= W - 1e-9;
+    return (sg < 0 ? "−" : "+") + (t[0] * 1000).toFixed(0) + (open && t[1] >= W - 1e-9 ? " mV onward" : " to " + (sg < 0 ? "−" : "+") + (t[1] * 1000).toFixed(0) + " mV")
       + (isFinite(il) ? ", " + d.toFixed(1) + " dec" : "");
   }
   el("bvRtc").textContent = tw(R.taf[1], -1);
@@ -1983,7 +1978,28 @@ function bvNumbers(R){
       + (Math.min(Math.abs(elin), Math.abs(etaf)) * 100).toFixed(0) + " %. Only the full equation describes this stretch.";
   }
 }
-function bvAll(){ var R = bvDrawTafel(); bvNumbers(R); bvDrawJV(); bvDrawProfile(); }
+/* ---- Table 4-1, made live ---------------------------------------------
+   The ratio the surface is forced to, decade by decade, if the couple is
+   fast enough to stay at equilibrium while the potential moves. Set beside
+   the tab's own ohmic and Tafel edges, so you can see how little of the
+   surface a small-eta measurement has disturbed.                        */
+/* the eta slider cannot ask for a potential the frame does not show */
+function bvFitSlider(){
+  var W = Math.round(bvW() * 1000), E = el("bvE");
+  if(+E.max !== W){
+    E.min = -W; E.max = W;
+    E.step = W <= 100 ? 1 : 2;
+    E.value = clamp(+E.value, -W, W);
+  }
+}
+PANEL_SHOW["p-bv"] = function(){ bvAll(); };
+function bvAll(){
+  bvFitSlider();
+  var R = bvDrawTafel();
+  bvNumbers(R);
+  bvDrawJV();
+  bvDrawProfile();
+}
 ["bvI", "bvA", "bvE", "bvL"].forEach(function(id){
   el(id).addEventListener("input", function(){
     if(id === "bvI") pillSet("bvP", ["-3", "-6", "-9"].indexOf(String(+el("bvI").value)) >= 0 ? String(+el("bvI").value) : "");
@@ -1994,8 +2010,10 @@ pillGroup("bvP", function(v){ el("bvI").value = v; bvAll(); });
 pillGroup("bvM", function(v){ BV.mt = (v === "on"); el("bvL").disabled = !BV.mt; bvAll(); });
 pillGroup("bvY", function(v){ BV.ys = +v; bvAll(); });
 function bvPreset(i0log, illog, ys, eta){
-  el("bvI").value = i0log; el("bvL").value = illog; el("bvE").value = eta; el("bvA").value = 0.5;
+  el("bvI").value = i0log; el("bvL").value = illog; el("bvA").value = 0.5;
   BV.mt = true; el("bvL").disabled = false; pillSet("bvM", "on");
+  bvFitSlider();                  /* widen the range before asking for eta */
+  el("bvE").value = eta;
   BV.ys = ys; pillSet("bvY", String(ys));
   pillSet("bvP", ["-3", "-6", "-9"].indexOf(String(i0log)) >= 0 ? String(i0log) : "");
   bvAll();
@@ -2003,6 +2021,9 @@ function bvPreset(i0log, illog, ys, eta){
 el("bvQ1").addEventListener("click", function(){ bvPreset(-3, 0, 1, -60); });
 el("bvQ2").addEventListener("click", function(){ bvPreset(-6, 0, 1, -180); });
 el("bvQ3").addEventListener("click", function(){ bvPreset(-7, 0, 1, -300); });
+
+
+
 
 
 /* ================= TAFEL ANALYSIS =======================================
@@ -2239,10 +2260,214 @@ function tfNumbers(pts, F, R){
   }
 }
 
+/* ===== three ways to get alpha, measured ===============================
+   The couple the tab is set to, measured three ways on the same synthetic
+   data. Route 1 fits one branch inside the chosen window and reads
+   alpha = -m_c/f'. Route 3 takes the ratio of the two fitted slopes,
+   b_a/b_c = alpha_c/alpha_a, which carries no f' and no temperature. Route 2
+   never leaves equilibrium: i0 = nFk0 C_O*^(1-alpha) C_R*^alpha at three
+   concentrations, and the slope of log i0 against log C_O* is 1 - alpha.
+   All three see the same 2 % scatter the plot above does.             */
+var TAW = {t0: -1, hold: 1, step: -1};
+var TAW_C = [1, Math.sqrt(10), 10];          /* C_O* over C_ref, half a decade apart */
+
+function tawMeasure(){
+  var sy = tfSys(), fp = tfFp(sy), pts = tfData(), w = tfWin(), F = tfFit(pts, w);
+  var o = {sys: sy, fp: fp, pts: pts, w: w, fit: F, trueAc: sy.ac, trueAa: sy.aa};
+  o.ac1 = (F.c && F.c.m < 0) ? -F.c.m / fp : NaN;              /* route 1 */
+  o.aa1 = (F.a && F.a.m > 0) ? F.a.m / fp : NaN;
+  o.ratio = (F.a && F.c && F.a.m !== 0) ? -F.c.m / F.a.m : NaN; /* route 3 */
+  o.ac3 = isFinite(o.ratio) ? o.ratio / (1 + o.ratio) : NaN;
+  /* route 2: i0 at three concentrations, with the same scatter */
+  var rnd = mulberry32(sy.seed + 77), xs = [], ys = [];
+  o.p2 = TAW_C.map(function(c){
+    var i0 = sy.i0 * Math.pow(c, 1 - sy.ac) * (1 + TF_SIG * gauss(rnd));
+    xs.push(Math.log10(c)); ys.push(Math.log10(i0));
+    return {x: Math.log10(c), y: Math.log10(i0)};
+  });
+  var L = linfit(xs, ys);
+  o.order = L ? L.m : NaN;                                     /* route 2 */
+  o.ac2 = L ? 1 - L.m : NaN;
+  o.l2 = L;
+  return o;
+}
+
+/* one panel's frame. Three across where there is room for them, stacked
+   where there is not -- at a phone's width three across would put the
+   labels under 5 px.                                                   */
+var TAW_W = true;
+function tawFrame(svg){
+  TAW_W = svg.clientWidth >= 480;
+  var VW = TAW_W ? 540 : 196, VH = TAW_W ? 190 : 588;
+  if(svg.getAttribute("viewBox") !== "0 0 " + VW + " " + VH)
+    svg.setAttribute("viewBox", "0 0 " + VW + " " + VH);
+  return {VW: VW, VH: VH};
+}
+function tawBox(k){
+  var ox = TAW_W ? 6 + k * 178 : 6, oy = TAW_W ? 0 : k * 196;
+  return {ox: ox, oy: oy, X0: ox + 32, X1: ox + 166, Y0: oy + 30, Y1: oy + 130};
+}
+function tawHead(k, n, title){
+  var B = tawBox(k);
+  return tx(B.ox, B.oy + 14, n + " \u00b7 " + title, "var(--ink-2)", 10.5, "start", 600);
+}
+function tawFoot(k, lab, val, col, on){
+  var B = tawBox(k), s = "";
+  s += tx(B.ox, B.oy + 166, lab, "var(--muted)", 9.5);
+  s += tx(B.ox, B.oy + 182, on ? val : "\u2014", on ? col : "var(--line-2)", 13, "start", 600);
+  return s;
+}
+
+function tawDraw(){
+  var svg = el("taw");
+  if(!svg) return;
+  var VB = tawFrame(svg);
+  var o = tawMeasure(), sy = o.sys, s = "";
+  var p = TAW.hold;                                   /* 0 to 1, the run */
+  var ph = [clamp(p / 0.34, 0, 1), clamp((p - 0.33) / 0.34, 0, 1), clamp((p - 0.66) / 0.34, 0, 1)];
+  if(TAW.step >= 0){ ph = [0, 0, 0]; ph[TAW.step] = 1; }
+  var lo = Math.log10(sy.i0) - 0.6, hi = Math.log10(sy.i0) + sy.span * Math.max(o.aa1 || sy.aa, sy.aa) * o.fp + 0.5;
+
+  /* ---- 1: the slope of one branch ---------------------------------- */
+  var B = tawBox(0), W = sy.span;
+  function x1(e){ return B.X0 + Math.abs(e) / W * (B.X1 - B.X0); }
+  function y1(l){ return B.Y1 - (l - lo) / (hi - lo) * (B.Y1 - B.Y0); }
+  s += rc(B.X0, B.Y0, B.X1 - B.X0, B.Y1 - B.Y0, "var(--surface-2)", 0.5, 3);
+  s += rc(x1(o.w.a), B.Y0, Math.max(1, x1(o.w.b) - x1(o.w.a)), B.Y1 - B.Y0, "var(--go)", 0.10, 2);
+  s += ln(B.X0, B.Y1, B.X1, B.Y1, "var(--line-2)", 1);
+  s += ln(B.X0, B.Y0, B.X0, B.Y1, "var(--line-2)", 1);
+  var shown = 0;
+  o.pts.forEach(function(q){
+    if(q.e >= 0 || q.i >= 0) return;
+    var a = Math.abs(q.e), inw = a >= o.w.a - 1e-9 && a <= o.w.b + 1e-9;
+    if(a / W > ph[0] * 1.02) return;
+    var yy = y1(Math.log10(-q.i));
+    if(yy < B.Y0 - 1 || yy > B.Y1 + 1) return;
+    shown++;
+    s += cir(x1(q.e), yy, inw ? 2.0 : 1.4, inw ? "var(--ox)" : "var(--line-2)", inw ? 0.95 : 0.6);
+  });
+  if(o.fit.c && ph[0] > 0.45){
+    var e1 = -o.w.a, e2 = -Math.min(o.w.b, o.w.a + (o.w.b - o.w.a) * clamp((ph[0] - 0.45) / 0.45, 0, 1));
+    s += ln(x1(e1), y1(o.fit.c.m * e1 + o.fit.c.c), x1(e2), y1(o.fit.c.m * e2 + o.fit.c.c),
+            "var(--ox)", 2.2, null, 0.95);
+  }
+  s += axX((B.X0 + B.X1) / 2, (B.X0 + B.X1) / 2, B.Y1 + 15, "|\u03b7| / mV");
+  s += axY(B.ox + 9, B.Y0, B.Y1, "log |i|");
+  s += tx(B.X0, B.Y1 + 15, "0", "var(--muted)", 9);
+  s += tx(B.X1, B.Y1 + 15, (W * 1000).toFixed(0), "var(--muted)", 9, "end");
+  s += tawHead(0, "1", "the slope");
+  s += tx(B.ox + 170, B.oy + 14, "\u03b1 = 1/(b f\u2032)", "var(--muted)", 9, "end");
+  s += tawFoot(0, "b_c = " + (isFinite(o.ac1) ? (1 / (o.ac1 * o.fp) * 1000).toFixed(0) + " mV/dec" : "\u2014"),
+               "\u03b1 = " + (isFinite(o.ac1) ? o.ac1.toFixed(2) : "\u2014"), "var(--ox)", ph[0] > 0.9);
+
+  /* ---- 2: the reaction order of i0 in C_O* -------------------------- */
+  B = tawBox(1);
+  var ly = o.p2.map(function(q){ return q.y; });
+  var l0 = Math.min.apply(null, ly) - 0.18, l1 = Math.max.apply(null, ly) + 0.18;
+  function x2(lx){ return B.X0 + (lx + 0.12) / 1.24 * (B.X1 - B.X0); }
+  function y2(l){ return B.Y1 - (l - l0) / (l1 - l0) * (B.Y1 - B.Y0); }
+  s += rc(B.X0, B.Y0, B.X1 - B.X0, B.Y1 - B.Y0, "var(--surface-2)", 0.5, 3);
+  s += ln(B.X0, B.Y1, B.X1, B.Y1, "var(--line-2)", 1);
+  s += ln(B.X0, B.Y0, B.X0, B.Y1, "var(--line-2)", 1);
+  if(o.l2 && ph[1] > 0.6){
+    var g = clamp((ph[1] - 0.6) / 0.4, 0, 1);
+    s += ln(x2(0), y2(o.l2.c), x2(1 * g), y2(o.l2.m * g + o.l2.c), "var(--go)", 2.2, null, 0.95);
+  }
+  o.p2.forEach(function(q, idx){
+    if(ph[1] < (idx + 0.4) / 3.2) return;
+    s += cir(x2(q.x), y2(q.y), 3.4, "var(--go)", 0.95);
+  });
+  s += axX(0, 0, B.Y1 + 15, "");
+  s += tx((B.X0 + B.X1) / 2, B.Y1 + 15, "log (C_O* / ref)", "var(--ink-2)", 10.5, "middle", 600);
+  s += axY(B.ox + 9, B.Y0, B.Y1, "log i\u2080");
+  s += tawHead(1, "2", "reaction order");
+  s += tx(B.ox + 170, B.oy + 14, "near E_eq", "var(--muted)", 9, "end");
+  s += tawFoot(1, "slope = 1 \u2212 \u03b1 = " + (isFinite(o.order) ? o.order.toFixed(2).replace("-", "\u2212") : "\u2014"),
+               "\u03b1 = " + (isFinite(o.ac2) ? o.ac2.toFixed(2) : "\u2014"), "var(--go)", ph[1] > 0.9);
+
+  /* ---- 3: the two slopes against each other ------------------------- */
+  B = tawBox(2);
+  function x3(e){ return (B.X0 + B.X1) / 2 + e / W * (B.X1 - B.X0) / 2; }
+  function y3(l){ return B.Y1 - (l - lo) / (hi - lo) * (B.Y1 - B.Y0); }
+  s += rc(B.X0, B.Y0, B.X1 - B.X0, B.Y1 - B.Y0, "var(--surface-2)", 0.5, 3);
+  s += ln(B.X0, B.Y1, B.X1, B.Y1, "var(--line-2)", 1);
+  s += ln(x3(0), B.Y0, x3(0), B.Y1, "var(--line-2)", 1, "3 3");
+  o.pts.forEach(function(q){
+    if(Math.abs(q.e) / W > ph[2] * 1.02) return;
+    var v = q.e > 0 ? q.i : -q.i;
+    if(v <= 0) return;
+    var yy = y3(Math.log10(v));
+    if(yy < B.Y0 - 1 || yy > B.Y1 + 1) return;
+    s += cir(x3(q.e), yy, 1.5, q.e > 0 ? "var(--ox)" : "var(--red-)", 0.55);
+  });
+  if(ph[2] > 0.5 && o.fit.a && o.fit.c){
+    var gg = clamp((ph[2] - 0.5) / 0.5, 0, 1);
+    var ea = o.w.a + (o.w.b - o.w.a) * gg;
+    s += ln(x3(o.w.a), y3(o.fit.a.m * o.w.a + o.fit.a.c), x3(ea), y3(o.fit.a.m * ea + o.fit.a.c),
+            "var(--ox)", 2.2, null, 0.95);
+    s += ln(x3(-o.w.a), y3(-o.fit.c.m * o.w.a + o.fit.c.c), x3(-ea), y3(o.fit.c.m * -ea + o.fit.c.c),
+            "var(--red-)", 2.2, null, 0.95);
+  }
+  s += tx((B.X0 + B.X1) / 2, B.Y1 + 15, "\u03b7 / mV", "var(--ink-2)", 10.5, "middle", 600);
+  s += tx(B.X0, B.Y1 + 15, "\u2212" + (W * 1000).toFixed(0), "var(--muted)", 9);
+  s += tx(B.X1, B.Y1 + 15, "+" + (W * 1000).toFixed(0), "var(--muted)", 9, "end");
+  s += axY(B.ox + 9, B.Y0, B.Y1, "log |i|");
+  s += tawHead(2, "3", "two slopes");
+  s += tx(B.ox + 170, B.oy + 14, "no f\u2032 needed", "var(--muted)", 9, "end");
+  s += tawFoot(2, "b_a/b_c = " + (isFinite(o.ratio) ? o.ratio.toFixed(2) : "\u2014"),
+               "\u03b1_c/\u03b1_a = " + (isFinite(o.ratio) ? o.ratio.toFixed(2) : "\u2014"),
+               "var(--red-)", ph[2] > 0.9);
+
+  /* the three answers on one line, and what they add up to saying */
+  var one = isFinite(o.ac1) && isFinite(o.aa1) && Math.abs(o.ac1 + o.aa1 - 1) < 0.1;
+  var agree = isFinite(o.ac1) && isFinite(o.ac2) && Math.abs(o.ac1 - o.ac2) < 0.06 * sy.ac;
+  var vd = el("tawVerdict");
+  if(vd){
+    if(ph[2] <= 0.95 || !isFinite(o.ac1) || !isFinite(o.ac2)){
+      vd.className = "verdict flat";
+      vd.innerHTML = "Press <b>Measure</b> and the three run in turn, on the same data.";
+    } else {
+      vd.className = "verdict " + (one && agree ? "go" : "cav");
+      vd.innerHTML = "<b>&alpha; = " + o.ac1.toFixed(2) + "</b> from the slope &middot; <b>"
+        + o.ac2.toFixed(2) + "</b> from the reaction order &middot; <b>b<sub>a</sub>/b<sub>c</sub> = "
+        + o.ratio.toFixed(2) + "</b>. "
+        + (one
+           ? (agree ? "Three routes, one &alpha; &mdash; and the ratio got there with no f&prime; and no temperature in it."
+                    : "Routes 1 and 2 differ by more than the scatter: look at the window.")
+           : "But both branches read &alpha; &asymp; " + o.ac1.toFixed(1)
+             + ", which cannot be one electron&rsquo;s share between two directions &mdash; so the ratio here "
+             + "is not an &alpha;, and the one-step one-electron picture is what has failed, not the measurement.");
+    }
+  }
+  svg.innerHTML = s;
+
+  var nt = el("tawNote");
+  if(nt){
+    nt.textContent = "made with \u03b1_c = " + sy.ac.toFixed(2) + " \u00b7 " + sy.lab
+      + " \u00b7 window " + (o.w.a * 1000).toFixed(0) + "\u2013" + (o.w.b * 1000).toFixed(0)
+      + " mV \u00b7 2 % scatter";
+  }
+}
+
+ANIM.push({panel: "p-taf", tick: function(ts){
+  if(TAW.t0 < 0) return;
+  TAW.hold = clamp((ts - TAW.t0) / 5400, 0, 1);
+  tawDraw();
+  if(TAW.hold >= 1) TAW.t0 = -1;
+}});
+el("tawRun").addEventListener("click", function(){
+  TAW.step = -1; TAW.t0 = REDUCED ? -1 : performance.now(); TAW.hold = REDUCED ? 1 : 0; tawDraw();
+});
+el("tawStep").addEventListener("click", function(){
+  TAW.t0 = -1; TAW.step = (TAW.step + 1) % 3; tawDraw();
+});
+
+PANEL_SHOW["p-taf"] = function(){ tfAll(); };
 function tfAll(){
   var pts = tfData(), R = tfRecommend(), F = tfFit(pts, tfWin());
   tfDraw(pts, F, R);
   tfNumbers(pts, F, R);
+  tawDraw();                 /* the three routes follow the same controls */
 }
 pillGroup("tfS", function(v){
   TF.sys = v;
@@ -2254,24 +2479,6 @@ pillGroup("tfM", function(v){ TF.mt = (v === "on"); el("tfL").disabled = !TF.mt;
 el("tfB2").addEventListener("click", function(){ TF.mode = "near"; tfAll(); });
 el("tfB3").addEventListener("click", function(){ TF.mode = "def"; tfAll(); });
 
-/* the two tables, worked out here so they cannot disagree with the plot */
-(function tfTables(){
-  var f25 = FARADAY / (RGAS * 298.15) / Math.LN10, f60 = FARADAY / (RGAS * 333.15) / Math.LN10;
-  /* apparent alpha_c and alpha_a of the same steps at low coverage; they add to n/nu */
-  var M = [["Volmer is the slow step", 0.5, "0.5"], ["Heyrovsky is slow, Volmer fast", 1.5, "0.5"], ["Tafel is slow, Volmer fast", 2.0, "0"]];
-  el("tfMech").innerHTML = M.map(function(m){
-    return "<tr><td class=\"wr\">" + m[0] + "</td><td class=\"num\">" + m[1].toFixed(1) + "</td><td class=\"num\">" + m[2] + "</td><td class=\"num\">"
-      + (1000 / (m[1] * f25)).toFixed(0) + " mV</td><td class=\"num\">" + (1000 / (m[1] * f60)).toFixed(0) + " mV</td></tr>";
-  }).join("");
-  var L = [["Pt(110), HOR/HER", 33, 333.15, "hi"], ["Pt(100), HOR/HER", 44, 333.15, ""], ["Pt(111), HOR/HER", 66, 333.15, ""],
-           ["n-LCO in LiOH, OER", 80.8, 298.15, "sep"], ["n-LCO in NaOH, OER", 66.2, 298.15, ""],
-           ["n-LCO in KOH, OER", 60.0, 298.15, ""], ["n-LCO in CsOH, OER", 47.1, 298.15, "hi"]];
-  el("tfLit").innerHTML = L.map(function(r){
-    var fp = FARADAY / (RGAS * r[2]) / Math.LN10;
-    return "<tr class=\"" + r[3] + "\"><td>" + r[0] + "</td><td class=\"num\">" + r[1].toFixed(r[2] > 300 ? 0 : 1)
-      + "</td><td class=\"num\">" + (r[2] - 273.15).toFixed(0) + " °C</td><td class=\"num\">" + (1 / (r[1] / 1000 * fp)).toFixed(2) + "</td></tr>";
-  }).join("");
-})();
 
 
 /* ================= CONCEPT CHECK QUESTIONS =============================
