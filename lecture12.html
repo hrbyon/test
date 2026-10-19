@@ -187,6 +187,8 @@ table.ions tr.lo td{color:var(--red-)}
 footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;line-height:1.8}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 .glegend{display:flex;flex-direction:column;gap:5px;font-size:12.5px;line-height:1.45;color:var(--ink-2)}
+.glegend.big{font-size:14.5px;line-height:1.5;gap:7px}
+.glegend.big > span > svg{flex:0 0 32px}
 .glegend > span{display:flex;align-items:flex-start;gap:8px}
 .glegend > span > svg{flex:0 0 26px;margin-top:3px}
 /* the loss waterfall: one row per term, number on the left of the bar */
@@ -221,7 +223,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
   <section class="panel" id="p-mix" role="tabpanel" aria-labelledby="t-mix">
 
     <div class="card" style="margin-bottom:16px">
-      <div class="card-h"><h2>Two reactions, one piece of metal, and a potential that belongs to neither</h2><span class="note">deck p.20&ndash;26 &mdash; mixed potential, corrosion, and the Evans diagram</span></div>
+      <div class="card-h"><h2>Two reactions, one piece of metal, and a potential that belongs to neither</h2><span class="note">mixed potential, corrosion, and the Evans diagram</span></div>
       <div class="card-b stack" style="gap:12px">
         <div class="eqbig" style="white-space:normal">
           <span class="mix">&Sigma; i<sub>anodic</sub> = &Sigma; i<sub>cathodic</sub></span>&nbsp;&nbsp;&rArr;&nbsp;&nbsp;
@@ -283,6 +285,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
             <input type="range" id="mxO2" min="-5" max="1" step="0.001" value="-5">
           </div>
           <div class="dfctl-wide btnrow" style="margin:0">
+            <button class="ghost" id="mxBuild" type="button">&#9654; Build it up, one line at a time</button>
             <button class="ghost" id="mxPlay" type="button">&#9654; Replay the surface, and sweep the potentiostat</button>
             <label style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-2);flex:1 1 auto">
               <input type="checkbox" id="mxProt" style="width:auto;accent-color:var(--ion-k)"> add a zinc sacrificial anode, equal area
@@ -298,19 +301,26 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
         <div class="card-h"><h2>Where it can go, and where it does</h2><span class="note" id="mxPBn">&mdash;</span></div>
         <div class="card-b stack" style="gap:14px">
           <svg id="mxpb" viewBox="0 0 440 260" style="display:block;width:100%;height:auto;margin:0 auto" role="img" aria-label="A schematic Pourbaix diagram for the metal set above: potential against pH, with regions of immunity as the metal, of corrosion as the dissolved ion, and of passivity as the oxide or hydroxide. Zinc also corrodes at high pH as the zincate ion, so its passive band is closed at both ends. The hydrogen and oxygen lines of water are drawn across it, and a marker sits at the current pH and corrosion potential."></svg>
-          <svg id="mxsurf" viewBox="0 0 440 260" style="display:block;width:100%;height:auto;margin:0 auto" role="img" aria-label="A metal surface in solution with an anodic patch releasing metal ions and a cathodic area taking electrons to make hydrogen bubbles or reduce oxygen, with electrons flowing sideways through the metal between them, drawn at a rate set by the corrosion current and with the two areas drawn to the set ratio."></svg>
+          <svg id="mxsurf" viewBox="0 0 440 260" style="display:block;width:88.3%;height:auto;margin:0 0 0 11.3%" role="img" aria-label="A metal surface in solution with an anodic patch releasing metal ions and a cathodic area taking electrons to make hydrogen bubbles or reduce oxygen, with electrons flowing sideways through the metal between them, drawn at a rate set by the corrosion current and with the two areas drawn to the set ratio."></svg>
         </div>
       </div>
 
       <div class="card">
         <div class="card-h"><h2>The Evans diagram</h2><span class="note" id="mxNote">&mdash;</span></div>
         <div class="card-b stack" style="gap:12px">
-          <svg id="mxev" viewBox="0 0 540 394" style="display:block;width:100%;height:auto;max-width:540px;margin:0 auto" role="img" aria-label="Evans diagram: potential on the vertical axis against the logarithm of current on the horizontal, with the anodic line of the metal and the cathodic line of the oxidant drawn from their own equilibrium potentials and exchange currents, crossing at the corrosion potential and corrosion current. The V-shaped curve of the net measurable current is drawn over them, and the two Tafel extrapolations that recover the crossing from it."></svg>
-          <div class="glegend">
-            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="2" y1="12" x2="24" y2="2" stroke="var(--ox)" stroke-width="2"/><circle cx="2" cy="12" r="2.5" fill="var(--ox)"/></svg><span><b class="act">the anodic line</b> of the metal, slope b<sub>a</sub>, from its own (E<sub>M</sub>, i<sub>0,M</sub>) &mdash; the dot.</span></span>
-            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="2" y1="2" x2="24" y2="12" stroke="var(--red-)" stroke-width="2"/><circle cx="2" cy="2" r="2.5" fill="var(--red-)"/></svg><span><b class="cnc">the cathodic line</b> of the oxidant. Where it goes vertical it has hit its <b>transport limit</b> &mdash; oxygen almost always does, and then diffusion alone sets i<sub>corr</sub>.</span></span>
+          <svg id="mxev" viewBox="0 0 540 360" style="display:block;width:100%;height:auto;max-width:540px;margin:0 auto" role="img" aria-label="Evans diagram: potential on the vertical axis against the logarithm of current on the horizontal, with the anodic line of the metal and the cathodic line of the oxidant drawn from their own equilibrium potentials and exchange currents, crossing at the corrosion potential and corrosion current. The V-shaped curve of the net measurable current is drawn over them, and the two Tafel extrapolations that recover the crossing from it."></svg>
+          <div class="glegend big">
+            <span><svg viewBox="0 0 26 14" width="32" height="17" aria-hidden="true"><line x1="2" y1="12" x2="24" y2="2" stroke="var(--ox)" stroke-width="2"/><circle cx="2" cy="12" r="2.5" fill="var(--ox)"/></svg><span><b class="act">Anodic line</b> &mdash; the metal dissolving. Slope b<sub>a</sub>, drawn from its own (E<sub>M</sub>, i<sub>0,M</sub>) &mdash; the dot its name sits on.</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="2" y1="2" x2="24" y2="12" stroke="var(--red-)" stroke-width="2"/><circle cx="2" cy="2" r="2.5" fill="var(--red-)"/></svg><span><b class="cnc">Cathodic line</b> &mdash; the oxidant that is actually carrying the cathodic current, named at its own dot. Where it turns vertical it has hit its <b>transport limit</b>; oxygen almost always does, and then diffusion alone sets i<sub>corr</sub>.</span></span>
             <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><circle cx="13" cy="7" r="4" fill="none" stroke="var(--ion-k)" stroke-width="2"/><line x1="13" y1="1" x2="13" y2="13" stroke="var(--ion-k)" stroke-width="1" stroke-dasharray="2 2"/></svg><span><b class="mix">the crossing</b> is (i<sub>corr</sub>, E<sub>corr</sub>). Both lines are <em>currents</em>, scaled by area &mdash; so the area ratio alone slides it.</span></span>
             <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><path d="M3 2 L12 11 L21 2" fill="none" stroke="var(--ink)" stroke-width="2"/></svg><span><b>the V</b> is what a potentiostat measures: |net current| swept through E<sub>corr</sub>, diving to zero where the two cancel. Extrapolating its legs back recovers i<sub>corr</sub> &mdash; <b>Tafel extrapolation</b>.</span></span>
+            <span><svg viewBox="0 0 26 14" width="32" height="17" aria-hidden="true"><line x1="2" y1="12" x2="24" y2="2" stroke="var(--ox)" stroke-width="1.6" opacity="0.35"/><line x1="2" y1="2" x2="24" y2="12" stroke="var(--red-)" stroke-width="1.6" opacity="0.35"/></svg><span><b>Faint lines</b> are the branches that are not doing the
+              work &mdash; the metal's own cathodic leg, an oxidant's anodic leg, a second oxidant that
+              loses. They are drawn so that you can see <em>why</em> they lose: they sit to the left of
+              the winner at every potential.</span></span>
+            <span><svg viewBox="0 0 26 14" width="32" height="17" aria-hidden="true"><line x1="2" y1="12" x2="24" y2="2" stroke="var(--ion-k)" stroke-width="2.4"/></svg><span><b class="mix">Purple line</b> appears only with a sacrificial
+              anode: a second, more active metal added in parallel. It drags E<sub>corr</sub> down to
+              near its own E, where the protected metal's anodic current is negligible.</span></span>
           </div>
         </div>
       </div>
@@ -469,6 +479,10 @@ function fmtA(i){
   if(a >= 1e-9) return (i * 1e9).toPrecision(3) + " nA";
   return sciH(i, 2) + " A";
 }
+/* the same two, for an SVG <text>, where <sup> is not markup but a
+   mistake: everything from it to the end of the string disappears */
+function fmtJSvg(j){ var t = fmtJ(j); return t.indexOf("<sup>") < 0 ? t : sciSvg(j, 2) + " A/cm²"; }
+function fmtASvg(i){ var t = fmtA(i); return t.indexOf("<sup>") < 0 ? t : sciSvg(i, 2) + " A"; }
 function fmtV(v){
   var a = Math.abs(v);
   if(a < 1) return (v * 1000).toFixed(a < 0.01 ? 2 : 1) + " mV";
@@ -494,6 +508,14 @@ function tx(x, y, s, col, size, anchor, weight){
        + ' font-size="' + (size || 10.5) + '"'
        + (anchor ? ' text-anchor="' + anchor + '"' : "")
        + (weight ? ' font-weight="' + weight + '"' : "") + '>' + s + '</text>';
+}
+/* an axis name that sits beside its axis rather than in a caption under
+   the frame: xName at the right end of the x axis, yName up the left */
+function xName(x0, x1, y, lab){ return tx((x0 + x1) / 2, y, lab, "var(--ink-2)", 11.5, "middle", 600); }
+function yName(x, y0, y1, lab){
+  var cy = (y0 + y1) / 2;
+  return tx(x, cy, lab, "var(--ink-2)", 11.5, "middle", 600)
+    .replace("<text", '<text transform="rotate(-90 ' + x.toFixed(1) + ' ' + cy.toFixed(1) + ')"');
 }
 function pth(d, col, w, fill, op){
   return '<path d="' + d + '" fill="' + (fill || "none") + '" stroke="' + (col || "none")
@@ -535,7 +557,8 @@ var MX_M = {
   ZnOH:  {E0: -1.199, i0: 1e-6, ba: 0.040, bc: 0.040, M: 65.38,  z: 2, rho: 7.14,
           nm: "Zn + 4OH⁻ → Zn(OH)₄²⁻ + 2e⁻", sh: "Zn/alk"}
 };
-var MX = {m: "Fe", pH: 0, prot: false, sweep: 0, t0: 0};
+var MX = {m: "Fe", pH: 0, prot: false, sweep: 0, t0: 0,
+          build: {on: false, step: 0, last: 0}};
 /* air-saturated water: 0.25 mM O2, D = 2e-5 cm2/s, n = 4, delta = 500 um, as
    Lecture 10's Concentration tab computes it -- in log10(mA/cm2), for the slider      */
 var O2_AIR = Math.log10(4 * FARADAY * 2e-5 * 0.25e-6 / 0.05 * 1000);
@@ -562,7 +585,7 @@ function mxCouples(){
               ba: 0.120, bc: 0.120, A: Ac, iL: mxILO2(), metal: false, conly: true});
   if(MX.prot){
     var z = MX_M.Zn;
-    out.push({nm: "sacrificial Zn → Zn²⁺", sh: "Zn anode", E: z.E0, i0: z.i0, ba: z.ba, bc: z.bc,
+    out.push({nm: "sacrificial Zn → Zn²⁺ + 2e⁻", sh: "Zn anode", E: z.E0, i0: z.i0, ba: z.ba, bc: z.bc,
               A: 1, iL: Infinity, metal: false, sac: true});
   }
   return out;
@@ -607,91 +630,195 @@ function mxDrawEvans(){
   var el = document.getElementById("mxev");
   if(!el) return;
   var st = mxState(), cs = st.cs;
-  var X0 = 58, X1 = 500, Y0 = 26, Y1 = 316;
-  var Es = cs.map(function(c){ return c.E; });
-  var eHi = Math.max.apply(null, Es) + 0.16, eLo = Math.min.apply(null, Es) - 0.16;
-  var lHi = Math.max(Math.log10(st.Ia) + 2.2, -2), lLo = Math.min(Math.log10(st.Ia) - 3.2, -9);
+  var X0 = 78, X1 = 500, Y0 = 26, Y1 = 316;    /* left margin for the axis name */
+  /* fixed axes. Every preset is drawn on the same paper, so changing one
+     moves the lines and leaves the scale where it was. The range holds
+     every couple this page can make - Zn(OH)4(2-) at -1.199 V up to
+     O2/H2O at +1.229 V - and thirteen decades of current. Push the
+     sliders far enough and a line will leave the frame; it is cut where
+     it leaves rather than flattened against the edge.                */
+  var eLo = -1.40, eHi = 1.40, lLo = -13, lHi = 1;
+  var LIC = Math.log10(st.Ia);              /* where the crossing sits */
   function px(l){ return X0 + (clamp(l, lLo, lHi) - lLo) / (lHi - lLo) * (X1 - X0); }
   function py(e){ return Y1 - (clamp(e, eLo, eHi) - eLo) / (eHi - eLo) * (Y1 - Y0); }
   var s = rc(X0, Y0, X1 - X0, Y1 - Y0, "var(--surface-2)", 0.5, 4);
+  var lStep = (lHi - lLo) > 10 ? 2 : 1;   /* fourteen names will not fit */
   for(var g = Math.ceil(lLo); g <= Math.floor(lHi); g++){
     s += ln(px(g), Y0, px(g), Y1, "var(--line-2)", 0.6, "2 4");
-    s += tx(px(g), Y1 + 13, "1e" + g, "var(--muted)", 8.5, "middle");
+    if((Math.floor(lHi) - g) % lStep) continue;
+    /* the last one would run under the axis name, so it hangs from the edge */
+    s += px(g) > X1 - 12 ? tx(X1, Y1 + 13, "1e" + g, "var(--muted)", 8.5, "end")
+                         : tx(px(g), Y1 + 13, "1e" + g, "var(--muted)", 8.5, "middle");
   }
   var step = (eHi - eLo) > 1.6 ? 0.4 : (eHi - eLo) > 0.8 ? 0.2 : 0.1;
   for(var e = Math.ceil(eLo / step) * step; e <= eHi; e += step){
     s += ln(X0, py(e), X1, py(e), "var(--line-2)", 0.6, "2 4");
-    s += tx(X0 - 4, py(e) + 3.5, e.toFixed(step < 0.2 ? 2 : 1), "var(--muted)", 8.5, "end");
+    s += tx(X0 - 4, py(e) + 3.5, (e + 0).toFixed(step < 0.2 ? 2 : 1).replace("-0.0", "0.0"),
+            "var(--muted)", 8.5, "end");
   }
   /* each couple: its anodic leg up-right, its cathodic leg down-right */
   /* the crossing is the headline, so it keeps the place it wants; every
      other label takes the nearest free slot at least a line away      */
-  var ecY = py(st.E) + 14, LABY = [ecY, ecY + 13];
+  var PITCH = 19;      /* measured: 13.9 px a line, 16.0 with a superscript */
+  var LO = Y0 + 12, HI = Y1 - 8;        /* no label may leave the frame   */
+  /* the marker's own two lines go under it, or over it near the floor */
+  var ecY = py(st.E) + 14 + PITCH > HI ? py(st.E) - 14 - PITCH : py(st.E) + 14;
+  var LABY = [ecY, ecY + PITCH, py(st.E)];   /* nor across the marker */
   function freeY(y){
     for(var t = 0; t < 40; t++){
-      var step = Math.ceil((t + 1) / 2) * 13 * (t % 2 ? -1 : 1), cand = t ? y + step : y, ok = true;
-      for(var q = 0; q < LABY.length; q++) if(Math.abs(LABY[q] - cand) < 13){ ok = false; break; }
+      var step = Math.ceil((t + 1) / 2) * PITCH * (t % 2 ? -1 : 1), cand = t ? y + step : y;
+      var ok = cand >= LO && cand <= HI;
+      for(var q = 0; ok && q < LABY.length; q++) if(Math.abs(LABY[q] - cand) < PITCH) ok = false;
       if(ok){ LABY.push(cand); return cand; }
     }
     LABY.push(y);
-    return y;
+    return clamp(y, LO, HI);
+  }
+  /* the build-up: each working leg arrives on its own, named by its own
+     reaction; then the crossing; then the V. The losing branches wait */
+  var seq = [];
+  cs.forEach(function(c){ if(c.metal) seq.push({c: c, an: true}); });
+  cs.forEach(function(c){ if(c === st.dom) seq.push({c: c, an: false}); });
+  cs.forEach(function(c){ if(c.conly && c !== st.dom) seq.push({c: c, an: false}); });
+  cs.forEach(function(c){ if(c.sac) seq.push({c: c, an: true}); });
+  var NSEQ = seq.length, NS = NSEQ + 2;
+  var shown = MX.build.on ? Math.min(MX.build.step, NS) : NS, full = shown >= NS;
+  function seqIdx(c){
+    for(var q = 0; q < NSEQ; q++) if(seq[q].c === c) return q;
+    return 99;
   }
   cs.forEach(function(c, k){
     var colA = c.metal ? "var(--ox)" : c.sac ? "var(--ion-k)" : "var(--ox)";
     var colC = "var(--red-)";
-    var da = "", dc = "";
+    var da = "", dc = "", penA = false, penC = false;
     for(var i = 0; i <= 90; i++){
       var ee = eLo + (eHi - eLo) * i / 90;
       var la = Math.log10(c.A * mxIa(c, ee)), lc = Math.log10(c.A * mxIc(c, ee));
-      if(la > lLo && !c.conly) da += (da ? "L" : "M") + px(la).toFixed(1) + " " + py(ee).toFixed(1) + " ";
-      if(lc > lLo) dc += (dc ? "L" : "M") + px(lc).toFixed(1) + " " + py(ee).toFixed(1) + " ";
+      /* a point outside the frame is left out, and the pen lifts: clamping
+         it to the edge would draw a vertical line nobody measured      */
+      if(la > lLo && la <= lHi && !c.conly){
+        da += (penA ? "L" : "M") + px(la).toFixed(1) + " " + py(ee).toFixed(1) + " ";
+        penA = true;
+      }else penA = false;
+      if(lc > lLo && lc <= lHi){
+        dc += (penC ? "L" : "M") + px(lc).toFixed(1) + " " + py(ee).toFixed(1) + " ";
+        penC = true;
+      }else penC = false;
     }
-    var strong = c.metal || c.sac;
-    s += pth(da, colA, strong ? 2.2 : 1.1, null, strong ? 0.95 : 0.35);
-    s += pth(dc, colC, c.metal ? 1.1 : 2.2, null, c.metal ? 0.35 : 0.95);
-    var li0 = Math.log10(c.A * c.i0);
-    if(li0 > lLo){
-      s += cir(px(li0), py(c.E), 3.4, strong ? colA : colC);
-      /* a label that would run off the right edge is hung on the other side */
-      var lab = c.sh + "  " + c.E.toFixed(3) + " V", flip = px(li0) > X1 - 130;
-      s += tx(px(li0) + (flip ? -6 : 6), freeY(py(c.E) - 5), lab,
-              strong ? colA : colC, 9.5, flip ? "end" : null, 600);
-    }else{
-      s += ln(X0, py(c.E), X0 + 10, py(c.E), strong ? colA : colC, 2);
-      s += tx(X0 + 13, freeY(py(c.E) - 5), c.sh + "  " + c.E.toFixed(3) + " V",
-              strong ? colA : colC, 9.5, null, 600);
+    /* the leg that does the work is drawn strongly; the other one is
+       there to show why it loses, and only once the build has finished.
+       A sacrificial anode is an anode: its own cathodic leg is as
+       negligible as the protected metal's.                           */
+    var strong = c.metal || c.sac, strongC = c === st.dom;
+    var idx = seqIdx(c), vis = idx < shown;
+    if(vis){
+      if(strong) s += pth(da, colA, 2.2, null, 0.95);
+      else       s += pth(dc, colC, strongC ? 2.2 : 1.1, null, strongC ? 0.95 : 0.35);
     }
+    if(full){
+      if(strong) s += pth(dc, colC, 1.1, null, 0.35);
+      else if(!c.conly) s += pth(da, colA, 1.1, null, 0.35);
+    }
+    /* only a line that is doing the work is named, and the name goes on
+       its own (E, i0) dot, which is a point of that line. While the
+       diagram is being built, the step that has just arrived is named
+       too, whichever line it is.                                    */
+    var justIn = MX.build.on && idx === shown - 1;
+    if(!vis || !(strong || strongC || justIn)) return;
+    var col = strong ? colA : colC, li0 = Math.log10(c.A * c.i0);
+    var lab = c.sh + " " + (strong ? "anodic" : "cathodic") + "   " + c.E.toFixed(3) + " V";
+    var dx = px(li0), dy = py(c.E), onLeft = dx <= lLo + 1 ? true : false;
+    if(li0 <= lLo){ dx = X0; dy = py(c.E); s += ln(X0, dy, X0 + 10, dy, col, 2); }
+    else s += cir(dx, dy, 3.6, col);
+    /* lean away from the crossing, which carries two lines of its own,
+       unless an edge of the frame says otherwise                     */
+    var flip = dx <= px(LIC);
+    if(dx > X1 - 150) flip = true;
+    if(dx < X0 + 150) flip = false;
+    var ty = freeY(dy - 4);
+    s += tx(dx + (flip ? -9 : (li0 <= lLo ? 13 : 9)), ty, lab, col, 10.5,
+            flip ? "end" : null, 700);
+    /* if the slot had to move, say which dot it belongs to */
+    if(Math.abs(ty - (dy - 4)) > 5)
+      s += ln(dx + (flip ? -7 : 7), dy, dx + (flip ? -7 : 7), ty - 4, col, 1, "2 2", 0.75);
   });
   /* the V that a potentiostat measures, and the crossing it hides */
-  var dv = "";
+  var dv = "", penV = false, vLo = null, vHi = null;
   for(var i = 0; i <= 200; i++){
     var ee = eLo + (eHi - eLo) * i / 200;
     var n = Math.abs(mxNet(cs, ee));
-    if(n <= 0) continue;
-    var l = Math.log10(n);
-    if(l < lLo) continue;
-    dv += (dv ? "L" : "M") + px(l).toFixed(1) + " " + py(ee).toFixed(1) + " ";
+    var l = n > 0 ? Math.log10(n) : -Infinity;
+    if(l >= lLo && l <= lHi){
+      dv += (penV ? "L" : "M") + px(l).toFixed(1) + " " + py(ee).toFixed(1) + " ";
+      penV = true;
+      if(vLo === null) vLo = ee;     /* the stretch of potential whose */
+      vHi = ee;                      /* current is on the paper        */
+    }else penV = false;       /* the vertex, and either end, may be missing */
   }
-  s += pth(dv, "var(--ink)", 1.8, null, 0.85);
-  var lic = Math.log10(st.Ia);
-  s += ln(X0, py(st.E), px(lic), py(st.E), "var(--ion-k)", 1.3, "4 3");
-  s += ln(px(lic), py(st.E), px(lic), Y1, "var(--ion-k)", 1.3, "4 3");
-  s += cir(px(lic), py(st.E), 5.5, "none").replace('fill="none"',
-        'fill="none" stroke="var(--ion-k)" stroke-width="2.2"');
-  s += tx(px(lic) + 9, ecY, "E_corr " + st.E.toFixed(3) + " V", "var(--ion-k)", 10.5, null, 600);
-  s += tx(px(lic) + 9, ecY + 13, "i_corr " + fmtA(st.Ia), "var(--ion-k)", 10);
+  if(shown > NSEQ + 1 && dv) s += pth(dv, "var(--ink)", 1.8, null, 0.85);
+  /* name the black curve where it starts, at the top of the sweep. The
+     whole V can be off the frame, and then there is no end to name   */
+  var dvN = dv.trim().split(/[ML]/).filter(Boolean);
+  var dvT = dvN.length ? dvN[dvN.length - 1].trim().split(/\s+/) : [];
+  if(dvT.length === 2 && shown > NSEQ + 1){
+    var nx = clamp(+dvT[0], X0 + 4, X1 - 4);
+    s += tx(nx > X1 - 70 ? nx - 8 : nx, freeY(Math.max(+dvT[1] + 14, Y0 + 13)),
+            "|net|  swept", "var(--ink)", 11, nx > X1 - 70 ? "end" : "middle", 700);
+  }
+  var lic = LIC, onPaper = lic >= lLo && lic <= lHi && st.E >= eLo && st.E <= eHi;
+  if(shown > NSEQ && !onPaper){
+    /* it has run off the fixed paper: say so at the edge it left through,
+       rather than draw it on the edge with its real numbers beside it */
+    var ex = clamp(px(lic), X0 + 2, X1 - 2), ey = clamp(py(st.E), Y0 + 2, Y1 - 2);
+    var rt = lic > lHi;
+    s += pth("M" + (ex + (rt ? -10 : 10)).toFixed(1) + " " + (ey - 6).toFixed(1)
+           + "L" + (ex + (rt ? -10 : 10)).toFixed(1) + " " + (ey + 6).toFixed(1)
+           + "L" + ex.toFixed(1) + " " + ey.toFixed(1) + "Z",
+             "var(--ion-k)", 1, "var(--ion-k)", 0.9);
+    s += tx(rt ? X1 - 8 : X0 + 8, freeY(ey + 18),
+            "E_corr " + st.E.toFixed(3) + " V, i_corr " + fmtASvg(st.Ia)
+            + " — off the frame", "var(--ion-k)", 10.5, rt ? "end" : null, 600);
+  }
+  if(shown > NSEQ && onPaper){
+    s += ln(X0, py(st.E), px(lic), py(st.E), "var(--ion-k)", 1.3, "4 3");
+    s += ln(px(lic), py(st.E), px(lic), Y1, "var(--ion-k)", 1.3, "4 3");
+    s += cir(px(lic), py(st.E), 5.5, "none").replace('fill="none"',
+          'fill="none" stroke="var(--ion-k)" stroke-width="2.2"');
+    /* on a fixed axis the crossing can sit anywhere, so its two lines go
+       to the right of the marker only while there is room for them   */
+    var mR = px(lic) < X1 - 118, mX = px(lic) + (mR ? 9 : -9), mA = mR ? null : "end";
+    s += tx(mX, ecY, "E_corr " + st.E.toFixed(3) + " V", "var(--ion-k)", 10.5, mA, 600);
+    s += tx(mX, ecY + PITCH, "i_corr " + fmtASvg(st.Ia), "var(--ion-k)", 10, mA);
+  }
   /* the sweep marker, so the V reads as something a machine traced out */
-  if(!REDUCED){
-    var ph = MX.sweep % 1, ee2 = eLo + (eHi - eLo) * (ph < 0.5 ? ph * 2 : 2 - ph * 2);
-    var n2 = Math.abs(mxNet(cs, ee2));
-    if(n2 > 0 && Math.log10(n2) > lLo) s += cir(px(Math.log10(n2)), py(ee2), 3.6, "var(--ink)", 0.9);
+  if(!REDUCED && shown > NSEQ + 1 && vLo !== null){
+    /* over the visible stretch only: swept to the ends of the axis the dot
+       would spend most of its time pinned against the right-hand edge,
+       where the current is decades past anything the frame can show  */
+    var ph = MX.sweep % 1, ee2 = vLo + (vHi - vLo) * (ph < 0.5 ? ph * 2 : 2 - ph * 2);
+    var n2 = Math.abs(mxNet(cs, ee2)), l2 = n2 > 0 ? Math.log10(n2) : -Infinity;
+    if(l2 >= lLo && l2 <= lHi) s += cir(px(l2), py(ee2), 3.6, "var(--ink)", 0.9);
   }
-  s += tx(X0, Y1 + 30, "horizontal: log current in A (density × area)   ·   vertical: E vs SHE",
-          "var(--muted)", 9.5);
-  s += tx(X0, Y1 + 44, "bold copper = metal dissolving · bold blue = oxidant reduced",
-        "var(--muted)", 9.5);
-  s += tx(X0, Y1 + 58, "faint = negligible branches · oxidants cathodic-only · black = |net| swept",
-        "var(--muted)", 9.5);
+  /* while building, say what has just been drawn and why it is there */
+  if(MX.build.on && shown >= 1){
+    var NUM = "\u2460\u2461\u2462\u2463\u2464\u2465\u2466\u2467";
+    var cap, ccol = "var(--ink-2)";
+    if(shown <= NSEQ){
+      var q = seq[shown - 1];
+      cap = q.c.nm + "   \u00b7   " + (q.an ? "oxidation \u2014 the anodic leg"
+                                            : "reduction \u2014 the cathodic leg");
+      ccol = q.an ? (q.c.sac ? "var(--ion-k)" : "var(--ox)") : "var(--red-)";
+    }else if(shown === NSEQ + 1){
+      cap = "\u03a3 i_anodic = \u03a3 i_cathodic   \u00b7   the crossing: E_corr, i_corr";
+      ccol = "var(--ion-k)";
+    }else{
+      cap = "|net| = |\u03a3 i|   \u00b7   what a potentiostat sweeps";
+      ccol = "var(--ink)";
+    }
+    s += tx(X0, Y0 - 9, NUM.charAt(Math.min(shown, 8) - 1) + "  " + cap, ccol, 11.5, null, 700);
+  }
+  s += xName(X0, X1, Y1 + 34, "log i   (i in amperes)");
+  s += yName(26, Y0, Y1, "E vs SHE  /V");
   el.innerHTML = s;
   document.getElementById("mxNote").textContent =
     MX_M[MX.m].sh + " at pH " + mxPH().toFixed(1) + ", A_c/A_a = " + mxAr().toPrecision(3);
@@ -731,7 +858,7 @@ function mxDrawSurface(ts){
   s += tx(X0 + 4, Y0 + 12, "copper = " + MX_M[MX.m].sh + " leaving as ions   ·   blue = "
         + (st.dom ? st.dom.sh : "the oxidant") + " being reduced", "var(--ink-2)", 9.5);
   s += tx(X0 + 4, Y0 + 26, "green = electrons, sideways through the metal, no wire needed", "var(--go)", 9.5);
-  s += tx(X0 + 4, Y1 + 14, "anodic current density " + fmtJ(st.ja) + "   ·   penetration "
+  s += tx(X0 + 4, Y1 + 14, "anodic current density " + fmtJSvg(st.ja) + "   ·   penetration "
         + (st.rate < 0.01 ? (st.rate * 1000).toPrecision(2) + " µm/yr" : st.rate.toPrecision(3) + " mm/yr"),
         "var(--ox)", 10, null, 600);
   el.innerHTML = s;
@@ -741,7 +868,7 @@ function mxDrawPourbaix(){
   var el = document.getElementById("mxpb");
   if(!el) return;
   var st = mxState(), pH = mxPH(), zinc = (MX.m === "Zn" || MX.m === "ZnOH");
-  var X0 = 44, X1 = 426, Y0 = 20, Y1 = 196;
+  var X0 = 62, X1 = 426, Y0 = 20, Y1 = 196;    /* left margin for the axis name */
   var ELO = zinc ? -1.8 : -1.3, EHI = zinc ? 1.2 : 1.5;
   function px(p){ return X0 + clamp(p, 0, 14) / 14 * (X1 - X0); }
   function py(e){ return Y1 - (clamp(e, ELO, EHI) - ELO) / (EHI - ELO) * (Y1 - Y0); }
@@ -750,6 +877,13 @@ function mxDrawPourbaix(){
                "none", 0, col, op);
   }
   var s = rc(X0, Y0, X1 - X0, Y1 - Y0, "var(--surface-2)", 0.5, 4);
+  /* the region names, remembered, so the marker's label can avoid them */
+  var REG = [];
+  function regLab(x, y, lab, col, anchor){
+    var w = lab.length * 5.3, x0 = anchor === "end" ? x - w : anchor === "middle" ? x - w / 2 : x;
+    REG.push({x0: x0, x1: x0 + w, y0: y - 9, y1: y + 3});
+    return tx(x, y, lab, col, 10, anchor, 600);
+  }
 
   if(zinc){
     /* 1e-6 M dissolved zinc, schematic. Zinc is amphoteric: the passive
@@ -771,12 +905,12 @@ function mxDrawPourbaix(){
     var zin = [[ZB, EHI], [14, EHI]];
     for(var p3 = 14; p3 >= ZB; p3 -= 0.5) zin.push([p3, zim(p3)]);
     s += poly(zin, "var(--ox)", 0.2);
-    s += tx(px(1.2), py(-1.45), "immunity (Zn)", "var(--go)", 10, null, 600);
-    s += tx(px(1.2), py(0.42), "corrosion (Zn²⁺)", "var(--ox)", 10, null, 600);
-    s += tx(px(9.6), py(0.52), "passivity", "var(--red-)", 10, "middle", 600);
-    s += tx(px(9.6), py(0.32), "Zn(OH)₂", "var(--red-)", 10, "middle", 600);
-    s += tx(px(13.8), py(0.52), "corrosion", "var(--ox)", 10, "end", 600);
-    s += tx(px(13.8), py(0.32), "(zincate)", "var(--ox)", 10, "end", 600);
+    s += regLab(px(1.2), py(-1.45), "immunity (Zn)", "var(--go)", null);
+    s += regLab(px(1.2), py(0.42), "corrosion (Zn²⁺)", "var(--ox)", null);
+    s += regLab(px(9.6), py(0.52), "passivity", "var(--red-)", "middle");
+    s += regLab(px(9.6), py(0.32), "Zn(OH)₂", "var(--red-)", "middle");
+    s += regLab(px(13.8), py(0.52), "corrosion", "var(--ox)", "end");
+    s += regLab(px(13.8), py(0.32), "(zincate)", "var(--ox)", "end");
   } else {
     /* straight-segment boundaries for 1e-6 M dissolved iron (schematic) */
     var E_FeFe2 = -0.618;                 /* Fe2+/Fe, pH independent          */
@@ -801,10 +935,10 @@ function mxDrawPourbaix(){
     dPas += " L" + px(PH_A) + " " + py(E_FeFe2) + " L" + px(14) + " " + py(E_FeOH2Fe(14))
          + " L" + px(14) + " " + py(1.5) + " Z";
     s += pth(dPas, "none", 0, "var(--red-)", 0.17);
-    s += tx(px(1.2), py(-0.95), "immunity (Fe)", "var(--go)", 10, null, 600);
-    s += tx(px(1.2), py(0.25), "corrosion (Fe²⁺)", "var(--ox)", 10, null, 600);
-    s += tx(px(0.4), py(1.36), "Fe³⁺", "var(--ox)", 10, null, 600);
-    s += tx(px(8.4), py(0.36), "passivity (oxide)", "var(--red-)", 10, null, 600);
+    s += regLab(px(1.2), py(-0.95), "immunity (Fe)", "var(--go)", null);
+    s += regLab(px(1.2), py(0.25), "corrosion (Fe²⁺)", "var(--ox)", null);
+    s += regLab(px(0.4), py(1.36), "Fe³⁺", "var(--ox)", null);
+    s += regLab(px(8.4), py(0.36), "passivity (oxide)", "var(--red-)", null);
   }
 
   /* water, the same on either map */
@@ -829,16 +963,26 @@ function mxDrawPourbaix(){
   for(var r = Math.ceil(ELO / 0.6) * 0.6; r <= EHI; r += 0.6){
     s += tx(X0 - 4, py(r) + 3.5, r.toFixed(1), "var(--muted)", 8.5, "end");
   }
-  s += tx(px(7), Y1 + 29, "pH", "var(--muted)", 9.5, "middle");
+  s += xName(X0, X1, Y1 + 31, "pH");
+  s += yName(20, Y0, Y1, "E vs SHE  /V");
   s += cir(px(pH), py(st.E), 5, "var(--ion-k)");
   s += '<circle cx="' + px(pH).toFixed(1) + '" cy="' + py(st.E).toFixed(1)
      + '" r="9" fill="none" stroke="var(--ion-k)" stroke-width="1.4" opacity="0.6"/>';
   /* the marker's label sits under it, where the two water lines never are;
      above it instead when the marker is near the floor of the frame      */
-  var dy = py(st.E) + 17 > Y1 - 2 ? -10 : 17;
-  s += tx(px(pH) + (pH > 9 ? -13 : 13), py(st.E) + dy, "E_corr", "var(--ion-k)", 10,
-          pH > 9 ? "end" : "start", 600);
-  s += tx(X0, Y1 + 45, zinc
+  var mx3 = px(pH), my3 = py(st.E), W3 = 6 * 5.3;
+  var cand = [[13, 17, "start"], [13, -10, "start"], [-13, 17, "end"], [-13, -10, "end"]];
+  if(pH > 9) cand = [cand[2], cand[3], cand[0], cand[1]];
+  var pick = cand[0];
+  for(var ci = 0; ci < cand.length; ci++){
+    var cx = mx3 + cand[ci][0], cy = my3 + cand[ci][1];
+    var x0 = cand[ci][2] === "end" ? cx - W3 : cx;
+    if(cy + 3 > Y1 - 2 || cy - 9 < Y0 + 2 || x0 < X0 || x0 + W3 > X1) continue;
+    var hit = REG.some(function(r){ return x0 < r.x1 && r.x0 < x0 + W3 && cy - 9 < r.y1 && r.y0 < cy + 3; });
+    if(!hit){ pick = cand[ci]; break; }
+  }
+  s += tx(mx3 + pick[0], my3 + pick[1], "E_corr", "var(--ion-k)", 10, pick[2], 600);
+  s += tx(10, Y1 + 45, zinc
         ? "zinc corrodes at both ends: the passive band is only pH 8.5 to 10.6"
         : "the marker is this page's own E_corr, at the pH set above", "var(--muted)", 9.5);
   el.innerHTML = s;
@@ -851,7 +995,7 @@ function mxNumbers(){
   document.getElementById("mxPHv").textContent = mxPH().toFixed(1);
   document.getElementById("mxARv").textContent = mxAr().toPrecision(3);
   document.getElementById("mxI0v").innerHTML = Math.log10(mxI0c()).toFixed(1) + " &rarr; " + fmtJ(mxI0c());
-  document.getElementById("mxO2v").textContent = mxO2On()
+  document.getElementById("mxO2v").innerHTML = mxO2On()
     ? "i_L = " + fmtJ(mxILO2()) : "deaerated — no O₂";
   document.getElementById("mxRm").innerHTML = st.met.nm + " &nbsp; " + st.met.E.toFixed(3) + " V";
   document.getElementById("mxRx").innerHTML = (st.dom ? st.dom.nm + " &nbsp; " + st.dom.E.toFixed(3) + " V" : "—");
@@ -912,7 +1056,31 @@ document.getElementById("mxP6").addEventListener("click", function(){ mxPreset("
 document.getElementById("mxP7").addEventListener("click", function(){ mxPreset("Fe",   7,   1,   -6,    O2_AIR, true); });
 document.getElementById("mxP8").addEventListener("click", function(){ mxPreset("Fe",   0,   1,   -9.5,  -5); });
 
+/* one line every 1.8 s, then it stops with the whole diagram showing */
+function mxBuildTick(ts){
+  if(!MX.build.on) return;
+  if(!MX.build.last) MX.build.last = ts;
+  if(ts - MX.build.last >= 1800){
+    MX.build.last = ts;
+    MX.build.step++;
+    var n = mxState().cs.length + 2;
+    if(MX.build.step > n + 1){ MX.build.on = false; mxBuildLabel(); }
+  }
+}
+function mxBuildLabel(){
+  var b = document.getElementById("mxBuild");
+  if(b) b.innerHTML = MX.build.on ? "&#10073;&#10073; Stop the build"
+                                  : "&#9654; Build it up, one line at a time";
+}
+document.getElementById("mxBuild").addEventListener("click", function(){
+  MX.build.on = !MX.build.on;
+  MX.build.step = MX.build.on ? 1 : 0;
+  MX.build.last = 0;
+  mxBuildLabel();
+  mxDrawEvans();
+});
 ANIM.push({panel: "p-mix", tick: function(ts){
+  mxBuildTick(ts);
   if(!MX.t0) MX.t0 = ts;
   MX.sweep = (ts - MX.t0) / 5200;
   mxDrawSurface(ts);
