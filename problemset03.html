@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Problem Set 3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+:root{
+  --ground:#F1F3F2; --surface:#FFFFFF; --surface-2:#E9EDEB;
+  --ink:#14191B; --ink-2:#3E4A4D; --muted:#68767A; --line:#D6DDDA; --line-2:#C3CCC8;
+  --ox:#A85B33; --ox-soft:#F3E4DA;
+  --red-:#15618E; --red-soft:#DDE9F2;
+  --go:#2C7355; --go-soft:#DCEBE3;
+  --stop:#8A5F0C; --stop-soft:#F3E9D3;
+  --shadow:0 1px 2px rgba(20,25,27,.05),0 8px 24px -12px rgba(20,25,27,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+    --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+    --ox:#D08551; --ox-soft:#33231A;
+    --red-:#5AA6D4; --red-soft:#152833;
+    --go:#5DBB8D; --go-soft:#152A21;
+    --stop:#D6A33F; --stop-soft:#2B2415;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+  --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+  --ox:#D08551; --ox-soft:#33231A;
+  --red-:#5AA6D4; --red-soft:#152833;
+  --go:#5DBB8D; --go-soft:#152A21;
+  --stop:#D6A33F; --stop-soft:#2B2415;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:880px;margin:0 auto;padding:32px 20px 80px}
+
+.masthead{padding-bottom:20px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.eyebrow a{color:inherit}
+h1{font-family:"IBM Plex Serif",Georgia,serif;font-weight:600;font-size:clamp(28px,4.2vw,40px);line-height:1.12;margin:0;letter-spacing:-.015em}
+.sub{margin:10px 0 0;color:var(--ink-2);font-size:15px;max-width:62ch}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);margin-top:16px}
+.card-h{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.card-h h2{font-size:15px;font-weight:600;margin:0}
+.card-h .note{font-size:12.5px;color:var(--muted)}
+.card-b{padding:18px}
+
+label.fld{display:block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+input[type=text]{width:100%;font-family:inherit;font-size:14px;color:var(--ink);background:var(--surface-2);
+  border:1px solid var(--line-2);border-radius:7px;padding:9px 10px}
+input:read-only{background:var(--surface);color:var(--muted);cursor:not-allowed}
+input:focus-visible,button:focus-visible{outline:2px solid var(--red-);outline-offset:1px}
+.startrow{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:end}
+@media(max-width:560px){.startrow{grid-template-columns:1fr}}
+
+.solid{appearance:none;background:var(--ox);border:1px solid var(--ox);color:#fff;font-family:inherit;
+  font-size:13.5px;font-weight:500;padding:10px 18px;border-radius:7px;cursor:pointer;white-space:nowrap}
+.solid:hover{filter:brightness(1.08)}
+.solid:disabled{background:var(--line-2);border-color:var(--line-2);color:var(--muted);cursor:not-allowed;filter:none}
+.ghost{appearance:none;background:var(--surface-2);border:1px solid var(--line-2);color:var(--ink-2);
+  font-family:inherit;font-size:12.5px;padding:8px 13px;border-radius:7px;cursor:pointer}
+.ghost:hover{border-color:var(--ox);color:var(--ox)}
+
+.pnum{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);letter-spacing:.1em}
+.ptopic{font-size:14px;font-weight:600;flex:1 1 auto}
+.stem{font-size:15px;line-height:1.7;margin:0 0 16px}
+.stem b{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--ox);font-size:14.5px}
+.answer{display:grid;grid-template-columns:minmax(120px,190px) auto auto;gap:10px;align-items:center}
+@media(max-width:560px){.answer{grid-template-columns:1fr}}
+.unit{font-family:"IBM Plex Mono",monospace;font-size:13.5px;color:var(--muted)}
+.verdict{margin:14px 0 0;padding:11px 14px;border-radius:8px;font-size:13.5px;line-height:1.6}
+.verdict[hidden]{display:none}
+.verdict.ok{background:var(--go-soft);color:var(--go)}
+.verdict.no{background:var(--stop-soft);color:var(--stop)}
+.sol{margin:14px 0 0;border-left:2px solid var(--line-2);padding-left:14px}
+.sol[hidden]{display:none}
+.sol h3{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 10px;font-weight:500}
+.sol ol{margin:0;padding-left:20px}
+.sol li{font-size:13.5px;line-height:1.8;color:var(--ink-2);margin-bottom:6px}
+.sol code{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--ink)}
+.sol .final{color:var(--ox);font-weight:600}
+.done .card-h{background:var(--go-soft)}
+
+.scorebar{display:flex;flex-wrap:wrap;align-items:center;gap:14px 22px;padding:16px 18px}
+.scorenum{font-family:"IBM Plex Mono",monospace;font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+.scorenum small{font-size:14px;font-weight:400;color:var(--muted)}
+.vcode{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted)}
+.vcode b{color:var(--ink);font-weight:600;letter-spacing:.08em}
+.hint{font-size:12.5px;color:var(--muted);line-height:1.65;margin:10px 0 0}
+footer{margin-top:44px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;line-height:1.8}
+
+/* --- section rules between Part A and Part B --- */
+.sect{margin:34px 0 0;padding:0 0 8px;border-bottom:1px solid var(--line-2);
+  display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.sect h2{font-family:"IBM Plex Serif",Georgia,serif;font-size:19px;font-weight:600;margin:0;letter-spacing:-.01em}
+.sect p{margin:0;font-size:12.5px;color:var(--muted)}
+
+/* --- multiple-choice items --- */
+.lect{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--muted);border:1px solid var(--line-2);border-radius:99px;padding:2px 8px}
+.opts{display:grid;gap:8px;margin:0}
+.opt{display:flex;gap:11px;align-items:flex-start;width:100%;text-align:left;
+  background:var(--surface-2);border:1px solid var(--line-2);border-radius:8px;
+  padding:11px 13px;font-family:inherit;font-size:13.5px;line-height:1.6;color:var(--ink);cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--ox)}
+.opt:disabled{cursor:default}
+.opt .k{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);flex:0 0 auto;padding-top:1px}
+.opt.picked{border-color:var(--ink-2)}
+.opt.right{background:var(--go-soft);border-color:var(--go);color:var(--go)}
+.opt.right .k{color:var(--go)}
+.opt.wrong{background:var(--stop-soft);border-color:var(--stop);color:var(--stop)}
+.opt.wrong .k{color:var(--stop)}
+.why{margin:14px 0 0;border-left:2px solid var(--line-2);padding-left:14px;
+  font-size:13.5px;line-height:1.75;color:var(--ink-2)}
+.why[hidden]{display:none}
+.why b{color:var(--ox)}
+
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow"><a href="index.html" style="color:inherit">CH40051 Electroanalytical Chemistry</a> · Problem Set 3</p>
+    <h1>Your own problem set</h1>
+    <p class="sub">Twelve problems on Lectures 9&ndash;12: junction and membrane potentials, the three
+      overpotentials, electrode kinetics, and the mixed potential. Six are calculations &mdash; one from each
+      lecture, with Lectures 10 and 11 asked twice &mdash; and six are concept questions. Every number is generated
+      from your student ID, so no two of you get the same set: an answer copied from anyone else will simply be
+      wrong.</p>
+  </header>
+
+  <div class="card" id="startCard">
+    <div class="card-h"><h2>Generate your set</h2><span class="note">same ID always gives the same problems</span></div>
+    <div class="card-b">
+      <div class="startrow">
+        <div>
+          <label class="fld" for="sId">Student ID</label>
+          <input type="text" id="sId" inputmode="numeric" placeholder="e.g. 20261234" autocomplete="off">
+        </div>
+        <button class="solid" id="genBtn" type="button">Generate my problems</button>
+      </div>
+      <p class="hint" id="startHint">You can close this page and come back &mdash; your work is saved in this
+        browser, and the same ID regenerates the same set.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h2>How this is marked</h2><span class="note">read once before you start</span></div>
+    <div class="card-b">
+      <p class="hint" style="margin-top:0">
+        <b style="color:var(--ink)">Calculations</b> allow two attempts. A wrong first attempt earns one diagnostic
+        hint; the worked solution opens after the second. <b style="color:var(--ink)">Concept questions</b> allow
+        one attempt, then the reasoning is shown &mdash; guessing costs you the mark, so think before you click.
+        Give calculations to three significant figures in the unit printed beside the box; anything within 2 % counts.
+      </p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h2>What you may need</h2><span class="note">nothing else is required</span></div>
+    <div class="card-b">
+      <p class="hint" style="margin-top:0">
+        F = 96 485 C mol⁻¹ &nbsp;·&nbsp; R = 8.314 J mol⁻¹ K⁻¹ &nbsp;·&nbsp; RT/F = 25.69 mV at 25 °C &nbsp;·&nbsp; 2.303RT/F = 59.16 mV per decade<br>
+        at 60 °C: RT/F = 28.71 mV, 2.303RT/F = 66.12 mV &nbsp;·&nbsp; 1 year = 3.156 × 10⁷ s &nbsp;·&nbsp; 1 µA cm⁻² on steel ≈ 11.6 µm/year<br>
+        η<sub>conc</sub> = (RT/nF) ln(1 − j/j<sub>L</sub>) &nbsp;·&nbsp; j<sub>L</sub> = nFDc*/δ &nbsp;·&nbsp; R<sub>ct</sub> = RT/nFi<sub>0</sub> &nbsp;·&nbsp; b = 2.303RT/αF &nbsp;·&nbsp; i<sub>0</sub> = nFk°C<sub>O</sub>*<sup>1−α</sup>C<sub>R</sub>*<sup>α</sup><br>
+        E<sub>j</sub> = (t₊ − t₋)(RT/F) ln(c₁/c₂) &nbsp;·&nbsp; B = b<sub>a</sub>b<sub>c</sub>/2.303(b<sub>a</sub>+b<sub>c</sub>) &nbsp;·&nbsp; rate = i<sub>corr</sub>M/zFρ
+      </p>
+    </div>
+  </div>
+
+  <div id="sheet" hidden></div>
+
+  <div class="card" id="summary" hidden>
+    <div class="card-h"><h2>Submission</h2><span class="note">one button &mdash; the file is only a backup</span></div>
+    <div class="scorebar">
+      <div>
+        <div class="scorenum" id="scoreNum">&mdash;</div>
+        <div class="vcode" style="margin-top:5px" id="whoLine">&mdash;</div>
+      </div>
+      <div style="flex:1 1 300px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="solid" id="sendBtn" type="button" hidden>Submit to the course</button>
+          <button class="ghost" id="dlBtn" type="button">Download my result</button>
+        </div>
+        <p class="hint" id="dlHint" style="margin-top:8px">Answer every problem first &mdash; unanswered ones are recorded as incomplete.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Transport numbers from the Lecture 8 and 9 tables · diffusion coefficients and exchange currents from the
+    Lecture 10 and 11 tables · metal data from the Lecture 12 Evans presets · every constant above is the one the
+    lectures use<br>
+    CH40051 Electroanalytical Chemistry · Fall 2026
+  </footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+var F = 96485.33;             /* C/mol                                   */
+var RG = 8.314462;            /* J/(mol K)                               */
+var E0 = 8.8541878e-12;       /* F/m                                     */
+var QE = 1.602176634e-19;     /* C                                       */
+var KB = 1.380649e-23;        /* J/K                                     */
+var NA = 6.02214076e23;       /* /mol                                    */
+var T25 = 298.15;             /* K                                       */
+var RT_F = RG * T25 / F;      /* 0.025693 V                              */
+var DEC_V = RT_F * Math.LN10; /* 0.059159 V per decade                   */
+var ER_W = 78.39;             /* water at 25 C                           */
+var ETA_W = 0.890e-3;         /* Pa s                                    */
+
+/* ---------- deterministic RNG: same student ID -> same problem set ---------- */
+function hash32(s){
+  var h = 0x811c9dc5;
+  for (var i = 0; i < s.length; i++){
+    h ^= s.charCodeAt(i);
+    h = (h + ((h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24))) >>> 0;
+  }
+  return h >>> 0;
+}
+function mulberry32(a){
+  return function(){
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    var t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function ri(r, a, b){ return a + Math.floor(r() * (b - a + 1)); }
+function rf(r, a, b, d){ var v = a + r() * (b - a); return +v.toFixed(d); }
+function pick(r, arr){ return arr[Math.floor(r() * arr.length)]; }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function gcd(a,b){ while(b){ var t=b; b=a%b; a=t; } return a; }
+function lcm(a,b){ return a*b/gcd(a,b); }
+var SUPD = {"-":"⁻","0":"⁰","1":"¹","2":"²","3":"³","4":"⁴",
+            "5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹"};
+function supn(e){ return String(e).split("").map(function(c){ return SUPD[c]; }).join(""); }
+/* three figures, and a power of ten written the way it is read aloud */
+function sig(x, d){
+  if (x === 0) return "0";
+  var e = Math.floor(Math.log10(Math.abs(x)));
+  if (e >= 4 || e <= -3)
+    return (+(x / Math.pow(10, e)).toPrecision(d)) + " × 10" + supn(e);
+  return (+x.toPrecision(d)).toString();
+}
+/* Fisher-Yates on a copy, reporting where a tracked index landed. */
+function shuffle(r, arr, track){
+  var a = arr.slice(), pos = track;
+  for (var i = a.length - 1; i > 0; i--){
+    var j = Math.floor(r() * (i + 1));
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+    if (pos === i) pos = j; else if (pos === j) pos = i;
+  }
+  return { list: a, at: pos };
+}
+
+/* ---------- chemistry data, Lectures 9-12 ----------
+   Transference numbers from the Lecture 8/9 tables; diffusion coefficients
+   and exchange currents from the Lecture 10 and 11 tables; metal data from
+   the Lecture 12 Evans presets. Every number a problem uses is one the
+   lectures already put on screen.                                        */
+var SALT_T = [
+ {nm:"HCl",  tp:0.821, ions:"H⁺ and Cl⁻"},
+ {nm:"KCl",  tp:0.491, ions:"K⁺ and Cl⁻"},
+ {nm:"NaCl", tp:0.396, ions:"Na⁺ and Cl⁻"},
+ {nm:"LiCl", tp:0.336, ions:"Li⁺ and Cl⁻"}
+];
+var METALS = [
+ {nm:"Fe", E0:-0.440, i0:1e-7, ba:0.060, M:55.845, z:2, rho:7.87},
+ {nm:"Zn", E0:-0.762, i0:1e-7, ba:0.040, M:65.38,  z:2, rho:7.14},
+ {nm:"Ni", E0:-0.257, i0:1e-6, ba:0.060, M:58.693, z:2, rho:8.90},
+ {nm:"Cd", E0:-0.403, i0:1e-6, ba:0.060, M:112.41, z:2, rho:8.65}
+];
+var SEC_YR = 3.15576e7;
+
+var SUP = {"-":"⁻","0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹"};
+function p10(x){            /* 1.0e-5 -> 10⁻⁵, 2.5e-5 -> 2.5 × 10⁻⁵ */
+  var e = Math.floor(Math.log10(Math.abs(x))), m = x / Math.pow(10, e);
+  var ex = String(e).split("").map(function(ch){ return SUP[ch]; }).join("");
+  return (Math.abs(m - 1) < 1e-9 ? "" : (+m.toFixed(2)) + " × ") + "10" + ex;
+}
+function mM(c){             /* a concentration in mol/L, printed where it reads best */
+  return c >= 0.01 ? (+c.toFixed(4)) + " M" : sig(c * 1000, 3) + " mM";
+}
+
+/* ---- 1. Lecture 9: the junction between two strengths of one salt ---- */
+function pJunction(r){
+  var s = pick(r, SALT_T);
+  var c1 = pick(r, [0.1, 0.2, 0.5, 1.0]);
+  var k  = pick(r, [10, 20, 50, 100]);
+  var c2 = c1 / k;
+  var Ej = (2 * s.tp - 1) * RT_F * Math.log(c1 / c2) * 1000;      /* mV */
+  return {
+    kind:"calc", lec:"Lecture 9", topic:"Liquid junction between two strengths of one salt", unit:"mV",
+    answer:Ej, abstol:0.05,
+    stem:"Two solutions of <b>" + s.nm + "</b> meet at a free-diffusion junction at 25 °C: <b>"
+        + c1.toFixed(1) + " M</b> on the left, <b>" + mM(c2) + "</b> on the right. The transport number "
+        + "of the cation is <b>t₊ = " + s.tp.toFixed(3) + "</b>, and activity coefficients may be taken as equal "
+        + "on both sides.<br><br>What is the junction potential <b>E<sub>j</sub> = φ(right) &minus; φ(left)</b>?",
+    solution:[
+      "For one salt at two concentrations Henderson collapses to <code>E_j = (t₊ − t₋)(RT/F) ln(c₁/c₂)</code>, "
+        + "and <code>t₋ = 1 − t₊</code>, so the bracket is <code>2t₊ − 1</code>.",
+      "<code>2t₊ − 1 = 2(" + s.tp.toFixed(3) + ") − 1 = " + sig(2 * s.tp - 1, 4) + "</code>",
+      "<code>ln(c₁/c₂) = ln " + k + " = " + sig(Math.log(k), 4) + "</code>",
+      "<span class='final'>E_j = " + sig(2 * s.tp - 1, 4) + " × 25.69 mV × " + sig(Math.log(k), 4)
+        + " = " + sig(Ej, 4) + " mV</span>",
+      "The sign is the whole lesson. " + (s.tp > 0.5
+        ? "The cation is the faster ion, so it runs ahead into the dilute side and leaves the concentrated side negative: the dilute side goes <b>positive</b>."
+        : "The anion is the faster ion, so it runs ahead into the dilute side and the dilute side goes <b>negative</b>.")
+        + " KCl is the salt bridge of choice because t₊ = 0.491 makes this bracket almost zero &mdash; "
+        + sig((2 * 0.491 - 1) * RT_F * Math.log(k) * 1000, 2) + " mV for this same ratio."
+    ]
+  };
+}
+
+/* ---- 2. Lecture 10: what the limiting current costs you ---- */
+function pConcOver(r){
+  var n = pick(r, [1, 2]);
+  var D = pick(r, [0.60, 0.72, 0.90, 1.00, 1.20]);        /* 1e-5 cm2/s */
+  var c = pick(r, [1.0, 2.0, 5.0, 10.0]);                 /* mM         */
+  var dl = pick(r, [50, 100, 200, 500]);                  /* micron     */
+  var fr = pick(r, [0.50, 0.75, 0.90, 0.95]);             /* j / j_L    */
+  var jL = n * F * (D * 1e-5) * (c * 1e-6) / (dl * 1e-4) * 1000;   /* mA/cm2 */
+  var eta = RT_F / n * Math.log(1 - fr) * 1000;                    /* mV     */
+  return {
+    kind:"calc", lec:"Lecture 10", topic:"Concentration overpotential at a fraction of the limit", unit:"mV",
+    answer:eta, abstol:0.05,
+    stem:"A quiet electrode at 25 °C reduces a <b>" + c.toFixed(1) + " mM</b> species with <b>n = " + n
+        + "</b> and <b>D = " + D.toFixed(2) + " × 10⁻⁵ cm² s⁻¹</b> across a Nernst diffusion layer <b>δ = "
+        + dl + " µm</b> thick. It is driven at <b>" + (fr * 100).toFixed(0) + " %</b> of its limiting current.<br><br>"
+        + "What <b>concentration overpotential</b> η<sub>conc</sub> = (RT/nF) ln(1 &minus; j/j<sub>L</sub>) "
+        + "does that cost?",
+    solution:[
+      "You are told j/j_L directly, so the limiting current is not needed for the answer &mdash; but it is worth "
+        + "having: <code>j_L = nFDc*/δ = " + n + " × 96485 × " + sig(D * 1e-5, 3) + " × " + sig(c * 1e-6, 3)
+        + " / " + sig(dl * 1e-4, 3) + " = " + sig(jL, 4) + " mA/cm²</code>.",
+      "<code>RT/nF = 25.69/" + n + " = " + sig(25.693 / n, 4) + " mV</code>",
+      "<code>ln(1 − " + fr.toFixed(2) + ") = ln " + (1 - fr).toFixed(2) + " = " + sig(Math.log(1 - fr), 4) + "</code>",
+      "<span class='final'>η_conc = " + sig(25.693 / n, 4) + " mV × " + sig(Math.log(1 - fr), 4)
+        + " = " + sig(eta, 4) + " mV</span>",
+      "It is <b>negative</b> because you are paying it: the surface is poorer than the bulk, so the electrode has "
+        + "to be driven further to keep the same current. Notice how cheap it is until the end &mdash; half the "
+        + "limiting current costs only " + sig(RT_F / n * Math.log(0.5) * 1000, 3) + " mV, while 99 % costs "
+        + sig(RT_F / n * Math.log(0.01) * 1000, 3) + " mV and 100 % costs an unbounded amount. There is no "
+        + "overpotential that will push past j_L."
+    ]
+  };
+}
+
+/* ---- 3. Lecture 10: the three losses added up ---- */
+function pThreeLosses(r){
+  /* i0 and j chosen together so the activation drop stays inside the
+     linear region, which is what the stem claims                     */
+  var i0 = pick(r, [1e-3, 3e-3, 1e-2]);                   /* A/cm2 */
+  var kap = pick(r, [5, 10, 20, 50]);                     /* mS/cm */
+  var L = pick(r, [0.5, 1.0, 2.0, 5.0]);                  /* mm, Luggin gap */
+  var j = pick(r, [0.1, 0.2, 0.5, 1.0]);                  /* mA/cm2 */
+  var Rct = RT_F / i0;                                    /* ohm cm2, n = 1 */
+  var Ru = (L * 0.1) / (kap * 1e-3);                      /* ohm cm2 */
+  var act = Rct * (j * 1e-3) * 1000;                      /* mV */
+  var ohm = Ru * (j * 1e-3) * 1000;                       /* mV */
+  return {
+    kind:"calc", lec:"Lecture 10", topic:"Charge-transfer resistance against the uncompensated one", unit:"mV",
+    answer:act + ohm, abstol:0.05,
+    stem:"A one-electron electrode with <b>i<sub>0</sub> = " + sig(i0, 2) + " A cm⁻²</b> is run at "
+        + "<b>" + j.toFixed(1) + " mA cm⁻²</b> at 25 °C, close enough to equilibrium for the linear law to hold. The "
+        + "reference tip sits <b>" + L.toFixed(1) + " mm</b> away through electrolyte of conductivity "
+        + "<b>" + kap + " mS cm⁻¹</b>.<br><br>What is the <b>total</b> of the activation and ohmic drops the "
+        + "reading carries, in mV?",
+    solution:[
+      "Near equilibrium the activation loss is a resistance: <code>R_ct = RT/nFi₀ = 0.025693/" + sig(i0, 2)
+        + " = " + sig(Rct, 4) + " Ω cm²</code>, so <code>η_act = R_ct × j = " + sig(act, 4) + " mV</code>.",
+      "The electrolyte between the working surface and the Luggin tip is a resistor of area resistance "
+        + "<code>R_u = L/κ = " + sig(L * 0.1, 3) + " cm / " + sig(kap * 1e-3, 3) + " S cm⁻¹ = "
+        + sig(Ru, 4) + " Ω cm²</code>, so <code>iR = " + sig(ohm, 4) + " mV</code>.",
+      "<span class='final'>total = " + sig(act, 4) + " + " + sig(ohm, 4) + " = " + sig(act + ohm, 4) + " mV</span>",
+      "The two look identical on a meter and are not the same thing. "
+        + (act > ohm
+           ? "Here the electrode is the bottleneck: a better catalyst would help, moving the Luggin closer would barely register."
+           : "Here the solution is the bottleneck: no catalyst helps, and " + sig(ohm, 3)
+             + " mV of this reading is not an overpotential at all. Halve the gap and half of it goes.")
+        + " The ohmic part carries no activation energy, does no chemistry, and vanishes the instant the current "
+        + "is interrupted &mdash; which is how it is measured away."
+    ]
+  };
+}
+
+/* ---- 4. Lecture 11: a Tafel line read back ---- */
+function pTafel(r){
+  var b = pick(r, [40, 60, 80, 118, 120, 150]);           /* mV/dec */
+  var TC = pick(r, [25, 60]);
+  var eta = pick(r, [150, 200, 250, 300]);                /* mV, cathodic */
+  var jp = pick(r, [0.10, 0.50, 1.00, 5.00]);             /* mA/cm2 at that eta */
+  var T = TC + 273.15;
+  var fp = F / (2.303 * RG * T);                          /* 1/V */
+  var alpha = 1 / (b * 1e-3 * fp);
+  var i0 = jp * Math.pow(10, -eta / b);                   /* mA/cm2 */
+  return {
+    kind:"calc", lec:"Lecture 11", topic:"Exchange current from a Tafel line", unit:"µA/cm²",
+    answer:i0 * 1000, abstol:0.05,
+    stem:"A cathodic Tafel plot taken at <b>" + TC + " °C</b> is straight with a slope of <b>" + b
+        + " mV per decade</b>. At an overpotential of <b>&minus;" + eta + " mV</b> the current density is "
+        + "<b>" + jp.toFixed(2) + " mA cm⁻²</b>, and the window is wide enough that the back reaction is "
+        + "negligible.<br><br>What <b>exchange current density</b> does the line extrapolate to?",
+    solution:[
+      "A Tafel line is <code>log|i| = log i₀ − |η|/b</code>, so running it back to η = 0 is one subtraction in "
+        + "the exponent: <code>i₀ = |i| × 10^(−|η|/b)</code>.",
+      "<code>|η|/b = " + eta + "/" + b + " = " + sig(eta / b, 4) + " decades</code>",
+      "<span class='final'>i₀ = " + jp.toFixed(2) + " mA/cm² × 10^(−" + sig(eta / b, 4) + ") = "
+        + sig(i0, 4) + " mA/cm² = " + sig(i0 * 1000, 4) + " µA/cm²</span>",
+      "The slope also carries α, and this is where the temperature matters: <code>α = 1/(b f′)</code> with "
+        + "<code>f′ = F/2.303RT = " + sig(fp, 4) + " V⁻¹</code> at " + TC + " °C, giving <b>α = "
+        + sig(alpha, 3) + "</b>. "
+        + (alpha > 1
+           ? "That is above 1, so it is not one electron's share of anything &mdash; the slow step comes after an electron has already crossed in a pre-equilibrium."
+           : "Between 0 and 1, as a single one-electron step requires.")
+        + " Note that i₀ came from the <b>intercept</b> and α from the <b>slope</b>: they are independent "
+        + "readings, and a slope alone never gives you i₀."
+    ]
+  };
+}
+
+/* ---- 5. Lecture 11: k0 and the concentrations make i0 ---- */
+function pExchange(r){
+  var k0 = pick(r, [1e-5, 1e-4, 1e-3, 1e-2]);             /* cm/s */
+  var al = pick(r, [0.25, 0.40, 0.50, 0.75]);
+  var cO = pick(r, [1.0, 2.0, 5.0, 10.0]);                /* mM */
+  var cR = pick(r, [1.0, 2.0, 5.0, 10.0]);                /* mM */
+  var i0 = F * k0 * Math.pow(cO * 1e-6, 1 - al) * Math.pow(cR * 1e-6, al);   /* A/cm2 */
+  return {
+    kind:"calc", lec:"Lecture 11", topic:"Exchange current from k° and the bulk concentrations", unit:"µA/cm²",
+    answer:i0 * 1e6, abstol:0.05,
+    stem:"A one-electron couple has <b>k° = " + p10(k0) + " cm s⁻¹</b> and <b>α<sub>c</sub> = "
+        + al.toFixed(2) + "</b> on a 1 cm² electrode, in a solution holding <b>C<sub>O</sub>* = " + cO.toFixed(1)
+        + " mM</b> and <b>C<sub>R</sub>* = " + cR.toFixed(1) + " mM</b> at 25 °C.<br><br>What is the "
+        + "<b>exchange current density</b>?",
+    solution:[
+      "<code>i₀ = nFk° C_O*^(1−α) C_R*^α</code> &mdash; the concentrations enter with the two transfer "
+        + "coefficients as their orders, 1 − α in O and α in R.",
+      "In the units the formula wants, <code>C_O* = " + sig(cO * 1e-6, 3) + " mol/cm³</code> and "
+        + "<code>C_R* = " + sig(cR * 1e-6, 3) + " mol/cm³</code>.",
+      "<code>C_O*^(1−α) C_R*^α = " + sig(Math.pow(cO * 1e-6, 1 - al), 4) + " × "
+        + sig(Math.pow(cR * 1e-6, al), 4) + " = " + sig(Math.pow(cO * 1e-6, 1 - al) * Math.pow(cR * 1e-6, al), 4)
+        + "</code>",
+      "<span class='final'>i₀ = 96485 × " + p10(k0) + " × " + sig(Math.pow(cO * 1e-6, 1 - al) * Math.pow(cR * 1e-6, al), 4)
+        + " = " + sig(i0, 4) + " A/cm² = " + sig(i0 * 1e6, 4) + " µA/cm²</span>",
+      "k° belongs to the electrode and the couple; i₀ belongs to the <b>experiment</b>, because it carries the "
+        + "solution with it. Change nothing but C_O* and i₀ moves with reaction order " + (1 - al).toFixed(2)
+        + " &mdash; which is a way of measuring α without ever leaving equilibrium."
+    ]
+  };
+}
+
+/* ---- 6. Lecture 12: the Evans crossing, and what it costs the metal ---- */
+/* Only the combinations where the crossing really is a corrosion crossing:
+   E_corr has to sit above the metal's own equilibrium potential, or the
+   two-branch solution is describing deposition, not dissolution. With a very
+   slow HER and a mild acid that condition fails, so those are left out. */
+function corrCases(){
+  var out = [], bc = 0.120;
+  METALS.forEach(function(m){
+    [0, 1, 2, 3].forEach(function(pH){
+      [1e-10, 1e-8, 1e-6].forEach(function(i0H){
+        var EH = -DEC_V * pH;
+        var Ec = (Math.log10(i0H / m.i0) + m.E0 / m.ba + EH / bc) / (1 / m.ba + 1 / bc);
+        var ic = m.i0 * Math.pow(10, (Ec - m.E0) / m.ba);
+        var rate = ic * m.M / (m.z * F * m.rho) * SEC_YR * 10;
+        if(Ec > m.E0 + 0.005 && Ec < EH - 0.005 && rate > 1e-4 && rate < 100)
+          out.push({m:m, pH:pH, i0H:i0H});
+      });
+    });
+  });
+  return out;
+}
+var CORR_CASES = corrCases();
+
+function pCorrosion(r){
+  var cse = pick(r, CORR_CASES);
+  var m = cse.m, pH = cse.pH, i0H = cse.i0H;
+  var bc = 0.120;
+  var EH = -DEC_V * pH;
+  var Ec = (Math.log10(i0H / m.i0) + m.E0 / m.ba + EH / bc) / (1 / m.ba + 1 / bc);
+  var ic = m.i0 * Math.pow(10, (Ec - m.E0) / m.ba);       /* A/cm2 */
+  var rate = ic * m.M / (m.z * F * m.rho) * SEC_YR * 10;  /* mm/yr */
+  return {
+    kind:"calc", lec:"Lecture 12", topic:"Corrosion rate from the Evans crossing", unit:"mm/yr",
+    answer:rate, abstol:0.05,
+    stem:"<b>" + m.nm + "</b> (E° = " + m.E0.toFixed(3) + " V, i<sub>0</sub> = " + sig(m.i0, 2)
+        + " A cm⁻², b<sub>a</sub> = " + (m.ba * 1000).toFixed(0) + " mV/dec, M = " + m.M + " g/mol, z = "
+        + m.z + ", ρ = " + m.rho + " g/cm³) sits in deaerated acid at <b>pH " + pH + "</b>. Hydrogen evolution "
+        + "on this surface has <b>i<sub>0</sub> = " + p10(i0H) + " A cm⁻²</b> and <b>b<sub>c</sub> = 120 "
+        + "mV/dec</b>. Anode and cathode areas are equal.<br><br>At what rate does the metal thin, in mm per year?",
+    solution:[
+      "The hydrogen line starts at <code>E = −0.059 pH = " + sig(EH, 3) + " V</code>. At E_corr the two branches "
+        + "carry the same current: <code>i₀,M 10^((E−E_M)/b_a) = i₀,H 10^(−(E−E_H)/b_c)</code>.",
+      "Taking logs and solving, <code>E_corr = [log(i₀,H/i₀,M) + E_M/b_a + E_H/b_c] / (1/b_a + 1/b_c) = "
+        + sig(Ec, 4) + " V</code>.",
+      "<code>i_corr = i₀,M 10^((E_corr − E_M)/b_a) = " + sig(ic, 4) + " A/cm² = " + sig(ic * 1e6, 4)
+        + " µA/cm²</code>",
+      "<span class='final'>rate = i_corr M / zFρ = " + sig(ic, 3) + " × " + m.M + " / (" + m.z
+        + " × 96485 × " + m.rho + ") cm/s × 3.156×10⁷ s/yr × 10 = " + sig(rate, 4) + " mm/yr</span>",
+      "E_corr is <b>not</b> an equilibrium potential and no Nernst equation gives it &mdash; two rates set it, "
+        + "and it sits " + sig((Ec - m.E0) * 1000, 3) + " mV above the metal's own E°. The thermodynamics only "
+        + "said the reaction would go; the kinetics said how fast, and here the hydrogen exchange current of "
+        + p10(i0H) + " A/cm² is what decided it."
+    ]
+  };
+}
+
+var CALC = [pJunction, pConcOver, pThreeLosses, pTafel, pExchange, pCorrosion];
+
+
+/* ---------- state ---------- */
+var STORE = "ch40051-ps3-v1";
+var probs = [], state = [], sid = "";
+var sId       = document.getElementById("sId"),
+    genBtn    = document.getElementById("genBtn"),
+    sheet     = document.getElementById("sheet"),
+    summary   = document.getElementById("summary"),
+    startHint = document.getElementById("startHint");
+
+function save(){
+  try { localStorage.setItem(STORE, JSON.stringify({id:sid, st:state})); } catch(e){}
+}
+function load(){
+  try {
+    var d = JSON.parse(localStorage.getItem(STORE) || "null");
+    if (d && d.id){ sId.value = d.id; return d; }
+  } catch(e){}
+  return null;
+}
+
+/* ---------- Part B: concepts ----------
+   Four per lecture, written fresh but aimed at the same misconceptions the
+   concept checks probe, so revising the checks is the right preparation and
+   memorising their answers is not enough. One question is drawn from each of
+   Lectures 9-12, plus two more from lectures chosen by your ID, and the
+   options are shuffled per student.                                        */
+var CONCEPTS = {
+"Lecture 9": [
+ {q:"A salt bridge is filled with saturated KCl rather than saturated NaCl. What does that buy you?",
+  o:["K⁺ and Cl⁻ have almost equal transport numbers, so the two ions carry the current across the junction at almost the same rate and leave almost no charge separation",
+     "KCl is more soluble, so the bridge has lower resistance",
+     "K⁺ is smaller than Na⁺, so it diffuses faster and the junction equilibrates sooner",
+     "KCl does not react with the analyte, while NaCl does"],
+  a:0,
+  why:"A junction potential appears because the two ions of a salt cross the boundary at different rates and separate charge. For KCl t₊ = 0.491 and t₋ = 0.509, so (t₊ − t₋) = −0.018 and the junction almost cancels; for NaCl t₊ = 0.396 gives (t₊ − t₋) = −0.208, more than ten times as much. Resistance and solubility are real but beside the point &mdash; what matters is that the two transport numbers are nearly equal."},
+ {q:"In the Donnan equilibrium of a cation-exchange membrane, why is the membrane phase at a different potential from the solution it sits in, even with no current flowing?",
+  o:["The fixed charges cannot move, so the mobile ions distribute unequally and the resulting charge separation is the potential",
+     "The membrane has a higher resistance",
+     "Water is excluded from the membrane",
+     "The fixed charges are reduced at the interface"],
+  a:0,
+  why:"The membrane holds anionic groups that are bolted to the polymer and cannot leave. Mobile counter-ions are drawn in and co-ions excluded until the electrochemical potential of every mobile species is equal across the boundary. The price of that is an unequal distribution of mobile charge, and the potential difference it creates is the Donnan potential &mdash; an equilibrium property, with no current anywhere."},
+ {q:"A pH electrode calibrated in buffers reads 12.6 in a solution that is genuinely at pH 13.2. What has gone wrong?",
+  o:["The alkaline error: at low H⁺ the glass responds partly to Na⁺, so the measured potential is higher than H⁺ alone would give and the pH reads low",
+     "The reference junction has dried out",
+     "The glass has dissolved",
+     "The temperature compensation is wrong"],
+  a:0,
+  why:"Nikolsky–Eisenman: the glass membrane responds to a sum, a_H + K a_Na, with a selectivity coefficient K of order 10⁻¹¹ for a good electrode. At pH 13 the hydrogen activity is 10⁻¹³, small enough that even a trace of sodium contributes, so the electrode sees more 'acid' than there is and reports a pH that is too low. The classic signature is that the error grows with sodium concentration at fixed pH."},
+ {q:"Two half cells are joined through a porous frit and the measured cell voltage is 3 mV different from the Nernst prediction. Which statement is right?",
+  o:["The junction potential is part of what the voltmeter reads, and it is not a property of either half cell",
+     "The Nernst equation does not apply to cells with a frit",
+     "The frit adds a resistance, and the 3 mV is the iR drop across it",
+     "Activity coefficients must have been left out"],
+  a:0,
+  why:"A voltmeter draws essentially no current, so an iR drop across the frit cannot be the explanation &mdash; (C) is the usual confusion. What the meter reads is the sum of the two electrode potentials and every junction potential in the path. E_j belongs to the boundary, not to either electrode, and it is why reference electrodes are specified with their filling solution and why a bridge is chosen to make E_j small rather than to make it zero."}
+],
+"Lecture 10": [
+ {q:"A cell is run at a current where the measured voltage is 1.80 V, and interrupting the current makes 120 mV of it vanish within microseconds. What was that 120 mV?",
+  o:["The ohmic drop through the electrolyte: it stores no charge and does no chemistry, so it disappears the instant the current stops",
+     "The activation overpotential of the slower electrode",
+     "The concentration overpotential at the anode",
+     "Part of the reversible cell voltage"],
+  a:0,
+  why:"The three losses relax on different timescales, and that is how they are told apart. The iR drop is a resistor: it follows the current with no delay at all. Activation overpotential decays as the double layer discharges through R_ct, on microseconds to milliseconds; concentration overpotential decays as the depleted layer refills, on the diffusion timescale of δ²/D, often seconds. The reversible voltage does not decay at all."},
+ {q:"Doubling the stirring rate at a rotating disc raises the limiting current by about √2. What does that tell you about the Nernst diffusion layer?",
+  o:["Its thickness falls as ω^(−½), and j_L = nFDc*/δ rises in proportion as δ shrinks",
+     "The diffusion coefficient rises with stirring",
+     "The bulk concentration at the surface has increased",
+     "Convection carries the ions through the layer itself"],
+  a:0,
+  why:"Levich: δ = 1.61 D^⅓ν^⅙ω^(−½), so doubling ω thins δ by √2 and j_L = nFDc*/δ rises by the same factor. Nothing has happened to D, which is a property of the species and the solvent. The model's whole content is that convection delivers to the outer edge of a stagnant film and diffusion alone crosses it &mdash; (D) would make the film meaningless."},
+ {q:"Why does moving a Luggin capillary closer to a working electrode reduce the measured overpotential, while a better catalyst also reduces it?",
+  o:["The first removes uncompensated solution resistance from the reading; the second removes real activation overpotential. Only one of them changes the chemistry",
+     "Both reduce the activation overpotential",
+     "Both reduce the ohmic drop",
+     "Neither changes the reading; they change the current"],
+  a:0,
+  why:"The iR drop between the working surface and the reference tip is in the reading but is not an overpotential: no activation barrier, no chemistry, nothing stored. Shortening the path deletes it from the measurement without changing what the electrode is doing. A better catalyst raises i₀, lowers R_ct = RT/nFi₀, and genuinely reduces the energy the reaction costs. Confusing the two is how a cell is reported as 'improved' when only the reference moved."},
+ {q:"A cell is driven at 95 % of its limiting current and the operator asks what overpotential would reach 100 %. What is the right answer?",
+  o:["There is none: η_conc = (RT/nF) ln(1 − j/j_L) diverges at j = j_L, so no finite voltage gets there",
+     "About 77 mV more, from the same formula",
+     "Twice what 95 % cost",
+     "It depends on the exchange current"],
+  a:0,
+  why:"At j = j_L the surface concentration is zero and the logarithm's argument is zero, so the overpotential is unbounded. Physically: the only way to pass more current is to deliver more reactant, which means stirring, raising c*, or thinning δ &mdash; all of them raise j_L rather than climbing past it. This is also why a Tafel line fitted near the plateau is fitting mass transport and not kinetics."}
+],
+"Lecture 11": [
+ {q:"Two electrodes carry the same couple in the same solution, one with k° = 10⁻² cm/s and one with 10⁻⁵ cm/s. How do their equilibrium potentials compare?",
+  o:["They are identical: E_eq is set by thermodynamics through Nernst, and k° only sets how big the two balanced partial currents are",
+     "The faster electrode sits at a more positive potential",
+     "The faster electrode sits at a more negative potential",
+     "They cannot be compared without knowing the areas"],
+  a:0,
+  why:"Set i = 0 in the current equation and k° cancels out, leaving the Nernst equation. What k° does set is i₀ = nFAk°C_O*^(1−α)C_R*^α &mdash; the size of the two balanced currents at that same potential. The fast electrode will need far less overpotential to pass any given current, which is a kinetic statement, not a thermodynamic one."},
+ {q:"The transfer coefficient α is sometimes described as 'the fraction of the applied potential that the transition state feels'. Which consequence of that is right?",
+  o:["It governs how a potential step is shared between the two directions, so α_a + α_c = 1 and the ratio of the two rates is e^(fη) whatever α is",
+     "It sets the equilibrium potential of the couple",
+     "It sets the exchange current density",
+     "It makes the forward rate independent of potential when α = 0.5"],
+  a:0,
+  why:"A step of η lowers the O + e⁻ well by Fη, and the crossing follows by α_a Fη, so the two barriers change by α_c Fη and −α_a Fη. The two shares must add to the whole step, which is why α_a + α_c = 1 and why the ratio of the two rate constants, e^(−f(E−E°′)), contains no α at all. Thermodynamics fixes the ratio; α only decides how it is divided."},
+ {q:"A Tafel plot of a one-electron couple gives a clean straight line from 40 to 90 mV of overpotential. Why should the fitted i₀ be treated with suspicion?",
+  o:["A Tafel line needs the back reaction below about 1 %, which takes |η| ≥ 118 mV at 25 °C, so at 40–90 mV both directions are still running and the line is not a Tafel line",
+     "40 mV is too close to the limiting current",
+     "The plot should be of i against η, not log i",
+     "Straight lines over 50 mV are always artefacts"],
+  a:0,
+  why:"Dividing the two Butler–Volmer terms gives back/forward = e^(−fη) for a one-electron step, so 1 % needs f|η| = ln 100 and |η| = 118 mV at 25 °C. Below that the measured current is a difference of two comparable terms, and fitting a straight line to it recovers neither branch's slope nor its intercept. The window is squeezed from the other side too: it must close before depletion, which is why a trustworthy fit needs i_L/i₀ of 10³ or more."},
+ {q:"Hydrogen evolution on Pt(110) at 60 °C gives a Tafel slope of 33 mV/decade, which reads as α ≈ 2. What does that mean?",
+  o:["Not that one electron's share is 2 — it means the slow step comes after an electron has already crossed in a fast pre-equilibrium, so the number is an apparent α and not a symmetry factor",
+     "The measurement is wrong, because α cannot exceed 1",
+     "Two electrons cross in the rate-determining step",
+     "The temperature correction was forgotten"],
+  a:0,
+  why:"For a single one-electron step α must lie between 0 and 1, so an apparent α of 2 is evidence about the mechanism rather than a broken measurement. If the Volmer step stays at equilibrium, adsorbed H builds up as e^(F|η|/RT) and a later step that consumes it inherits that dependence &mdash; twice over for a chemical Tafel step. A slope that matches a mechanism is evidence for it, not proof, and b alone still says nothing about i₀."}
+],
+"Lecture 12": [
+ {q:"A steel sample sits in acid at a steady open-circuit potential of −0.25 V, and a voltmeter reads it as unchanging for hours. What does that reading tell you about the corrosion rate?",
+  o:["Nothing at all: no net current leaves the metal, so the same potential is consistent with any corrosion current",
+     "That the rate is zero, since the system is at equilibrium",
+     "That the rate is set by the difference from the standard potential",
+     "That the rate is proportional to the measured potential"],
+  a:0,
+  why:"E_corr is where the anodic and cathodic currents match, so the net current leaving the metal is zero by construction &mdash; and a voltmeter only ever sees the net. Two samples at the same E_corr can corrode at rates that differ by orders of magnitude, with the exchange currents setting the difference. Getting the rate out needs either Tafel extrapolation or a polarisation resistance; the open-circuit reading alone will not do it."},
+ {q:"A painted steel tank develops a pinhole 0.01 cm² across while 100 cm² of intact coating still conducts as cathode. Why is this worse than no paint at all?",
+  o:["The balance is on current, not current density, so the whole cathodic current leaves through a ten-thousandth of the area and the local anodic current density goes up by that factor",
+     "Paint accelerates the cathodic reaction",
+     "The pinhole concentrates the electric field and raises the potential",
+     "Oxygen reduction is faster on paint than on steel"],
+  a:0,
+  why:"The mixed potential condition is A_a i_a = A_c i_c &mdash; an equality of currents. A large cathode feeding a small anode means the anode must supply all of that current from a tiny area, so its current density, and with it the penetration rate, rises in proportion to A_c/A_a. The plate looks untouched while the pit goes straight through, which is exactly why an incomplete coating is more dangerous than bare metal."},
+ {q:"Zinc is far more reactive than iron, yet it corrodes more slowly in the same acid. How does the Evans diagram explain that?",
+  o:["Hydrogen evolution on zinc has an exchange current about four decades below iron's, so the cathodic line sits much lower and the crossing is dragged down near E_Zn, where zinc's own anodic current is small",
+     "Zinc's oxide passivates it in acid",
+     "Zinc has a smaller molar mass, so the same current removes less metal",
+     "Zinc's anodic exchange current is much smaller than iron's"],
+  a:0,
+  why:"Thermodynamics chose the direction and kinetics chose the timescale. Zinc sits lower than iron, so the driving force is larger, but the cathodic partner is the same hydrogen reaction and it is hopeless on zinc: j₀ near 10⁻¹⁰·⁵ A/cm² against iron's 10⁻⁶. The crossing therefore lands a few tens of millivolts above E_Zn instead of far up the line, and i_corr with it. This is the same fact that makes zinc a sacrificial anode rather than a liability."},
+ {q:"Why is polarisation resistance preferred to Tafel extrapolation for monitoring a structure in service?",
+  o:["R_p is read within a few millivolts of E_corr, so i_corr = B/R_p is obtained without driving the sample into either Tafel region and changing the surface being measured",
+     "R_p needs no knowledge of the Tafel slopes",
+     "Tafel extrapolation only works in acid",
+     "R_p measures the solution resistance, which is what corrodes the metal"],
+  a:0,
+  why:"Stern–Geary gives i_corr = B/R_p with B = b_a b_c/2.303(b_a + b_c), around 13–25 mV for ordinary slope pairs. The measurement is a small perturbation through E_corr, so the sample survives it and can be measured again tomorrow; Tafel extrapolation needs 100 mV or more on one branch, which roughens, films or dissolves the surface it is interrogating. It is not that the slopes are unnecessary &mdash; B contains them &mdash; but that a guessed B still gets the order of magnitude."}
+]
+};
+
+function build(id){
+  sid = id;
+  var r = mulberry32(hash32("CH40051-PS3-" + id));
+  probs = CALC.map(function(fn){ return fn(r); });
+
+  /* one concept question from each lecture, and a second from one of them */
+  var LECS = ["Lecture 9", "Lecture 10", "Lecture 11", "Lecture 12"];
+  var want = {};
+  LECS.forEach(function(L){ want[L] = 1; });
+  want[pick(r, LECS)] += 1;
+  want[pick(r, LECS)] += 1;
+  LECS.forEach(function(L){
+    var pool = CONCEPTS[L].map(function(c, i){ return {c:c, i:i}; });
+    for (var k = 0; k < want[L]; k++){
+      var take = pool.splice(Math.floor(r() * pool.length), 1)[0];
+      var sh = shuffle(r, take.c.o, take.c.a);
+      probs.push({
+        kind:"mcq", lec:L, topic:"Concept — " + L + " #" + (take.i + 1),
+        stem:take.c.q, opts:sh.list, answer:sh.at, why:take.c.why
+      });
+    }
+  });
+}
+
+
+/* ---------- rendering ---------- */
+var LETTER = ["A", "B", "C", "D", "E"];
+
+function section(title, note){
+  return '<div class="sect"><h2>' + title + '</h2><p>' + note + '</p></div>';
+}
+
+function render(){
+  sheet.hidden = false;
+  summary.hidden = false;
+  sId.readOnly = true;
+
+  var h = "";
+  probs.forEach(function(p, i){
+    if (i === 0) h += section("Part A &mdash; calculations", "six problems across Lectures 9&ndash;12 &middot; two attempts each &middot; answers within 2 %");
+    if (i === 6) h += section("Part B &mdash; concepts", "six questions across Lectures 9&ndash;12 &middot; one attempt each &middot; think before you click");
+
+    var st = state[i];
+    h += '<div class="card' + (st.solved ? " done" : "") + '">'
+       +   '<div class="card-h">'
+       +     '<span class="pnum">' + (i < 9 ? "0" : "") + (i + 1) + '</span>'
+       +     '<span class="ptopic">' + esc(p.topic) + '</span>'
+       +     '<span class="lect">' + esc(p.lec) + '</span>'
+       +   '</div>'
+       +   '<div class="card-b">'
+       +     '<p class="stem">' + p.stem + '</p>';
+
+    if (p.kind === "calc"){
+      h += '<div class="answer">'
+         +   '<input type="text" id="in' + i + '" inputmode="decimal" autocomplete="off"'
+         +     ' placeholder="your answer" value="' + esc(st.given) + '"'
+         +     (st.solved ? " readonly" : "") + '>'
+         +   '<span class="unit">' + esc(p.unit) + '</span>'
+         +   '<button class="ghost" type="button" data-check="' + i + '"'
+         +     (st.solved ? " disabled" : "") + '>Check</button>'
+         + '</div>';
+      if (st.msg) h += '<p class="verdict ' + st.msgKind + '">' + st.msg + '</p>';
+      if (st.showSol){
+        h += '<div class="sol"><h3>Worked solution</h3><ol>';
+        p.solution.forEach(function(s){ h += "<li>" + s + "</li>"; });
+        h += '</ol></div>';
+      }
+    } else {
+      h += '<div class="opts">';
+      p.opts.forEach(function(o, j){
+        var cls = "opt";
+        if (st.showSol){
+          if (j === p.answer) cls += " right";
+          else if (String(j) === String(st.given)) cls += " wrong";
+        }
+        h += '<button type="button" class="' + cls + '" data-mcq="' + i + '" data-opt="' + j + '"'
+           +   (st.showSol ? " disabled" : "") + '>'
+           +   '<span class="k">' + LETTER[j] + '</span><span>' + o + '</span></button>';
+      });
+      h += '</div>';
+      if (st.msg) h += '<p class="verdict ' + st.msgKind + '">' + st.msg + '</p>';
+      if (st.showSol) h += '<div class="why"><b>Why.</b> ' + p.why + '</div>';
+    }
+    h += '</div></div>';
+  });
+  sheet.innerHTML = h;
+
+  var solved = state.filter(function(s){ return s.solved; }).length;
+  document.getElementById("scoreNum").innerHTML = solved + ' <small>/ ' + probs.length + ' correct</small>';
+  document.getElementById("whoLine").innerHTML = esc(sid) + " &middot; verification <b>" + vcode() + "</b>";
+}
+
+/* A short code over the student ID and the exact answers this set expects, so a
+   marker can confirm a submitted file was produced by this page and not edited. */
+function vcode(){
+  var s = sid + "|";
+  probs.forEach(function(p){ s += sig(p.answer, 6) + "|"; });
+  var v = hash32(s).toString(36).toUpperCase();
+  while (v.length < 7) v = "0" + v;
+  return v.slice(0, 4) + "-" + v.slice(4);
+}
+
+/* ---------- checking ---------- */
+function check(i){
+  var el = document.getElementById("in" + i);
+  var raw = (el.value || "").trim().replace(/,/g, "").replace(/\s+/g, "");
+  var v = parseFloat(raw);
+  var st = state[i], p = probs[i];
+  if (!raw || !isFinite(v)){
+    st.msg = "Type a number. Use a decimal point, and scientific notation like <code>1.7e-2</code> if you need it.";
+    st.msgKind = "no";
+    render(); return;
+  }
+  st.tries++;
+  st.given = raw;
+  var tol = Math.max(Math.abs(p.answer) * 0.02, p.abstol || 1e-9);
+  if (Math.abs(v - p.answer) <= tol){
+    st.solved = true; st.showSol = true;
+    st.msg = "Correct. The exact value is <b>" + sig(p.answer, 4) + " " + esc(p.unit) + "</b>.";
+    st.msgKind = "ok";
+  } else if (st.tries >= 2){
+    st.showSol = true;
+    st.msg = "Not correct, and that was your second attempt &mdash; the worked solution is below. "
+           + "Read it, then try the number again.";
+    st.msgKind = "no";
+  } else {
+    var ratio = v / p.answer, nudge = "";
+    function near(x, f){ return Math.abs(ratio - x) < x * f; }
+    if (ratio < 0)
+      nudge = " Check the sign &mdash; every answer here is a positive magnitude.";
+    else if (ratio > 0.9 && ratio < 1.1)
+      nudge = " You are very close &mdash; check your rounding or significant figures.";
+    else if (near(1000, 0.08) || near(0.001, 0.08))
+      nudge = " Out by a factor of 1000 &mdash; look for a milli- prefix: mM against M, mS against S, or mol/L against mol/cm\u00b3.";
+    else if (near(1e4, 0.08) || near(1e-4, 0.08))
+      nudge = " Out by 10\u2074 &mdash; that is cm\u00b2 against m\u00b2. Decide once whether you are working in centimetres or in metres, and convert everything.";
+    else if (near(100, 0.08) || near(0.01, 0.08))
+      nudge = " Out by 100 &mdash; check a cm-to-m conversion, or F/m\u00b2 against \u00b5F/cm\u00b2 (1 F/m\u00b2 = 100 \u00b5F/cm\u00b2).";
+    else if (near(10, 0.08) || near(0.1, 0.08))
+      nudge = " Out by 10 &mdash; check nm against \u00c5, or mm against cm.";
+    else if (p.unit === "nm" && (near(2, 0.06) || near(0.5, 0.06) || near(3, 0.06) || near(1/3, 0.06)
+          || near(4, 0.06) || near(0.25, 0.06) || near(6, 0.06)))
+      nudge = " Out by a small whole-number factor &mdash; that is the charge. Ionic strength weights every ion by z\u00b2, and the pairing distance carries |z\u2081z\u2082|.";
+    else if (near(Math.PI, 0.05) || near(1 / Math.PI, 0.05) || near(Math.sqrt(Math.PI), 0.04))
+      nudge = " Out by \u03c0 or \u221a\u03c0 &mdash; check whether a \u221a(\u03c0t) or a 4\u03c0\u03b5\u2080 has gone missing.";
+    else if (near(2, 0.06) || near(0.5, 0.06))
+      nudge = " Out by a factor of 2 &mdash; look for n, for the 2 in the ionic-strength \u00bd, or for the 2k_BT in the pairing criterion.";
+    st.msg = "Not correct." + nudge + " One more attempt before the solution appears.";
+    st.msgKind = "no";
+  }
+  save(); render();
+}
+
+function choose(i, j){
+  var st = state[i], p = probs[i];
+  if (st.showSol) return;
+  st.tries = 1;
+  st.given = String(j);
+  st.showSol = true;
+  st.solved = (j === p.answer);
+  st.msg = st.solved
+    ? "Correct."
+    : "Not correct &mdash; the right option is <b>" + LETTER[p.answer] + "</b>. Concept questions get one attempt.";
+  st.msgKind = st.solved ? "ok" : "no";
+  save(); render();
+}
+
+sheet.addEventListener("click", function(ev){
+  var b = ev.target.closest("[data-check]");
+  if (b){ check(+b.getAttribute("data-check")); return; }
+  var m = ev.target.closest("[data-mcq]");
+  if (m) choose(+m.getAttribute("data-mcq"), +m.getAttribute("data-opt"));
+});
+sheet.addEventListener("keydown", function(ev){
+  if (ev.key !== "Enter") return;
+  var m = (ev.target.id || "").match(/^in(\d+)$/);
+  if (m){ ev.preventDefault(); check(+m[1]); }
+});
+
+function start(id){
+  build(id);
+  if (!state.length || state.length !== probs.length){
+    state = probs.map(function(){
+      return {solved:false, tries:0, given:"", msg:"", msgKind:"", showSol:false};
+    });
+  }
+  save(); render();
+}
+
+genBtn.addEventListener("click", function(){
+  var id = (sId.value || "").trim();
+  if (!id){
+    startHint.innerHTML = "<b style='color:var(--stop)'>Enter your student ID first.</b> "
+                        + "It is what generates your particular problems.";
+    sId.focus(); return;
+  }
+  state = []; start(id);
+});
+sId.addEventListener("keydown", function(e){ if (e.key === "Enter") genBtn.click(); });
+
+/* ---------- the result, in one shape ----------
+   The download and the course submission carry exactly the same columns, so a
+   sheet export and a handed-in file can be marked by the same tool. */
+function result(){
+  var solved = state.filter(function(s){ return s.solved; }).length;
+  var r = {
+    assignment:"PS3", student_id:sid, completed_utc:new Date().toISOString(),
+    solved:solved, total:probs.length, verification:vcode(),
+    kinds:[], topics:[], expected:[], given:[], tries:[], ok:[]
+  };
+  probs.forEach(function(p, i){
+    var g = state[i].given;
+    r.kinds.push(p.kind);
+    r.topics.push(p.topic);
+    r.expected.push(p.kind === "calc" ? sig(p.answer, 5) : LETTER[p.answer]);
+    r.given.push(p.kind === "calc" ? g : (g === "" ? "" : LETTER[+g]));
+    r.tries.push(state[i].tries);
+    r.ok.push(state[i].solved ? 1 : 0);
+  });
+  return r;
+}
+
+/* ---------- submission file ---------- */
+document.getElementById("dlBtn").addEventListener("click", function(){
+  var res = result();
+  var head = ["assignment", "student_id", "completed_utc", "solved", "total", "verification"];
+  var row  = [res.assignment, res.student_id, res.completed_utc, res.solved, res.total, res.verification];
+  probs.forEach(function(p, i){
+    head.push("q" + (i+1) + "_kind");     row.push(res.kinds[i]);
+    head.push("q" + (i+1) + "_topic");    row.push(res.topics[i]);
+    head.push("q" + (i+1) + "_expected"); row.push(res.expected[i]);
+    head.push("q" + (i+1) + "_given");    row.push(res.given[i]);
+    head.push("q" + (i+1) + "_tries");    row.push(res.tries[i]);
+    head.push("q" + (i+1) + "_solved");   row.push(res.ok[i]);
+  });
+  function cell(v){ v = String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+  var csv = head.join(",") + "\n" + row.map(cell).join(",") + "\n";
+  try {
+    var blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = "CH40051-PS3_" + sid.replace(/[^A-Za-z0-9_-]/g, "") + ".csv";
+    a.style.display = "none";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+    document.getElementById("dlHint").textContent =
+      "Saved. Keep it as your backup — the submission itself is the button beside this one.";
+  } catch(e){
+    document.getElementById("dlHint").textContent =
+      "Your browser blocked the download. Screenshot this page and submit that instead.";
+  }
+});
+
+/* ---- submit straight to the course sheet ----------------------------------
+   The same endpoint the concept checks use; the assignment field is what
+   routes this row to the "Problem set" tab of the submissions sheet. Left
+   empty, the button stays hidden and only the download exists.             */
+var SUBMIT_URL = "https://script.google.com/macros/s/AKfycbxPm7WrbttFu6-gnTi__IcUPt-816GthK0eI8TPuwOZyYlcRW3RAWJlmsr791moxBc5GA/exec";
+
+var sendBtn = document.getElementById("sendBtn"),
+    dlHint  = document.getElementById("dlHint");
+if (SUBMIT_URL){
+  sendBtn.hidden = false;
+  dlHint.textContent = "Press Submit to send your result to the course. The download is a backup.";
+}
+
+sendBtn.addEventListener("click", function(){
+  if (!sid){ dlHint.textContent = "Generate your set first."; return; }
+  var payload = result();
+  sendBtn.disabled = true;
+  dlHint.textContent = "Sending\u2026";
+
+  /* text/plain keeps this a simple request, so the browser sends it without
+     a preflight the Apps Script endpoint cannot answer */
+  fetch(SUBMIT_URL, {
+    method:"POST",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify(payload)
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(j){
+    if (j && j.ok){
+      sendBtn.textContent = "Submitted \u2713";
+      dlHint.textContent = "Recorded for student ID " + payload.student_id + " \u2014 "
+        + payload.solved + " of " + payload.total + " correct. You can close this page.";
+    } else {
+      var e = new Error((j && j.error) || "rejected"); e.fromServer = !!(j && j.error); throw e;
+    }
+  })
+  .catch(function(err){
+    /* a refusal the endpoint gave us is the student's to act on and resending
+       would not help; a reply we could not read is ours, so resend blind and
+       let the downloaded file stand as proof */
+    if (err && err.fromServer){
+      sendBtn.disabled = false;
+      sendBtn.textContent = "Submit to the course";
+      dlHint.textContent = err.message;
+      return;
+    }
+    fetch(SUBMIT_URL, {method:"POST", mode:"no-cors",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(payload)}).catch(function(){});
+    sendBtn.disabled = false;
+    sendBtn.textContent = "Submit to the course";
+    dlHint.textContent = "Sent, but the confirmation did not come back. "
+      + "Download the file as well and keep it \u2014 it is your proof of submission.";
+  });
+});
+
+/* resume a set from a previous visit */
+var prev = load();
+if (prev){ state = prev.st || []; start(prev.id); }
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Mixed Potential Bench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+:root{
+  --ground:#F1F3F2; --surface:#FFFFFF; --surface-2:#E9EDEB;
+  --ink:#14191B; --ink-2:#3E4A4D; --muted:#68767A; --line:#D6DDDA; --line-2:#C3CCC8;
+  --ox:#A85B33; --ox-soft:#F3E4DA;
+  --red-:#15618E; --red-soft:#DDE9F2;
+  --go:#2C7355; --go-soft:#DCEBE3;
+  --stop:#8A5F0C; --stop-soft:#F3E9D3;
+  --elec:#3E4A4D; --ion-k:#6E4C9B; --ion-k-soft:#EBE3F5;
+  --shadow:0 1px 2px rgba(20,25,27,.05),0 8px 24px -12px rgba(20,25,27,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+    --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+    --ox:#D08551; --ox-soft:#33231A;
+    --red-:#5AA6D4; --red-soft:#152833;
+    --go:#5DBB8D; --go-soft:#152A21;
+    --stop:#D6A33F; --stop-soft:#2B2415;
+    --elec:#AEBBBE; --ion-k:#B99BE0; --ion-k-soft:#241C33;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+  --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+  --ox:#D08551; --ox-soft:#33231A;
+  --red-:#5AA6D4; --red-soft:#152833;
+  --go:#5DBB8D; --go-soft:#152A21;
+  --stop:#D6A33F; --stop-soft:#2B2415;
+  --elec:#AEBBBE; --ion-k:#B99BE0; --ion-k-soft:#241C33;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:32px 20px 72px}
+.masthead{display:flex;flex-wrap:wrap;align-items:flex-end;gap:20px 32px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.eyebrow a{color:inherit}
+h1{font-family:"IBM Plex Serif",Georgia,serif;font-weight:600;font-size:clamp(28px,4.2vw,42px);line-height:1.12;margin:0;text-wrap:balance;letter-spacing:-.015em}
+.sub{margin:8px 0 0;color:var(--ink-2);font-size:15px;max-width:62ch}
+.tabs{display:flex;gap:2px;margin:24px 0 22px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{appearance:none;background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);
+  font-family:inherit;font-size:14.5px;font-weight:500;padding:11px 16px;cursor:pointer;white-space:nowrap;margin-bottom:-1px}
+.tab:hover{color:var(--ink-2)}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ox)}
+.tab:focus-visible{outline:2px solid var(--red-);outline-offset:-2px;border-radius:4px 4px 0 0}
+.panel[hidden]{display:none}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow)}
+.card-h{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.card-h h2{font-size:15px;font-weight:600;margin:0;letter-spacing:-.01em}
+.card-h .note{font-size:12.5px;color:var(--muted)}
+.card-b{padding:18px}
+.stack{display:flex;flex-direction:column;gap:16px}
+.two{display:grid;grid-template-columns:minmax(270px,1fr) minmax(330px,1.45fr);gap:16px;align-items:start}
+@media(max-width:900px){.two{grid-template-columns:1fr}}
+label.fld,span.fld{display:block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+select,input[type=text],input[type=number]{width:100%;font-family:inherit;font-size:14px;color:var(--ink);
+  background:var(--surface-2);border:1px solid var(--line-2);border-radius:7px;padding:9px 10px}
+input:read-only{background:var(--surface);color:var(--muted);cursor:not-allowed}
+select:focus-visible,input:focus-visible{outline:2px solid var(--red-);outline-offset:1px}
+input[type=range]{width:100%;accent-color:var(--ox)}
+input[type=range]:focus-visible{outline:2px solid var(--red-);outline-offset:3px}
+.slider-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;gap:10px}
+.slider-row .val{font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+.readout{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px dotted var(--line)}
+.readout:last-child{border-bottom:0}
+.readout .k{font-size:13px;color:var(--muted)}
+.rgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 32px}
+.rgrid .readout:last-child{border-bottom:1px dotted var(--line)}
+@media(max-width:620px){.rgrid{grid-template-columns:minmax(0,1fr)}}
+.readout .v{font-family:"IBM Plex Mono",monospace;font-size:16px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--ink)}
+.verdict{padding:12px 14px;border-radius:8px;font-size:13.5px;line-height:1.55}
+.verdict.go{background:var(--go-soft);color:var(--go)}
+.verdict.stop{background:var(--stop-soft);color:var(--stop)}
+.verdict.flat{background:var(--surface-2);color:var(--ink-2)}
+.verdict.mixv{background:var(--ion-k-soft);color:var(--ion-k)}
+.eqline{font-family:"IBM Plex Mono",monospace;font-size:13px;line-height:1.9;color:var(--ink-2);
+  background:var(--surface-2);border-radius:7px;padding:11px 13px}
+.eqline b{color:var(--ox);font-weight:600}
+svg{display:block;max-width:100%}
+.scrollx{overflow-x:auto}
+.solid{appearance:none;background:var(--ox);border:1px solid var(--ox);color:#fff;font-family:inherit;
+  font-size:13.5px;font-weight:500;padding:10px 16px;border-radius:7px;cursor:pointer}
+.solid:hover{filter:brightness(1.08)}
+.solid:disabled{background:var(--line-2);border-color:var(--line-2);color:var(--muted);cursor:not-allowed}
+.ghost{appearance:none;background:var(--surface-2);border:1px solid var(--line-2);color:var(--ink-2);
+  font-family:inherit;font-size:12.5px;padding:8px 12px;border-radius:7px;cursor:pointer;text-align:left}
+.ghost:hover{border-color:var(--ox);color:var(--ox)}
+table.ions{border-collapse:collapse;width:100%;font-size:13px}
+table.ions th,table.ions td{text-align:left;padding:8px 9px;border-bottom:1px solid var(--line);white-space:nowrap}
+table.ions th{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500}
+table.ions td.num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;text-align:right}
+table.ions tr.hi td{color:var(--ox);font-weight:500}
+table.ions tr.lo td{color:var(--red-)}
+.idgrid{display:grid;grid-template-columns:1fr;gap:14px;max-width:340px}
+.scorebar{display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;padding:14px 18px;border-top:1px solid var(--line)}
+.scorenum{font-family:"IBM Plex Mono",monospace;font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+.scorenum small{font-size:14px;font-weight:400;color:var(--muted)}
+.vcode{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted)}
+.vcode b{color:var(--ink);font-weight:600;letter-spacing:.08em}
+.quiz{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:16px}
+.q .stem{font-size:14.5px;line-height:1.6;margin:0 0 12px}
+.q .stem code{font-family:"IBM Plex Mono",monospace;font-size:13px;background:var(--surface-2);padding:1px 5px;border-radius:4px}
+.opts{display:flex;flex-direction:column;gap:7px}
+.opt{appearance:none;text-align:left;font-family:inherit;font-size:13.5px;line-height:1.45;color:var(--ink);
+  background:var(--surface-2);border:1px solid transparent;border-radius:7px;padding:9px 12px;cursor:pointer;display:flex;gap:9px}
+.opt .ltr{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);flex:0 0 auto;padding-top:1px}
+.opt:hover:not(:disabled){border-color:var(--line-2)}
+.opt.right{background:var(--go-soft);color:var(--go);border-color:var(--go);font-weight:500}
+.opt.right .ltr{color:var(--go)}
+.opt.wrong{background:var(--stop-soft);color:var(--stop);border-color:var(--stop)}
+.opt.wrong .ltr{color:var(--stop)}
+.opt:disabled{cursor:default}
+.why{margin:12px 0 0;font-size:13px;line-height:1.65;color:var(--ink-2);border-left:2px solid var(--line-2);padding-left:12px}
+.misc{display:block;margin-top:10px;padding:9px 12px;border-radius:7px;background:var(--stop-soft);color:var(--stop);font-size:12.5px;line-height:1.6}
+.misc a{color:inherit;font-weight:600;white-space:nowrap}
+.why[hidden]{display:none}
+.tally{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.hint{font-size:12.5px;color:var(--muted);line-height:1.65;margin:10px 0 0}
+.locked{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;background:var(--go-soft);color:var(--go);padding:2px 7px;border-radius:4px;margin-left:8px}
+.pill-row{display:flex;gap:3px;background:var(--surface-2);border-radius:8px;padding:3px}
+.pill{flex:1;appearance:none;border:0;background:none;font-family:"IBM Plex Mono",monospace;font-size:12.5px;
+  font-weight:500;color:var(--muted);padding:7px 2px;border-radius:6px;cursor:pointer}
+.pill[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.pill:focus-visible{outline:2px solid var(--red-);outline-offset:1px}
+.pill-row.pw .pill{font-size:11.5px}
+/* nowrap + scroll: a formula broken across lines mid-term is harder to read
+   than one the reader has to nudge sideways.  Explicit <br> still breaks. */
+.eqbig{font-family:"IBM Plex Mono",monospace;font-size:13.5px;line-height:2.05;color:var(--ink);
+  background:var(--surface-2);border-radius:8px;padding:14px 15px;overflow-x:auto;white-space:nowrap}
+.eqbig small{color:var(--muted);font-size:11.5px;letter-spacing:.04em}
+/* one colour per loss term, used in prose, in the equations and in every picture */
+.act{color:var(--ox);font-weight:600}
+.cnc{color:var(--red-);font-weight:600}
+.ohm{color:var(--stop);font-weight:600}
+.pot{color:var(--go);font-weight:600}
+.mix{color:var(--ion-k);font-weight:600}
+.termtbl{border-collapse:collapse;width:100%;font-size:13px}
+.termtbl td,.termtbl th{padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+.termtbl th{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);font-weight:500;text-align:left}
+.termtbl td.num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;text-align:right}
+.termtbl tr.tot td{border-bottom:0;border-top:2px solid var(--line-2);font-weight:600}
+.sumwrap{overflow-x:auto}
+.sumtbl{border-collapse:collapse;width:100%;font-size:13px}
+.sumtbl td,.sumtbl th{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}
+.sumtbl th{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.sumtbl tr:last-child td{border-bottom:0}
+.sumtbl td.eq{font-family:"IBM Plex Mono",monospace;font-size:13.5px;color:var(--ink);white-space:nowrap}
+.sumtbl td.nm{color:var(--ink-2);white-space:nowrap;font-size:12.5px}
+.sumtbl td.sy{color:var(--muted);font-size:12.5px;line-height:1.5;white-space:normal}
+.symgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:4px 20px;font-size:12.5px;color:var(--ink-2);line-height:1.6}
+.symgrid b{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--ink)}
+.swatch{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px}
+.trio3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:stretch}
+.trio3>.card{display:flex;flex-direction:column}
+.trio3>.card>.card-b:last-child{flex:1 1 auto}
+@media(max-width:1000px){.trio3{grid-template-columns:1fr 1fr}}
+@media(max-width:720px){.trio3{grid-template-columns:1fr}}
+.two.eq{align-items:stretch}
+.two.wideL{grid-template-columns:minmax(330px,1.5fr) minmax(240px,1fr)}
+.two.eq>.card{display:flex;flex-direction:column}
+.two.eq>.card>.card-b:last-child{flex:1 1 auto}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap}
+.btnrow .ghost{flex:1 1 auto;text-align:center}
+.dfctl{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:14px 16px;align-items:end}
+.trio3 .dfctl{grid-template-columns:1fr}
+.dfctl-2{grid-template-columns:repeat(2,minmax(150px,1fr))}
+.dfctl-3{grid-template-columns:repeat(3,minmax(150px,1fr))}
+.dfctl-wide{grid-column:1 / -1}
+@media(max-width:820px){.dfctl{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.dfctl{grid-template-columns:1fr}}
+footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;line-height:1.8}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+.glegend{display:flex;flex-direction:column;gap:5px;font-size:12.5px;line-height:1.45;color:var(--ink-2)}
+.glegend > span{display:flex;align-items:flex-start;gap:8px}
+.glegend > span > svg{flex:0 0 26px;margin-top:3px}
+/* the loss waterfall: one row per term, number on the left of the bar */
+.wide1{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+.pairfig{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+.pairfig.eq{align-items:stretch}
+.pairfig.eq>.card{display:flex;flex-direction:column}
+.pairfig.eq>.card>.card-b:last-child{flex:1 1 auto}
+@media(max-width:880px){.pairfig{grid-template-columns:1fr}}
+/* terse notes, two to a row */
+.notes2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 22px}
+.notes2>p{margin:0}
+@media(max-width:760px){.notes2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+  <div class="wrap">
+  <header class="masthead">
+    <div style="flex:1 1 380px">
+      <p class="eyebrow"><a href="index.html">CH40051 Electroanalytical Chemistry</a> &middot; Lecture 12 &middot; Mixed potential</p>
+      <h1>Mixed Potential Bench</h1>
+      <p class="sub">Two reactions on one piece of metal, and the metal cannot be at either equilibrium: it settles where their rates match, and that potential tells you nothing at all about how fast it is being eaten. Build the Evans diagram, read the corrosion rate off it, and move the lines the way a corrosion engineer does.</p>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true"  aria-controls="p-mix"  id="t-mix">Mixed potential</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-quiz" id="t-quiz">Concept Check</button>
+  </div>
+
+  <!-- ============== MIXED POTENTIAL ============== -->
+  <section class="panel" id="p-mix" role="tabpanel" aria-labelledby="t-mix">
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>Two reactions, one piece of metal, and a potential that belongs to neither</h2><span class="note">deck p.20&ndash;26 &mdash; mixed potential, corrosion, and the Evans diagram</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig" style="white-space:normal">
+          <span class="mix">&Sigma; i<sub>anodic</sub> = &Sigma; i<sub>cathodic</sub></span>&nbsp;&nbsp;&rArr;&nbsp;&nbsp;
+          <span class="mix">A<sub>a</sub> i<sub>a</sub>(E<sub>corr</sub>) = A<sub>c</sub> i<sub>c</sub>(E<sub>corr</sub>)</span>
+          <small>the only condition &mdash; charge in equals charge out, as <b>current</b>, not as current density</small><br>
+          i<sub>a</sub> = i<sub>0,M</sub> &middot; 10<sup>(E &minus; E<sub>M</sub>)/b<sub>a</sub></sup>&nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          i<sub>c</sub> = i<sub>0,X</sub> &middot; 10<sup>&minus;(E &minus; E<sub>X</sub>)/b<sub>c</sub></sup>
+          <small>each branch is just Tafel, from <a href="lecture10.html">Lecture 10</a></small><br>
+          <span class="mix">i<sub>corr</sub></span> = the common value where they meet
+          &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          rate = i<sub>corr</sub>M/z<sub>M</sub>F&rho;
+          <small>Faraday&rsquo;s law as a penetration rate &mdash; on steel, 1 &micro;A/cm<sup>2</sup> is 11.6 &micro;m/year</small><br>
+          i<sub>corr</sub> = B/R<sub>p</sub>, &nbsp; B = b<sub>a</sub>b<sub>c</sub>/2.303(b<sub>a</sub>+b<sub>c</sub>)
+          <small>Stern&ndash;Geary: the slope through E<sub>corr</sub> gives the rate without removing the sample. B = 17.4 mV for b = 60/120 mV</small>
+        </div>
+        <div class="notes2">
+          <p class="hint">Zinc in acid: Zn/Zn<sup>2+</sup> wants &minus;0.76 V, H<sup>+</sup>/H<sub>2</sub> wants 0 V, and
+            <b>one conductor cannot be at both</b>. It settles in between, where neither couple is at equilibrium: zinc dissolves
+            steadily and hydrogen comes off at the matching rate. That is the <b class="mix">mixed potential</b> &mdash;
+            E<sub>corr</sub> when it is corrosion, at the rate i<sub>corr</sub>.</p>
+          <p class="hint">Three consequences. <b>It is not an equilibrium</b>: two rates set it, so it depends on kinetics, not on
+            Nernst. <b>No net current leaves</b>, so a steady open-circuit reading says nothing about how fast the metal is going.
+            And <b>the two reactions need not share a place</b> &mdash; which is where the areas start doing the damage.</p>
+        </div>
+      </div>
+    </div>
+
+
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-b">
+        <div class="dfctl dfctl-wide">
+          <div class="dfctl-wide btnrow" style="margin:0">
+            <button class="ghost" id="mxP1" type="button">1 &middot; Fe in 1 M acid, deaerated</button>
+            <button class="ghost" id="mxP2" type="button">2 &middot; Fe in aerated neutral water: O&#8322;-limited</button>
+            <button class="ghost" id="mxP3" type="button">3 &middot; Zn in pH 1 acid: HER is 10<sup>&minus;10.5</sup> slow</button>
+            <button class="ghost" id="mxP4" type="button">4 &middot; Zn in 1 M ZnSO&#8324;, pH 5.6 &mdash; the deck&rsquo;s own cell</button>
+          </div>
+          <div class="dfctl-wide btnrow" style="margin:0">
+            <button class="ghost" id="mxP5" type="button">5 &middot; Alkaline Zn, Zn(OH)&#8324;<sup>2&minus;</sup></button>
+            <button class="ghost" id="mxP6" type="button">6 &middot; A scratch in a coating: A<sub>c</sub>/A<sub>a</sub> = 100</button>
+            <button class="ghost" id="mxP7" type="button">7 &middot; Fe with a zinc sacrificial anode</button>
+            <button class="ghost" id="mxP8" type="button">8 &middot; A cathodic inhibitor on the steel</button>
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">pH of the solution</span><span class="val" id="mxPHv"></span></div>
+            <input type="range" id="mxPH" min="0" max="14" step="0.1" value="0">
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">A<sub>c</sub> / A<sub>a</sub> &mdash; cathode : anode area</span><span class="val" id="mxARv"></span></div>
+            <input type="range" id="mxAR" min="-2" max="3" step="0.02" value="0">
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">log i<sub>0</sub> of the cathodic reaction</span><span class="val" id="mxI0v"></span></div>
+            <input type="range" id="mxI0" min="-13" max="-3" step="0.1" value="-6">
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">dissolved O<sub>2</sub> &rarr; i<sub>L</sub></span><span class="val" id="mxO2v"></span></div>
+            <input type="range" id="mxO2" min="-5" max="1" step="0.001" value="-5">
+          </div>
+          <div class="dfctl-wide btnrow" style="margin:0">
+            <button class="ghost" id="mxPlay" type="button">&#9654; Replay the surface, and sweep the potentiostat</button>
+            <label style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-2);flex:1 1 auto">
+              <input type="checkbox" id="mxProt" style="width:auto;accent-color:var(--ion-k)"> add a zinc sacrificial anode, equal area
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pairfig eq" style="margin-bottom:16px">
+
+      <div class="card">
+        <div class="card-h"><h2>Where it can go, and where it does</h2><span class="note" id="mxPBn">&mdash;</span></div>
+        <div class="card-b stack" style="gap:14px">
+          <svg id="mxpb" viewBox="0 0 440 260" style="display:block;width:100%;height:auto;margin:0 auto" role="img" aria-label="A schematic Pourbaix diagram for the metal set above: potential against pH, with regions of immunity as the metal, of corrosion as the dissolved ion, and of passivity as the oxide or hydroxide. Zinc also corrodes at high pH as the zincate ion, so its passive band is closed at both ends. The hydrogen and oxygen lines of water are drawn across it, and a marker sits at the current pH and corrosion potential."></svg>
+          <svg id="mxsurf" viewBox="0 0 440 260" style="display:block;width:100%;height:auto;margin:0 auto" role="img" aria-label="A metal surface in solution with an anodic patch releasing metal ions and a cathodic area taking electrons to make hydrogen bubbles or reduce oxygen, with electrons flowing sideways through the metal between them, drawn at a rate set by the corrosion current and with the two areas drawn to the set ratio."></svg>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2>The Evans diagram</h2><span class="note" id="mxNote">&mdash;</span></div>
+        <div class="card-b stack" style="gap:12px">
+          <svg id="mxev" viewBox="0 0 540 394" style="display:block;width:100%;height:auto;max-width:540px;margin:0 auto" role="img" aria-label="Evans diagram: potential on the vertical axis against the logarithm of current on the horizontal, with the anodic line of the metal and the cathodic line of the oxidant drawn from their own equilibrium potentials and exchange currents, crossing at the corrosion potential and corrosion current. The V-shaped curve of the net measurable current is drawn over them, and the two Tafel extrapolations that recover the crossing from it."></svg>
+          <div class="glegend">
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="2" y1="12" x2="24" y2="2" stroke="var(--ox)" stroke-width="2"/><circle cx="2" cy="12" r="2.5" fill="var(--ox)"/></svg><span><b class="act">the anodic line</b> of the metal, slope b<sub>a</sub>, from its own (E<sub>M</sub>, i<sub>0,M</sub>) &mdash; the dot.</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="2" y1="2" x2="24" y2="12" stroke="var(--red-)" stroke-width="2"/><circle cx="2" cy="2" r="2.5" fill="var(--red-)"/></svg><span><b class="cnc">the cathodic line</b> of the oxidant. Where it goes vertical it has hit its <b>transport limit</b> &mdash; oxygen almost always does, and then diffusion alone sets i<sub>corr</sub>.</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><circle cx="13" cy="7" r="4" fill="none" stroke="var(--ion-k)" stroke-width="2"/><line x1="13" y1="1" x2="13" y2="13" stroke="var(--ion-k)" stroke-width="1" stroke-dasharray="2 2"/></svg><span><b class="mix">the crossing</b> is (i<sub>corr</sub>, E<sub>corr</sub>). Both lines are <em>currents</em>, scaled by area &mdash; so the area ratio alone slides it.</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><path d="M3 2 L12 11 L21 2" fill="none" stroke="var(--ink)" stroke-width="2"/></svg><span><b>the V</b> is what a potentiostat measures: |net current| swept through E<sub>corr</sub>, diving to zero where the two cancel. Extrapolating its legs back recovers i<sub>corr</sub> &mdash; <b>Tafel extrapolation</b>.</span></span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+        <div class="card-h"><h2>The numbers</h2><span class="note" id="mxWho">&mdash;</span></div>
+        <div class="card-b">
+          <div class="rgrid">
+          <div class="readout"><span class="k">metal couple, E<sub>M</sub></span><span class="v" id="mxRm">&mdash;</span></div>
+          <div class="readout"><span class="k">oxidant couple, E<sub>X</sub></span><span class="v" id="mxRx">&mdash;</span></div>
+          <div class="readout"><span class="k"><span class="mix">E<sub>corr</sub></span>, the mixed potential</span><span class="v" id="mxRec">&mdash;</span></div>
+          <div class="readout"><span class="k">&hellip; how far it is from E<sub>M</sub></span><span class="v" id="mxRpol">&mdash;</span></div>
+          <div class="readout"><span class="k"><span class="mix">i<sub>corr</sub></span>, matched current</span><span class="v" id="mxRic">&mdash;</span></div>
+          <div class="readout"><span class="k">anodic current <b>density</b> on A<sub>a</sub></span><span class="v" id="mxRja">&mdash;</span></div>
+          <div class="readout"><span class="k">metal loss</span><span class="v" id="mxRrate">&mdash;</span></div>
+          <div class="readout"><span class="k">cathodic branch, limited?</span><span class="v" id="mxRlim">&mdash;</span></div>
+          <div class="readout"><span class="k">R<sub>p</sub> from Stern&ndash;Geary, per cm<sup>2</sup></span><span class="v" id="mxRrp">&mdash;</span></div>
+          </div>
+          <div id="mxVerdict" class="verdict mixv" style="margin-top:14px">&mdash;</div>
+        </div>
+      </div>
+
+  </section>
+
+
+  <section class="panel" id="p-quiz" role="tabpanel" aria-labelledby="t-quiz" hidden>
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h">
+        <h2>Concept check</h2>
+        <span class="note">Answer once per question &mdash; the reasoning appears immediately</span>
+        <span class="tally" style="margin-left:auto" id="tally"></span>
+      </div>
+      <div class="card-b">
+        <div class="idgrid">
+          <div>
+            <label class="fld" for="sId">Student ID</label>
+            <input type="text" id="sId" inputmode="numeric" placeholder="e.g. 20261234">
+          </div>
+        </div>
+        <p class="hint" id="idHint"></p>
+      </div>
+      <div class="scorebar" id="scorebar" hidden>
+        <div>
+          <div class="scorenum" id="scoreNum">&mdash;</div>
+          <div class="vcode" style="margin-top:4px" id="whoLine">&mdash;</div>
+        </div>
+        <div style="flex:1 1 300px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="solid" id="sendBtn" type="button" hidden>Submit to the course</button>
+            <button class="ghost" id="dlBtn" type="button">Download my result</button>
+          </div>
+          <p class="hint" id="dlHint" style="margin-top:8px">Download the file and hand it in as your instructor directs.</p>
+        </div>
+      </div>
+    </div>
+    <div class="quiz" id="quiz"></div>
+  </section>
+
+  <footer>
+    The Evans construction, Tafel extrapolation and Stern&ndash;Geary as in Bard &amp; Faulkner, <i>Electrochemical Methods</i>, chapter 1, and in Fontana, <i>Corrosion Engineering</i> &middot;
+    the corrosion presets follow the Lecture 10 deck&rsquo;s own examples, with Tafel parameters of the usual textbook magnitude &middot;
+    standard potentials for the aqua ions, hexacyanoferrate, tris(phenanthroline)iron, hexaamminecobalt and Cu<sup>2+</sup>/CuI from the CRC Handbook;
+    the EDTA, oxalate and remaining cobalt entries are formal potentials from the analytical literature &middot;
+    the Pourbaix diagram is schematic, for 10<sup>&minus;6</sup> M dissolved iron &middot;
+    activity coefficients are taken as 1 throughout<br>
+    CH40051 Electroanalytical Chemistry &middot; Fall 2026 &mdash; companion to Lecture 12
+  </footer>
+</div>
+<script>
+(function(){
+"use strict";
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+/* ---------------- tabs ---------------- */
+var tabs=[].slice.call(document.querySelectorAll(".tab"));
+tabs.forEach(function(t){
+  t.addEventListener("click",function(){
+    tabs.forEach(function(o){
+      var on=(o===t);
+      o.setAttribute("aria-selected",on?"true":"false");
+      document.getElementById(o.getAttribute("aria-controls")).hidden=!on;
+    });
+  });
+});
+
+/* ================= SHARED CONSTANTS AND HELPERS =========================
+   Currents in A/cm2, potentials in V, lengths in cm unless a name says
+   otherwise. Everything on the page is derived from these.              */
+var QE = 1.602176634e-19, KB = 1.380649e-23, NA = 6.02214076e23;
+var FARADAY = QE * NA, RGAS = KB * NA, T25 = 298.15;
+var RTF = RGAS * T25 / FARADAY;            /* 0.025693 V                 */
+var DEC = RTF * Math.LN10;                 /* 0.059159 V per decade      */
+var MONO = 'font-family="IBM Plex Mono,monospace"';
+var SEC_YR = 3.15576e7;
+
+function pillGroup(id, cb){
+  var wrap = document.getElementById(id);
+  wrap.addEventListener("click", function(e){
+    var b = e.target.closest("button.pill");
+    if(!b) return;
+    [].slice.call(wrap.querySelectorAll("button.pill")).forEach(function(o){
+      o.setAttribute("aria-pressed", o === b ? "true" : "false");
+    });
+    cb(b.getAttribute("data-s"));
+  });
+}
+function pillSet(id, val){
+  [].slice.call(document.querySelectorAll("#" + id + " button.pill")).forEach(function(o){
+    o.setAttribute("aria-pressed", o.getAttribute("data-s") === val ? "true" : "false");
+  });
+}
+
+/* ---- one requestAnimationFrame loop; a picture only ticks while shown -- */
+var REDUCED = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+var ANIM = [], animLast = 0;
+function animLoop(ts){
+  if(ts - animLast > 32){
+    animLast = ts;
+    ANIM.forEach(function(a){ if(!document.getElementById(a.panel).hidden) a.tick(ts); });
+  }
+  window.requestAnimationFrame(animLoop);
+}
+
+/* x as "1.84 × 10<sup>7</sup>", and the same with a tspan for inside an SVG */
+function sciH(x, d){
+  if(x === 0) return "0";
+  var e = Math.floor(Math.log10(Math.abs(x))), m = x / Math.pow(10, e);
+  if(Math.abs(+m.toFixed(d - 1)) >= 10){ m /= 10; e++; }
+  return m.toFixed(d - 1) + " × 10<sup>" + e + "</sup>";
+}
+function sciSvg(x, d){
+  if(x === 0) return "0";
+  var e = Math.floor(Math.log10(Math.abs(x))), m = x / Math.pow(10, e);
+  if(Math.abs(+m.toFixed(d - 1)) >= 10){ m /= 10; e++; }
+  return m.toFixed(d - 1) + ' × 10<tspan baseline-shift="super" font-size="8">' + e + '</tspan>';
+}
+/* a current density, in whatever unit keeps it readable */
+function fmtJ(j){
+  var a = Math.abs(j);
+  if(a === 0) return "0";
+  if(a >= 1) return j.toFixed(2) + " A/cm²";
+  if(a >= 1e-3) return (j * 1e3).toFixed(2) + " mA/cm²";
+  if(a >= 1e-6) return (j * 1e6).toFixed(2) + " µA/cm²";
+  if(a >= 1e-9) return (j * 1e9).toFixed(2) + " nA/cm²";
+  return sciH(j, 2) + " A/cm²";
+}
+/* the same, for a current rather than a current density */
+function fmtA(i){
+  var a = Math.abs(i);
+  if(a === 0) return "0";
+  if(a >= 1) return i.toFixed(3) + " A";
+  if(a >= 1e-3) return (i * 1e3).toPrecision(3) + " mA";
+  if(a >= 1e-6) return (i * 1e6).toPrecision(3) + " µA";
+  if(a >= 1e-9) return (i * 1e9).toPrecision(3) + " nA";
+  return sciH(i, 2) + " A";
+}
+function fmtV(v){
+  var a = Math.abs(v);
+  if(a < 1) return (v * 1000).toFixed(a < 0.01 ? 2 : 1) + " mV";
+  return v.toFixed(3) + " V";
+}
+function fmtR(r){
+  if(r >= 1e6) return (r / 1e6).toFixed(2) + " MΩ";
+  if(r >= 1e3) return (r / 1e3).toFixed(2) + " kΩ";
+  if(r >= 1) return r.toFixed(1) + " Ω";
+  return (r * 1000).toFixed(1) + " mΩ";
+}
+function clamp(v, a, b){ return v < a ? a : v > b ? b : v; }
+
+/* ---- the small SVG vocabulary every picture on this page is drawn in --- */
+function ln(x1, y1, x2, y2, col, w, dash, op){
+  return '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + x2.toFixed(1)
+       + '" y2="' + y2.toFixed(1) + '" stroke="' + col + '" stroke-width="' + (w || 1) + '"'
+       + (dash ? ' stroke-dasharray="' + dash + '"' : "")
+       + (op !== undefined ? ' opacity="' + op + '"' : "") + '/>';
+}
+function tx(x, y, s, col, size, anchor, weight){
+  return '<text x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" fill="' + col + '" ' + MONO
+       + ' font-size="' + (size || 10.5) + '"'
+       + (anchor ? ' text-anchor="' + anchor + '"' : "")
+       + (weight ? ' font-weight="' + weight + '"' : "") + '>' + s + '</text>';
+}
+function pth(d, col, w, fill, op){
+  return '<path d="' + d + '" fill="' + (fill || "none") + '" stroke="' + (col || "none")
+       + '" stroke-width="' + (w || 2) + '"'
+       + (op !== undefined ? ' opacity="' + op + '"' : "") + ' stroke-linejoin="round"/>';
+}
+function rc(x, y, w, h, col, op, rx){
+  if(w <= 0 || h <= 0) return "";
+  return '<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + w.toFixed(1)
+       + '" height="' + h.toFixed(1) + '" fill="' + col + '"'
+       + (rx ? ' rx="' + rx + '"' : "")
+       + (op !== undefined ? ' opacity="' + op + '"' : "") + '/>';
+}
+function cir(x, y, r, col, op){
+  return '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + r.toFixed(2)
+       + '" fill="' + col + '"' + (op !== undefined ? ' opacity="' + op + '"' : "") + '/>';
+}
+/* a two-headed measure, used for every "this much" on the page */
+function arrowV(x, y1, y2, col, lab, side){
+  var s = ln(x, y1, x, y2, col, 1.6);
+  var d = y2 > y1 ? 1 : -1;
+  s += '<polygon points="' + x + ',' + y2 + ' ' + (x - 3) + ',' + (y2 - 4 * d) + ' ' + (x + 3) + ',' + (y2 - 4 * d) + '" fill="' + col + '"/>';
+  s += '<polygon points="' + x + ',' + y1 + ' ' + (x - 3) + ',' + (y1 + 4 * d) + ' ' + (x + 3) + ',' + (y1 + 4 * d) + '" fill="' + col + '"/>';
+  if(lab) s += tx(x + (side === "l" ? -6 : 6), (y1 + y2) / 2 + 3.5, lab, col, 10, side === "l" ? "end" : "start", 600);
+  return s;
+}
+
+
+/* ================= 5 - MIXED POTENTIAL ================================
+   Two or three couples share one surface. Each contributes an anodic and a
+   cathodic Tafel branch, scaled by its own area, and the mixed potential is
+   where the signed sum of all of them is zero. Nothing is neglected, so the
+   picture is honest about the branches that happen to be negligible.    */
+var MX_M = {
+  Fe:    {E0: -0.440, i0: 1e-7, ba: 0.060, bc: 0.060, M: 55.845, z: 2, rho: 7.87,
+          nm: "Fe → Fe²⁺ + 2e⁻", sh: "Fe"},
+  Zn:    {E0: -0.762, i0: 1e-7, ba: 0.040, bc: 0.040, M: 65.38,  z: 2, rho: 7.14,
+          nm: "Zn → Zn²⁺ + 2e⁻", sh: "Zn"},
+  ZnOH:  {E0: -1.199, i0: 1e-6, ba: 0.040, bc: 0.040, M: 65.38,  z: 2, rho: 7.14,
+          nm: "Zn + 4OH⁻ → Zn(OH)₄²⁻ + 2e⁻", sh: "Zn/alk"}
+};
+var MX = {m: "Fe", pH: 0, prot: false, sweep: 0, t0: 0};
+/* air-saturated water: 0.25 mM O2, D = 2e-5 cm2/s, n = 4, delta = 500 um, as
+   Lecture 10's Concentration tab computes it -- in log10(mA/cm2), for the slider      */
+var O2_AIR = Math.log10(4 * FARADAY * 2e-5 * 0.25e-6 / 0.05 * 1000);
+
+function mxPH(){ return +document.getElementById("mxPH").value; }
+function mxAr(){ return Math.pow(10, +document.getElementById("mxAR").value); }   /* Ac/Aa */
+function mxI0c(){ return Math.pow(10, +document.getElementById("mxI0").value); }
+function mxILO2(){ return Math.pow(10, +document.getElementById("mxO2").value) / 1000; }  /* A/cm2 */
+function mxO2On(){ return +document.getElementById("mxO2").value > -4.9; }
+
+/* every couple on the surface, as {nm, E, i0, ba, bc, A, iL, metal} */
+function mxCouples(){
+  var pH = mxPH(), ar = mxAr(), Aa = 1, Ac = ar;
+  var m = MX_M[MX.m], out = [];
+  out.push({nm: m.nm, sh: m.sh, E: m.E0, i0: m.i0, ba: m.ba, bc: m.bc, A: Aa, iL: Infinity, metal: true, dat: m});
+  /* the oxidants are drawn cathodic-only: there is no dissolved H2 in the cell
+     and no O2 evolution at these potentials, so their anodic branches have no
+     reagent to run on. Writing them in would let hydrogen oxidation supply
+     current the cell does not have.                                          */
+  out.push({nm: "2H⁺ + 2e⁻ → H₂", sh: "H⁺/H₂", E: -DEC * pH, i0: mxI0c(), ba: 0.120, bc: 0.120,
+            A: Ac, iL: Infinity, metal: false, conly: true});
+  if(mxO2On())
+    out.push({nm: "O₂ + 4H⁺ + 4e⁻ → 2H₂O", sh: "O₂/H₂O", E: 1.229 - DEC * pH, i0: 1e-10,
+              ba: 0.120, bc: 0.120, A: Ac, iL: mxILO2(), metal: false, conly: true});
+  if(MX.prot){
+    var z = MX_M.Zn;
+    out.push({nm: "sacrificial Zn → Zn²⁺", sh: "Zn anode", E: z.E0, i0: z.i0, ba: z.ba, bc: z.bc,
+              A: 1, iL: Infinity, metal: false, sac: true});
+  }
+  return out;
+}
+function mxIa(c, E){ return c.conly ? 0 : c.i0 * Math.pow(10, (E - c.E) / c.ba); }
+function mxIc(c, E){ return Math.min(c.i0 * Math.pow(10, -(E - c.E) / c.bc), c.iL); }
+function mxNet(cs, E){
+  var t = 0;
+  cs.forEach(function(c){ t += c.A * (mxIa(c, E) - mxIc(c, E)); });
+  return t;
+}
+function mxSolve(cs){
+  var lo = -2.4, hi = 2.4;
+  for(var k = 0; k < 90; k++){
+    var mid = (lo + hi) / 2;
+    if(mxNet(cs, mid) < 0) lo = mid; else hi = mid;
+  }
+  return (lo + hi) / 2;
+}
+function mxState(){
+  var cs = mxCouples(), E = mxSolve(cs);
+  var met = cs[0];
+  var ja = mxIa(met, E);                              /* A/cm2 on the anode */
+  var Ia = met.A * ja;
+  var m = met.dat;
+  var rate = ja * m.M / (m.z * FARADAY * m.rho) * SEC_YR * 10;   /* mm/year  */
+  /* which cathodic branch carries the current, and is it diffusion limited */
+  var dom = null, domI = 0;
+  cs.forEach(function(c){
+    if(c.metal || c.sac) return;
+    var i = c.A * mxIc(c, E);
+    if(i > domI){ domI = i; dom = c; }
+  });
+  var limited = dom ? mxIc(dom, E) >= dom.iL * 0.999 && isFinite(dom.iL) : false;
+  var B = limited ? met.ba / 2.303
+                  : met.ba * (dom ? dom.bc : met.bc) / (2.303 * (met.ba + (dom ? dom.bc : met.bc)));
+  return {cs: cs, E: E, met: met, ja: ja, Ia: Ia, rate: rate, dom: dom, limited: limited,
+          Rp: B / ja, B: B};
+}
+
+function mxDrawEvans(){
+  var el = document.getElementById("mxev");
+  if(!el) return;
+  var st = mxState(), cs = st.cs;
+  var X0 = 58, X1 = 500, Y0 = 26, Y1 = 316;
+  var Es = cs.map(function(c){ return c.E; });
+  var eHi = Math.max.apply(null, Es) + 0.16, eLo = Math.min.apply(null, Es) - 0.16;
+  var lHi = Math.max(Math.log10(st.Ia) + 2.2, -2), lLo = Math.min(Math.log10(st.Ia) - 3.2, -9);
+  function px(l){ return X0 + (clamp(l, lLo, lHi) - lLo) / (lHi - lLo) * (X1 - X0); }
+  function py(e){ return Y1 - (clamp(e, eLo, eHi) - eLo) / (eHi - eLo) * (Y1 - Y0); }
+  var s = rc(X0, Y0, X1 - X0, Y1 - Y0, "var(--surface-2)", 0.5, 4);
+  for(var g = Math.ceil(lLo); g <= Math.floor(lHi); g++){
+    s += ln(px(g), Y0, px(g), Y1, "var(--line-2)", 0.6, "2 4");
+    s += tx(px(g), Y1 + 13, "1e" + g, "var(--muted)", 8.5, "middle");
+  }
+  var step = (eHi - eLo) > 1.6 ? 0.4 : (eHi - eLo) > 0.8 ? 0.2 : 0.1;
+  for(var e = Math.ceil(eLo / step) * step; e <= eHi; e += step){
+    s += ln(X0, py(e), X1, py(e), "var(--line-2)", 0.6, "2 4");
+    s += tx(X0 - 4, py(e) + 3.5, e.toFixed(step < 0.2 ? 2 : 1), "var(--muted)", 8.5, "end");
+  }
+  /* each couple: its anodic leg up-right, its cathodic leg down-right */
+  /* the crossing is the headline, so it keeps the place it wants; every
+     other label takes the nearest free slot at least a line away      */
+  var ecY = py(st.E) + 14, LABY = [ecY, ecY + 13];
+  function freeY(y){
+    for(var t = 0; t < 40; t++){
+      var step = Math.ceil((t + 1) / 2) * 13 * (t % 2 ? -1 : 1), cand = t ? y + step : y, ok = true;
+      for(var q = 0; q < LABY.length; q++) if(Math.abs(LABY[q] - cand) < 13){ ok = false; break; }
+      if(ok){ LABY.push(cand); return cand; }
+    }
+    LABY.push(y);
+    return y;
+  }
+  cs.forEach(function(c, k){
+    var colA = c.metal ? "var(--ox)" : c.sac ? "var(--ion-k)" : "var(--ox)";
+    var colC = "var(--red-)";
+    var da = "", dc = "";
+    for(var i = 0; i <= 90; i++){
+      var ee = eLo + (eHi - eLo) * i / 90;
+      var la = Math.log10(c.A * mxIa(c, ee)), lc = Math.log10(c.A * mxIc(c, ee));
+      if(la > lLo && !c.conly) da += (da ? "L" : "M") + px(la).toFixed(1) + " " + py(ee).toFixed(1) + " ";
+      if(lc > lLo) dc += (dc ? "L" : "M") + px(lc).toFixed(1) + " " + py(ee).toFixed(1) + " ";
+    }
+    var strong = c.metal || c.sac;
+    s += pth(da, colA, strong ? 2.2 : 1.1, null, strong ? 0.95 : 0.35);
+    s += pth(dc, colC, c.metal ? 1.1 : 2.2, null, c.metal ? 0.35 : 0.95);
+    var li0 = Math.log10(c.A * c.i0);
+    if(li0 > lLo){
+      s += cir(px(li0), py(c.E), 3.4, strong ? colA : colC);
+      /* a label that would run off the right edge is hung on the other side */
+      var lab = c.sh + "  " + c.E.toFixed(3) + " V", flip = px(li0) > X1 - 130;
+      s += tx(px(li0) + (flip ? -6 : 6), freeY(py(c.E) - 5), lab,
+              strong ? colA : colC, 9.5, flip ? "end" : null, 600);
+    }else{
+      s += ln(X0, py(c.E), X0 + 10, py(c.E), strong ? colA : colC, 2);
+      s += tx(X0 + 13, freeY(py(c.E) - 5), c.sh + "  " + c.E.toFixed(3) + " V",
+              strong ? colA : colC, 9.5, null, 600);
+    }
+  });
+  /* the V that a potentiostat measures, and the crossing it hides */
+  var dv = "";
+  for(var i = 0; i <= 200; i++){
+    var ee = eLo + (eHi - eLo) * i / 200;
+    var n = Math.abs(mxNet(cs, ee));
+    if(n <= 0) continue;
+    var l = Math.log10(n);
+    if(l < lLo) continue;
+    dv += (dv ? "L" : "M") + px(l).toFixed(1) + " " + py(ee).toFixed(1) + " ";
+  }
+  s += pth(dv, "var(--ink)", 1.8, null, 0.85);
+  var lic = Math.log10(st.Ia);
+  s += ln(X0, py(st.E), px(lic), py(st.E), "var(--ion-k)", 1.3, "4 3");
+  s += ln(px(lic), py(st.E), px(lic), Y1, "var(--ion-k)", 1.3, "4 3");
+  s += cir(px(lic), py(st.E), 5.5, "none").replace('fill="none"',
+        'fill="none" stroke="var(--ion-k)" stroke-width="2.2"');
+  s += tx(px(lic) + 9, ecY, "E_corr " + st.E.toFixed(3) + " V", "var(--ion-k)", 10.5, null, 600);
+  s += tx(px(lic) + 9, ecY + 13, "i_corr " + fmtA(st.Ia), "var(--ion-k)", 10);
+  /* the sweep marker, so the V reads as something a machine traced out */
+  if(!REDUCED){
+    var ph = MX.sweep % 1, ee2 = eLo + (eHi - eLo) * (ph < 0.5 ? ph * 2 : 2 - ph * 2);
+    var n2 = Math.abs(mxNet(cs, ee2));
+    if(n2 > 0 && Math.log10(n2) > lLo) s += cir(px(Math.log10(n2)), py(ee2), 3.6, "var(--ink)", 0.9);
+  }
+  s += tx(X0, Y1 + 30, "horizontal: log current in A (density × area)   ·   vertical: E vs SHE",
+          "var(--muted)", 9.5);
+  s += tx(X0, Y1 + 44, "bold copper = metal dissolving · bold blue = oxidant reduced",
+        "var(--muted)", 9.5);
+  s += tx(X0, Y1 + 58, "faint = negligible branches · oxidants cathodic-only · black = |net| swept",
+        "var(--muted)", 9.5);
+  el.innerHTML = s;
+  document.getElementById("mxNote").textContent =
+    MX_M[MX.m].sh + " at pH " + mxPH().toFixed(1) + ", A_c/A_a = " + mxAr().toPrecision(3);
+}
+
+function mxDrawSurface(ts){
+  var el = document.getElementById("mxsurf");
+  if(!el) return;
+  var st = mxState(), ar = mxAr();
+  var X0 = 14, X1 = 426, Y0 = 20, YM = 150, Y1 = 236;
+  var s = rc(X0, Y0, X1 - X0, YM - Y0, "var(--red-soft)", 0.5, 3);
+  s += rc(X0, YM, X1 - X0, Y1 - YM, "var(--elec)", 0.8, 3);
+  /* the anodic patch, drawn to the set area share */
+  var fa = clamp(1 / (1 + ar), 0.02, 0.98), W = X1 - X0;
+  var ax0 = X0 + W * 0.5 - W * fa / 2, ax1 = ax0 + W * fa;
+  s += rc(ax0, YM, ax1 - ax0, 8, "var(--ox)", 0.95, 2);
+  s += tx((ax0 + ax1) / 2, Y1 - 8, "anode  A_a = 1 cm²", "var(--surface)", 9.5, "middle", 600);
+  s += tx(X0 + 8, Y1 - 8, "cathode  A_c = " + ar.toPrecision(3) + " cm²", "var(--surface)", 9.5, null, 600);
+  s += tx(X0 + 4, YM - 6, "solution", "var(--red-)", 9.5);
+  /* rate: compressed to log, so eight decades still read on one screen */
+  var lg = clamp(Math.log10(Math.max(st.ja, 1e-12)) + 11, 0.4, 8);
+  var per = 2600 / lg;
+  var phase = (ts % per) / per;
+  var nd = Math.round(clamp(lg, 1, 8));
+  for(var k = 0; k < nd; k++){
+    var u = (phase + k / nd) % 1;
+    /* metal ion leaving the anode */
+    var mx = ax0 + (ax1 - ax0) * ((k * 0.37 + 0.2) % 1);
+    s += cir(mx, YM - u * (YM - Y0 - 14) - 6, 4, "var(--ox)", 0.9 * (1 - u * 0.6));
+    /* electrons travelling sideways inside the metal to the cathodic area */
+    var ex = ax0 + (u - 0.5) * (X1 - ax0) * (k % 2 ? 1 : -1) * 0.9;
+    s += cir(clamp(ex, X0 + 4, X1 - 4), YM + 22, 3, "var(--go)", 0.85);
+    /* and the product coming off the cathode */
+    var cx = (k % 2 ? X0 + 28 + k * 11 : X1 - 28 - k * 11);
+    s += cir(cx, YM - u * (YM - Y0 - 10) - 4, 3.4 + u * 3.4, "var(--red-)", 0.55 * (1 - u * 0.5));
+  }
+  s += tx(X0 + 4, Y0 + 12, "copper = " + MX_M[MX.m].sh + " leaving as ions   ·   blue = "
+        + (st.dom ? st.dom.sh : "the oxidant") + " being reduced", "var(--ink-2)", 9.5);
+  s += tx(X0 + 4, Y0 + 26, "green = electrons, sideways through the metal, no wire needed", "var(--go)", 9.5);
+  s += tx(X0 + 4, Y1 + 14, "anodic current density " + fmtJ(st.ja) + "   ·   penetration "
+        + (st.rate < 0.01 ? (st.rate * 1000).toPrecision(2) + " µm/yr" : st.rate.toPrecision(3) + " mm/yr"),
+        "var(--ox)", 10, null, 600);
+  el.innerHTML = s;
+}
+
+function mxDrawPourbaix(){
+  var el = document.getElementById("mxpb");
+  if(!el) return;
+  var st = mxState(), pH = mxPH(), zinc = (MX.m === "Zn" || MX.m === "ZnOH");
+  var X0 = 44, X1 = 426, Y0 = 20, Y1 = 196;
+  var ELO = zinc ? -1.8 : -1.3, EHI = zinc ? 1.2 : 1.5;
+  function px(p){ return X0 + clamp(p, 0, 14) / 14 * (X1 - X0); }
+  function py(e){ return Y1 - (clamp(e, ELO, EHI) - ELO) / (EHI - ELO) * (Y1 - Y0); }
+  function poly(pts, col, op){
+    return pth("M" + pts.map(function(q){ return px(q[0]) + " " + py(q[1]); }).join(" L") + " Z",
+               "none", 0, col, op);
+  }
+  var s = rc(X0, Y0, X1 - X0, Y1 - Y0, "var(--surface-2)", 0.5, 4);
+
+  if(zinc){
+    /* 1e-6 M dissolved zinc, schematic. Zinc is amphoteric: the passive
+       band is closed at both ends, and the zincate field reopens it.   */
+    var ZE = -0.939, ZA = 8.45, ZB = 10.6;         /* V, and the two pH's */
+    function zim(p){
+      return p <= ZA ? ZE
+           : p <= ZB ? -0.439 - DEC * p
+           : -0.439 - DEC * ZB - 2 * DEC * (p - ZB);
+    }
+    var imm = [[0, ELO], [0, ZE], [ZA, ZE]];
+    for(var p = ZA; p <= 14.001; p += 0.5) imm.push([Math.min(p, 14), zim(Math.min(p, 14))]);
+    imm.push([14, ELO]);
+    s += poly(imm, "var(--go)", 0.17);
+    s += poly([[0, ZE], [0, EHI], [ZA, EHI], [ZA, ZE]], "var(--ox)", 0.2);
+    var pas = [[ZA, ZE], [ZA, EHI], [ZB, EHI]];
+    for(var p2 = ZB; p2 >= ZA; p2 -= 0.5) pas.push([p2, zim(p2)]);
+    s += poly(pas, "var(--red-)", 0.17);
+    var zin = [[ZB, EHI], [14, EHI]];
+    for(var p3 = 14; p3 >= ZB; p3 -= 0.5) zin.push([p3, zim(p3)]);
+    s += poly(zin, "var(--ox)", 0.2);
+    s += tx(px(1.2), py(-1.45), "immunity (Zn)", "var(--go)", 10, null, 600);
+    s += tx(px(1.2), py(0.42), "corrosion (Zn²⁺)", "var(--ox)", 10, null, 600);
+    s += tx(px(9.6), py(0.52), "passivity", "var(--red-)", 10, "middle", 600);
+    s += tx(px(9.6), py(0.32), "Zn(OH)₂", "var(--red-)", 10, "middle", 600);
+    s += tx(px(13.8), py(0.52), "corrosion", "var(--ox)", 10, "end", 600);
+    s += tx(px(13.8), py(0.32), "(zincate)", "var(--ox)", 10, "end", 600);
+  } else {
+    /* straight-segment boundaries for 1e-6 M dissolved iron (schematic) */
+    var E_FeFe2 = -0.618;                 /* Fe2+/Fe, pH independent          */
+    function E_FeOH2Fe(p){ return -0.047 - DEC * p; }
+    var PH_A = 9.65;                      /* Fe2+ | Fe(OH)2                   */
+    var PH_B = 3.2;                       /* Fe3+ | Fe(OH)3                   */
+    function E_ox(p){ return 0.771 + 0.1775 * (PH_B - p); }   /* Fe2+ | oxide */
+    var dIm = "M" + px(0) + " " + py(-1.3) + " L" + px(0) + " " + py(E_FeFe2)
+            + " L" + px(PH_A) + " " + py(E_FeFe2) + " L" + px(14) + " " + py(E_FeOH2Fe(14))
+            + " L" + px(14) + " " + py(-1.3) + " Z";
+    s += pth(dIm, "none", 0, "var(--go)", 0.17);
+    var dFe2 = "M" + px(0) + " " + py(E_FeFe2) + " L" + px(0) + " " + py(0.771)
+             + " L" + px(PH_B) + " " + py(0.771);
+    for(var p4 = PH_B; p4 <= PH_A; p4 += 0.5) dFe2 += " L" + px(p4) + " " + py(E_ox(p4));
+    dFe2 += " L" + px(PH_A) + " " + py(E_ox(PH_A)) + " L" + px(PH_A) + " " + py(E_FeFe2) + " Z";
+    s += pth(dFe2, "none", 0, "var(--ox)", 0.2);
+    s += pth("M" + px(0) + " " + py(0.771) + " L" + px(PH_B) + " " + py(0.771)
+           + " L" + px(PH_B) + " " + py(1.5) + " L" + px(0) + " " + py(1.5) + " Z",
+           "none", 0, "var(--ox)", 0.34);
+    var dPas = "M" + px(PH_B) + " " + py(1.5) + " L" + px(PH_B) + " " + py(0.771);
+    for(var p5 = PH_B; p5 <= PH_A; p5 += 0.5) dPas += " L" + px(p5) + " " + py(E_ox(p5));
+    dPas += " L" + px(PH_A) + " " + py(E_FeFe2) + " L" + px(14) + " " + py(E_FeOH2Fe(14))
+         + " L" + px(14) + " " + py(1.5) + " Z";
+    s += pth(dPas, "none", 0, "var(--red-)", 0.17);
+    s += tx(px(1.2), py(-0.95), "immunity (Fe)", "var(--go)", 10, null, 600);
+    s += tx(px(1.2), py(0.25), "corrosion (Fe²⁺)", "var(--ox)", 10, null, 600);
+    s += tx(px(0.4), py(1.36), "Fe³⁺", "var(--ox)", 10, null, 600);
+    s += tx(px(8.4), py(0.36), "passivity (oxide)", "var(--red-)", 10, null, 600);
+  }
+
+  /* water, the same on either map */
+  s += ln(px(0), py(0), px(14), py(-DEC * 14), "var(--ink-2)", 1.3, "5 3", 0.8);
+  s += ln(px(0), py(1.229), px(14), py(1.229 - DEC * 14), "var(--ink-2)", 1.3, "5 3", 0.8);
+  /* the two water lines carry their own labels, lying along them */
+  function onLine(p0, e0, p1, e1, lab){
+    var xa = px(p0), ya = py(e0), xb = px(p1), yb = py(e1);
+    var mx2 = (xa + xb) / 2, my2 = (ya + yb) / 2;
+    var ang = Math.atan2(yb - ya, xb - xa) * 180 / Math.PI;
+    return tx(mx2, my2 - 4.5, lab, "var(--ink-2)", 9.5, "middle", 600)
+      .replace("<text", '<text transform="rotate(' + ang.toFixed(2) + " "
+               + mx2.toFixed(1) + " " + (my2 - 4.5).toFixed(1) + ')"');
+  }
+  s += onLine(3.4, 1.229 - DEC * 3.4, 8.4, 1.229 - DEC * 8.4,
+              "O₂/H₂O:  1.229 − 0.059 pH");
+  s += onLine(1.2, -DEC * 1.2, 6.2, -DEC * 6.2, "H⁺/H₂:  −0.059 pH");
+  for(var q = 0; q <= 14; q += 2){
+    s += ln(px(q), Y1, px(q), Y1 + 4, "var(--line-2)", 1);
+    s += tx(px(q), Y1 + 15, String(q), "var(--muted)", 8.5, "middle");
+  }
+  for(var r = Math.ceil(ELO / 0.6) * 0.6; r <= EHI; r += 0.6){
+    s += tx(X0 - 4, py(r) + 3.5, r.toFixed(1), "var(--muted)", 8.5, "end");
+  }
+  s += tx(px(7), Y1 + 29, "pH", "var(--muted)", 9.5, "middle");
+  s += cir(px(pH), py(st.E), 5, "var(--ion-k)");
+  s += '<circle cx="' + px(pH).toFixed(1) + '" cy="' + py(st.E).toFixed(1)
+     + '" r="9" fill="none" stroke="var(--ion-k)" stroke-width="1.4" opacity="0.6"/>';
+  /* the marker's label sits under it, where the two water lines never are;
+     above it instead when the marker is near the floor of the frame      */
+  var dy = py(st.E) + 17 > Y1 - 2 ? -10 : 17;
+  s += tx(px(pH) + (pH > 9 ? -13 : 13), py(st.E) + dy, "E_corr", "var(--ion-k)", 10,
+          pH > 9 ? "end" : "start", 600);
+  s += tx(X0, Y1 + 45, zinc
+        ? "zinc corrodes at both ends: the passive band is only pH 8.5 to 10.6"
+        : "the marker is this page's own E_corr, at the pH set above", "var(--muted)", 9.5);
+  el.innerHTML = s;
+  var nt = document.getElementById("mxPBn");
+  if(nt) nt.innerHTML = (zinc ? "zinc" : "iron") + ", schematic &mdash; 10<sup>&minus;6</sup> M dissolved";
+}
+
+function mxNumbers(){
+  var st = mxState();
+  document.getElementById("mxPHv").textContent = mxPH().toFixed(1);
+  document.getElementById("mxARv").textContent = mxAr().toPrecision(3);
+  document.getElementById("mxI0v").innerHTML = Math.log10(mxI0c()).toFixed(1) + " &rarr; " + fmtJ(mxI0c());
+  document.getElementById("mxO2v").textContent = mxO2On()
+    ? "i_L = " + fmtJ(mxILO2()) : "deaerated — no O₂";
+  document.getElementById("mxRm").innerHTML = st.met.nm + " &nbsp; " + st.met.E.toFixed(3) + " V";
+  document.getElementById("mxRx").innerHTML = (st.dom ? st.dom.nm + " &nbsp; " + st.dom.E.toFixed(3) + " V" : "—");
+  document.getElementById("mxRec").textContent = st.E.toFixed(3) + " V";
+  document.getElementById("mxRpol").textContent = "+" + ((st.E - st.met.E) * 1000).toFixed(0) + " mV";
+  document.getElementById("mxRic").innerHTML = fmtA(st.Ia);   /* fmtA may carry a 10<sup>n</sup> */
+  document.getElementById("mxRja").innerHTML = fmtJ(st.ja);
+  document.getElementById("mxRrate").textContent = st.rate < 0.01
+    ? (st.rate * 1000).toPrecision(3) + " µm/yr" : st.rate.toPrecision(3) + " mm/yr";
+  document.getElementById("mxRlim").textContent = st.limited
+    ? "yes — diffusion sets i_corr" : "no — both branches are kinetic";
+  document.getElementById("mxRrp").textContent = fmtR(st.Rp);
+  document.getElementById("mxWho").textContent = (st.dom ? st.dom.sh : "—") + " is the cathode";
+  var v = document.getElementById("mxVerdict"), r = st.rate;
+  var head = st.limited
+    ? "<b>Diffusion-controlled.</b> The cathodic reaction is pinned at its limiting current, so i_corr = i_L × A_c "
+      + "and nothing about the metal's own kinetics matters. Stir the solution and the corrosion rate rises in "
+      + "proportion; deaerate it and the rate collapses."
+    : "<b>Kinetically controlled.</b> Both branches are on their Tafel lines, so i_corr responds to the exchange "
+      + "current densities &mdash; which is why the same metal corrodes at wildly different rates in solutions of "
+      + "the same thermodynamic driving force.";
+  var tail = r < 0.001 ? " At " + (r * 1000).toPrecision(2) + " µm/year this is effectively immune on any human "
+      + "timescale, though not on a thermodynamic one."
+    : r < 0.1 ? " " + (r * 1000).toPrecision(3) + " µm/year: slow, and the sort of rate a battery or a buried "
+      + "structure can live with."
+    : r < 1 ? " " + r.toPrecision(3) + " mm/year: a real engineering problem, and the usual threshold at which "
+      + "a material is rejected for service."
+    : " " + r.toPrecision(3) + " mm/year. At this rate a millimetre of wall is gone within the year.";
+  v.innerHTML = head + tail;
+}
+
+function mxAll(){ mxNumbers(); mxDrawEvans(); mxDrawPourbaix(); }
+["mxPH", "mxAR", "mxI0", "mxO2"].forEach(function(id){
+  document.getElementById(id).addEventListener("input", mxAll);
+});
+document.getElementById("mxProt").addEventListener("change", function(){
+  MX.prot = this.checked; mxAll();
+});
+document.getElementById("mxPlay").addEventListener("click", function(){ MX.t0 = 0; MX.sweep = 0; });
+function mxPreset(m, pH, ar, i0c, o2, prot){
+  MX.m = m; MX.prot = !!prot;
+  document.getElementById("mxPH").value = pH;
+  document.getElementById("mxAR").value = Math.log10(ar);
+  document.getElementById("mxI0").value = i0c;
+  document.getElementById("mxO2").value = o2;
+  document.getElementById("mxProt").checked = !!prot;
+  mxAll();
+}
+/* the eight moves of the deck's table, in its order. The two zinc rows and
+   the alkaline one all run on the same HER exchange current, 10^-10.5 A/cm2,
+   because it is the same metal.                                           */
+document.getElementById("mxP1").addEventListener("click", function(){ mxPreset("Fe",   0,   1,   -6,    -5); });
+document.getElementById("mxP2").addEventListener("click", function(){ mxPreset("Fe",   7,   1,   -6,    O2_AIR); });
+document.getElementById("mxP3").addEventListener("click", function(){ mxPreset("Zn",   1,   1,   -10.5, -5); });
+document.getElementById("mxP4").addEventListener("click", function(){ mxPreset("Zn",   5.6, 1,   -10.5, -5); });
+document.getElementById("mxP5").addEventListener("click", function(){ mxPreset("ZnOH", 14,  1,   -10.5, -5); });
+document.getElementById("mxP6").addEventListener("click", function(){ mxPreset("Fe",   7,   100, -6,    O2_AIR); });
+document.getElementById("mxP7").addEventListener("click", function(){ mxPreset("Fe",   7,   1,   -6,    O2_AIR, true); });
+document.getElementById("mxP8").addEventListener("click", function(){ mxPreset("Fe",   0,   1,   -9.5,  -5); });
+
+ANIM.push({panel: "p-mix", tick: function(ts){
+  if(!MX.t0) MX.t0 = ts;
+  MX.sweep = (ts - MX.t0) / 5200;
+  mxDrawSurface(ts);
+  mxDrawEvans();
+}});
+
+
+/* ================= 6 - THE LIGAND SHIFT ================================
+   E' = E - (0.0592/n) log(beta_ox/beta_red). The measured potentials are
+   the data; the implied log ratio in the table is the shift divided by
+   59.16 mV, which is the whole content of the relation.                 */
+/* ================= CONCEPT CHECK QUESTIONS ============================= */
+var QZ12 = [
+  {q:"Zinc metal sits in a mildly acidic 1 M ZnSO₄ electrolyte at pH 5.6. E°(Zn²⁺/Zn) = −0.76 V and E(H⁺/H₂) at that pH is −0.33 V, so the reaction Zn + 2H⁺ → Zn²⁺ + H₂ has ΔG < 0. The cell nevertheless holds charge for months. What is going on?",
+   o:["The reaction is thermodynamically forbidden; the quoted potentials must be wrong",
+      "A passive ZnO film forms immediately and blocks all further reaction",
+      "Hydrogen evolution on zinc has an exchange current density near 10⁻¹⁰·⁵ A/cm², so the mixed potential sits almost at E(Zn) and the self-discharge current is a fraction of a µA/cm²",
+      "Sulfate ions complex the Zn²⁺ and raise its potential above that of hydrogen"],
+   a:2,
+   w:"Thermodynamics says it <em>will</em> happen; it says nothing about how fast. Both couples share the one piece of metal, so the metal takes the potential at which the two rates match — the mixed potential. Where that lands depends on the exchange current densities, and HER on zinc is about four orders of magnitude slower than on iron and seven below platinum. The crossing therefore sits within a few millivolts of E(Zn), the anodic current is a fraction of a microamp per square centimetre, and the battery survives. Over a hundred hours it is still enough to raise the local pH and precipitate zinc hydroxide sulfate, which is exactly what the deck's own micrographs show. Kinetics decides the timescale; thermodynamics only decides the direction."},
+
+  {q:"A steel pipe is coated, and a small scratch 0.01 cm² exposes bare metal while 1 cm² of intact coated surface still supports oxygen reduction. The oxygen reduction current density is unchanged at 39 µA/cm². What happens at the scratch?",
+   o:["Nothing special — the corrosion rate per unit area is the same as it would be on bare steel",
+      "The anodic current density at the scratch is about 100 times higher than on bare steel, because the same total cathodic current must now leave through a hundredth of the area",
+      "The scratch is cathodically protected by the surrounding coating",
+      "The corrosion potential shifts far negative and the steel becomes immune"],
+   a:1,
+   w:"The balance condition is on current, not current density: A_a·i_a = A_c·i_c. The cathodic area and its current density are untouched, so the total cathodic current is about 39 µA. All of it must be matched by metal dissolution through 0.01 cm², giving roughly 3.9 mA/cm² at the scratch — a hundredfold concentration, and tens of millimetres per year of penetration. This is why an incomplete coating or an incomplete passive film is worse than none at all, and why pits and crevices go deep while the plate around them looks sound. It is also why an anodic inhibitor is dangerous and a cathodic one is safe: the first leaves small bare patches carrying the whole current, the second reduces the current itself."},
+
+  {q:"A steel sample corroding in aerated neutral water is stirred. The corrosion current rises in proportion to the stirring, and deaerating the water collapses it by orders of magnitude. What does that tell you about the Evans diagram?",
+   o:["The anodic line has moved, because stirring removes Fe²⁺ from the surface",
+      "The cathodic branch is at its mass-transport limit, so i_corr = i_L × A_c and the metal's own kinetics do not enter at all",
+      "Both branches are under activation control",
+      "The corrosion potential must be at the Fe/Fe²⁺ equilibrium"],
+   a:1,
+   w:"Air-saturated water holds only 0.25 mM O₂ and needs four electrons per molecule, so in a quiescent cell the cathodic current is capped at about 39 µA/cm² by diffusion — the cathodic line goes vertical. When the crossing lands on that vertical segment, i_corr is set entirely by oxygen supply: thinning δ by stirring raises i_L in proportion and the corrosion rate follows, while removing the oxygen removes the only oxidant strong enough to matter. This is why flowing seawater corrodes steel faster than still seawater with no change in chemistry, and why boiler feedwater is deaerated rather than inhibited. Note what it also means: in this regime a better or worse steel makes no difference at all."},
+
+
+  {q:"You measure the polarisation resistance of corroding zinc in acid and get R_p = 2.2 k&Omega; cm&sup2;. The Tafel slopes are b_a = 40 and b_c = 120 mV/decade. What is i_corr, and what did this measurement cost the sample?",
+   o:["13.0 mV / 2.2 k&Omega; cm&sup2; = 5.9 &micro;A/cm&sup2;, and the sample is intact: R_p is read within a few millivolts of E_corr",
+      "80 mV / 2.2 k&Omega; cm&sup2; = 36 &micro;A/cm&sup2;, after polarising 250 mV to reach the Tafel region",
+      "You cannot get i_corr from R_p without knowing i&#8320; of both couples",
+      "R_p is the solution resistance, so it says nothing about the rate"],
+   a:0,
+   w:"Stern&ndash;Geary: i_corr = B/R_p with <b>B = b_a b_c / 2.303(b_a + b_c)</b> = (40 &times; 120)/(2.303 &times; 160) = <b>13.0 mV</b>. So i_corr = 13.0 mV / 2.2 k&Omega; cm&sup2; = <b>5.9 &micro;A/cm&sup2;</b> &mdash; preset 3. The point of the method is the second half of the answer: R_p is the slope dE/di <em>through</em> E_corr, measured over perhaps &plusmn;10 mV, so the sample is not driven into either Tafel region and is still there afterwards. That is why it is the standard field technique, while Tafel extrapolation &mdash; which needs 100 mV or more on one branch &mdash; changes the surface it is trying to measure. B is 17.4 mV for the 60/120 pair the deck quotes; it never strays far from 15&ndash;25 mV, which is why a single R_p and a guessed B still gets the order of magnitude right."},
+
+];
+
+mxAll();
+window.requestAnimationFrame(animLoop);
+
+/* ================= CONCEPT CHECK ================= */
+var QZ=QZ12;
+
+var LETTERS="ABCD", STORE="ch40051-l12-check-v1";
+var picks=new Array(QZ.length).fill(-1);
+var sId=document.getElementById("sId"), elTally=document.getElementById("tally"),
+    elBar=document.getElementById("scorebar"), elScore=document.getElementById("scoreNum"),
+    elWho=document.getElementById("whoLine"), elIdHint=document.getElementById("idHint"),
+    dlBtn=document.getElementById("dlBtn"), dlHint=document.getElementById("dlHint");
+var startedAt=null, finishedAt=null;
+
+function save(){
+  try{ localStorage.setItem(STORE,JSON.stringify({i:sId.value,p:picks,s:startedAt,t:finishedAt})); }catch(e){}
+}
+function loadState(){
+  try{
+    var d=JSON.parse(localStorage.getItem(STORE)||"null");
+    if(d){ sId.value=d.i||""; if(Array.isArray(d.p)&&d.p.length===QZ.length) picks=d.p.slice();
+           startedAt=d.s||null; finishedAt=d.t||null; }
+  }catch(e){}
+}
+function started(){ return picks.some(function(p){return p>=0;}); }
+function code(str){
+  var h=0x811c9dc5;
+  for(var i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=(h+((h<<1)+(h<<4)+(h<<7)+(h<<8)+(h<<24)))>>>0; }
+  return ("0000000"+h.toString(16).toUpperCase()).slice(-8);
+}
+function scoreOf(){ var s=0; for(var i=0;i<QZ.length;i++) if(picks[i]===QZ[i].a) s++; return s; }
+function answered(){ return picks.filter(function(p){return p>=0;}).length; }
+
+function receipt(){
+  var s=scoreOf(), pct=Math.round(s/QZ.length*100), id=(sId.value||"").trim();
+  var stamp=finishedAt||new Date().toISOString();
+  var vc=code(id+"|"+stamp+"|"+picks.join(""));
+  var head=["lecture","student_id","completed_utc","score","total","percent","verification"];
+  var row=["L12",id,stamp,s,QZ.length,pct,vc];
+  for(var i=0;i<QZ.length;i++){ head.push("a"+(i+1)); row.push(picks[i]>=0?LETTERS[picks[i]]:"-"); }
+  for(var j=0;j<QZ.length;j++){ head.push("ok"+(j+1)); row.push(picks[j]===QZ[j].a?1:0); }
+  function cell(v){ v=String(v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
+  return {csv:head.join(",")+"\n"+row.map(cell).join(",")+"\n", vcode:vc, score:s, pct:pct, id:id};
+}
+
+function render(){
+  var done=answered(), all=(done===QZ.length);
+  elTally.textContent=done+" / "+QZ.length+" answered";
+  elBar.hidden=!all;
+  sId.readOnly=started();
+  elIdHint.innerHTML = all
+    ? "<strong>Attempt complete.</strong> Your answers are final. Every question now shows the correct answer and why — read them before you close this page."
+    : started() ? "<strong>Attempt in progress.</strong><span class=\"locked\">ID locked</span><br>Each answer is final."
+                : "<strong>One attempt.</strong> Enter your student ID before you begin — it locks once you answer the first question.";
+  if(all){
+    if(!finishedAt){ finishedAt=new Date().toISOString(); save(); }
+    var r=receipt();
+    elScore.innerHTML=r.score+' <small>/ '+QZ.length+'  ·  '+r.pct+' %</small>';
+    elWho.innerHTML="Student ID <b>"+esc(r.id||"—")+"</b> &nbsp;·&nbsp; Verification <b>"+r.vcode+"</b>";
+  }
+  for(var i=0;i<QZ.length;i++){
+    var box=document.querySelector('.opts[data-q="'+i+'"]');
+    var kids=[].slice.call(box.children), why=box.parentNode.querySelector(".why");
+    if(picks[i]<0){ kids.forEach(function(o){o.disabled=false;o.className="opt";}); why.hidden=true; }
+    else{
+      (function(qi){ kids.forEach(function(o,j){
+        o.disabled=true;
+        o.className="opt"+(j===QZ[qi].a?" right":(j===picks[qi]?" wrong":""));
+      }); })(i);
+      var _note=(picks[i]!==QZ[i].a)
+        ? '<span class="misc">You chose <b>'+LETTERS[picks[i]]+'</b>. '
+          + 'The correct answer is <b>'+LETTERS[QZ[i].a]+'</b>.</span>'
+        : "";
+      why.innerHTML=_note+QZ[i].w; why.hidden=false;
+    }
+  }
+}
+
+document.getElementById("quiz").innerHTML=QZ.map(function(item,i){
+  return '<div class="card q"><div class="card-b">'
+    +'<p class="stem"><b style="font-family:IBM Plex Mono,monospace;color:var(--muted);font-size:12px">Q'+(i+1)+'</b>  '+item.q+'</p>'
+    +'<div class="opts" data-q="'+i+'">'+item.o.map(function(o,j){
+        return '<button class="opt" data-i="'+j+'"><span class="ltr">'+LETTERS[j]+'</span><span>'+o+'</span></button>';
+      }).join("")+'</div><p class="why" hidden></p></div></div>';
+}).join("");
+
+[].slice.call(document.querySelectorAll(".opts")).forEach(function(box){
+  box.addEventListener("click",function(ev){
+    var b=ev.target.closest(".opt");
+    if(!b||b.disabled) return;
+    var qi=+box.getAttribute("data-q");
+    if(picks[qi]>=0) return;
+    if(!(sId.value||"").trim()){
+      elIdHint.innerHTML="<strong style=\"color:var(--stop)\">Enter your student ID first.</strong> It is written into the result file you submit.";
+      sId.focus(); return;
+    }
+    if(!startedAt) startedAt=new Date().toISOString();
+    picks[qi]=+b.getAttribute("data-i");
+    save(); render();
+  });
+});
+sId.addEventListener("input",save);
+
+dlBtn.addEventListener("click",function(){
+  var id=(sId.value||"").trim();
+  if(!id){ dlHint.textContent="Enter your student ID first — it goes into the file."; return; }
+  var r=receipt();
+  try{
+    var blob=new Blob([r.csv],{type:"text/csv;charset=utf-8"});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement("a");
+    a.href=url; a.download="CH40051-L12-check_"+id.replace(/[^A-Za-z0-9_-]/g,"")+".csv";
+    a.style.display="none";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(url);},1000);
+    dlHint.textContent="Saved. Hand it in as your instructor directs.";
+  }catch(e){
+    dlHint.textContent="Your browser blocked the download. Screenshot this panel and submit that instead.";
+  }
+});
+
+/* ---- submit straight to the course sheet ---------------------------------- */
+var SUBMIT_URL = "https://script.google.com/macros/s/AKfycbxPm7WrbttFu6-gnTi__IcUPt-816GthK0eI8TPuwOZyYlcRW3RAWJlmsr791moxBc5GA/exec";
+
+var sendBtn=document.getElementById("sendBtn");
+if(SUBMIT_URL){
+  sendBtn.hidden=false;
+  dlHint.textContent="Press Submit to send your result to the course. The download is a backup.";
+}
+
+sendBtn.addEventListener("click",function(){
+  var id=(sId.value||"").trim();
+  if(!id){ dlHint.textContent="Enter your student ID first."; return; }
+  var r=receipt();
+  var payload={
+    lecture:"L12", student_id:id, completed_utc:finishedAt||new Date().toISOString(),
+    score:r.score, total:QZ.length, percent:r.pct, verification:r.vcode,
+    answers:picks.map(function(p){ return p>=0?LETTERS[p]:"-"; }),
+    ok:picks.map(function(p,i){ return p===QZ[i].a?1:0; })
+  };
+  sendBtn.disabled=true;
+  dlHint.textContent="Sending...";
+  fetch(SUBMIT_URL,{
+    method:"POST",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify(payload)
+  })
+  .then(function(res){ return res.json(); })
+  .then(function(j){
+    if(j && j.ok){
+      sendBtn.textContent="Submitted ✓";
+      dlHint.textContent="Recorded for student ID "+id+". You can close this page.";
+    }else{
+      sendBtn.disabled=false;
+      sendBtn.textContent="Submit to the course";
+      dlHint.textContent="Not recorded — "+((j && j.error) || "the course sheet refused it.")
+        + " Keep the downloaded file and tell your instructor if this looks wrong.";
+    }
+  })
+  .catch(function(){
+    fetch(SUBMIT_URL,{method:"POST",mode:"no-cors",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(payload)}).catch(function(){});
+    sendBtn.disabled=false;
+    sendBtn.textContent="Submit to the course";
+    dlHint.textContent="Sent, but the confirmation did not come back. "
+      + "Download the file as well and keep it - it is your proof of submission.";
+  });
+});
+
+loadState();
+render();
+
+})();
+</script>
+</body>
+</html>
