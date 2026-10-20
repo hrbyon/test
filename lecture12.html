@@ -731,16 +731,38 @@ function mxDrawEvans(){
     if(li0 <= lLo){ dx = X0; dy = py(c.E); s += ln(X0, dy, X0 + 10, dy, col, 2); }
     else s += cir(dx, dy, 3.6, col);
     /* lean away from the crossing, which carries two lines of its own,
-       unless an edge of the frame says otherwise                     */
+       unless this label's own length says it would leave the frame. A
+       fixed margin was too small for the longest of them, which then ran
+       back over the numbers on the potential axis.                   */
+    var estW = lab.length * 6.4;    /* 10.5-unit text, measured and rounded up */
     var flip = dx <= px(LIC);
-    if(dx > X1 - 150) flip = true;
-    if(dx < X0 + 150) flip = false;
+    if(flip && dx - 9 - estW < X0 + 4) flip = false;
+    if(!flip && dx + 9 + estW > X1 - 2) flip = true;
+    var ax = dx + (flip ? -9 : (li0 <= lLo ? 13 : 9));
+    /* X0 + 4 is the right edge of the tick numbers */
+    ax = flip ? Math.max(ax, X0 + 4 + estW) : Math.min(ax, X1 - 2 - estW);
     var ty = freeY(dy - 4);
-    s += tx(dx + (flip ? -9 : (li0 <= lLo ? 13 : 9)), ty, lab, col, 10.5,
-            flip ? "end" : null, 700);
+    s += tx(ax, ty, lab, col, 10.5, flip ? "end" : null, 700);
     /* if the slot had to move, say which dot it belongs to */
     if(Math.abs(ty - (dy - 4)) > 5)
       s += ln(dx + (flip ? -7 : 7), dy, dx + (flip ? -7 : 7), ty - 4, col, 1, "2 2", 0.75);
+  });
+  /* where a cathodic branch goes vertical it has hit its transport limit.
+     That is the one feature of the diagram no dot carries, and the one
+     that moves when the cathode area does, so it is marked - after every
+     name has taken its slot, so none of them has to move for it.     */
+  cs.forEach(function(c){
+    if(c.metal || c.sac || !isFinite(c.iL) || seqIdx(c) >= shown) return;
+    var lL = Math.log10(c.A * c.iL);
+    var Etop = c.E - c.bc * Math.log10(c.iL / c.i0);
+    if(!(lL > lLo && lL <= lHi && Etop > eLo && Etop < eHi)) return;
+    var lab2 = "i_L " + fmtA(c.A * c.iL), w2 = lab2.length * 5.8;
+    var right = px(lL) + 8 + w2 < X1 - 2;
+    s += ln(px(lL) - 5, py(Etop), px(lL) + 5, py(Etop), "var(--red-)", 1.4, null, 0.9);
+    var ax2 = px(lL) + (right ? 8 : -8);
+    ax2 = right ? Math.min(ax2, X1 - 2 - w2) : Math.max(ax2, X0 + 4 + w2);
+    s += tx(ax2, freeY(py(Etop) - 4), lab2, "var(--red-)", 9.5,
+            right ? null : "end", 700);
   });
   /* the V that a potentiostat measures, and the crossing it hides */
   var dv = "", penV = false, vLo = null, vHi = null;
