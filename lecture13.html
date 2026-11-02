@@ -1,0 +1,2553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script src="exam-lock.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Cyclic Voltammetry Bench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+:root{
+  --ground:#F1F3F2; --surface:#FFFFFF; --surface-2:#E9EDEB;
+  --ink:#14191B; --ink-2:#3E4A4D; --muted:#68767A; --line:#D6DDDA; --line-2:#C3CCC8;
+  --ox:#A85B33; --ox-soft:#F3E4DA;
+  --red-:#15618E; --red-soft:#DDE9F2;
+  --go:#2C7355; --go-soft:#DCEBE3;
+  --stop:#8A5F0C; --stop-soft:#F3E9D3;
+  --elec:#3E4A4D; --ion-k:#6E4C9B; --ion-k-soft:#EBE3F5;
+  --shadow:0 1px 2px rgba(20,25,27,.05),0 8px 24px -12px rgba(20,25,27,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+    --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+    --ox:#D08551; --ox-soft:#33231A;
+    --red-:#5AA6D4; --red-soft:#152833;
+    --go:#5DBB8D; --go-soft:#152A21;
+    --stop:#D6A33F; --stop-soft:#2B2415;
+    --elec:#AEBBBE; --ion-k:#B99BE0; --ion-k-soft:#241C33;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+  --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+  --ox:#D08551; --ox-soft:#33231A;
+  --red-:#5AA6D4; --red-soft:#152833;
+  --go:#5DBB8D; --go-soft:#152A21;
+  --stop:#D6A33F; --stop-soft:#2B2415;
+  --elec:#AEBBBE; --ion-k:#B99BE0; --ion-k-soft:#241C33;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:32px 20px 72px}
+.masthead{display:flex;flex-wrap:wrap;align-items:flex-end;gap:20px 32px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.eyebrow a{color:inherit}
+h1{font-family:"IBM Plex Serif",Georgia,serif;font-weight:600;font-size:clamp(28px,4.2vw,42px);line-height:1.12;margin:0;text-wrap:balance;letter-spacing:-.015em}
+.sub{margin:8px 0 0;color:var(--ink-2);font-size:15px;max-width:62ch}
+.tabs{display:flex;gap:2px;margin:24px 0 22px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{appearance:none;background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);
+  font-family:inherit;font-size:14.5px;font-weight:500;padding:11px 16px;cursor:pointer;white-space:nowrap;margin-bottom:-1px}
+.tab:hover{color:var(--ink-2)}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ox)}
+.tab:focus-visible{outline:2px solid var(--red-);outline-offset:-2px;border-radius:4px 4px 0 0}
+.panel[hidden]{display:none}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow)}
+.card-h{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.card-h h2{font-size:15px;font-weight:600;margin:0;letter-spacing:-.01em}
+.card-h .note{font-size:12.5px;color:var(--muted)}
+.card-b{padding:18px}
+.stack{display:flex;flex-direction:column;gap:16px}
+.two{display:grid;grid-template-columns:minmax(270px,1fr) minmax(330px,1.45fr);gap:16px;align-items:start}
+@media(max-width:900px){.two{grid-template-columns:1fr}}
+label.fld,span.fld{display:block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+select,input[type=text],input[type=number]{width:100%;font-family:inherit;font-size:14px;color:var(--ink);
+  background:var(--surface-2);border:1px solid var(--line-2);border-radius:7px;padding:9px 10px}
+input:read-only{background:var(--surface);color:var(--muted);cursor:not-allowed}
+select:focus-visible,input:focus-visible{outline:2px solid var(--red-);outline-offset:1px}
+input[type=range]{width:100%;accent-color:var(--ox)}
+input[type=range]:focus-visible{outline:2px solid var(--red-);outline-offset:3px}
+.slider-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;gap:10px}
+.slider-row .val{font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+.readout{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px dotted var(--line)}
+.readout:last-child{border-bottom:0}
+.readout .k{font-size:13px;color:var(--muted)}
+.rgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 32px}
+.rgrid .readout:last-child{border-bottom:1px dotted var(--line)}
+@media(max-width:620px){.rgrid{grid-template-columns:minmax(0,1fr)}}
+.readout .v{font-family:"IBM Plex Mono",monospace;font-size:16px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--ink)}
+.verdict{padding:12px 14px;border-radius:8px;font-size:13.5px;line-height:1.55}
+.verdict.go{background:var(--go-soft);color:var(--go)}
+.verdict.stop{background:var(--stop-soft);color:var(--stop)}
+.verdict.flat{background:var(--surface-2);color:var(--ink-2)}
+.verdict.mixv{background:var(--ion-k-soft);color:var(--ion-k)}
+.eqline{font-family:"IBM Plex Mono",monospace;font-size:13px;line-height:1.9;color:var(--ink-2);
+  background:var(--surface-2);border-radius:7px;padding:11px 13px}
+.eqline b{color:var(--ox);font-weight:600}
+svg{display:block;max-width:100%}
+.scrollx{overflow-x:auto}
+.solid{appearance:none;background:var(--ox);border:1px solid var(--ox);color:#fff;font-family:inherit;
+  font-size:13.5px;font-weight:500;padding:10px 16px;border-radius:7px;cursor:pointer}
+.solid:hover{filter:brightness(1.08)}
+.solid:disabled{background:var(--line-2);border-color:var(--line-2);color:var(--muted);cursor:not-allowed}
+.ghost{appearance:none;background:var(--surface-2);border:1px solid var(--line-2);color:var(--ink-2);
+  font-family:inherit;font-size:12.5px;padding:8px 12px;border-radius:7px;cursor:pointer;text-align:left}
+.ghost:hover{border-color:var(--ox);color:var(--ox)}
+table.ions{border-collapse:collapse;width:100%;font-size:13px}
+table.ions th,table.ions td{text-align:left;padding:8px 9px;border-bottom:1px solid var(--line);white-space:nowrap}
+table.ions th{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500}
+table.ions td.num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;text-align:right}
+table.ions tr.hi td{color:var(--ox);font-weight:500}
+table.ions tr.lo td{color:var(--red-)}
+.idgrid{display:grid;grid-template-columns:1fr;gap:14px;max-width:340px}
+.scorebar{display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;padding:14px 18px;border-top:1px solid var(--line)}
+.scorenum{font-family:"IBM Plex Mono",monospace;font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+.scorenum small{font-size:14px;font-weight:400;color:var(--muted)}
+.vcode{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted)}
+.vcode b{color:var(--ink);font-weight:600;letter-spacing:.08em}
+.quiz{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:16px}
+.q .stem{font-size:14.5px;line-height:1.6;margin:0 0 12px}
+.q .stem code{font-family:"IBM Plex Mono",monospace;font-size:13px;background:var(--surface-2);padding:1px 5px;border-radius:4px}
+.opts{display:flex;flex-direction:column;gap:7px}
+.opt{appearance:none;text-align:left;font-family:inherit;font-size:13.5px;line-height:1.45;color:var(--ink);
+  background:var(--surface-2);border:1px solid transparent;border-radius:7px;padding:9px 12px;cursor:pointer;display:flex;gap:9px}
+.opt .ltr{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);flex:0 0 auto;padding-top:1px}
+.opt:hover:not(:disabled){border-color:var(--line-2)}
+.opt.right{background:var(--go-soft);color:var(--go);border-color:var(--go);font-weight:500}
+.opt.right .ltr{color:var(--go)}
+.opt.wrong{background:var(--stop-soft);color:var(--stop);border-color:var(--stop)}
+.opt.wrong .ltr{color:var(--stop)}
+.opt:disabled{cursor:default}
+.why{margin:12px 0 0;font-size:13px;line-height:1.65;color:var(--ink-2);border-left:2px solid var(--line-2);padding-left:12px}
+.misc{display:block;margin-top:10px;padding:9px 12px;border-radius:7px;background:var(--stop-soft);color:var(--stop);font-size:12.5px;line-height:1.6}
+.misc a{color:inherit;font-weight:600;white-space:nowrap}
+.why[hidden]{display:none}
+.tally{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.hint{font-size:12.5px;color:var(--muted);line-height:1.65;margin:10px 0 0}
+.locked{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;background:var(--go-soft);color:var(--go);padding:2px 7px;border-radius:4px;margin-left:8px}
+.pill-row{display:flex;gap:3px;background:var(--surface-2);border-radius:8px;padding:3px}
+.pill{flex:1;appearance:none;border:0;background:none;font-family:"IBM Plex Mono",monospace;font-size:12.5px;
+  font-weight:500;color:var(--muted);padding:7px 2px;border-radius:6px;cursor:pointer}
+.pill[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.pill:focus-visible{outline:2px solid var(--red-);outline-offset:1px}
+.pill-row.pw .pill{font-size:11.5px}
+/* nowrap + scroll: a formula broken across lines mid-term is harder to read
+   than one the reader has to nudge sideways.  Explicit <br> still breaks. */
+.eqbig{font-family:"IBM Plex Mono",monospace;font-size:13.5px;line-height:2.05;color:var(--ink);
+  background:var(--surface-2);border-radius:8px;padding:14px 15px;overflow-x:auto;white-space:nowrap}
+.eqbig small{color:var(--muted);font-size:11.5px;letter-spacing:.04em}
+/* one colour per loss term, used in prose, in the equations and in every picture */
+.act{color:var(--ox);font-weight:600}
+.cnc{color:var(--red-);font-weight:600}
+.ohm{color:var(--stop);font-weight:600}
+.pot{color:var(--go);font-weight:600}
+.mix{color:var(--ion-k);font-weight:600}
+.termtbl{border-collapse:collapse;width:100%;font-size:13px}
+.termtbl td,.termtbl th{padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+.termtbl th{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);font-weight:500;text-align:left}
+.termtbl td.num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;text-align:right}
+.termtbl tr.tot td{border-bottom:0;border-top:2px solid var(--line-2);font-weight:600}
+.sumwrap{overflow-x:auto}
+.sumtbl{border-collapse:collapse;width:100%;font-size:13px}
+.sumtbl td,.sumtbl th{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}
+.sumtbl th{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.sumtbl tr:last-child td{border-bottom:0}
+.sumtbl td.eq{font-family:"IBM Plex Mono",monospace;font-size:13.5px;color:var(--ink);white-space:nowrap}
+.sumtbl td.nm{color:var(--ink-2);white-space:nowrap;font-size:12.5px}
+.sumtbl td.sy{color:var(--muted);font-size:12.5px;line-height:1.5;white-space:normal}
+.symgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:4px 20px;font-size:12.5px;color:var(--ink-2);line-height:1.6}
+.symgrid b{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--ink)}
+.swatch{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px}
+.trio3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:stretch}
+.trio3>.card{display:flex;flex-direction:column}
+.trio3>.card>.card-b:last-child{flex:1 1 auto}
+@media(max-width:1000px){.trio3{grid-template-columns:1fr 1fr}}
+@media(max-width:720px){.trio3{grid-template-columns:1fr}}
+.two.eq{align-items:stretch}
+.two.wideL{grid-template-columns:minmax(330px,1.5fr) minmax(240px,1fr)}
+.two.eq>.card{display:flex;flex-direction:column}
+.two.eq>.card>.card-b:last-child{flex:1 1 auto}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap}
+.btnrow .ghost{flex:1 1 auto;text-align:center}
+.dfctl{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:14px 16px;align-items:end}
+.trio3 .dfctl{grid-template-columns:1fr}
+.dfctl-2{grid-template-columns:repeat(2,minmax(150px,1fr))}
+.dfctl-3{grid-template-columns:repeat(3,minmax(150px,1fr))}
+.dfctl-wide{grid-column:1 / -1}
+@media(max-width:820px){.dfctl{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.dfctl{grid-template-columns:1fr}}
+footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;line-height:1.8}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+.glegend{display:flex;flex-direction:column;gap:5px;font-size:12.5px;line-height:1.45;color:var(--ink-2)}
+.glegend.big{font-size:14.5px;line-height:1.5;gap:7px}
+.glegend.big > span > svg{flex:0 0 32px}
+.glegend > span{display:flex;align-items:flex-start;gap:8px}
+.glegend > span > svg{flex:0 0 26px;margin-top:3px}
+/* the loss waterfall: one row per term, number on the left of the bar */
+.wide1{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+.pairfig{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+.pairfig.eq{align-items:stretch}
+.pairfig.eq>.card{display:flex;flex-direction:column}
+.pairfig.eq>.card>.card-b:last-child{flex:1 1 auto}
+@media(max-width:880px){.pairfig{grid-template-columns:1fr}}
+/* terse notes, two to a row */
+.notes2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 22px}
+.notes2>p{margin:0}
+@media(max-width:760px){.notes2{grid-template-columns:1fr}}
+</style><style>
+.wrap{max-width:1480px}
+.trio3{grid-template-columns:minmax(230px,0.92fr) minmax(300px,1.34fr) minmax(300px,1.34fr)}
+@media(max-width:1180px){.trio3{grid-template-columns:minmax(230px,1fr) minmax(300px,1.4fr)}}
+@media(max-width:760px){.trio3{grid-template-columns:1fr}}
+/* two cards in one grid column, the lower one taking up the slack so
+   that the column ends level with the figure beside it */
+.colpair{display:flex;flex-direction:column;gap:16px}
+.colpair>.card{display:flex;flex-direction:column}
+.colpair>.card:last-child{flex:1 1 auto}
+.colpair>.card:last-child>.card-b:last-child{flex:1 1 auto}
+</style>
+
+</head>
+<body>
+  <div class="wrap">
+  <header class="masthead">
+    <div style="flex:1 1 380px">
+      <p class="eyebrow"><a href="index.html">CH40051 Electroanalytical Chemistry</a> &middot; Lecture 13 &middot; Cyclic voltammetry</p>
+      <h1>Cyclic Voltammetry Bench</h1>
+      <p class="sub">One triangular sweep, and the current that comes back carries the thermodynamics, the electron-transfer rate, the diffusion coefficient and whatever chemistry the product goes on to do &mdash; all tangled together in one trace. This page untangles them one condition at a time. Every voltammogram here is <b>simulated, not drawn</b>: the diffusion equation is solved at each step, so the shapes are consequences, not illustrations.</p>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true"  aria-controls="p-sweep" id="t-sweep">The sweep</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-rev"   id="t-rev">Reversible?</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-rs"    id="t-rs">Randles&ndash;Sevcik</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-mech"  id="t-mech">Coupled chemistry</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-read"  id="t-read">Read the voltammogram</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-quiz1" id="t-quiz1">Concept Check 1</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-quiz2" id="t-quiz2">Concept Check 2</button>
+  </div>
+
+  <!-- ====================== 1 · THE SWEEP ====================== -->
+  <section class="panel" id="p-sweep" role="tabpanel" aria-labelledby="t-sweep">
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>A triangle in, a peak back &mdash; and the peak is the whole point</h2>
+        <span class="note">the four equations this page is built on</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig" style="white-space:normal">
+          <span class="pot">E(t) = E<sub>i</sub> &minus; &upsilon;t</span>, reversed at E<sub>&lambda;</sub>
+          <small>the only thing you control &mdash; and &upsilon; is the clock the whole experiment is timed against</small><br>
+          <span class="act">i<sub>p</sub> = 0.446 nFAC*&radic;(nFD&upsilon;/RT) = (2.69&times;10<sup>5</sup>) n<sup>3/2</sup> A D<sup>1/2</sup> C* &upsilon;<sup>1/2</sup></span>
+          <small>Randles&ndash;Sevcik, reversible &middot; the irreversible form carries 2.99&times;10<sup>5</sup>&radic;&alpha; instead</small><br>
+          <span class="cnc">m<sub>T</sub> = D/&delta; &asymp; &radic;(DF&upsilon;/RT)</span>&nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="cnc">&Lambda; = k&deg;/m<sub>T</sub></span>
+          <small>the sweep sets how fast mass transport is, so &upsilon; decides which of k&deg; and m<sub>T</sub> is the slow one</small><br>
+          <span class="mix">&Delta;E<sub>p</sub> = E<sub>p,a</sub> &minus; E<sub>p,c</sub> &rarr; 57/n mV</span>&nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="mix">|i<sub>p,a</sub>/i<sub>p,c</sub>| &rarr; 1</span>
+          <small>the two reversibility tests &mdash; and both of them fail in their own characteristic way</small>
+        </div>
+        <div class="notes2">
+          <p class="hint"><b>Why a peak and not a plateau.</b> Walk the potential down and two things happen at once. The
+            Nernst condition drags the surface ratio C<sub>O</sub>/C<sub>R</sub> down exponentially, which drives the
+            current <em>up</em>; and every electron taken costs one molecule of O from a layer that nothing is
+            replenishing, which drives the current <em>down</em>. The first wins early, the second wins late, and the
+            crossing is the peak. Nothing about the peak is a property of the molecule alone.</p>
+          <p class="hint"><b>Why &radic;&upsilon; and not &upsilon;.</b> The diffusion layer grows as &delta; &asymp;
+            &radic;(Dt), and the experiment lasts t &asymp; RT/F&upsilon;. Sweep ten times faster and the layer is
+            &radic;10 times thinner, so the gradient &mdash; and the current &mdash; is &radic;10 times steeper.
+            <b>The same total charge passes, in a tenth of the time.</b></p>
+        </div>
+      </div>
+    </div>
+
+<div class="trio3" style="margin-bottom:16px">
+      <div class="card">
+        <div class="card-h"><h2>Drive the sweep</h2></div>
+        <div class="card-b stack" style="gap:14px">
+          <div class="btnrow">
+            <button class="solid" id="swPlay" type="button">Play</button>
+            <button class="ghost" id="swStep" type="button">Step</button>
+            <button class="ghost" id="swRew" type="button">Rewind</button>
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">where we are in the sweep</span><span class="val" id="swPosv"></span></div>
+            <input type="range" id="swPos" min="0" max="149" step="1" value="0">
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">scan rate &upsilon;</span><span class="val" id="swNuv"></span></div>
+            <input type="range" id="swNu" min="-2" max="2" step="0.05" value="-1">
+          </div>
+          <div class="btnrow">
+            <button class="ghost" id="swL1" type="button">at the foot of the wave</button>
+            <button class="ghost" id="swL2" type="button">at the peak</button>
+            <button class="ghost" id="swL3" type="button">past the peak</button>
+            <button class="ghost" id="swL4" type="button">at the switch</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h"><h2>The voltammogram, as it is being traced</h2><span class="note" id="swNote">&mdash;</span></div>
+        <div class="card-b">
+          <svg id="swcv" viewBox="0 0 520 330" style="width:100%;height:auto" role="img"
+               aria-label="A cyclic voltammogram with a marker showing the point currently being swept; the cathodic peak and the anodic return peak are marked with their potentials and currents."></svg>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h"><h2>What the solution looks like at that instant</h2><span class="note">concentration against distance</span></div>
+        <div class="card-b">
+          <svg id="swprof" viewBox="0 0 520 330" style="width:100%;height:auto" role="img"
+               aria-label="Concentration profiles of the starting material and the product against distance from the electrode, at the instant marked on the voltammogram."></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="wide1" style="margin-bottom:16px">
+      <div class="card">
+        <div class="card-h"><h2>What is limiting, right now</h2></div>
+        <div class="card-b stack" style="gap:12px">
+          <div class="rgrid">
+            <div class="readout"><span class="k">E &minus; E&deg;&prime;</span><span class="v" id="swE">&mdash;</span></div>
+            <div class="readout"><span class="k">current i</span><span class="v" id="swI">&mdash;</span></div>
+            <div class="readout"><span class="k">surface C<sub>O</sub>/C*</span><span class="v" id="swCO">&mdash;</span></div>
+            <div class="readout"><span class="k">surface C<sub>R</sub>/C*</span><span class="v" id="swCR">&mdash;</span></div>
+            <div class="readout"><span class="k">diffusion layer &delta;</span><span class="v" id="swDel">&mdash;</span></div>
+            <div class="readout"><span class="k">time since the start</span><span class="v" id="swT">&mdash;</span></div>
+          </div>
+          <div class="verdict flat" id="swVerdict">&mdash;</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><h2>The same sweep at three scan rates</h2><span class="note">the shape is identical; only the axes move</span></div>
+      <div class="card-b">
+        <div class="two">
+          <svg id="swtrio" viewBox="0 0 460 300" style="width:100%;height:auto" role="img"
+               aria-label="Three voltammograms at scan rates a decade apart, showing the peak current rising as the square root of the scan rate while the peak potential does not move."></svg>
+          <div class="stack" style="gap:10px">
+            <p class="hint" style="margin:0"><b>Look at what does not change.</b> Ten times the scan rate gives
+              &radic;10 = 3.16 times the peak current, and leaves E<sub>p</sub> exactly where it was. A peak potential
+              that <em>does</em> move with &upsilon; is the single most useful diagnostic in the whole of voltammetry:
+              it means either the electron transfer cannot keep up, or the product is reacting. Both are on the next
+              two tabs.</p>
+            <div class="rgrid">
+              <div class="readout"><span class="k">i<sub>p</sub> at 10 mV/s</span><span class="v" id="sw3a">&mdash;</span></div>
+              <div class="readout"><span class="k">at 100 mV/s</span><span class="v" id="sw3b">&mdash;</span></div>
+              <div class="readout"><span class="k">at 1 V/s</span><span class="v" id="sw3c">&mdash;</span></div>
+              <div class="readout"><span class="k">ratio, consecutive</span><span class="v" id="sw3r">&mdash;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 2 · REVERSIBLE? ====================== -->
+  <section class="panel" id="p-rev" role="tabpanel" aria-labelledby="t-rev" hidden>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>&lsquo;Reversible&rsquo; is not a property of the molecule</h2>
+        <span class="note">it is a verdict on k&deg; <em>compared with</em> the scan rate</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig" style="white-space:normal">
+          <span class="cnc">&Lambda; = k&deg; / &radic;(DF&upsilon;/RT)</span>
+          <small>one dimensionless number decides the shape &mdash; everything else is cosmetic</small><br>
+          <span class="go">&Lambda; &gt; 15</span>: Nernst holds at the surface &rarr; &Delta;E<sub>p</sub> = 57/n mV, fixed&nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="ohm">0.3 &lt; &Lambda; &lt; 15</span>: quasi-reversible &rarr; &Delta;E<sub>p</sub> grows with &upsilon;&nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="act">&Lambda; &lt; 0.3</span>: irreversible &rarr; no return peak at all
+          <small>and because &Lambda; &prop; &upsilon;<sup>&minus;1/2</sup>, <b>the same couple moves between all three</b> as you turn the scan rate up</small>
+        </div>
+        <p class="hint" style="margin:0">The deck puts it as a race. m<sub>T</sub> = D/&delta; is how fast mass transport
+          can deliver; k&deg; is how fast the interface can take. Sweeping faster thins &delta;, which <em>speeds mass
+          transport up</em> &mdash; so the electron transfer is the one left behind. This is why the deck's &lsquo;higher
+          scan rate shows better reversibility&rsquo; is exactly backwards for electrode kinetics, and right only for
+          outrunning <em>chemistry</em>, which is the next tab.</p>
+      </div>
+    </div>
+
+<div class="trio3" style="margin-bottom:16px">
+      <div class="card">
+        <div class="card-h"><h2>Set the race</h2></div>
+        <div class="card-b stack" style="gap:13px">
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">k&deg;</span><span class="val" id="rvK0v"></span></div>
+            <input type="range" id="rvK0" min="-6" max="0" step="0.05" value="-2">
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">scan rate &upsilon;</span><span class="val" id="rvNuv"></span></div>
+            <input type="range" id="rvNu" min="-3" max="3" step="0.05" value="-1">
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">&alpha;</span><span class="val" id="rvAlv"></span></div>
+            <input type="range" id="rvAl" min="0.2" max="0.8" step="0.01" value="0.5">
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">D<sub>R</sub>/D<sub>O</sub></span><span class="val" id="rvDrv"></span></div>
+            <input type="range" id="rvDr" min="-1" max="1" step="0.02" value="0">
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">switch this far past E&deg;&prime;</span><span class="val" id="rvSwv"></span></div>
+            <input type="range" id="rvSw" min="0.12" max="0.70" step="0.01" value="0.35">
+          </div>
+          <div class="btnrow">
+            <button class="ghost" id="rvP1" type="button">&Lambda; = 100, fast kinetics</button>
+            <button class="ghost" id="rvP2" type="button">&Lambda; = 0.1, slow kinetics</button>
+            <button class="ghost" id="rvP3" type="button">an organic couple at 20 mV/s</button>
+            <button class="ghost" id="rvP4" type="button">&hellip; the same couple at 20 V/s</button>
+            <button class="ghost" id="rvP5" type="button">&alpha; = 0.25, lopsided</button>
+            <button class="ghost" id="rvP6" type="button">D<sub>R</sub> ten times smaller</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h"><h2>Your voltammogram, against the reversible one</h2>
+          <span class="note">faint grey: the same couple with k&deg; &rarr; &infin;</span></div>
+        <div class="card-b">
+          <svg id="rvcv" viewBox="0 0 520 340" style="width:100%;height:auto" role="img"
+               aria-label="A simulated cyclic voltammogram with the peak separation and peak ratio marked, drawn over a faint reversible reference voltammogram for the same couple."></svg>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h"><h2>Nicholson&rsquo;s working curve</h2><span class="note">&Delta;E<sub>p</sub> against &Lambda;</span></div>
+        <div class="card-b stack" style="gap:12px">
+          <svg id="rvwork" viewBox="0 0 520 340" style="width:100%;height:auto" role="img"
+               aria-label="Peak separation plotted against the logarithm of lambda, with the current condition marked; this is the curve used to extract a rate constant from a measured peak separation."></svg>
+          <div class="glegend">
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><path d="M2 2 C8 3 12 11 24 12" fill="none" stroke="var(--red-)" stroke-width="2.2"/></svg><span><b class="cnc">The curve</b> &mdash; &Delta;E<sub>p</sub> as a function of &Lambda;, recomputed here by the same simulator that draws the trace rather than copied out of the 1965 table, so that it can be checked.</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="2" y1="7" x2="24" y2="7" stroke="var(--go)" stroke-width="2" stroke-dasharray="4 3"/></svg><span><b>57 mV</b> &mdash; the floor, 2.218RT/nF. The curve comes down to it and never goes below.</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="13" y1="1" x2="13" y2="13" stroke="var(--ion-k)" stroke-width="1.2" stroke-dasharray="3 2"/><circle cx="13" cy="7" r="4" fill="var(--ion-k)"/></svg><span><b class="mix">you are here</b> &mdash; the &Lambda; and the &Delta;E<sub>p</sub> of the trace beside it, dropped onto the curve.</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><rect x="2" y="2" width="22" height="10" fill="var(--stop)" opacity="0.3"/></svg><span><b>&Lambda; &lt; 0.3 &mdash; irreversible.</b> The return peak has gone, so there is no &Delta;E<sub>p</sub> to measure at all; the curve is drawn pinned to the top of the frame to say so, not because &Delta;E<sub>p</sub> is really 320 mV.</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><rect x="2" y="2" width="22" height="10" fill="var(--go)" opacity="0.32"/></svg><span><b>&Lambda; &gt; 15 &mdash; reversible.</b> The curve is flat: &Delta;E<sub>p</sub> has stopped depending on k&deg;, so measuring it carries no kinetic information. <b>Only the unshaded middle returns a k&deg;</b>, which is the whole reason the quasi-reversible window matters.</span></span>
+          </div>
+          <p class="hint" style="margin:0"><b>How it is used backwards.</b> You measure &Delta;E<sub>p</sub>, find it on the vertical axis, read &Lambda; off the horizontal one, and multiply: k&deg; = &Lambda;m<sub>T</sub>, with m<sub>T</sub> = &radic;(DF&upsilon;/RT). That is the whole of Nicholson&rsquo;s method. It assumes &alpha; = 0.5 and D<sub>O</sub> = D<sub>R</sub> &mdash; break either with the sliders and the &Lambda; you read back is wrong, while the picture still looks perfectly respectable.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="wide1" style="margin-bottom:16px">
+      <div class="card">
+        <div class="card-h"><h2>What the trace says</h2><span class="note">read these, not the picture&rsquo;s prettiness</span></div>
+        <div class="card-b stack" style="gap:12px">
+          <div class="rgrid">
+            <div class="readout"><span class="k">&Lambda; = k&deg;/m<sub>T</sub></span><span class="v" id="rvLam">&mdash;</span></div>
+            <div class="readout"><span class="k">m<sub>T</sub></span><span class="v" id="rvMt">&mdash;</span></div>
+            <div class="readout"><span class="k">&Delta;E<sub>p</sub></span><span class="v" id="rvDep">&mdash;</span></div>
+            <div class="readout"><span class="k">|i<sub>p,a</sub>/i<sub>p,c</sub>|</span><span class="v" id="rvRat">&mdash;</span></div>
+            <div class="readout"><span class="k">E<sub>p,c</sub> &minus; E&deg;&prime;</span><span class="v" id="rvEpc">&mdash;</span></div>
+            <div class="readout"><span class="k">i<sub>p,c</sub></span><span class="v" id="rvIp">&mdash;</span></div>
+            <div class="readout"><span class="k">E<sub>1/2</sub> from the two peaks</span><span class="v" id="rvEh">&mdash;</span></div>
+            <div class="readout"><span class="k">diffusion layer at the peak</span><span class="v" id="rvDel">&mdash;</span></div>
+          </div>
+          <div class="verdict flat" id="rvVerdict">&mdash;</div>
+          <p class="hint" style="margin:0"><b>The trap in E<sub>1/2</sub>.</b> The midpoint of the two peaks is only
+            E&deg;&prime; when D<sub>O</sub> = D<sub>R</sub>; in general it is offset by (RT/nF)ln&radic;(D<sub>R</sub>/D<sub>O</sub>).
+            Try the last preset: the whole wave slides negative without a single thermodynamic quantity having changed.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 3 · RANDLES–SEVCIK ====================== -->
+  <section class="panel" id="p-rs" role="tabpanel" aria-labelledby="t-rs" hidden>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>A straight line through the origin, or an excuse</h2>
+        <span class="note">what i<sub>p</sub> vs &radic;&upsilon; is actually testing</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig" style="white-space:normal">
+          <span class="act">i<sub>p</sub> = (2.69&times;10<sup>5</sup>) n<sup>3/2</sup> A D<sup>1/2</sup> C* &upsilon;<sup>1/2</sup></span>
+          <small>A in cm<sup>2</sup>, D in cm<sup>2</sup> s<sup>&minus;1</sup>, C* in mol cm<sup>&minus;3</sup>, &upsilon; in V s<sup>&minus;1</sup> &rarr; i<sub>p</sub> in A</small><br>
+          <span class="pot">slope = (2.69&times;10<sup>5</sup>) n<sup>3/2</sup> A D<sup>1/2</sup> C*</span>
+          <small>so one plot gives D if n is known, or n if D is &middot; and a <b>curved</b> plot says the premise is wrong</small>
+        </div>
+        <p class="hint" style="margin:0">The equation assumes three things, and the plot tests all three at once:
+          the only transport is <b>diffusion</b> (no stirring, no migration, no adsorption), the species is
+          <b>dissolved and free</b> (so the amount reacting grows as &radic;&upsilon; rather than staying fixed),
+          and the kinetics are <b>fast enough not to matter</b>. Break the third and the line bends down at high
+          &upsilon;; break the second &mdash; an adsorbed monolayer &mdash; and i<sub>p</sub> goes as &upsilon;, not &radic;&upsilon;.</p>
+      </div>
+    </div>
+
+<div class="trio3" style="margin-bottom:16px">
+      <div class="card">
+        <div class="card-h"><h2>The cell, and the couple in it</h2></div>
+        <div class="card-b stack" style="gap:13px">
+          <div class="dfctl dfctl-2">
+            <div>
+              <label class="fld" for="rsN">electrons n</label>
+              <select id="rsN"><option value="1">1</option><option value="2">2</option><option value="3">3</option></select>
+            </div>
+            <div>
+              <label class="fld" for="rsA">electrode area A</label>
+              <select id="rsA">
+                <option value="0.0707">3 mm disc &mdash; 0.0707 cm²</option>
+                <option value="0.0314">2 mm disc &mdash; 0.0314 cm²</option>
+                <option value="0.196">5 mm disc &mdash; 0.196 cm²</option>
+                <option value="1">1 cm²</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">bulk concentration C*</span><span class="val" id="rsCv"></span></div>
+            <input type="range" id="rsC" min="-1" max="1.3" step="0.02" value="0">
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">diffusion coefficient D</span><span class="val" id="rsDv"></span></div>
+            <input type="range" id="rsD" min="-6" max="-4.3" step="0.02" value="-5">
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">k&deg; &mdash; drag it down and watch the line bend</span><span class="val" id="rsK0v"></span></div>
+            <input type="range" id="rsK0" min="-5" max="0" step="0.05" value="-1">
+          </div>
+          <div class="btnrow">
+            <button class="ghost" id="rsP1" type="button">a well-behaved couple</button>
+            <button class="ghost" id="rsP2" type="button">sluggish: the line bends</button>
+            <button class="ghost" id="rsP3" type="button">two electrons</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h"><h2>Six scan rates, one couple</h2><span class="note" id="rsNote">&mdash;</span></div>
+        <div class="card-b stack" style="gap:12px">
+          <svg id="rscv" viewBox="0 0 520 330" style="width:100%;height:auto" role="img"
+               aria-label="Six cyclic voltammograms recorded at scan rates spanning two decades, overlaid on common axes with a fixed current scale."></svg>
+          <p class="hint" style="margin:0"><b>The current axis is held fixed on purpose.</b> If it were refitted to the
+            data every time you moved a slider, ten times the concentration would redraw an identical picture with
+            different numbers beside it &mdash; and the thing worth seeing, that the height answers to the conditions,
+            would be invisible. It behaves like a current range on an instrument instead: it holds where it is, and
+            steps by 1&ndash;2&ndash;5 only when the trace would leave the frame or shrink into the baseline.
+            <b>Nothing here is divided by &radic;&upsilon;</b>, so a fiftyfold scan rate should give &radic;50 &asymp; 7
+            times the peak. Watch the diffusion tail past the peak as well: it grows with it, because the whole
+            diffusion layer is thinner.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h"><h2>i<sub>p</sub> against &radic;&upsilon;</h2><span class="note">the diagnostic plot</span></div>
+        <div class="card-b stack" style="gap:12px">
+          <svg id="rsfit" viewBox="0 0 520 330" style="width:100%;height:auto" role="img"
+               aria-label="Peak current plotted against the square root of scan rate, with a straight line fitted through the origin and the points that deviate from it shown."></svg>
+          <p class="hint" style="margin:0"><b>Same current axis as the trace above</b>, and held fixed for the same
+            reason: the six dots are the six peaks, read straight off those voltammograms, so a height here and a
+            height there are one quantity. The grey line is a least-squares fit <b>forced through the origin</b>,
+            because the equation has no intercept; the faint green one is what the equation <b>predicts</b> from the
+            n, A, C* and D that went in. <b>Now drag k&deg; down.</b> The points do not leave the line &mdash;
+            R&sup2; hardly moves &mdash; the <b>line itself tilts away from the predicted one</b>, because slow
+            kinetics pull every peak down together. That is the trap worth learning: a plot can be straight,
+            through the origin, with R&sup2; = 0.999, and still return a D that is a third too small. Straightness
+            proves diffusion control, nothing more; reversibility is the previous tab&rsquo;s question.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="wide1" style="margin-bottom:16px">
+      <div class="card">
+        <div class="card-h"><h2>What you would report</h2></div>
+        <div class="card-b stack" style="gap:12px">
+          <div class="rgrid">
+            <div class="readout"><span class="k">fitted slope</span><span class="v" id="rsSlope">&mdash;</span></div>
+            <div class="readout"><span class="k">R&sup2; of the fit</span><span class="v" id="rsR2">&mdash;</span></div>
+            <div class="readout"><span class="k">D recovered, n assumed</span><span class="v" id="rsDfit">&mdash;</span></div>
+            <div class="readout"><span class="k">error against the true D</span><span class="v" id="rsErr">&mdash;</span></div>
+            <div class="readout"><span class="k">n recovered, D assumed</span><span class="v" id="rsNfit">&mdash;</span></div>
+            <div class="readout"><span class="k">&Lambda; at the fastest scan</span><span class="v" id="rsLam">&mdash;</span></div>
+          </div>
+          <div class="verdict flat" id="rsVerdict">&mdash;</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 4 · COUPLED CHEMISTRY ====================== -->
+  <section class="panel" id="p-mech" role="tabpanel" aria-labelledby="t-mech" hidden>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>The product does not always sit there waiting to be put back</h2>
+        <span class="note">homogeneous reactions coupled to the electron transfer</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig" style="white-space:normal">
+          <span class="mix">K<sub>1</sub> = k<sub>1</sub>(RT/F)/&upsilon;</span>&nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="mix">K<sub>2</sub> = k<sub>2</sub>C*(RT/F)/&upsilon;</span>
+          <small>the chemistry, measured against the sweep &mdash; <b>this is what a scan rate study changes</b></small><br>
+          <span class="go">K &lt; 0.1</span>: outrun it &rarr; a clean reversible couple&nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="ohm">K &asymp; 1</span>: the diagnostic window&nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="act">K &gt; 10</span>: the return peak is gone and E<sub>p</sub> has moved
+          <small>so a mechanism is assigned from <b>how the trace changes with &upsilon;</b>, never from one voltammogram</small>
+        </div>
+        <div class="notes2">
+          <p class="hint"><b>Why the forward peak moves <em>positive</em>.</b> Removing B pulls the surface equilibrium
+            over &mdash; Le Chatelier at an electrode. The couple reaches the same ratio at a less negative potential, so
+            a reduction becomes <em>easier</em> the faster the follow-up chemistry runs. Ten times slower a sweep,
+            ten times more chemistry per sweep, and the peak moves about <b>30 mV positive</b>.</p>
+          <p class="hint"><b>Why it stops working when the kinetics are slow.</b> If &Lambda; &lt;&lt; 1 the
+            rate-determining step is already the electron transfer; whatever happens to B afterwards cannot reach back
+            through it. The deck's &Lambda; = 0.1 panels show exactly this &mdash; E<sub>p</sub> stops responding to K
+            altogether, and the diagnosis has to come from somewhere else.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>Pick the mechanism</h2><span class="note" id="mcName">&mdash;</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="pill-row pw" id="mcPills">
+          <button class="pill" data-s="E"   aria-pressed="true">E</button>
+          <button class="pill" data-s="EE"  aria-pressed="false">EE</button>
+          <button class="pill" data-s="EC"  aria-pressed="false">EC</button>
+          <button class="pill" data-s="EC2" aria-pressed="false">EC₂</button>
+          <button class="pill" data-s="ECE" aria-pressed="false">ECE</button>
+          <button class="pill" data-s="CE"  aria-pressed="false">CE</button>
+          <button class="pill" data-s="ECp" aria-pressed="false">EC&prime;</button>
+        </div>
+        <div class="eqline" id="mcScheme">&mdash;</div>
+      </div>
+    </div>
+
+<div class="two eq" style="margin-bottom:16px">
+      <div class="colpair">
+        <div class="card">
+        <div class="card-h"><h2>Set the chemistry and the sweep</h2></div>
+        <div class="card-b stack" style="gap:13px">
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0" id="mcKlab">homogeneous rate constant k</span><span class="val" id="mcKcv"></span></div>
+            <input type="range" id="mcKc" min="-3" max="5" step="0.05" value="1">
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">middle scan rate &upsilon;</span><span class="val" id="mcNuv"></span></div>
+            <input type="range" id="mcNu" min="-3" max="3" step="0.05" value="-1">
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">k&deg; of the first electron transfer</span><span class="val" id="mcK0v"></span></div>
+            <input type="range" id="mcK0" min="-5" max="0" step="0.05" value="-1">
+          </div>
+          <div id="mcDe0Wrap" hidden>
+            <div class="slider-row"><span class="fld" style="margin:0" id="mcDe0lab">&Delta;E&deg; = E&deg;(2nd) &minus; E&deg;(1st)</span><span class="val" id="mcDe0v"></span></div>
+            <input type="range" id="mcDe0" min="-0.4" max="0.25" step="0.005" value="-0.18">
+          </div>
+          <div id="mcKeqWrap" hidden>
+            <div class="slider-row"><span class="fld" style="margin:0">K = [A]/[Y] of the preceding step</span><span class="val" id="mcKeqv"></span></div>
+            <input type="range" id="mcKeq" min="-3" max="2" step="0.05" value="-1">
+          </div>
+          <div class="btnrow" id="mcPresets"></div>
+        </div>
+      </div>
+        <div class="card">
+        <div class="card-h"><h2>Diagnosis</h2></div>
+        <div class="card-b stack" style="gap:12px">
+          <div class="rgrid">
+            <div class="readout"><span class="k">K at the middle scan</span><span class="v" id="mcK">&mdash;</span></div>
+            <div class="readout"><span class="k">&Lambda; at the middle scan</span><span class="v" id="mcLam">&mdash;</span></div>
+            <div class="readout"><span class="k">|i<sub>p,a</sub>/i<sub>p,c</sub>| slow</span><span class="v" id="mcRs">&mdash;</span></div>
+            <div class="readout"><span class="k">&hellip; fast</span><span class="v" id="mcRf">&mdash;</span></div>
+            <div class="readout"><span class="k">E<sub>p</sub> shift per decade of &upsilon;</span><span class="v" id="mcShift">&mdash;</span></div>
+            <div class="readout"><span class="k">&psi;<sub>p</sub> (normalised peak)</span><span class="v" id="mcPsi">&mdash;</span></div>
+          </div>
+          <div class="verdict flat" id="mcVerdict">&mdash;</div>
+        </div>
+      </div>
+      </div>
+      <div class="card">
+        <div class="card-h"><h2>Three scan rates, a decade apart</h2>
+          <span class="note">normalised by &radic;&upsilon;, so a plain E would superimpose exactly</span></div>
+        <div class="card-b">
+          <svg id="mccv" viewBox="0 0 520 340" style="width:100%;height:auto" role="img"
+               aria-label="Three voltammograms of the chosen mechanism at scan rates a decade apart, with the current normalised by the square root of scan rate so that departures from a simple electron transfer are visible as changes of shape."></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="wide1" style="margin-bottom:16px">
+      <div class="card">
+        <div class="card-h"><h2>What to look for</h2><span class="note">mechanism by mechanism</span></div>
+        <div class="card-b">
+          <div class="sumwrap"><table class="sumtbl" id="mcTable"></table></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 5 · READ THE VOLTAMMOGRAM ====================== -->
+  <section class="panel" id="p-read" role="tabpanel" aria-labelledby="t-read" hidden>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>Now do it without being told</h2>
+        <span class="note">unlabelled traces, hidden conditions &mdash; diagnose them</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <p class="hint" style="margin:0">Every voltammogram below is simulated from conditions chosen at random and not
+          shown to you. Work from the trace the way you would in a laboratory: measure &Delta;E<sub>p</sub>, compare the
+          two peak heights, and &mdash; above all &mdash; <b>watch what changes between the two scan rates</b>. Answer,
+          then the conditions are revealed and the figure is annotated. There is no penalty and no limit; this is
+          practice, not assessment.</p>
+        <div class="btnrow">
+          <button class="solid" id="rdNew" type="button">New voltammogram</button>
+          <button class="ghost" id="rdReveal" type="button">Show me the answer</button>
+          <span class="tally" style="margin-left:auto;align-self:center" id="rdTally">0 right of 0</span>
+        </div>
+      </div>
+    </div>
+
+<div class="two">
+      <div class="card">
+        <div class="card-h"><h2>Your reading</h2></div>
+        <div class="card-b stack" style="gap:12px">
+          <p class="stem" id="rdQ" style="margin:0">&mdash;</p>
+          <div class="opts" id="rdOpts"></div>
+          <p class="why" id="rdWhy" hidden></p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h"><h2 id="rdTitle">Case 1</h2><span class="note" id="rdNote">two scan rates, a decade apart</span></div>
+        <div class="card-b">
+          <svg id="rdcv" viewBox="0 0 520 350" style="width:100%;height:auto" role="img"
+               aria-label="An unlabelled pair of cyclic voltammograms recorded a decade apart in scan rate, for the student to diagnose."></svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 6 · CONCEPT CHECKS ====================== -->
+  <section class="panel" id="p-quiz1" role="tabpanel" aria-labelledby="t-quiz1" hidden>
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h">
+        <h2>Concept check 1 &middot; the sweep, and the shape one electron makes</h2>
+        <span class="note">four questions on the first three tabs &mdash; answer once per question; the reasoning appears immediately</span>
+        <span class="tally" style="margin-left:auto" id="tally1"></span>
+      </div>
+      <div class="card-b">
+        <div class="idgrid">
+          <div>
+            <label class="fld" for="sId1">Student ID</label>
+            <input type="text" id="sId1" inputmode="numeric" placeholder="e.g. 20261234">
+          </div>
+        </div>
+        <p class="hint" id="idHint1"></p>
+      </div>
+      <div class="scorebar" id="scorebar1" hidden>
+        <div>
+          <div class="scorenum" id="scoreNum1">&mdash;</div>
+          <div class="vcode" style="margin-top:4px" id="whoLine1">&mdash;</div>
+        </div>
+        <div style="flex:1 1 300px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="solid" id="sendBtn1" type="button" hidden>Submit to the course</button>
+            <button class="ghost" id="dlBtn1" type="button">Download my result</button>
+          </div>
+          <p class="hint" id="dlHint1" style="margin-top:8px">Download the file and hand it in as your instructor directs.</p>
+        </div>
+      </div>
+    </div>
+    <div class="quiz" id="quiz1"></div>
+  </section>
+
+  <section class="panel" id="p-quiz2" role="tabpanel" aria-labelledby="t-quiz2" hidden>
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h">
+        <h2>Concept check 2 &middot; what happens to the product afterwards</h2>
+        <span class="note">four questions on the coupled mechanisms &mdash; answer once per question; the reasoning appears immediately</span>
+        <span class="tally" style="margin-left:auto" id="tally2"></span>
+      </div>
+      <div class="card-b">
+        <div class="idgrid">
+          <div>
+            <label class="fld" for="sId2">Student ID</label>
+            <input type="text" id="sId2" inputmode="numeric" placeholder="e.g. 20261234">
+          </div>
+        </div>
+        <p class="hint" id="idHint2"></p>
+      </div>
+      <div class="scorebar" id="scorebar2" hidden>
+        <div>
+          <div class="scorenum" id="scoreNum2">&mdash;</div>
+          <div class="vcode" style="margin-top:4px" id="whoLine2">&mdash;</div>
+        </div>
+        <div style="flex:1 1 300px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="solid" id="sendBtn2" type="button" hidden>Submit to the course</button>
+            <button class="ghost" id="dlBtn2" type="button">Download my result</button>
+          </div>
+          <p class="hint" id="dlHint2" style="margin-top:8px">Download the file and hand it in as your instructor directs.</p>
+        </div>
+      </div>
+    </div>
+    <div class="quiz" id="quiz2"></div>
+  </section>
+
+  <footer>
+    Every voltammogram on this page is computed, not sketched: the diffusion equation is integrated on an expanding grid
+    with the electrode condition solved from Butler&ndash;Volmer at each step &middot;
+    the simulation reproduces &psi;<sub>p</sub> = 0.4463 and 0.4958&radic;&alpha;, &Delta;E<sub>p</sub> = 57 mV,
+    Nicholson&rsquo;s &Delta;E<sub>p</sub>(&Lambda;) table to within 2 mV, and the 29.6 and 19.7 mV/decade peak shifts
+    of the EC and EC<sub>2</sub> mechanisms &middot;
+    treatment follows Bard &amp; Faulkner, <i>Electrochemical Methods</i>, chapters 6 and 12, Compton &amp; Banks,
+    <i>Understanding Voltammetry</i>, and Nicholson, <i>Anal. Chem.</i> <b>1965</b>, <i>37</i>, 1351 &middot;
+    the mechanism panels follow the Lecture 13 and 14 decks &middot;
+    diffusion coefficients and areas are typical laboratory values, and activity coefficients are taken as 1 throughout<br>
+    CH40051 Electroanalytical Chemistry &middot; Fall 2026 &mdash; companion to Lectures 13 and 14
+  </footer>
+</div>
+<script>
+(function(){
+"use strict";
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+/* ---------------- tabs ---------------- */
+var tabs=[].slice.call(document.querySelectorAll(".tab"));
+tabs.forEach(function(t){
+  t.addEventListener("click",function(){
+    tabs.forEach(function(o){
+      var on=(o===t);
+      o.setAttribute("aria-selected",on?"true":"false");
+      document.getElementById(o.getAttribute("aria-controls")).hidden=!on;
+    });
+  });
+});
+
+/* ================= SHARED CONSTANTS AND HELPERS =========================
+   Currents in A/cm2, potentials in V, lengths in cm unless a name says
+   otherwise. Everything on the page is derived from these.              */
+var QE = 1.602176634e-19, KB = 1.380649e-23, NA = 6.02214076e23;
+var FARADAY = QE * NA, RGAS = KB * NA, T25 = 298.15;
+var RTF = RGAS * T25 / FARADAY;            /* 0.025693 V                 */
+var DEC = RTF * Math.LN10;                 /* 0.059159 V per decade      */
+var MONO = 'font-family="IBM Plex Mono,monospace"';
+var SEC_YR = 3.15576e7;
+
+function pillGroup(id, cb){
+  var wrap = document.getElementById(id);
+  wrap.addEventListener("click", function(e){
+    var b = e.target.closest("button.pill");
+    if(!b) return;
+    [].slice.call(wrap.querySelectorAll("button.pill")).forEach(function(o){
+      o.setAttribute("aria-pressed", o === b ? "true" : "false");
+    });
+    cb(b.getAttribute("data-s"));
+  });
+}
+function pillSet(id, val){
+  [].slice.call(document.querySelectorAll("#" + id + " button.pill")).forEach(function(o){
+    o.setAttribute("aria-pressed", o.getAttribute("data-s") === val ? "true" : "false");
+  });
+}
+
+/* ---- one requestAnimationFrame loop; a picture only ticks while shown -- */
+var REDUCED = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+var ANIM = [], animLast = 0;
+function animLoop(ts){
+  if(ts - animLast > 32){
+    animLast = ts;
+    ANIM.forEach(function(a){ if(!document.getElementById(a.panel).hidden) a.tick(ts); });
+  }
+  window.requestAnimationFrame(animLoop);
+}
+
+/* x as "1.84 × 10<sup>7</sup>", and the same with a tspan for inside an SVG */
+function sciH(x, d){
+  if(x === 0) return "0";
+  var e = Math.floor(Math.log10(Math.abs(x))), m = x / Math.pow(10, e);
+  if(Math.abs(+m.toFixed(d - 1)) >= 10){ m /= 10; e++; }
+  return m.toFixed(d - 1) + " × 10<sup>" + e + "</sup>";
+}
+function sciSvg(x, d){
+  if(x === 0) return "0";
+  var e = Math.floor(Math.log10(Math.abs(x))), m = x / Math.pow(10, e);
+  if(Math.abs(+m.toFixed(d - 1)) >= 10){ m /= 10; e++; }
+  return m.toFixed(d - 1) + ' × 10<tspan baseline-shift="super" font-size="8">' + e + '</tspan>';
+}
+/* a current density, in whatever unit keeps it readable */
+function fmtJ(j){
+  var a = Math.abs(j);
+  if(a === 0) return "0";
+  if(a >= 1) return j.toFixed(2) + " A/cm²";
+  if(a >= 1e-3) return (j * 1e3).toFixed(2) + " mA/cm²";
+  if(a >= 1e-6) return (j * 1e6).toFixed(2) + " µA/cm²";
+  if(a >= 1e-9) return (j * 1e9).toFixed(2) + " nA/cm²";
+  return sciH(j, 2) + " A/cm²";
+}
+/* the same, for a current rather than a current density */
+function fmtA(i){
+  var a = Math.abs(i);
+  if(a === 0) return "0";
+  if(a >= 1) return i.toFixed(3) + " A";
+  if(a >= 1e-3) return (i * 1e3).toPrecision(3) + " mA";
+  if(a >= 1e-6) return (i * 1e6).toPrecision(3) + " µA";
+  if(a >= 1e-9) return (i * 1e9).toPrecision(3) + " nA";
+  return sciH(i, 2) + " A";
+}
+/* the same two, for an SVG <text>, where <sup> is not markup but a
+   mistake: everything from it to the end of the string disappears */
+function fmtJSvg(j){ var t = fmtJ(j); return t.indexOf("<sup>") < 0 ? t : sciSvg(j, 2) + " A/cm²"; }
+function fmtASvg(i){ var t = fmtA(i); return t.indexOf("<sup>") < 0 ? t : sciSvg(i, 2) + " A"; }
+function fmtV(v){
+  var a = Math.abs(v);
+  if(a < 1) return (v * 1000).toFixed(a < 0.01 ? 2 : 1) + " mV";
+  return v.toFixed(3) + " V";
+}
+function fmtR(r){
+  if(r >= 1e6) return (r / 1e6).toFixed(2) + " MΩ";
+  if(r >= 1e3) return (r / 1e3).toFixed(2) + " kΩ";
+  if(r >= 1) return r.toFixed(1) + " Ω";
+  return (r * 1000).toFixed(1) + " mΩ";
+}
+function clamp(v, a, b){ return v < a ? a : v > b ? b : v; }
+
+/* ---- the small SVG vocabulary every picture on this page is drawn in --- */
+function ln(x1, y1, x2, y2, col, w, dash, op){
+  return '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + x2.toFixed(1)
+       + '" y2="' + y2.toFixed(1) + '" stroke="' + col + '" stroke-width="' + (w || 1) + '"'
+       + (dash ? ' stroke-dasharray="' + dash + '"' : "")
+       + (op !== undefined ? ' opacity="' + op + '"' : "") + '/>';
+}
+function tx(x, y, s, col, size, anchor, weight){
+  return '<text x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" fill="' + col + '" ' + MONO
+       + ' font-size="' + (size || 10.5) + '"'
+       + (anchor ? ' text-anchor="' + anchor + '"' : "")
+       + (weight ? ' font-weight="' + weight + '"' : "") + '>' + s + '</text>';
+}
+/* an axis name that sits beside its axis rather than in a caption under
+   the frame: xName at the right end of the x axis, yName up the left */
+function xName(x0, x1, y, lab){ return tx((x0 + x1) / 2, y, lab, "var(--ink-2)", 11.5, "middle", 600); }
+function yName(x, y0, y1, lab){
+  var cy = (y0 + y1) / 2;
+  return tx(x, cy, lab, "var(--ink-2)", 11.5, "middle", 600)
+    .replace("<text", '<text transform="rotate(-90 ' + x.toFixed(1) + ' ' + cy.toFixed(1) + ')"');
+}
+function pth(d, col, w, fill, op){
+  return '<path d="' + d + '" fill="' + (fill || "none") + '" stroke="' + (col || "none")
+       + '" stroke-width="' + (w || 2) + '"'
+       + (op !== undefined ? ' opacity="' + op + '"' : "") + ' stroke-linejoin="round"/>';
+}
+function rc(x, y, w, h, col, op, rx){
+  if(w <= 0 || h <= 0) return "";
+  return '<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + w.toFixed(1)
+       + '" height="' + h.toFixed(1) + '" fill="' + col + '"'
+       + (rx ? ' rx="' + rx + '"' : "")
+       + (op !== undefined ? ' opacity="' + op + '"' : "") + '/>';
+}
+function cir(x, y, r, col, op){
+  return '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + r.toFixed(2)
+       + '" fill="' + col + '"' + (op !== undefined ? ' opacity="' + op + '"' : "") + '/>';
+}
+/* a two-headed measure, used for every "this much" on the page */
+function arrowV(x, y1, y2, col, lab, side){
+  var s = ln(x, y1, x, y2, col, 1.6);
+  var d = y2 > y1 ? 1 : -1;
+  s += '<polygon points="' + x + ',' + y2 + ' ' + (x - 3) + ',' + (y2 - 4 * d) + ' ' + (x + 3) + ',' + (y2 - 4 * d) + '" fill="' + col + '"/>';
+  s += '<polygon points="' + x + ',' + y1 + ' ' + (x - 3) + ',' + (y1 + 4 * d) + ' ' + (x + 3) + ',' + (y1 + 4 * d) + '" fill="' + col + '"/>';
+  if(lab) s += tx(x + (side === "l" ? -6 : 6), (y1 + y2) / 2 + 3.5, lab, col, 10, side === "l" ? "end" : "start", 600);
+  return s;
+}
+
+
+
+/* ================= 6 - THE VOLTAMMOGRAM ITSELF =========================
+   Nothing on this page is a sketch of a voltammogram. The diffusion equation
+   is integrated for every species on an expanding grid by backward Euler,
+   with the electrode condition solved from Butler-Volmer at each step, and
+   the current that comes out is whatever that gives. Neither the step nor
+   the grid is set by stability, so a fast follow-up reaction costs accuracy
+   rather than correctness. The shapes are therefore consequences,
+   and a student who moves a slider is moving a cause.
+
+   Everything is done dimensionless, which is what keeps it honest: a scan
+   rate can only enter through
+
+       L  = k0 / sqrt(D F v / RT)      electron transfer against transport
+       K1 = k1 (RT/F) / v              chemistry against the sweep
+
+   and one multiplication puts the amperes back:
+
+       i = n F A C* sqrt(D F v / RT) * psi
+
+   which is Randles-Sevcik the moment psi takes its reversible peak value of
+   0.4463. The simulation is checked against that number, against 0.4958*sqrt(a)
+   for the irreversible peak, against Nicholson's dEp table, and against the
+   29.6 and 19.7 mV per decade peak shifts of EC and EC2.                  */
+
+var FRT = FARADAY / (RGAS * T25);          /* 38.92 V^-1                   */
+
+var MECH = {
+  E:   {sp:["A","B"],         rx:[[0,1]],       chem:null},
+  EE:  {sp:["A","B","C"],     rx:[[0,1],[1,2]], chem:null},
+  EC:  {sp:["A","B","C"],     rx:[[0,1]],       chem:"EC"},
+  EC2: {sp:["A","B"],         rx:[[0,1]],       chem:"EC2"},
+  ECp: {sp:["A","B"],         rx:[[0,1]],       chem:"ECp"},
+  ECE: {sp:["A","B","C","Z"], rx:[[0,1],[2,3]], chem:"ECE"},
+  CE:  {sp:["Y","A","B"],     rx:[[1,2]],       chem:"CE"}
+};
+
+function cvGrid(Xmax, h1, gam){
+  var X = [0], h = [0], x = 0, s = h1;
+  while(x < Xmax && X.length < 6000){ x += s; X.push(x); h.push(s); s *= gam; }
+  return {X:X, h:h, N:X.length - 1};
+}
+function thomas(a, b, c, r, n, out){
+  var cp = thomas._cp, dp = thomas._dp, i;
+  if(!cp || cp.length < n + 2){ cp = thomas._cp = new Float64Array(n + 2); dp = thomas._dp = new Float64Array(n + 2); }
+  cp[1] = c[1] / b[1]; dp[1] = r[1] / b[1];
+  for(i = 2; i <= n; i++){
+    var m = b[i] - a[i] * cp[i - 1];
+    cp[i] = c[i] / m;
+    dp[i] = (r[i] - a[i] * dp[i - 1]) / m;
+  }
+  out[n] = dp[n];
+  for(i = n - 1; i >= 1; i--) out[i] = dp[i] - cp[i] * out[i + 1];
+  return out;
+}
+function Sp(g, d, bulk, dt){
+  var N = g.N, j;
+  this.g = g; this.dt = dt; this.d = d; this.bulk = bulk; this.N = N;
+  this.c = new Float64Array(N + 1); this.p = new Float64Array(N + 1);
+  this.q = new Float64Array(N + 1); this.a = new Float64Array(N + 1);
+  this.b = new Float64Array(N + 1); this.cc = new Float64Array(N + 1);
+  this.r = new Float64Array(N + 1); this.lost = new Float64Array(N + 1);
+  for(j = 0; j <= N; j++) this.c[j] = bulk;
+  var h1 = g.h[1], h2 = g.h[2];
+  this.g0 = -(2 * h1 + h2) / (h1 * (h1 + h2));
+  this.g1 = (h1 + h2) / (h1 * h2);
+  this.g2 = -h1 / (h2 * (h1 + h2));
+  this.build(null);
+}
+/* the first-order loss goes in the matrix rather than in a step of its own:
+   that is what lets k1 be enormous without the time step being tiny      */
+Sp.prototype.build = function(sink){
+  var g = this.g, dt = this.dt, N = this.N, j;
+  var arr = (sink && sink.length) ? sink : null, k0 = (typeof sink === "number") ? sink : 0;
+  this.sink = sink;
+  for(j = 1; j <= N - 1; j++){
+    var L = 2 * this.d * dt / (g.h[j] + g.h[j + 1]);
+    this.a[j] = -L / g.h[j];
+    this.b[j] = 1 + L / g.h[j] + L / g.h[j + 1] + (arr ? arr[j] : k0) * dt;
+    this.cc[j] = -L / g.h[j + 1];
+  }
+  for(j = 1; j <= N - 1; j++) this.r[j] = 0;
+  this.r[1] = -this.a[1];
+  thomas(this.a, this.b, this.cc, this.r, N - 1, this.q);
+  this.q[0] = 1; this.q[N] = 0;
+  this.G = this.g0 + this.g1 * this.q[1] + this.g2 * this.q[2];
+};
+Sp.prototype.pre = function(){
+  var N = this.N, j;
+  for(j = 1; j <= N - 1; j++) this.r[j] = this.c[j];
+  this.r[N - 1] -= this.cc[N - 1] * this.bulk;
+  thomas(this.a, this.b, this.cc, this.r, N - 1, this.p);
+  this.P = this.g1 * this.p[1] + this.g2 * this.p[2];
+};
+Sp.prototype.post = function(c0){
+  var N = this.N, j, arr = (this.sink && this.sink.length) ? this.sink : null;
+  var k0 = (typeof this.sink === "number") ? this.sink : 0, dt = this.dt;
+  this.c[0] = c0;
+  for(j = 1; j <= N - 1; j++){
+    var v = this.p[j] + this.q[j] * c0;
+    this.c[j] = v;
+    this.lost[j] = (arr ? arr[j] : k0) * dt * v;
+  }
+  this.c[N] = this.bulk;
+  this.lost[0] = (arr ? arr[0] : k0) * dt * c0;
+  this.lost[N] = 0;
+};
+function dense(M, v, R){
+  var i, j, k;
+  for(i = 0; i < R; i++){
+    var pv = i;
+    for(k = i + 1; k < R; k++) if(Math.abs(M[k][i]) > Math.abs(M[pv][i])) pv = k;
+    if(pv !== i){ var t = M[i]; M[i] = M[pv]; M[pv] = t; var u = v[i]; v[i] = v[pv]; v[pv] = u; }
+    if(M[i][i] === 0) M[i][i] = 1e-300;
+    for(k = i + 1; k < R; k++){
+      var f = M[k][i] / M[i][i];
+      for(j = i; j < R; j++) M[k][j] -= f * M[i][j];
+      v[k] -= f * v[i];
+    }
+  }
+  var x = new Array(R);
+  for(i = R - 1; i >= 0; i--){
+    var s = v[i];
+    for(j = i + 1; j < R; j++) s -= M[i][j] * x[j];
+    x[i] = s / M[i][i];
+  }
+  return x;
+}
+function hand(from, to, N){ for(var j = 0; j <= N - 1; j++) to.c[j] += from.lost[j]; }
+
+function cvRun(o){
+  var m = MECH[o.mech] || MECH.E;
+  var thI = o.thI, thS = o.thS, M = o.M || 2600;
+  var tauT = 2 * Math.abs(thI - thS), dt = tauT / M;
+  var dmax = Math.max(1, o.dB || 1, o.dC || 1);
+  var K1 = o.K1 || 0, K2 = o.K2 || 0, kf = o.kchem || 0, Keq = o.Keq === undefined ? 1 : o.Keq;
+  var kmax = Math.max(K1, K2, kf * (1 + 1 / Keq), 1);
+  var g = cvGrid(6 * Math.sqrt(tauT * dmax) + 2,
+                 Math.min(3e-3, 0.12 / Math.sqrt(kmax)), 1.05);
+
+  var dOf = {A:1, B:o.dB || 1, C:o.dC || (o.dB || 1), Z:o.dB || 1, Y:1};
+  var bulk = {A:1, B:0, C:0, Z:0, Y:0};
+  if(m.chem === "CE"){ bulk.Y = 1 / (1 + Keq); bulk.A = Keq / (1 + Keq); }
+  var S = m.sp.map(function(nm){ return new Sp(g, dOf[nm], bulk[nm], dt); });
+  var ix = {}; m.sp.forEach(function(nm, k){ ix[nm] = k; });
+  if(m.chem === "EC" || m.chem === "ECE" || m.chem === "ECp") S[ix.B].build(K1);
+  if(m.chem === "CE"){ S[ix.Y].build(kf); S[ix.A].build(kf / Keq); }
+  var ec2 = m.chem === "EC2" ? new Float64Array(g.N + 1) : null;
+
+  var R = m.rx.length;
+  var rxL = [o.L, o.L2 === undefined ? o.L : o.L2], rxE0 = [0, o.dE0 || 0];
+  var al = o.al === undefined ? 0.5 : o.al;
+  var nF = o.frames || 0, keep = nF ? Math.max(1, Math.floor(M / nF)) : 0;
+  var th = [], psi = [], prof = [], profTh = [], psiR = [];
+
+  for(var step = 0; step <= M; step++){
+    var tau = step * dt;
+    var theta = tau <= tauT / 2 ? thI - tau : thS + (tau - tauT / 2);
+    if(ec2){
+      var Bc = S[ix.B].c;
+      for(var z = 0; z <= g.N; z++) ec2[z] = 2 * K2 * Bc[z];
+      S[ix.B].build(ec2);
+    }
+    for(var i = 0; i < S.length; i++) S[i].pre();
+
+    /* every charge transfer at the surface at once. Each row is divided by
+       its own largest exponential, so a reversible couple makes the 1/L
+       term vanish instead of overflowing                                */
+    var Mx = [], vv = [];
+    for(var r = 0; r < R; r++){
+      var oxi = m.rx[r][0], rdi = m.rx[r][1], dth = theta - rxE0[r];
+      var Kf = Math.exp(-al * dth), Kb = Math.exp((1 - al) * dth);
+      var sc = Math.max(Kf, Kb); Kf /= sc; Kb /= sc;
+      var row = new Array(R);
+      for(var s = 0; s < R; s++){
+        var wO = (m.rx[s][0] === oxi ? 1 : 0) - (m.rx[s][1] === oxi ? 1 : 0);
+        var wR = (m.rx[s][0] === rdi ? 1 : 0) - (m.rx[s][1] === rdi ? 1 : 0);
+        row[s] = (s === r ? 1 / (rxL[r] * sc) : 0)
+               - (Kf * wO / (S[oxi].d * S[oxi].G) - Kb * wR / (S[rdi].d * S[rdi].G));
+      }
+      Mx.push(row);
+      vv.push(Kf * (-S[oxi].P / S[oxi].G) - Kb * (-S[rdi].P / S[rdi].G));
+    }
+    var ps = dense(Mx, vv, R);
+    for(var k = 0; k < S.length; k++){
+      var net = 0;
+      for(var rr = 0; rr < R; rr++)
+        net += ((m.rx[rr][0] === k ? 1 : 0) - (m.rx[rr][1] === k ? 1 : 0)) * ps[rr];
+      S[k].post((net - S[k].d * S[k].P) / (S[k].d * S[k].G));
+    }
+    /* what the sink took, the product is handed - exactly, so the two never
+       disagree about how much B became something else                   */
+    if(m.chem === "EC" || m.chem === "ECE") hand(S[ix.B], S[ix.C], g.N);
+    else if(m.chem === "ECp") hand(S[ix.B], S[ix.A], g.N);
+    else if(m.chem === "CE"){ hand(S[ix.Y], S[ix.A], g.N); hand(S[ix.A], S[ix.Y], g.N); }
+
+    var tot = 0; for(var q = 0; q < R; q++) tot += ps[q];
+    th.push(theta); psi.push(tot); if(R > 1) psiR.push(ps.slice());
+    if(keep && step % keep === 0){
+      prof.push(S.map(function(sp){ var a = new Float64Array(g.N + 1); a.set(sp.c); return a; }));
+      profTh.push(theta);
+    }
+  }
+  return {th:th, psi:psi, psiR:psiR, X:g.X, prof:prof, profTh:profTh,
+          names:m.sp, R:R, N:g.N, M:M, ix:ix};
+}
+
+/* the four numbers a student measures off the trace */
+function cvPeaks(th, psi){
+  var n = th.length, half = Math.floor(n / 2), i;
+  var fI = 2, rI = half + 2, fV = -Infinity, rV = Infinity;
+  for(i = 2; i < half; i++) if(psi[i] > fV){ fV = psi[i]; fI = i; }
+  for(i = half + 2; i < n - 1; i++) if(psi[i] < rV){ rV = psi[i]; rI = i; }
+  var o = {ipc:fV, Epc:th[fI] / FRT, ipa:rV, Epa:th[rI] / FRT, iF:fI, iR:rI, isw:psi[half]};
+  o.dEp = o.Epa - o.Epc;
+  /* Nicholson's correction: the return peak sits on a cathodic current that
+     is still decaying underneath it, and this is how that is undone     */
+  o.ratio = fV > 0 ? (-rV) / fV + 0.485 * psi[half] / fV + 0.086 : 0;
+  if(!(rV < 0)) o.ratio = 0;
+  if(o.ratio < 0) o.ratio = 0;
+  return o;
+}
+/* every peak, not just the largest: a two-electron system has more than one */
+function cvAllPeaks(th, psi, half, minh){
+  var out = [], i, n = half === undefined ? Math.floor(th.length / 2) : half;
+  for(i = 3; i < n - 2; i++)
+    if(psi[i] >= psi[i - 1] && psi[i] > psi[i + 1] && psi[i] > (minh || 0.08))
+      out.push({E:th[i] / FRT, psi:psi[i]});
+  return out;
+}
+
+/* ---- putting the amperes and the micrometres back ---------------------- */
+function iScale(n, A, Cs, D, nu){ return n * FARADAY * A * Cs * Math.sqrt(D * FRT * nu); }
+function xScale(D, nu){ return Math.sqrt(D / (FRT * nu)); }   /* cm per unit X */
+
+/* ---- one frame, one set of axes, used by every picture here ------------
+   x is a potential in volts and runs POSITIVE TO THE LEFT, so that the
+   forward (reducing) sweep travels left to right the way the deck draws it;
+   y is a current with the cathodic direction up.                        */
+function fr(X0, X1, Y0, Y1, xlo, xhi, ylo, yhi){
+  return {X0:X0, X1:X1, Y0:Y0, Y1:Y1, xlo:xlo, xhi:xhi, ylo:ylo, yhi:yhi,
+    px:function(v){ return X0 + (xhi - v) / (xhi - xlo) * (X1 - X0); },
+    py:function(v){ return Y1 - (v - ylo) / (yhi - ylo) * (Y1 - Y0); }};
+}
+/* an axis tick reads as a number: 100, not 1.0e+2 */
+function tickNum(v){
+  var a = Math.abs(v);
+  if(a < 1e-9) return "0";
+  return (+v.toFixed(a >= 100 ? 0 : a >= 10 ? 1 : a >= 1 ? 2 : 3)) + "";
+}
+/* microamps, or milliamps when microamps would need six digits */
+function iUnit(maxA){
+  var a = Math.abs(maxA) * 1e6;
+  return a >= 1000 ? {k:1e3, u:"mA"} : a >= 0.5 ? {k:1, u:"µA"} : {k:1e-3, u:"nA"};
+}
+function nice(v){
+  var e = Math.pow(10, Math.floor(Math.log10(v))), m = v / e;
+  return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 2.5 ? 2.5 : m <= 5 ? 5 : 10) * e;
+}
+function axesCV(f, xlab, ylab, fy, xstepWant){
+  var s = "", g, i;
+  var xs = nice((f.xhi - f.xlo) / 5.5), ys = nice((f.yhi - f.ylo) / 5);
+  if(xstepWant) xs = xstepWant;
+  s += rc(f.X0, f.Y0, f.X1 - f.X0, f.Y1 - f.Y0, "var(--surface-2)", 0.5, 4);
+  for(g = Math.ceil(f.xlo / xs) * xs; g <= f.xhi + 1e-9; g += xs){
+    var x = f.px(g);
+    s += ln(x, f.Y0, x, f.Y1, "var(--line)", 1, "2 3", 0.75);
+    s += tx(x, f.Y1 + 14, (Math.abs(g) < 1e-9 ? 0 : Math.round(g * 1000)) + "", "var(--muted)", 9.5, "middle");
+  }
+  for(g = Math.ceil(f.ylo / ys) * ys; g <= f.yhi + 1e-9; g += ys){
+    var y = f.py(g);
+    s += ln(f.X0, y, f.X1, y, "var(--line)", 1, "2 3", 0.75);
+    s += tx(f.X0 - 6, y + 3.4, fy ? fy(g) : (Math.abs(g) < 1e-12 ? "0" : g.toPrecision(2)),
+            "var(--muted)", 9.5, "end");
+  }
+  if(f.ylo < 0 && f.yhi > 0) s += ln(f.X0, f.py(0), f.X1, f.py(0), "var(--line-2)", 1.4);
+  s += xName(f.X0, f.X1, f.Y1 + 30, xlab);
+  s += yName(14, f.Y0, f.Y1, ylab);
+  return s;
+}
+/* a path through (E, i) pairs, clipped to the frame by lifting the pen */
+function cvPath(f, th, psi, sx, sy, off){
+  var d = "", pen = false;
+  for(var i = 0; i < th.length; i++){
+    var E = th[i] / FRT * sx + (off || 0), I = psi[i] * sy;
+    if(E < f.xlo || E > f.xhi || I < f.ylo || I > f.yhi){ pen = false; continue; }
+    d += (pen ? "L" : "M") + f.px(E).toFixed(1) + " " + f.py(I).toFixed(1) + " ";
+    pen = true;
+  }
+  return d;
+}
+/* the little arrow that says which way the sweep was going */
+function sweepArrow(f, th, psi, k, sx, sy, col){
+  if(k < 2 || k >= th.length) return "";
+  var x1 = f.px(th[k - 2] / FRT * sx), y1 = f.py(psi[k - 2] * sy);
+  var x2 = f.px(th[k] / FRT * sx), y2 = f.py(psi[k] * sy);
+  var dx = x2 - x1, dy = y2 - y1, L = Math.hypot(dx, dy);
+  if(L < 0.5) return "";
+  dx /= L; dy /= L;
+  var nx = -dy, ny = dx;
+  return '<polygon points="' + (x2 + dx * 5).toFixed(1) + "," + (y2 + dy * 5).toFixed(1)
+       + " " + (x2 - dx * 3 + nx * 3.5).toFixed(1) + "," + (y2 - dy * 3 + ny * 3.5).toFixed(1)
+       + " " + (x2 - dx * 3 - nx * 3.5).toFixed(1) + "," + (y2 - dy * 3 - ny * 3.5).toFixed(1)
+       + '" fill="' + col + '"/>';
+}
+function fmtNu(v){
+  return v >= 1 ? (+v.toFixed(v >= 10 ? 0 : 2)) + " V/s"
+       : (+(v * 1000).toPrecision(3)) + " mV/s";
+}
+function fmtLen(cm){
+  var um = cm * 1e4;
+  if(um >= 1000) return (um / 1000).toFixed(2) + " mm";
+  if(um >= 1) return um.toPrecision(3) + " µm";
+  return (um * 1000).toPrecision(3) + " nm";
+}
+/* a cache: the same dimensionless run is asked for over and over */
+var RUNC = {}, RUNK = [];
+function runc(o){
+  var k = JSON.stringify(o);
+  if(RUNC[k]) return RUNC[k];
+  var r = cvRun(o);
+  RUNC[k] = r; RUNK.push(k);
+  if(RUNK.length > 48) delete RUNC[RUNK.shift()];
+  return r;
+}
+/* one recompute per frame however many sliders are dragged */
+var PEND = {};
+function later(key, fn){
+  if(PEND[key]) return;
+  PEND[key] = true;
+  window.requestAnimationFrame(function(){ PEND[key] = false; fn(); });
+}
+
+/* ======================= 1 - THE SWEEP ================================= */
+var SW = {nu:0.1, pos:0, play:false, last:0};
+var SW_N = 1, SW_A = 0.0707, SW_C = 1e-6, SW_D = 1e-5, SW_WIN = 0.40;
+var SW_FR = 150;
+
+function swRun(){
+  return runc({mech:"E", thI:SW_WIN * FRT, thS:-SW_WIN * FRT, L:1000, al:0.5,
+               M:3000, frames:SW_FR});
+}
+function swDraw(){
+  var r = swRun(), sy = iScale(SW_N, SW_A, SW_C, SW_D, SW.nu);
+  var k = Math.round(SW.pos / (SW_FR - 1) * (r.th.length - 1));
+  var pk = cvPeaks(r.th, r.psi);
+  var ipk = pk.ipc * sy, lim = ipk * 1.45;
+
+  var f = fr(62, 500, 24, 272, -SW_WIN, SW_WIN, -lim * 0.8, lim);
+  var s = axesCV(f, "E − E°′ / mV   (reducing →)", "i / µA   (cathodic ↑)",
+                 function(v){ return tickNum(v * 1e6); }, 0.1);
+
+  /* the part already swept, solid; what is still to come, faint */
+  s += pth(cvPath(f, r.th.slice(0, k + 1), r.psi.slice(0, k + 1), 1, sy), "var(--ox)", 2.4);
+  s += pth(cvPath(f, r.th.slice(k), r.psi.slice(k), 1, sy), "var(--line-2)", 1.4, null, 0.8);
+  s += sweepArrow(f, r.th, r.psi, k, 1, sy, "var(--ox)");
+
+  /* the two peaks, named once the sweep has passed them */
+  if(k >= pk.iF){
+    s += cir(f.px(pk.Epc), f.py(pk.ipc * sy), 3.4, "var(--red-)");
+    s += ln(f.px(pk.Epc), f.py(pk.ipc * sy), f.px(pk.Epc), f.py(0), "var(--red-)", 1, "3 3", 0.8);
+    s += tx(f.px(pk.Epc) + 8, f.py(pk.ipc * sy) - 7,
+            "i_p,c " + (pk.ipc * sy * 1e6).toPrecision(3) + " µA", "var(--red-)", 10, null, 700);
+    s += tx(f.px(pk.Epc) + 8, f.py(pk.ipc * sy) + 6,
+            "at " + (pk.Epc * 1000).toFixed(0) + " mV", "var(--red-)", 9.5);
+  }
+  if(k >= pk.iR){
+    s += cir(f.px(pk.Epa), f.py(pk.ipa * sy), 3.4, "var(--go)");
+    s += tx(f.px(pk.Epa) - 8, f.py(pk.ipa * sy) + 13,
+            "i_p,a   ΔE_p " + (pk.dEp * 1000).toFixed(0) + " mV", "var(--go)", 10, "end", 700);
+  }
+  /* where we are */
+  var E = r.th[k] / FRT, I = r.psi[k] * sy;
+  if(E >= f.xlo && E <= f.xhi && I >= f.ylo && I <= f.yhi){
+    s += cir(f.px(E), f.py(I), 5.4, "var(--ion-k)", 0.25);
+    s += cir(f.px(E), f.py(I), 3.2, "var(--ion-k)");
+  }
+  /* the triangle, inset, with the same marker on it */
+  var g = fr(360, 494, 32, 92, 0, 1, -1.08, 1.08);
+  s += rc(358, 30, 138, 64, "var(--surface)", 0.92, 4);
+  var tp = "M" + g.px(1).toFixed(1) + " " + g.py(1).toFixed(1)
+         + "L" + g.px(0.5).toFixed(1) + " " + g.py(-1).toFixed(1)
+         + "L" + g.px(0).toFixed(1) + " " + g.py(1).toFixed(1);
+  s += pth(tp, "var(--go)", 1.6);   /* --pot is a class, not a token */
+  var fracT = k / (r.th.length - 1);
+  var tri = fracT <= 0.5 ? 1 - 4 * fracT : 4 * fracT - 3;
+  s += cir(g.px(1 - fracT), g.py(tri), 3, "var(--ion-k)");
+  s += tx(364, 104, "E against t", "var(--muted)", 9, null, 600);
+  document.getElementById("swcv").innerHTML = s;
+
+  /* ---- the profile ---- */
+  var pf = r.prof[Math.min(SW.pos, r.prof.length - 1)];
+  var xs = xScale(SW_D, SW.nu);
+  var xmaxCm = 6 * Math.sqrt(SW_D * (SW_WIN * 2) / SW.nu) * 0.42;
+  var pfr = fr(58, 500, 24, 262, 0, xmaxCm * 1e4, 0, 1.08);
+  /* this frame alone runs the ordinary way round */
+  pfr.px = function(v){ return 58 + (v - 0) / (xmaxCm * 1e4 - 0) * (500 - 58); };
+  var q = rc(pfr.X0, pfr.Y0, pfr.X1 - pfr.X0, pfr.Y1 - pfr.Y0, "var(--surface-2)", 0.5, 4);
+  var gstep = nice(xmaxCm * 1e4 / 4.5), gg;
+  for(gg = 0; gg <= xmaxCm * 1e4 + 1e-9; gg += gstep){
+    q += ln(pfr.px(gg), pfr.Y0, pfr.px(gg), pfr.Y1, "var(--line)", 1, "2 3", 0.75);
+    q += tx(pfr.px(gg), pfr.Y1 + 14, (+gg.toPrecision(2)) + "", "var(--muted)", 9.5, "middle");
+  }
+  for(gg = 0; gg <= 1.0001; gg += 0.25){
+    q += ln(pfr.X0, pfr.py(gg), pfr.X1, pfr.py(gg), "var(--line)", 1, "2 3", 0.75);
+    q += tx(pfr.X0 - 6, pfr.py(gg) + 3.4, gg.toFixed(2), "var(--muted)", 9.5, "end");
+  }
+  q += xName(pfr.X0, pfr.X1, pfr.Y1 + 30, "distance from the electrode / µm");
+  q += yName(14, pfr.Y0, pfr.Y1, "C / C*");
+  q += rc(pfr.X0 - 7, pfr.Y0, 7, pfr.Y1 - pfr.Y0, "var(--elec)", 0.5);
+  function prof(ci, col, w){
+    var d = "", j;
+    for(j = 0; j <= r.N; j++){
+      var xu = r.X[j] * xs * 1e4;
+      if(xu > xmaxCm * 1e4) break;
+      d += (j ? "L" : "M") + pfr.px(xu).toFixed(1) + " " + pfr.py(Math.min(pf[ci][j], 1.07)).toFixed(1) + " ";
+    }
+    return pth(d, col, w);
+  }
+  q += prof(0, "var(--ox)", 2.4);
+  q += prof(1, "var(--red-)", 2.4);
+  var c0 = pf[0][0], c1 = pf[1][0];
+  q += cir(pfr.X0, pfr.py(Math.min(c0, 1.07)), 3.4, "var(--ox)");
+  q += cir(pfr.X0, pfr.py(Math.min(c1, 1.07)), 3.4, "var(--red-)");
+  /* the two names go in a box of their own: R sits on zero for most of the
+     forward sweep, and a label on that curve lands on the axis numbers */
+  q += rc(pfr.X1 - 134, pfr.Y0 + 5, 130, 34, "var(--surface)", 0.93, 4);
+  q += ln(pfr.X1 - 128, pfr.Y0 + 15, pfr.X1 - 114, pfr.Y0 + 15, "var(--ox)", 2.4);
+  q += tx(pfr.X1 - 108, pfr.Y0 + 18.5, "O, starting material", "var(--ox)", 9.5, null, 700);
+  q += ln(pfr.X1 - 128, pfr.Y0 + 29, pfr.X1 - 114, pfr.Y0 + 29, "var(--red-)", 2.4);
+  q += tx(pfr.X1 - 108, pfr.Y0 + 32.5, "R, product", "var(--red-)", 9.5, null, 700);
+  /* the Nernst layer, as the deck defines it. The clock has to come from
+     how far round the cycle we are, not from the potential: after the
+     switch the potential retraces itself and time does not.          */
+  var tsec = fracT * 4 * SW_WIN / SW.nu;
+  var del = Math.sqrt(SW_D * Math.max(tsec, 1e-6)) * 1e4;
+  if(del > 0 && del < xmaxCm * 1e4){
+    q += ln(pfr.px(del), pfr.Y0, pfr.px(del), pfr.Y1, "var(--ion-k)", 1.4, "5 3", 0.9);
+    var dRight = pfr.px(del) + 5 + 54 < pfr.X1 - 2;
+    q += tx(pfr.px(del) + (dRight ? 5 : -5), pfr.Y1 - 7, "δ ≈ √(Dt)",
+            "var(--ion-k)", 9.5, dRight ? null : "end", 600);
+  }
+  document.getElementById("swprof").innerHTML = q;
+
+  /* ---- the readouts ---- */
+  document.getElementById("swE").textContent = (E * 1000).toFixed(0) + " mV";
+  document.getElementById("swI").textContent = (I * 1e6).toFixed(2) + " µA";
+  document.getElementById("swCO").textContent = c0.toFixed(3);
+  document.getElementById("swCR").textContent = c1.toFixed(3);
+  document.getElementById("swDel").textContent = fmtLen(del / 1e4);
+  document.getElementById("swT").textContent = tsec.toFixed(tsec < 10 ? 2 : 1) + " s";
+  document.getElementById("swPosv").textContent = (fracT * 100).toFixed(0) + " % of the cycle";
+  document.getElementById("swNuv").textContent = fmtNu(SW.nu);
+  document.getElementById("swNote").textContent =
+    fmtNu(SW.nu) + " · 1 mM · 3 mm disc · D = 1×10⁻⁵ cm²/s";
+
+  var vd = document.getElementById("swVerdict"), cls = "flat", msg;
+  if(c0 > 0.97 && fracT < 0.5){
+    cls = "flat";
+    msg = "<b>Nothing is happening yet.</b> The potential is still well positive of E°′, the surface is "
+        + "essentially all O, and the current is the few nanoamps of a couple sitting at equilibrium.";
+  }else if(fracT < 0.5 && k < pk.iF && c0 > 0.25){
+    cls = "go";
+    msg = "<b>Electron-transfer limited &mdash; the exponential part.</b> Nernst is dragging the surface ratio down "
+        + "and every 59 mV multiplies it by ten. Supply is not yet a problem: C<sub>O</sub>(0) is still "
+        + c0.toFixed(2) + " of bulk, so the current is rising almost exponentially.";
+  }else if(fracT < 0.5 && Math.abs(k - pk.iF) < 0.06 * r.th.length){
+    cls = "mixv";
+    msg = "<b>The peak: the two limits have crossed.</b> The surface is nearly stripped of O "
+        + "(C<sub>O</sub>(0)/C* = " + c0.toFixed(3) + "), so Nernst has almost nothing left to take. From here the "
+        + "current is set by how fast diffusion can bring more, and that only gets worse.";
+  }else if(fracT < 0.5){
+    cls = "stop";
+    msg = "<b>Mass-transport limited &mdash; the decay.</b> The surface has been empty of O for a while; the only "
+        + "thing still changing is the <em>thickness</em> of the depleted layer, now about " + fmtLen(del / 1e4)
+        + ". It grows as √t, so the gradient and the current fall as 1/√t. <b>This is why a CV has a peak and a "
+        + "rotating disc does not</b> &mdash; stir the solution and δ stops growing.";
+  }else if(I > 0){
+    cls = "stop";
+    msg = "<b>Going back, but still reducing.</b> The sweep has turned round, yet the potential is still negative "
+        + "enough to reduce O, so the current stays cathodic and keeps decaying. The return peak cannot appear "
+        + "until the potential is positive enough to take electrons back off R.";
+  }else{
+    cls = "go";
+    msg = "<b>Re-oxidising the product.</b> R built up in a thin layer next to the electrode on the way down and has "
+        + "not had time to leave; the return sweep finds it still there and puts it back. <b>That is the whole "
+        + "meaning of a return peak</b> &mdash; it measures how much of the product survived the round trip.";
+  }
+  vd.className = "verdict " + cls;
+  vd.innerHTML = msg;
+}
+
+function swTrio(){
+  var r = swRun(), pk = cvPeaks(r.th, r.psi);
+  var nus = [0.01, 0.1, 1], cols = ["var(--go)", "var(--ox)", "var(--red-)"];
+  /* the frame comes from the curve, not from its peak: the return peak of
+     a reversible couple is about two thirds of the forward one, which a
+     guessed fraction kept cutting off                                 */
+  var syTop = iScale(SW_N, SW_A, SW_C, SW_D, nus[2]), lo3 = 0, hi3 = 0;
+  r.psi.forEach(function(v){ if(v < lo3) lo3 = v; if(v > hi3) hi3 = v; });
+  var top = pk.ipc * syTop;
+  var f = fr(62, 440, 22, 244, -SW_WIN - 0.01, SW_WIN + 0.01,
+             lo3 * syTop * 1.14, hi3 * syTop * 1.14);
+  var s = axesCV(f, "E − E°′ / mV", "i / µA", function(v){ return tickNum(v * 1e6); }, 0.2);
+  nus.forEach(function(nu, i){
+    var sy = iScale(SW_N, SW_A, SW_C, SW_D, nu);
+    s += pth(cvPath(f, r.th, r.psi, 1, sy), cols[i], 2.1);
+    var yy = f.py(pk.ipc * sy);
+    s += tx(f.px(pk.Epc) - 9, yy - 5, fmtNu(nu), cols[i], 10, "end", 700);
+  });
+  s += ln(f.px(pk.Epc), f.Y0 + 4, f.px(pk.Epc), f.Y1, "var(--ion-k)", 1.2, "4 3", 0.85);
+  s += tx(f.px(pk.Epc) + 6, f.Y0 + 14, "E_p does not move", "var(--ion-k)", 10, null, 700);
+  document.getElementById("swtrio").innerHTML = s;
+  var v = nus.map(function(nu){ return pk.ipc * iScale(SW_N, SW_A, SW_C, SW_D, nu); });
+  document.getElementById("sw3a").textContent = (v[0] * 1e6).toPrecision(3) + " µA";
+  document.getElementById("sw3b").textContent = (v[1] * 1e6).toPrecision(3) + " µA";
+  document.getElementById("sw3c").textContent = (v[2] * 1e6).toPrecision(3) + " µA";
+  document.getElementById("sw3r").textContent = (v[1] / v[0]).toFixed(2) + " ×  (√10 = 3.16)";
+}
+
+document.getElementById("swPos").addEventListener("input", function(){
+  SW.pos = +this.value; SW.play = false;
+  document.getElementById("swPlay").textContent = "Play";
+  later("sw", swDraw);
+});
+document.getElementById("swNu").addEventListener("input", function(){
+  SW.nu = Math.pow(10, +this.value); later("sw", swDraw);
+});
+document.getElementById("swPlay").addEventListener("click", function(){
+  SW.play = !SW.play; this.textContent = SW.play ? "Pause" : "Play";
+});
+document.getElementById("swStep").addEventListener("click", function(){
+  SW.play = false; document.getElementById("swPlay").textContent = "Play";
+  SW.pos = (SW.pos + 2) % SW_FR; document.getElementById("swPos").value = SW.pos; swDraw();
+});
+document.getElementById("swRew").addEventListener("click", function(){
+  SW.pos = 0; document.getElementById("swPos").value = 0; swDraw();
+});
+/* the forward sweep covers E = E_i - 4*SW_WIN*(fraction of the cycle), so
+   each landmark is solved for rather than guessed at                   */
+var SWMARK = [0.02, -0.0285, -0.18, -SW_WIN];
+SWMARK.map(function(E){ return (SW_WIN - E) / (4 * SW_WIN); })
+      .map(function(fr, i){ return ["swL" + (i + 1), fr]; }).forEach(function(p){
+  document.getElementById(p[0]).addEventListener("click", function(){
+    SW.play = false; document.getElementById("swPlay").textContent = "Play";
+    SW.pos = Math.round(p[1] * (SW_FR - 1));
+    document.getElementById("swPos").value = SW.pos; swDraw();
+  });
+});
+ANIM.push({panel:"p-sweep", tick:function(ts){
+  if(!SW.play || REDUCED) return;
+  if(ts - SW.last < 70) return;
+  SW.last = ts;
+  SW.pos = (SW.pos + 1) % SW_FR;
+  document.getElementById("swPos").value = SW.pos;
+  swDraw();
+}});
+
+/* ======================= 2 - REVERSIBLE? =============================== */
+var RV = {k0:1e-2, nu:0.1, al:0.5, dr:1, sw:0.35};
+var RV_D = 1e-5, RV_A = 0.0707, RV_C = 1e-6;
+
+function rvLam(){ return RV.k0 / Math.sqrt(RV_D * FRT * RV.nu); }
+function rvRun(L, al, dr, sw){
+  return runc({mech:"E", thI:0.45 * FRT, thS:-sw * FRT, L:Math.min(L, 2000),
+               al:al, dB:dr, M:3400});
+}
+function rvDraw(){
+  var L = rvLam();
+  var r = rvRun(L, RV.al, RV.dr, RV.sw);
+  var ref = rvRun(1500, 0.5, 1, RV.sw);
+  var pk = cvPeaks(r.th, r.psi), rp = cvPeaks(ref.th, ref.psi);
+  var sy = iScale(1, RV_A, RV_C, RV_D, RV.nu);
+  var top = Math.max(pk.ipc, rp.ipc) * sy;
+  var f = fr(62, 500, 24, 282, -RV.sw - 0.02, 0.45, -top * 0.95, top * 1.2);
+  var s = axesCV(f, "E − E°′ / mV   (reducing →)", "i / µA   (cathodic ↑)",
+                 function(v){ return tickNum(v * 1e6); }, 0.1);
+  s += pth(cvPath(f, ref.th, ref.psi, 1, sy), "var(--line-2)", 1.5, null, 0.85);
+  s += pth(cvPath(f, r.th, r.psi, 1, sy), "var(--ox)", 2.5);
+
+  /* the two measurements, drawn where they are made */
+  var yC = f.py(pk.ipc * sy), yA = f.py(pk.ipa * sy);
+  s += cir(f.px(pk.Epc), yC, 3.4, "var(--red-)");
+  s += ln(f.px(pk.Epc), yC, f.px(pk.Epc), f.Y1 - 2, "var(--red-)", 1, "3 3", 0.7);
+  if(pk.ratio > 0.02){
+    s += cir(f.px(pk.Epa), yA, 3.4, "var(--go)");
+    s += ln(f.px(pk.Epa), yA, f.px(pk.Epa), f.Y1 - 2, "var(--go)", 1, "3 3", 0.7);
+    var xa = f.px(pk.Epa), xc = f.px(pk.Epc), ym = f.Y1 - 12;
+    s += ln(xa, ym, xc, ym, "var(--ion-k)", 1.6);
+    s += tx((xa + xc) / 2, ym - 5, "ΔE_p " + (pk.dEp * 1000).toFixed(0) + " mV",
+            "var(--ion-k)", 10, "middle", 700);
+  }else{
+    s += tx(f.px(pk.Epc) - 10, f.Y1 - 14, "no return peak", "var(--stop)", 10.5, "end", 700);
+  }
+  /* an irreversible peak sits at the right-hand edge, so the label has to
+     be able to lean the other way                                     */
+  var labIp = "i_p,c " + (pk.ipc * sy * 1e6).toPrecision(3) + " µA";
+  var ipR = f.px(pk.Epc) + 8 + labIp.length * 6.1 < f.X1 - 2;
+  s += tx(f.px(pk.Epc) + (ipR ? 8 : -8), yC - 7, labIp,
+          "var(--red-)", 10, ipR ? null : "end", 700);
+  document.getElementById("rvcv").innerHTML = s;
+
+  /* ---- Nicholson's working curve, computed not tabulated ---- */
+  var wf = fr(54, 500, 24, 272, -1.2, 2.6, 40, 320);
+  wf.px = function(v){ return 54 + (v - (-1.2)) / (2.6 - (-1.2)) * (500 - 54); };
+  var w = rc(wf.X0, wf.Y0, wf.X1 - wf.X0, wf.Y1 - wf.Y0, "var(--surface-2)", 0.5, 4), gq;
+  for(gq = -1; gq <= 2.6; gq += 1){
+    w += ln(wf.px(gq), wf.Y0, wf.px(gq), wf.Y1, "var(--line)", 1, "2 3", 0.75);
+    w += tx(wf.px(gq), wf.Y1 + 14, "10" + supr(gq), "var(--muted)", 9.5, "middle");
+  }
+  for(gq = 50; gq <= 320; gq += 50){
+    w += ln(wf.X0, wf.py(gq), wf.X1, wf.py(gq), "var(--line)", 1, "2 3", 0.75);
+    w += tx(wf.X0 - 6, wf.py(gq) + 3.4, gq + "", "var(--muted)", 9.5, "end");
+  }
+  w += xName(wf.X0, wf.X1, wf.Y1 + 30, "Λ = k° / m_T");
+  w += yName(14, wf.Y0, wf.Y1, "ΔE_p / mV");
+  var d = "";
+  RVWORK.forEach(function(p, i){
+    d += (i ? "L" : "M") + wf.px(p[0]).toFixed(1) + " " + wf.py(Math.min(p[1], 318)).toFixed(1) + " ";
+  });
+  w += pth(d, "var(--red-)", 2.2);
+  w += ln(wf.X0, wf.py(57), wf.X1, wf.py(57), "var(--go)", 1.3, "4 3", 0.9);
+  w += tx(wf.X0 + 6, wf.py(57) + 13, "57 mV, the reversible floor", "var(--go)", 9.5, null, 600);
+  var lg = clamp(Math.log10(L), -1.2, 2.6);
+  var dep = pk.ratio > 0.02 ? pk.dEp * 1000 : 320;
+  w += ln(wf.px(lg), wf.Y0, wf.px(lg), wf.Y1, "var(--ion-k)", 1.2, "4 3", 0.8);
+  w += cir(wf.px(lg), wf.py(clamp(dep, 42, 318)), 4.4, "var(--ion-k)");
+  w += tx(wf.px(lg) + (lg > 1.4 ? -8 : 8), clamp(wf.py(clamp(dep, 48, 312)) - 9, wf.Y0 + 11, wf.Y1 - 18),
+          "you are here", "var(--ion-k)", 10, lg > 1.4 ? "end" : null, 700);
+  var bIrr = wf.px(Math.log10(0.3)), bRev = wf.px(Math.log10(15));
+  w += rc(wf.X0 + 1, wf.Y0 + 1, bIrr - wf.X0 - 1, wf.Y1 - wf.Y0 - 2, "var(--stop)", 0.09);
+  w += rc(bRev, wf.Y0 + 1, wf.X1 - bRev - 1, wf.Y1 - wf.Y0 - 2, "var(--go)", 0.1);
+  /* the two bands are the point of the figure, so they are named inside it.
+     y = 196 is ΔE_p = 125 mV, which the curve crosses at Λ ≈ 0.6 — in the
+     unshaded middle, and so in neither band                             */
+  w += tx((wf.X0 + bIrr) / 2, 196, "irreversible", "var(--stop)", 9.5, "middle", 700);
+  w += tx((wf.X0 + bIrr) / 2, 208, "no return peak", "var(--stop)", 8, "middle", 500);
+  w += tx((bRev + wf.X1) / 2, 196, "reversible", "var(--go)", 9.5, "middle", 700);
+  w += tx((bRev + wf.X1) / 2, 208, "ΔE_p no longer depends on k°", "var(--go)", 8.5, "middle", 500);
+  document.getElementById("rvwork").innerHTML = w;
+
+  /* ---- the numbers ---- */
+  var mt = Math.sqrt(RV_D * FRT * RV.nu);
+  document.getElementById("rvLam").textContent = L >= 100 ? L.toPrecision(3) : L.toPrecision(3);
+  document.getElementById("rvMt").textContent = mt.toPrecision(3) + " cm/s";
+  document.getElementById("rvDep").textContent = pk.ratio > 0.02 ? (pk.dEp * 1000).toFixed(0) + " mV" : "no return peak";
+  document.getElementById("rvRat").textContent = pk.ratio > 0.02 ? pk.ratio.toFixed(2) : "0";
+  document.getElementById("rvEpc").textContent = (pk.Epc * 1000).toFixed(0) + " mV";
+  document.getElementById("rvIp").textContent = (pk.ipc * sy * 1e6).toPrecision(3) + " µA";
+  document.getElementById("rvEh").textContent = pk.ratio > 0.02
+    ? (((pk.Epa + pk.Epc) / 2) * 1000).toFixed(0) + " mV" : "not available";
+  document.getElementById("rvDel").textContent = fmtLen(Math.sqrt(RV_D * 0.45 / RV.nu));
+  document.getElementById("rvK0v").innerHTML = sciH(RV.k0, 2) + " cm/s";
+  document.getElementById("rvNuv").textContent = fmtNu(RV.nu);
+  document.getElementById("rvAlv").textContent = RV.al.toFixed(2);
+  document.getElementById("rvDrv").textContent = RV.dr.toPrecision(2) + " ×";
+  document.getElementById("rvSwv").textContent = (RV.sw * 1000).toFixed(0) + " mV";
+
+  var vd = document.getElementById("rvVerdict"), cls, msg;
+  if(L > 15){
+    cls = "go";
+    msg = "<b>Reversible at this scan rate.</b> Λ = " + L.toPrecision(2) + " means the interface is at least fifteen "
+        + "times faster than transport, so Nernst holds at the surface throughout and ΔE<sub>p</sub> sits at its "
+        + "floor. <b>You can read E°′ off this trace</b>, and the peak current obeys Randles&ndash;Sevcik. "
+        + "Note what you cannot do: measure k° &mdash; the trace has stopped depending on it.";
+  }else if(L > 0.3){
+    cls = "stop";
+    msg = "<b>Quasi-reversible.</b> Λ = " + L.toPrecision(2) + ". The electron transfer is no longer fast enough to "
+        + "keep Nernst at the surface, so the peaks pull apart (" + (pk.dEp * 1000).toFixed(0) + " mV) and the "
+        + "current drops below the reversible curve. <b>This is the only window in which k° can be measured</b> "
+        + "&mdash; the working curve beside the trace turns that ΔE<sub>p</sub> into a number.";
+  }else{
+    cls = "mixv";
+    msg = "<b>Irreversible at this scan rate.</b> Λ = " + L.toPrecision(2) + ": the sweep is finished before the "
+        + "interface can respond. The return peak has gone, E<sub>p</sub> now moves " + (29.6 / RV.al).toFixed(0)
+        + " mV per decade of υ for α = " + RV.al.toFixed(2) + ", and the peak current carries "
+        + "2.99×10⁵√α rather than 2.69×10⁵. <b>The midpoint of the peaks is no longer E°′</b> &mdash; there is no "
+        + "midpoint, and nothing on this trace is a thermodynamic quantity.";
+  }
+  if(Math.abs(RV.dr - 1) > 0.08){
+    msg += " <br><br><b>And D<sub>R</sub> ≠ D<sub>O</sub>:</b> the midpoint of the peaks is displaced from E°′ by "
+        + "(RT/F)ln√(D<sub>R</sub>/D<sub>O</sub>) = " + ((RTF * 0.5 * Math.log(RV.dr)) * 1000).toFixed(0)
+        + " mV, with no thermodynamics involved at all. A product that diffuses away slowly piles up at the "
+        + "surface, and the couple reaches its Nernstian ratio at a more negative potential.";
+  }
+  vd.className = "verdict " + cls;
+  vd.innerHTML = msg;
+}
+/* the working curve, computed once from the same simulator that draws the
+   trace: a table copied out of a 1965 paper would not be checkable      */
+var RVWORK = [];
+function rvBuildWork(){
+  for(var lg = -1.2; lg <= 2.61; lg += 0.2){
+    var r = cvRun({mech:"E", thI:0.45 * FRT, thS:-0.35 * FRT, L:Math.pow(10, lg), al:0.5, M:2400});
+    var p = cvPeaks(r.th, r.psi);
+    RVWORK.push([lg, p.ratio > 0.02 ? p.dEp * 1000 : 400]);
+  }
+}
+function supr(e){
+  var m = {"-":"⁻", "0":"⁰", "1":"¹", "2":"²", "3":"³", "4":"⁴", "5":"⁵", "6":"⁶", "7":"⁷", "8":"⁸", "9":"⁹"};
+  return String(Math.round(e)).split("").map(function(c){ return m[c] || c; }).join("");
+}
+function rvSync(){
+  document.getElementById("rvK0").value = Math.log10(RV.k0);
+  document.getElementById("rvNu").value = Math.log10(RV.nu);
+  document.getElementById("rvAl").value = RV.al;
+  document.getElementById("rvDr").value = Math.log10(RV.dr);
+  document.getElementById("rvSw").value = RV.sw;
+  rvDraw();
+}
+document.getElementById("rvK0").addEventListener("input", function(){ RV.k0 = Math.pow(10, +this.value); later("rv", rvDraw); });
+document.getElementById("rvNu").addEventListener("input", function(){ RV.nu = Math.pow(10, +this.value); later("rv", rvDraw); });
+document.getElementById("rvAl").addEventListener("input", function(){ RV.al = +this.value; later("rv", rvDraw); });
+document.getElementById("rvDr").addEventListener("input", function(){ RV.dr = Math.pow(10, +this.value); later("rv", rvDraw); });
+document.getElementById("rvSw").addEventListener("input", function(){ RV.sw = +this.value; later("rv", rvDraw); });
+/* lambda = k0/sqrt(D F v / RT), so each k0 below is solved from the lambda
+   its own button claims, at the scan rate beside it                    */
+[["rvP1", {k0:0.624,  nu:0.1, al:0.5, dr:1}],
+ ["rvP2", {k0:6.239e-04, nu:0.1, al:0.5, dr:1}],
+ ["rvP3", {k0:1e-2, nu:0.02,   al:0.5, dr:1}],
+ ["rvP4", {k0:1e-2, nu:20,     al:0.5, dr:1}],
+ ["rvP5", {k0:1e-3, nu:1,      al:0.25, dr:1}],
+ ["rvP6", {k0:1e-1, nu:0.1,    al:0.5, dr:0.1}]].forEach(function(p){
+  document.getElementById(p[0]).addEventListener("click", function(){
+    RV.k0 = p[1].k0; RV.nu = p[1].nu; RV.al = p[1].al; RV.dr = p[1].dr; rvSync();
+  });
+});
+
+/* ======================= 3 - RANDLES-SEVCIK ============================= */
+var RS = {n:1, A:0.0707, C:1e-6, D:1e-5, k0:1e-1, full:0};
+var RS_NU = [0.02, 0.05, 0.1, 0.25, 0.5, 1.0];
+
+/* a current range, the way an instrument has them: round numbers, but
+   close enough together that a frame is never mostly empty           */
+function iRange(v){
+  var e = Math.pow(10, Math.floor(Math.log10(v))), f = v / e;
+  var k = [1, 1.5, 2, 3, 4, 5, 6, 8, 10];
+  for(var i = 0; i < k.length; i++) if(f <= k[i] + 1e-12) return k[i] * e;
+  return 10 * e;
+}
+
+function rsDraw(){
+  var cols = ["var(--go)", "var(--red-)", "var(--ox)", "var(--stop)", "var(--ion-k)", "var(--elec)"];
+  var pts = RS_NU.map(function(nu){
+    var L = RS.k0 / Math.sqrt(RS.D * FRT * nu * RS.n);
+    var r = runc({mech:"E", thI:0.45 * FRT, thS:-0.45 * FRT, L:Math.min(L, 2000), al:0.5, M:2600});
+    var p = cvPeaks(r.th, r.psi);
+    return {nu:nu, L:L, r:r, p:p, i:p.ipc * iScale(RS.n, RS.A, RS.C, RS.D, nu) * Math.sqrt(RS.n)};
+  });
+  /* ---- the line is fitted first, because it sets the scale of both
+     pictures and must not move when only the trace does ---- */
+  var sxx = 0, sxy = 0, ssum = 0, xm = Math.sqrt(RS_NU[5]) * 1.08, m;
+  pts.forEach(function(q){
+    var x = Math.sqrt(q.nu);
+    sxx += x * x; sxy += x * q.i; ssum += q.i;
+  });
+  m = sxy / sxx;                               /* through the origin, as the
+                                                  equation demands          */
+  var ssr = 0, sst = 0, mean = ssum / pts.length;
+  pts.forEach(function(q){
+    var x = Math.sqrt(q.nu);
+    ssr += Math.pow(q.i - m * x, 2); sst += Math.pow(q.i - mean, 2);
+  });
+  var R2 = 1 - ssr / sst;
+
+  /* The current scale is deliberately NOT refitted to the data on every
+     redraw. If it were, ten times the concentration would redraw an
+     identical picture with different numbers beside it, and the one thing
+     both panels are for — watching the height answer to the conditions —
+     would be invisible. It behaves like the current range on an instrument
+     instead: it holds where it is, and steps by 1-2-5 only when the trace
+     would leave the frame or shrink into the baseline. A step lands the
+     trace at about 60 % of full scale, so there is room to grow either way.
+     The reversible return peak reaches −0.79 of the forward one, which is
+     what the 0.9 below leaves room for.                               */
+  /* the slope the equation predicts, from the numbers that went in. The
+     fitted line can be beautifully straight and still not be this one —
+     slow kinetics tilt it rather than bend it, which is why R² never
+     notices them                                                       */
+  var kRS = 0.4463 * RS.n * FARADAY * RS.A * RS.C * Math.sqrt(FRT * RS.n);
+  var mRS = kRS * Math.sqrt(RS.D);
+
+  var need = Math.max(pts[5].i, m * xm, mRS * xm);
+  if(!RS.full) RS.full = iRange(need / 0.88);
+  else if(need > RS.full || need < RS.full * 0.07) RS.full = iRange(need / 0.60);
+  var un = iUnit(RS.full);
+  var f = fr(62, 500, 22, 272, -0.46, 0.46, -0.9 * RS.full, RS.full);
+  var s = axesCV(f, "E − E°′ / mV", "i / " + un.u,
+                 function(v){ return tickNum(v * 1e6 / un.k); }, 0.2);
+  /* the simulation is of one electron; a reversible n-electron wave is the
+     same curve with the potential axis divided by n, which is where the
+     57/n mV peak separation comes from                                */
+  pts.forEach(function(q, i){
+    var sy = iScale(RS.n, RS.A, RS.C, RS.D, q.nu) * Math.sqrt(RS.n);
+    s += pth(cvPath(f, q.r.th, q.r.psi, 1 / RS.n, sy), cols[i], 1.9);
+  });
+  /* the legend sits top left: the sweep begins at the far positive end with
+     no faradaic current, so that corner is the one that is always empty */
+  s += rc(f.X0 + 5, f.Y0 + 4, 86, 108, "var(--surface)", 0.9, 4);
+  s += tx(f.X0 + 11, f.Y0 + 18, "scan rate υ", "var(--muted)", 9.5, null, 700);
+  pts.forEach(function(q, i){
+    var ly = f.Y0 + 33 + i * 13;
+    s += ln(f.X0 + 11, ly - 3.5, f.X0 + 25, ly - 3.5, cols[i], 2.2);
+    s += tx(f.X0 + 30, ly, fmtNu(q.nu), cols[i], 9.5, null, 600);
+  });
+  document.getElementById("rscv").innerHTML = s;
+  /* the full scale is announced in the header rather than in the corner of
+     the frame, which a trace at the top of its range would run into    */
+  document.getElementById("rsNote").textContent =
+    "n = " + RS.n + " · " + (RS.C * 1e6).toPrecision(3) + " mM · A = " + RS.A + " cm² · full scale "
+    + (+(RS.full * 1e6 / un.k).toPrecision(3)) + " " + un.u + ", held fixed";
+
+  /* ---- the same six numbers, plotted as the diagnostic. Same current
+     scale as the trace above, so a peak is the same height in both ---- */
+  var g = fr(58, 500, 22, 272, 0, xm, 0, RS.full);
+  g.px = function(v){ return 58 + v / xm * (500 - 58); };
+  var q2 = rc(g.X0, g.Y0, g.X1 - g.X0, g.Y1 - g.Y0, "var(--surface-2)", 0.5, 4), gg;
+  var xs2 = nice(xm / 4.5), ys2 = nice(RS.full / 4.5);
+  for(gg = 0; gg <= xm + 1e-9; gg += xs2){
+    q2 += ln(g.px(gg), g.Y0, g.px(gg), g.Y1, "var(--line)", 1, "2 3", 0.75);
+    q2 += tx(g.px(gg), g.Y1 + 14, (+gg.toPrecision(2)) + "", "var(--muted)", 9.5, "middle");
+  }
+  for(gg = 0; gg <= RS.full + 1e-9; gg += ys2){
+    q2 += ln(g.X0, g.py(gg), g.X1, g.py(gg), "var(--line)", 1, "2 3", 0.75);
+    q2 += tx(g.X0 - 6, g.py(gg) + 3.4, tickNum(gg * 1e6 / un.k), "var(--muted)", 9.5, "end");
+  }
+  q2 += xName(g.X0, g.X1, g.Y1 + 30, "√υ / (V/s)^½");
+  q2 += yName(16, g.Y0, g.Y1, "i_p / " + un.u);
+  q2 += ln(g.px(0), g.py(0), g.px(xm), g.py(mRS * xm), "var(--go)", 1.6, "2 4", 0.85);
+  q2 += ln(g.px(0), g.py(0), g.px(xm), g.py(m * xm), "var(--line-2)", 1.6, "5 4");
+  pts.forEach(function(q, i){
+    q2 += cir(g.px(Math.sqrt(q.nu)), g.py(q.i), 4.2, cols[i]);
+  });
+  /* the gap between the two lines at the fastest scan — the thing a
+     correlation coefficient cannot see                               */
+  var slo = m / mRS - 1, xf = Math.sqrt(pts[5].nu);
+  if(slo < -0.02){
+    q2 += ln(g.px(xf), g.py(m * xf), g.px(xf), g.py(mRS * xf), "var(--stop)", 1.6);
+    q2 += tx(g.px(xf) - 8, g.py((m + mRS) / 2 * xf) + 4,
+             "slope " + (slo * 100).toFixed(0) + " %", "var(--stop)", 10, "end", 700);
+  }
+  /* top left is the empty corner of a line through the origin; the legend
+     is drawn last so that it sits over the frame's gridlines           */
+  q2 += rc(g.X0 + 6, g.Y0 + 4, 227, slo < -0.02 ? 71 : 57, "var(--surface)", 0.9, 4);
+  q2 += ln(g.X0 + 13, g.Y0 + 18, g.X0 + 31, g.Y0 + 18, "var(--line-2)", 1.6, "5 4");
+  q2 += tx(g.X0 + 37, g.Y0 + 21.5, "least squares, through the origin", "var(--muted)", 9.5, null, 600);
+  q2 += ln(g.X0 + 13, g.Y0 + 31, g.X0 + 31, g.Y0 + 31, "var(--go)", 1.6, "2 4");
+  q2 += tx(g.X0 + 37, g.Y0 + 34.5, "what the equation predicts", "var(--go)", 9.5, null, 600);
+  pts.forEach(function(q, i){ q2 += cir(g.X0 + 15 + i * 7, g.Y0 + 49, 3.2, cols[i]); });
+  q2 += tx(g.X0 + 60, g.Y0 + 52.5, "one point per scan rate", "var(--muted)", 9.5, null, 600);
+  if(slo < -0.02){
+    q2 += ln(g.X0 + 22, g.Y0 + 60, g.X0 + 22, g.Y0 + 70, "var(--stop)", 1.6);
+    q2 += tx(g.X0 + 37, g.Y0 + 68, "how far the fit falls short", "var(--stop)", 9.5, null, 600);
+  }
+  document.getElementById("rsfit").innerHTML = q2;
+
+  /* ---- what you would report ---- */
+  var Dfit = Math.pow(m / kRS, 2);
+  var nfit = Math.pow(m / (0.4463 * FARADAY * RS.A * RS.C * Math.sqrt(FRT * RS.D)), 2 / 3);
+  document.getElementById("rsSlope").textContent = (m * 1e6).toPrecision(3) + " µA/(V/s)^½";
+  document.getElementById("rsR2").textContent = R2.toFixed(5);
+  document.getElementById("rsDfit").innerHTML = sciH(Dfit, 3) + " cm²/s";
+  document.getElementById("rsErr").textContent = ((Dfit / RS.D - 1) * 100).toFixed(1) + " %";
+  document.getElementById("rsNfit").textContent = nfit.toFixed(2);
+  document.getElementById("rsLam").textContent = pts[5].L.toPrecision(3);
+  document.getElementById("rsCv").textContent = (RS.C * 1e6).toPrecision(3) + " mM";
+  document.getElementById("rsDv").innerHTML = sciH(RS.D, 2) + " cm²/s";
+  document.getElementById("rsK0v").innerHTML = sciH(RS.k0, 2) + " cm/s";
+
+  var vd = document.getElementById("rsVerdict"), cls, msg;
+  if(pts[5].L > 15){
+    cls = "go";
+    msg = "<b>Straight, through the origin, R² = " + R2.toFixed(4) + ".</b> Every one of the six points lies on the "
+        + "line, and the line lies on the one the equation predicts, so the species is freely diffusing and the "
+        + "kinetics are not interfering even at the fastest scan. The slope returns D to within "
+        + Math.abs((Dfit / RS.D - 1) * 100).toFixed(1) + " % of the value that went in &mdash; which is the honest "
+        + "test of the method, since nothing here was fitted to anything.";
+  }else if(pts[5].L > 0.5){
+    cls = "stop";
+    msg = "<b>Straight, and wrong.</b> At the fastest scan Λ has fallen to " + pts[5].L.toPrecision(2) + ", so the "
+        + "electron transfer can no longer keep Nernst at the surface and every peak comes in low &mdash; the fast "
+        + "ones most. <b>R² is still " + R2.toFixed(4) + "</b>, because what slow kinetics do to this plot is "
+        + "<b>tilt the line, not bend it</b>: the fitted slope is " + Math.abs(slo * 100).toFixed(0) + " % below "
+        + "the faint line the equation predicts, and the points sit on the tilted one almost perfectly. A D taken "
+        + "from that slope is <b>" + ((Dfit / RS.D - 1) * 100).toFixed(0) + " % wrong</b>, and no goodness-of-fit "
+        + "will warn you. The ΔE<sub>p</sub> on the previous tab will.";
+  }else{
+    cls = "mixv";
+    msg = "<b>Do not report a D from this.</b> Λ = " + pts[5].L.toPrecision(2) + " at the top of the range: these "
+        + "are irreversible waves, and their peak current carries 2.99×10⁵√α, not 2.69×10⁵. The plot is straight "
+        + "again &mdash; R² = " + R2.toFixed(4) + ", <b>which is exactly the trap</b> &mdash; but the constant in "
+        + "front is wrong, so the line sits " + Math.abs(slo * 100).toFixed(0) + " % below the predicted one and "
+        + "the D that comes out is low by a factor of about "
+        + (Math.pow(2.69 / 2.99 / Math.sqrt(0.5), 2)).toFixed(1)
+        + ". Straightness proves diffusion control, not reversibility.";
+  }
+  vd.className = "verdict " + cls;
+  vd.innerHTML = msg;
+}
+document.getElementById("rsN").addEventListener("change", function(){ RS.n = +this.value; later("rs", rsDraw); });
+document.getElementById("rsA").addEventListener("change", function(){ RS.A = +this.value; later("rs", rsDraw); });
+document.getElementById("rsC").addEventListener("input", function(){ RS.C = Math.pow(10, +this.value) * 1e-6; later("rs", rsDraw); });
+document.getElementById("rsD").addEventListener("input", function(){ RS.D = Math.pow(10, +this.value); later("rs", rsDraw); });
+document.getElementById("rsK0").addEventListener("input", function(){ RS.k0 = Math.pow(10, +this.value); later("rs", rsDraw); });
+[["rsP1", {n:1, k0:1e-1, D:1e-5, C:1e-6}],
+ ["rsP2", {n:1, k0:1e-3, D:1e-5, C:1e-6}],
+ ["rsP3", {n:2, k0:1e-1, D:6e-6, C:1e-6}]].forEach(function(p){
+  document.getElementById(p[0]).addEventListener("click", function(){
+    RS.n = p[1].n; RS.k0 = p[1].k0; RS.D = p[1].D; RS.C = p[1].C;
+    RS.full = 0;         /* a preset is a jump, not a drag: re-range for it */
+    document.getElementById("rsN").value = RS.n;
+    document.getElementById("rsC").value = Math.log10(RS.C * 1e6);
+    document.getElementById("rsD").value = Math.log10(RS.D);
+    document.getElementById("rsK0").value = Math.log10(RS.k0);
+    rsDraw();
+  });
+});
+
+/* ======================= 4 - COUPLED CHEMISTRY ========================= */
+var MC = {m:"E", kc:10, nu:0.1, k0:0.1, dE0:-0.18, Keq:0.1};
+
+var MCI = {
+  E:   {nm:"a plain electron transfer, for comparison",
+        sch:"A + e⁻ ⇌ B &nbsp;&mdash;&nbsp; nothing follows, so nothing depends on υ except the size of the current",
+        k:false, look:"Perfect superposition when the current is divided by √υ. Anything else on this page is a departure from this picture."},
+  EE:  {nm:"two one-electron steps on the same molecule",
+        sch:"A + e⁻ ⇌ B &nbsp;·&nbsp; B + e⁻ ⇌ C &nbsp;&mdash;&nbsp; the second at ΔE° from the first",
+        k:false, de0:true,
+        look:"ΔE° < −100 mV: two separate waves, each of unit height. ΔE° > +100 mV (<b>potential inversion</b>): one wave of 2.8× the height and about 29 mV separation, because the second electron is easier than the first and the intermediate never accumulates."},
+  EC:  {nm:"the product reacts away, first order",
+        sch:"A + e⁻ ⇌ B &nbsp;·&nbsp; B → C &nbsp;(k₁, s⁻¹)",
+        k:true, klab:"k₁ of B → C",
+        look:"The return peak dies as υ falls, and E<sub>p</sub> moves <b>positive by 29.6 mV per decade</b> of decreasing υ. Both happen together: that pairing is the signature."},
+  EC2: {nm:"the product dimerises, second order",
+        sch:"A + e⁻ ⇌ B &nbsp;·&nbsp; 2B → B₂ &nbsp;(k₂, M⁻¹s⁻¹)",
+        k:true, klab:"k₂ of 2B → B₂", conc:true,
+        look:"Like EC, but the shift is <b>19.7 mV per decade</b> &mdash; two thirds of EC's &mdash; and it also moves with <b>concentration</b>, which EC never does. That is how the two are told apart."},
+  ECE: {nm:"a chemical step opens a second electron transfer",
+        sch:"A + e⁻ ⇌ B &nbsp;·&nbsp; B → C &nbsp;·&nbsp; C + e⁻ ⇌ Z",
+        k:true, de0:true, klab:"k₁ of B → C",
+        look:"If C is <b>harder</b> to reduce than A, a second wave grows in at slow υ. If C is <b>easier</b>, no second wave appears at all &mdash; the first one simply grows towards a two-electron height, which is the far more common and far more deceiving case."},
+  CE:  {nm:"only part of what is dissolved can react",
+        sch:"Y ⇌ A &nbsp;(K, k) &nbsp;·&nbsp; A + e⁻ ⇌ B",
+        k:true, keq:true, klab:"k of Y → A",
+        look:"The peak current is <b>below</b> Randles&ndash;Sevcik and falls further as υ rises, because a fast sweep gives the preceding reaction less time to make more A. The i<sub>p</sub>/√υ ratio <em>decreasing</em> with υ is the diagnostic."},
+  ECp: {nm:"the product is regenerated — catalysis",
+        sch:"A + e⁻ ⇌ B &nbsp;·&nbsp; B + Z → A &nbsp;(k, Z in excess)",
+        k:true, klab:"k of B + Z → A",
+        look:"The forward current rises far above Randles&ndash;Sevcik (towards ψ = √K), the peak flattens into a <b>plateau</b>, and the return peak vanishes &mdash; not because B decayed, but because it was turned straight back into A."}
+};
+var MCPRE = {
+  E:   [["clean couple", {k0:0.1, nu:0.1}]],
+  EE:  [["ΔE° = −180 mV: two waves", {dE0:-0.18}], ["ΔE° = 0", {dE0:0}],
+        ["ΔE° = +180 mV: inversion", {dE0:0.18}]],
+  EC:  [["outrun it", {kc:1, nu:1}], ["the diagnostic window", {kc:10, nu:0.1}],
+        ["no return peak left", {kc:1000, nu:0.1}], ["Λ = 0.1: E_p stops moving", {k0:1e-4, kc:100, nu:0.1}]],
+  EC2: [["slow dimerisation", {kc:100, nu:1}], ["fast dimerisation", {kc:1e4, nu:0.1}]],
+  ECE: [["C harder than A", {dE0:-0.3, kc:10}], ["C easier than A", {dE0:0.15, kc:10}],
+        ["k₁ ≫ 1: a 2e wave", {dE0:0.15, kc:1000}]],
+  CE:  [["K = 0.1", {Keq:0.1, kc:10}], ["K = 0.01, starved", {Keq:0.01, kc:10}],
+        ["fast pre-equilibrium", {Keq:0.1, kc:1000}]],
+  ECp: [["mild catalysis", {kc:10, nu:0.1}], ["a full plateau", {kc:1000, nu:0.1}]]
+};
+
+function mcK(nu){
+  var i = MCI[MC.m];
+  if(!i.k) return 0;
+  return MC.m === "EC2" ? MC.kc * 1e-3 * (RTF / nu) : MC.kc * (RTF / nu);
+}
+/* the sweep has to begin where only A exists, which means 450 mV above
+   the most positive couple in the mechanism and not merely above the
+   first one                                                            */
+function mcStart(){
+  return 0.45 + (MCI[MC.m].de0 ? Math.max(0, MC.dE0) : 0);
+}
+function mcSpec(nu){
+  var o = {mech:MC.m, thI:mcStart() * FRT,
+           L:Math.min(MC.k0 / Math.sqrt(1e-5 * FRT * nu), 2000)};
+  o.thS = (MC.m === "EE" || MC.m === "ECE") ? -0.75 * FRT : -0.45 * FRT;
+  if(MC.m === "ECp") o.thS = -0.45 * FRT;
+  /* 2600 steps over 0.9 V is 0.69 mV each; keep that however wide the
+     window grows, or a narrow two-electron wave is under-resolved and
+     backward Euler quietly shaves its peak                            */
+  o.M = Math.min(7000, Math.round(2600 * (o.thI - o.thS) / (0.9 * FRT)));
+  var K = mcK(nu);
+  if(MC.m === "EC2") o.K2 = K; else if(MCI[MC.m].k) o.K1 = K;
+  if(MCI[MC.m].de0) o.dE0 = MC.dE0 * FRT;
+  if(MC.m === "CE"){ o.Keq = MC.Keq; o.kchem = K; o.K1 = 0; }
+  if(MC.m === "ECE") o.L2 = o.L;
+  return o;
+}
+function mcDraw(){
+  var i = MCI[MC.m];
+  var nus = [MC.nu * 10, MC.nu, MC.nu / 10];
+  var cols = ["var(--red-)", "var(--ox)", "var(--go)"];
+  var runs = nus.map(function(nu){ return runc(mcSpec(nu)); });
+  var pks = runs.map(function(r){ return cvPeaks(r.th, r.psi); });
+  var lo = 0, hi = 0;
+  runs.forEach(function(r){ r.psi.forEach(function(v){ if(v > hi) hi = v; if(v < lo) lo = v; }); });
+  hi = Math.max(hi, 0.55); lo = Math.min(lo, -0.3);
+  var thS = runs[0].th[Math.floor(runs[0].th.length / 2)] / FRT;
+  var f = fr(62, 500, 24, 282, thS - 0.02, mcStart(), lo * 1.12, hi * 1.14);
+  var s = axesCV(f, "E − E°′(A/B) / mV   (reducing →)", "ψ = i / nFAC*√(DFυ/RT)",
+                 function(v){ return v.toFixed(1); }, 0.1);
+  runs.forEach(function(r, k){
+    s += pth(cvPath(f, r.th, r.psi, 1, 1), cols[k], k === 1 ? 2.6 : 1.8, null, k === 1 ? 1 : 0.9);
+  });
+  /* the legend goes top left: the sweep begins at the far positive end,
+     which is drawn there, and no current flows yet                    */
+  var labs = nus.map(function(nu){ return fmtNu(nu) + (i.k ? "   K = " + fmtK(mcK(nu)) : ""); });
+  var lw = 0; labs.forEach(function(t){ lw = Math.max(lw, t.length * 5.6); });
+  var LX = f.X0 + 5, LY = f.Y0 + 5, LW = lw + 30, LH = 13 * nus.length + 7;
+  s += rc(LX, LY, LW, LH, "var(--surface)", 0.92, 4);
+  labs.forEach(function(t, k){
+    var yy = LY + 12 + k * 13;
+    s += ln(LX + 6, yy - 3.5, LX + 20, yy - 3.5, cols[k], k === 1 ? 2.6 : 1.8);
+    s += tx(LX + 24, yy, t, cols[k], 9.5, null, 600);
+  });
+  /* the peak of the middle trace, named */
+  var pk = pks[1];
+  var pxx = f.px(pk.Epc), pyy = f.py(pk.ipc);
+  s += cir(pxx, pyy, 3.4, "var(--ion-k)");
+  var plab = "ψ_p " + pk.ipc.toFixed(3) + " at " + (pk.Epc * 1000).toFixed(0) + " mV";
+  var pw = plab.length * 6.1, pR = pxx + 8 + pw < f.X1 - 2;
+  var l0 = pR ? pxx + 8 : pxx - 8 - pw;
+  var clash = l0 < LX + LW + 2 && l0 + pw > LX - 2 && pyy - 17 < LY + LH + 2;
+  /* dropping it by a line is not enough when the peak is as high as the
+     legend is deep: it has to clear the whole box                     */
+  s += tx(pR ? pxx + 8 : pxx - 8,
+          clash ? Math.max(pyy + 17, LY + LH + 13) : pyy - 7, plab,
+          "var(--ion-k)", 10, pR ? null : "end", 700);
+  s += ln(f.px(-0.0285), f.Y0 + 2, f.px(-0.0285), f.Y1 - 2, "var(--muted)", 1, "3 4", 0.6);
+  s += tx(f.px(-0.0285) - 5, f.Y1 - 6, "where a reversible E_p would be", "var(--muted)", 9, "end", 600);
+  document.getElementById("mccv").innerHTML = s;
+
+  /* ---- the diagnosis ---- */
+  var shift = (pks[0].Epc - pks[2].Epc) / 2 * 1000;     /* per decade of υ  */
+  document.getElementById("mcK").innerHTML = i.k ? fmtK(mcK(MC.nu)) : "—";
+  document.getElementById("mcLam").textContent = (MC.k0 / Math.sqrt(1e-5 * FRT * MC.nu)).toPrecision(3);
+  document.getElementById("mcRs").textContent = pks[2].ratio > 0.02 ? pks[2].ratio.toFixed(2) : "0";
+  document.getElementById("mcRf").textContent = pks[0].ratio > 0.02 ? pks[0].ratio.toFixed(2) : "0";
+  document.getElementById("mcShift").textContent = (shift >= 0 ? "+" : "") + shift.toFixed(1) + " mV";
+  document.getElementById("mcPsi").textContent = pks[1].ipc.toPrecision(3);
+  document.getElementById("mcName").textContent = i.nm;
+  document.getElementById("mcScheme").innerHTML = i.sch;
+  document.getElementById("mcKcv").innerHTML = i.k
+    ? (MC.m === "EC2" ? sciH(MC.kc, 2) + " M⁻¹s⁻¹" : sciH(MC.kc, 2) + " s⁻¹") : "—";
+  document.getElementById("mcNuv").textContent = fmtNu(MC.nu);
+  document.getElementById("mcK0v").innerHTML = sciH(MC.k0, 2) + " cm/s";
+  document.getElementById("mcDe0v").textContent = (MC.dE0 * 1000).toFixed(0) + " mV";
+  document.getElementById("mcKeqv").innerHTML = sciH(MC.Keq, 2);
+  document.getElementById("mcKlab").textContent = i.klab || "homogeneous rate constant";
+
+  var vd = document.getElementById("mcVerdict"), cls = "flat", msg;
+  var K = mcK(MC.nu);
+  if(MC.m === "E"){
+    cls = "go";
+    msg = "<b>Three traces, one curve.</b> Divided by √υ they lie on top of each other, which is what 'no coupled "
+        + "chemistry' looks like. Any separation between these three lines on any other mechanism is the thing you "
+        + "are being asked to diagnose.";
+  }else if(MC.m === "EE"){
+    cls = "mixv";
+    var np = cvAllPeaks(runs[1].th, runs[1].psi, Math.floor(runs[1].th.length / 2), 0.12).length;
+    msg = "<b>ΔE° = " + (MC.dE0 * 1000).toFixed(0) + " mV</b> gives " + (np > 1 ? "two separate waves" : "a single wave")
+        + " of peak height ψ = " + pks[1].ipc.toFixed(2) + ". For reference a single one-electron wave gives 0.446 "
+        + "and a fully inverted two-electron wave gives 1.26 &mdash; that is 2<sup>3/2</sup>, the n<sup>3/2</sup> of "
+        + "Randles&ndash;Sevcik. <b>Scan rate changes none of this</b>, which is how a thermodynamic splitting is "
+        + "told apart from a kinetic one.";
+  }else if(MC.m === "ECp"){
+    cls = "stop";
+    msg = "<b>Catalytic.</b> ψ reaches " + pks[1].ipc.toFixed(2) + " where a plain couple gives 0.446, and the "
+        + "limit it is heading for is √K = " + Math.sqrt(K).toPrecision(3) + ". The giveaway is that the peak has "
+        + "become a <b>plateau</b>: the current no longer falls after the peak, because A is being remade as fast "
+        + "as it is consumed. Sweep faster and the advantage shrinks &mdash; there is less time per sweep for the "
+        + "catalysis to act.";
+  }else if(MC.m === "CE"){
+    cls = "stop";
+    msg = "<b>Starved by the preceding step.</b> Only K/(1+K) = " + (MC.Keq / (1 + MC.Keq)).toFixed(3)
+        + " of what is dissolved is A to begin with, and ψ comes out at " + pks[1].ipc.toFixed(3) + " against the "
+        + "0.446 of a full concentration. The direction of travel is the diagnostic: ψ <em>falls</em> as υ rises "
+        + "(" + pks[2].ipc.toFixed(3) + " → " + pks[0].ipc.toFixed(3) + " here), because a quick sweep gives Y less "
+        + "time to become A. Every other mechanism on this page does the opposite or nothing.";
+  }else if(MC.m === "ECE"){
+    cls = "mixv";
+    msg = "<b>ECE with C " + (MC.dE0 > 0 ? "easier" : "harder") + " to reduce than A.</b> "
+        + (MC.dE0 > 0
+           ? "Because C is reduced as soon as it forms, no second wave ever appears: the first one simply grows "
+             + "from a one-electron height towards two, ψ = " + pks[1].ipc.toFixed(2) + " here. <b>A wave of "
+             + "non-integer height is the only warning you get</b>, and it is easy to mistake for a dirty electrode."
+           : "C is reduced " + Math.abs(MC.dE0 * 1000).toFixed(0) + " mV further on, so it shows as a separate "
+             + "second wave that grows in as υ falls and there is more time to make C.");
+  }else{
+    var want = MC.m === "EC2" ? 19.7 : 29.6;
+    if(K < 0.1){
+      cls = "go";
+      msg = "<b>Outrun.</b> K = " + fmtK(K) + " &lt; 0.1: the sweep is over before the chemistry does anything, the "
+          + "return peak is back to " + pks[1].ratio.toFixed(2) + ", and the couple looks perfectly reversible. "
+          + "<b>This is what a scan-rate study is for</b> &mdash; sweep fast enough and almost any unstable product "
+          + "can be caught.";
+    }else if(K > 20){
+      cls = "mixv";
+      msg = "<b>Gone.</b> K = " + fmtK(K) + ": B is destroyed long before the sweep turns round, so there is no "
+          + "return peak at any of these three rates and E<sub>p</sub> has moved "
+          + (pks[1].Epc * 1000 + 28.5).toFixed(0) + " mV positive of where a reversible couple would peak. The peak "
+          + "shift still measures " + Math.abs(shift).toFixed(1) + " mV per decade against the expected "
+          + want.toFixed(1) + ", so <b>k can still be extracted from the shift</b> even when the return peak is "
+          + "long gone.";
+    }else{
+      cls = "stop";
+      msg = "<b>The diagnostic window.</b> K = " + fmtK(K) + ", and the three traces now disagree: the return peak "
+          + "is " + pks[0].ratio.toFixed(2) + " at " + fmtNu(nus[0]) + " and " + pks[2].ratio.toFixed(2) + " at "
+          + fmtNu(nus[2]) + ". E<sub>p</sub> moves " + Math.abs(shift).toFixed(1) + " mV per decade, against "
+          + want.toFixed(1) + " for " + (MC.m === "EC2" ? "a dimerisation" : "a first-order follow-up")
+          + ". <b>This is where k is measured</b>, and the number you need is the ratio, not the picture.";
+    }
+    if(MC.k0 < 1e-3){
+      msg += "<br><br><b>But Λ = " + (MC.k0 / Math.sqrt(1e-5 * FRT * MC.nu)).toPrecision(2) + ".</b> The electron "
+          + "transfer is itself the slow step, so the follow-up chemistry can no longer reach back through it: "
+          + "E<sub>p</sub> has stopped responding to K. This is the deck's Λ = 0.1 case, and it means the shift "
+          + "method has quietly stopped working.";
+    }
+  }
+  vd.className = "verdict " + cls;
+  vd.innerHTML = msg;
+
+  document.getElementById("mcDe0Wrap").hidden = !i.de0;
+  document.getElementById("mcKeqWrap").hidden = !i.keq;
+  document.getElementById("mcKc").parentNode.hidden = !i.k;
+}
+function fmtK(K){
+  if(K === 0) return "0";
+  if(K >= 1000 || K < 0.01) return sciH(K, 2);
+  return (+K.toPrecision(3)) + "";
+}
+function mcPresets(){
+  var box = document.getElementById("mcPresets");
+  box.innerHTML = (MCPRE[MC.m] || []).map(function(p, i){
+    return '<button class="ghost" data-i="' + i + '" type="button">' + p[0] + "</button>";
+  }).join("");
+}
+document.getElementById("mcPresets").addEventListener("click", function(e){
+  var b = e.target.closest("button"); if(!b) return;
+  var p = MCPRE[MC.m][+b.getAttribute("data-i")][1];
+  Object.keys(p).forEach(function(k){ MC[k] = p[k]; });
+  mcSync();
+});
+function mcSync(){
+  document.getElementById("mcKc").value = Math.log10(MC.kc);
+  document.getElementById("mcNu").value = Math.log10(MC.nu);
+  document.getElementById("mcK0").value = Math.log10(MC.k0);
+  document.getElementById("mcDe0").value = MC.dE0;
+  document.getElementById("mcKeq").value = Math.log10(MC.Keq);
+  mcDraw();
+}
+pillGroup("mcPills", function(v){
+  MC.m = v;
+  if(v === "EC2" && MC.kc < 10) MC.kc = 1000;
+  mcPresets(); mcSync();
+});
+document.getElementById("mcKc").addEventListener("input", function(){ MC.kc = Math.pow(10, +this.value); later("mc", mcDraw); });
+document.getElementById("mcNu").addEventListener("input", function(){ MC.nu = Math.pow(10, +this.value); later("mc", mcDraw); });
+document.getElementById("mcK0").addEventListener("input", function(){ MC.k0 = Math.pow(10, +this.value); later("mc", mcDraw); });
+document.getElementById("mcDe0").addEventListener("input", function(){ MC.dE0 = +this.value; later("mc", mcDraw); });
+document.getElementById("mcKeq").addEventListener("input", function(){ MC.Keq = Math.pow(10, +this.value); later("mc", mcDraw); });
+
+document.getElementById("mcTable").innerHTML =
+  "<tr><th>mechanism</th><th>scheme</th><th>what to look for as υ changes</th></tr>"
+  + Object.keys(MCI).map(function(k){
+      var i = MCI[k];
+      return '<tr><td class="nm"><b>' + (k === "ECp" ? "EC′" : k === "EC2" ? "EC₂" : k) + "</b></td>"
+        + '<td class="eq" style="white-space:normal;font-size:12px">' + i.sch.split("&mdash;")[0] + "</td>"
+        + '<td class="sy">' + i.look + "</td></tr>";
+    }).join("");
+
+/* ======================= 5 - READ THE VOLTAMMOGRAM ===================== */
+var DIAG = [
+  "A simple reversible one-electron couple",
+  "Quasi-reversible electron transfer &mdash; k° is marginal at this scan rate",
+  "Totally irreversible electron transfer",
+  "EC &mdash; the product decays by a first-order reaction",
+  "EC&prime; &mdash; the product is catalytically regenerated",
+  "Two separated one-electron transfers (EE)",
+  "A two-electron wave with potential inversion",
+  "CE &mdash; a slow chemical step supplies the electroactive species",
+  "ECE &mdash; a chemical step opens a second electron transfer",
+  "The product diffuses much more slowly than the starting material",
+  "A proton-coupled couple, recorded at two different pH values"
+];
+var RD_C = [
+  {a:0, q:"Two scan rates a decade apart, currents divided by √υ. What is this?",
+   mk:function(R){ return {runs:[{s:{mech:"E", L:600, al:0.5}}, {s:{mech:"E", L:600, al:0.5}}]}; },
+   w:"<b>Reversible.</b> The two traces superimpose exactly once the current is divided by √υ, ΔE<sub>p</sub> is at its 57 mV floor and the peak ratio is 1. Nothing about the trace depends on the scan rate, which is precisely what 'no slow step other than diffusion' means. Every other case on this page breaks that superposition somewhere."},
+  {a:1, q:"The same couple at two scan rates. What is limiting?",
+   mk:function(R){ var k = 0.6 + R() * 1.4; return {runs:[{s:{mech:"E", L:k, al:0.5}}, {s:{mech:"E", L:k * 3.16, al:0.5}}]}; },
+   w:"<b>Quasi-reversible.</b> ΔE<sub>p</sub> is well above 57 mV and &mdash; the decisive point &mdash; it is <em>larger at the faster scan</em>, because Λ = k°/√(DFυ/RT) falls as υ rises. The peak ratio is still near 1, so the product is perfectly stable: nothing is reacting, the interface is simply slow. This is the only window in which k° can be measured."},
+  {a:2, q:"What does the missing return peak mean here?",
+   mk:function(R){ return {runs:[{s:{mech:"E", L:0.02, al:0.4 + R() * 0.2}}, {s:{mech:"E", L:0.0063, al:0.4 + R() * 0.2}}]}; },
+   w:"<b>Totally irreversible electron transfer.</b> There is no return peak at either rate, the wave is broad, and E<sub>p</sub> marches negative as υ rises. Contrast this with EC, where the return peak comes <em>back</em> when you sweep faster: here sweeping faster makes things worse, not better, because the problem is the interface and not the chemistry."},
+  {a:3, q:"The return peak is there at one rate and not the other. Why?",
+   mk:function(R){ var K = 20 + R() * 60; return {runs:[{s:{mech:"EC", L:600, K1:K / 10}}, {s:{mech:"EC", L:600, K1:K}}]}; },
+   w:"<b>EC.</b> Sweep fast and you catch the product before it reacts, so the return peak is restored; sweep slowly and it is gone, and the forward peak has moved <em>positive</em> by about 30 mV per decade. That pairing &mdash; return peak recovering with υ, forward peak moving positive as υ falls &mdash; is the EC signature, and no kinetic sluggishness of the electrode can imitate it."},
+  {a:4, q:"The forward current is several times too large. What is happening?",
+   mk:function(R){ var K = 60 + R() * 200; return {runs:[{s:{mech:"ECp", L:600, K1:K / 10}}, {s:{mech:"ECp", L:600, K1:K}}]}; },
+   w:"<b>EC′, catalytic.</b> ψ is far above 0.446 &mdash; it is heading for √K &mdash; the peak has flattened into a plateau, and there is no return peak. The plateau is the tell: an ordinary peak falls away after its maximum because the surface is being stripped, but here A is being remade as fast as it is consumed, so the current simply holds. Sweep faster and the advantage shrinks, because there is less time per sweep for the chemistry."},
+  {a:5, q:"Two waves. Are they two species, or one species twice?",
+   mk:function(R){ var d = -(0.15 + R() * 0.12); return {runs:[{s:{mech:"EE", L:600, L2:600, dE0:d * FRT, thS:-0.75 * FRT}}, {s:{mech:"EE", L:600, L2:600, dE0:d * FRT, thS:-0.75 * FRT}}], wide:true}; },
+   w:"<b>EE &mdash; one species, two successive one-electron steps.</b> Each wave is of unit height and both have the reversible 57 mV separation, and critically <b>the spacing does not change with scan rate</b>: it is ΔE° between the two couples, a thermodynamic quantity. A kinetic splitting would move. Two different species at these concentrations would be a coincidence; one molecule with two accessible oxidation states is not."},
+  {a:6, q:"One wave, but it is far too tall and far too narrow. What is it?",
+   mk:function(R){ return {runs:[{s:{mech:"EE", L:600, L2:600, dE0:(0.15 + R() * 0.1) * FRT}}, {s:{mech:"EE", L:600, L2:600, dE0:(0.15 + R() * 0.1) * FRT}}]}; },
+   w:"<b>A two-electron wave with potential inversion.</b> ψ is about 1.26 &mdash; that is 2<sup>3/2</sup>×0.446, the n<sup>3/2</sup> of Randles&ndash;Sevcik &mdash; and ΔE<sub>p</sub> has fallen to about 29 mV, which is 57/n for n = 2. The second electron goes on more easily than the first, so the intermediate B never accumulates and the two steps merge into one. Both traces still superimpose: this is thermodynamics, not kinetics."},
+  {a:7, q:"The peak current is too small, and gets worse as you sweep faster. Why?",
+   mk:function(R){ var K = 0.02 + R() * 0.08; return {runs:[{s:{mech:"CE", L:600, Keq:K, kchem:300}}, {s:{mech:"CE", L:600, Keq:K, kchem:30}}]}; },
+   w:"<b>CE &mdash; a chemical step precedes the electron transfer.</b> Only a small equilibrium fraction of what is dissolved is actually electroactive, so ψ starts below 0.446; and because a faster sweep gives the preceding reaction less time to top the supply up, ψ falls further as υ rises. <b>Every other mechanism here either leaves ψ/√υ alone or raises it.</b> A current that is sub-Nernstian and worsens with scan rate is almost diagnostic on its own."},
+  {a:8, q:"A second wave grows in at the slower scan rate. What is it?",
+   mk:function(R){ var K = 4 + R() * 20; return {runs:[{s:{mech:"ECE", L:600, L2:600, dE0:-0.30 * FRT, K1:K / 10, thS:-0.78 * FRT}}, {s:{mech:"ECE", L:600, L2:600, dE0:-0.30 * FRT, K1:K, thS:-0.78 * FRT}}], wide:true}; },
+   w:"<b>ECE.</b> The second wave is not a second species &mdash; it is the product of the chemical step, C, being reduced in its turn. It therefore <b>grows with time</b>: slow the sweep down and more C has been made by the time the potential reaches it. An EE pair would not do that; the two waves of an EE are both there at every scan rate, in the same ratio."},
+  {a:9, q:"ΔE_p is a textbook 57 mV, yet the whole wave sits in the wrong place. Why?",
+   mk:function(R){ return {runs:[{s:{mech:"E", L:600, dB:0.08}}, {s:{mech:"E", L:600, dB:0.08}}]}; },
+   w:"<b>The product diffuses much more slowly than the starting material.</b> ΔE<sub>p</sub> is still 57 mV and the ratio is still 1 &mdash; the couple is perfectly reversible &mdash; but the midpoint of the two peaks is offset from E°′ by (RT/nF)ln√(D<sub>R</sub>/D<sub>O</sub>). With D<sub>R</sub> an order of magnitude down that is about &minus;30 mV &mdash; negative, because a product that leaves slowly piles up at the surface. The trap is to report this midpoint as a formal potential: it is not one, and nothing thermodynamic has changed."},
+  {a:10, q:"The same couple, same scan rate, two solutions. What differs between them?",
+   mk:function(R){ var dpH = 2 + Math.floor(R() * 3);
+     return {runs:[{s:{mech:"E", L:600}, off:0, lab:"pH 2"},
+                   {s:{mech:"E", L:600}, off:-0.0592 * dpH, lab:"pH " + (2 + dpH)}], pH:dpH, same:true}; },
+   w:"<b>A proton-coupled couple at two pH values.</b> The shape is untouched &mdash; identical ΔE<sub>p</sub>, identical peak height &mdash; and the entire wave has simply translated along the potential axis by 59(m/n) mV per pH unit. That is the Nernst equation with protons in it: E = E°′ − (RT/nF)ln([B]/[A][H⁺]^m). Measuring the slope of E<sub>p</sub> against pH is how m/n, the proton-to-electron ratio, is determined &mdash; which is the whole basis of a Pourbaix diagram."}
+];
+var RD = {k:0, opts:[], answered:false, right:0, done:0, seed:1};
+function rnd(){ RD.seed = (RD.seed * 1103515245 + 12345) & 0x7fffffff; return RD.seed / 0x7fffffff; }
+
+function rdNew(){
+  RD.k = Math.floor(rnd() * RD_C.length);
+  RD.seed = (RD.seed + 7919) & 0x7fffffff;
+  RD.answered = false;
+  var c = RD_C[RD.k];
+  RD.case = c.mk(rnd);
+  /* three distractors, never the answer twice */
+  var pool = [], i;
+  for(i = 0; i < DIAG.length; i++) if(i !== c.a) pool.push(i);
+  for(i = pool.length - 1; i > 0; i--){ var j = Math.floor(rnd() * (i + 1)), t = pool[i]; pool[i] = pool[j]; pool[j] = t; }
+  RD.opts = [c.a, pool[0], pool[1], pool[2]];
+  for(i = RD.opts.length - 1; i > 0; i--){ var j2 = Math.floor(rnd() * (i + 1)), t2 = RD.opts[i]; RD.opts[i] = RD.opts[j2]; RD.opts[j2] = t2; }
+  rdRender();
+}
+function rdRuns(){
+  var c = RD_C[RD.k], out = [];
+  RD.case.runs.forEach(function(u){
+    var s = {mech:"E", thI:0.45 * FRT, thS:(RD.case.wide ? -0.78 : -0.45) * FRT, M:2600, al:0.5, L:600};
+    Object.keys(u.s).forEach(function(k){ s[k] = u.s[k]; });
+    out.push({r:runc(s), off:u.off || 0, lab:u.lab});
+  });
+  return out;
+}
+function rdRender(){
+  var c = RD_C[RD.k], runs = rdRuns();
+  var lo = 0, hi = 0, xlo = 0.45, xhi = 0.45;
+  runs.forEach(function(u){
+    u.r.psi.forEach(function(v){ if(v > hi) hi = v; if(v < lo) lo = v; });
+    xlo = Math.min(xlo, u.r.th[u.r.th.length >> 1] / FRT + u.off);
+  });
+  hi = Math.max(hi, 0.55);
+  var f = fr(62, 500, 26, 290, xlo - 0.02, xhi, lo * 1.14 - 0.05, hi * 1.16);
+  var s = axesCV(f, RD.case.pH ? "E / mV (arbitrary reference)" : "E − E°′ / mV   (reducing →)",
+                 "ψ = i / nFAC*√(DFυ/RT)", function(v){ return v.toFixed(1); }, 0.1);
+  var cols = ["var(--ox)", "var(--red-)"];
+  runs.forEach(function(u, k){
+    s += pth(cvPath(f, u.r.th, u.r.psi, 1, 1, u.off), cols[k], k ? 1.9 : 2.5, null, k ? 0.95 : 1);
+  });
+  var ly = f.Y0 + 13;
+  runs.forEach(function(u, k){
+    var lab = u.lab || (k === 0 ? "υ" : "10 υ");
+    s += ln(f.X1 - 92, ly - 3.5, f.X1 - 78, ly - 3.5, cols[k], k ? 1.9 : 2.5);
+    s += tx(f.X1 - 72, ly, lab, cols[k], 10, null, 600);
+    ly += 14;
+  });
+  if(RD.answered) s += rdAnnotate(f, runs);
+  document.getElementById("rdcv").innerHTML = s;
+  document.getElementById("rdQ").innerHTML = c.q;
+  document.getElementById("rdTitle").textContent = "Case " + (RD.done + 1);
+  document.getElementById("rdNote").textContent = RD.case.pH
+    ? "one scan rate, two solutions" : "two scan rates, a decade apart";
+  document.getElementById("rdOpts").innerHTML = RD.opts.map(function(o, j){
+    var cls = "opt";
+    if(RD.answered) cls += (o === c.a) ? " right" : (o === RD.picked ? " wrong" : "");
+    return '<button class="' + cls + '" data-o="' + o + '"' + (RD.answered ? " disabled" : "")
+      + '><span class="ltr">' + "ABCD"[j] + '</span><span>' + DIAG[o] + "</span></button>";
+  }).join("");
+  var why = document.getElementById("rdWhy");
+  why.hidden = !RD.answered;
+  if(RD.answered) why.innerHTML = (RD.picked === c.a ? ""
+      : RD.picked < 0 ? '<span class="misc">Shown without an answer &mdash; this one does not count either way.</span>'
+      : '<span class="misc">You chose <b>' + DIAG[RD.picked] + "</b>.</span>") + c.w;
+  document.getElementById("rdTally").textContent = RD.right + " right of " + RD.done;
+}
+/* once the answer is out, say on the picture where it was written */
+function rdAnnotate(f, runs){
+  var c = RD_C[RD.k], s = "", p0 = cvPeaks(runs[0].r.th, runs[0].r.psi),
+      p1 = cvPeaks(runs[1].r.th, runs[1].r.psi);
+  function note(x, y, t, col){ return tx(x, y, t, col || "var(--ion-k)", 10, "middle", 700); }
+  var xC = f.px(p0.Epc + (runs[0].off || 0)), yC = f.py(p0.ipc);
+  s += cir(xC, yC, 3.6, "var(--ion-k)");
+  s += note(xC, yC - 10, "ψ_p " + p0.ipc.toFixed(2) + (p0.ratio > 0.02 ? "  ΔE_p " + (p0.dEp * 1000).toFixed(0) + " mV" : ""));
+  if(c.a === 1 || c.a === 2)
+    s += note((f.X0 + f.X1) / 2, f.Y1 - 10,
+      "ΔE_p: " + (p0.dEp * 1000).toFixed(0) + " mV at υ, " + (p1.ratio > 0.02 ? (p1.dEp * 1000).toFixed(0) + " mV" : "no return peak") + " at 10υ");
+  if(c.a === 3 || c.a === 4)
+    s += note((f.X0 + f.X1) / 2, f.Y1 - 10,
+      "return peak: " + p0.ratio.toFixed(2) + " at υ, " + p1.ratio.toFixed(2) + " at 10υ");
+  if(c.a === 7)
+    s += note((f.X0 + f.X1) / 2, f.Y1 - 10,
+      "ψ_p falls from " + p0.ipc.toFixed(3) + " to " + p1.ipc.toFixed(3) + " as υ rises");
+  if(c.a === 10)
+    s += note((f.X0 + f.X1) / 2, f.Y1 - 10,
+      "the whole wave moves " + (RD.case.pH * 59) + " mV over " + RD.case.pH + " pH units");
+  if(c.a === 9)
+    s += note((f.X0 + f.X1) / 2, f.Y1 - 10,
+      "midpoint " + (((p0.Epa + p0.Epc) / 2) * 1000).toFixed(0) + " mV, yet ΔE_p is " + (p0.dEp * 1000).toFixed(0) + " mV");
+  return s;
+}
+document.getElementById("rdOpts").addEventListener("click", function(e){
+  var b = e.target.closest("button.opt"); if(!b || RD.answered) return;
+  RD.picked = +b.getAttribute("data-o");
+  RD.answered = true; RD.done++;
+  if(RD.picked === RD_C[RD.k].a) RD.right++;
+  rdRender();
+});
+document.getElementById("rdNew").addEventListener("click", rdNew);
+document.getElementById("rdReveal").addEventListener("click", function(){
+  if(RD.answered) return;
+  RD.picked = -1; RD.answered = true;   /* not an attempt, so not counted */
+  rdRender();
+});
+
+/* ---- panels that are expensive are drawn the first time they are shown -- */
+var PANEL_SHOW = {}, SHOWN = {};
+[].slice.call(document.querySelectorAll(".tab")).forEach(function(t){
+  t.addEventListener("click", function(){
+    var id = t.getAttribute("aria-controls");
+    if(PANEL_SHOW[id] && !SHOWN[id]){ SHOWN[id] = 1; PANEL_SHOW[id](); }
+  });
+});
+PANEL_SHOW["p-rev"] = function(){ rvBuildWork(); rvDraw(); };
+PANEL_SHOW["p-rs"] = rsDraw;
+PANEL_SHOW["p-mech"] = function(){ mcPresets(); mcDraw(); };
+PANEL_SHOW["p-read"] = function(){ RD.seed = (Date.now() % 100000) | 1; rdNew(); };
+
+swDraw();
+swTrio();
+window.requestAnimationFrame(animLoop);
+
+
+/* ================= CONCEPT CHECK QUESTIONS =============================
+   Two checks, split where the two decks split. The first is the single
+   electron transfer and the shape it makes: why there is a peak, what the
+   peak separation is a verdict on, what the Randles-Sevcik plot tests, and
+   what two electrons do to both. The second is everything that happens to
+   the product afterwards.                                              */
+
+var QZ1 = [
+ {q:"Why does a cyclic voltammogram have a <i>peak</i>, when the same couple at a rotating disc gives a plateau?",
+  o:["Because the depleted layer keeps thickening, so after the surface is stripped the current can only fall",
+     "Because the reaction runs out of starting material in the cell as the sweep proceeds",
+     "Because the electron transfer becomes slower as the overpotential grows",
+     "Because the double-layer charging current decays away after the peak"],
+  a:0,
+  w:"Two things happen at once. Nernst drags the surface ratio down exponentially, which drives the current <em>up</em>; and every electron taken costs one molecule of O from a layer that only diffusion replenishes, which drives it <em>down</em>. The first wins early, the second wins late, and the peak is where they cross. After it, the surface has been empty for a while and the only thing still changing is the <b>thickness</b> of the depleted layer, &delta; &asymp; &radic;(Dt) &mdash; so the gradient, and the current, fall as 1/&radic;t. <b>Stirring is exactly what removes the peak</b>: a rotating disc holds &delta; fixed, so the current has nowhere to fall to and the wave becomes a plateau. Bulk depletion is negligible (a CV consumes a vanishing fraction of the cell), the kinetics get <em>faster</em> with overpotential, not slower, and charging current is a constant offset, not a peak."},
+
+ {q:"A couple gives &Delta;E<sub>p</sub> = 59 mV at 20 mV/s and 115 mV at 2 V/s, with |i<sub>p,a</sub>/i<sub>p,c</sub>| = 1.0 at both rates. What has changed?",
+  o:["Nothing about the molecule &mdash; &Lambda; = k&deg;/&radic;(DF&upsilon;/RT) has fallen, so the electron transfer can no longer keep Nernst at the surface",
+     "The product has begun to decompose at the longer timescale of the fast scan",
+     "Uncompensated solution resistance, which is the only thing that can broaden a wave",
+     "The diffusion coefficient has fallen, because the diffusion layer is thinner at high scan rate"],
+  a:0,
+  w:"&Lambda; = k&deg;/m<sub>T</sub> and m<sub>T</sub> = &radic;(DF&upsilon;/RT), so &Lambda; &prop; &upsilon;<sup>&minus;1/2</sup>: a hundredfold faster sweep drops &Lambda; by ten. <b>The couple has not changed; the clock it is being measured against has.</b> The peak ratio staying at 1.0 is what rules out the chemistry &mdash; the product is perfectly stable, it is the interface that cannot keep up. This is also why the deck's phrase &lsquo;higher scan rate shows better reversibility&rsquo; has to be read carefully: it is true for outrunning <i>chemistry</i> and exactly backwards for electrode <i>kinetics</i>. Resistance would broaden both scans in proportion to the current, not in this pattern, and D is a property of the molecule and the solvent &mdash; the layer being thinner is the <em>consequence</em> of the faster sweep, not a change in D."},
+
+ {q:"A plot of i<sub>p</sub> against &radic;&upsilon; is beautifully straight and passes through the origin, R&sup2; = 0.9997. Which conclusion is <i>not</i> justified?",
+  o:["That the electron transfer is reversible, so the slope can be used with 2.69&times;10<sup>5</sup> to get D",
+     "That the species reaching the electrode is doing so by diffusion rather than by convection",
+     "That the electroactive species is dissolved and free rather than adsorbed as a monolayer",
+     "That the peak current is proportional to bulk concentration at any one scan rate"],
+  a:0,
+  w:"Straightness tests <b>diffusion control</b>, not reversibility. A totally irreversible wave is also proportional to &radic;&upsilon; &mdash; it simply carries 2.99&times;10<sup>5</sup>&radic;&alpha; in front instead of 2.69&times;10<sup>5</sup>, which for &alpha; = 0.5 makes the recovered D low by a factor of 1.6. The honest check is &Delta;E<sub>p</sub>, or &Lambda; at the <em>fastest</em> scan, and the Randles&ndash;Sevcik tab shows a case that is straight to R&sup2; = 0.999 and still gives a D that is 30 % wrong. An adsorbed layer would give i<sub>p</sub> &prop; &upsilon;, not &radic;&upsilon;, because the amount available to react is fixed instead of drawn from a layer that grows &mdash; so B, C and D are all safe."},
+
+ {q:"A single reduction wave has &Delta;E<sub>p</sub> = 29 mV and a peak current 2.8 times that of a one-electron standard at the same concentration. Both numbers are unchanged from 10 mV/s to 1 V/s. What is it?",
+  o:["Two one-electron transfers in which the second is easier than the first &mdash; potential inversion",
+     "A one-electron transfer at an electrode with twice the area you assumed",
+     "An EC process fast enough that the chemistry has merged the two waves",
+     "A reversible one-electron couple measured at 50 &deg;C rather than 25 &deg;C"],
+  a:0,
+  w:"Both numbers say n = 2 at once: &Delta;E<sub>p</sub> = 57/n = 29 mV, and i<sub>p</sub> &prop; n<sup>3/2</sup> = 2<sup>3/2</sup> = 2.83. A larger area would raise the current <i>without</i> narrowing &Delta;E<sub>p</sub>, and raising the temperature would <i>widen</i> it, since every one of these spacings carries RT/F. The mechanism is E&deg;(B/C) positive of E&deg;(A/B), so B is reduced as soon as it forms and never accumulates &mdash; <b>a single two-electron wave, with no sign at all that there were ever two steps</b>. That it is identical at both scan rates is the final check: this is a thermodynamic splitting, and thermodynamics has no clock. A kinetic merging, as in C, would change with &upsilon;."}
+];
+
+var QZ2 = [
+ {q:"At 50 mV/s there is no return peak and E<sub>p,c</sub> is &minus;0.52 V. At 5 V/s the return peak is back with a ratio of 0.95, and E<sub>p,c</sub> has moved to &minus;0.58 V. Which mechanism, and what does the 60 mV tell you?",
+  o:["EC &mdash; and 60 mV over two decades is 30 mV per decade, the first-order signature",
+     "Quasi-reversible kinetics &mdash; the return peak returns because the interface is given more time",
+     "EC<sub>2</sub> &mdash; dimerisation, because the shift exceeds the 19.7 mV per decade of a first-order step",
+     "CE &mdash; the preceding equilibrium cannot resupply A at the faster scan"],
+  a:0,
+  w:"Two things move together and only EC does both. <b>The return peak comes back when you sweep faster</b>, which means the product exists but is being consumed &mdash; outrun the chemistry and it survives the round trip. And <b>E<sub>p</sub> moves positive as &upsilon; falls</b>, by 60 mV across two decades, which is 30 mV per decade: the 29.6 mV of a first-order follow-up at 25 &deg;C. Quasi-reversibility is excluded by the same evidence: slowing the sweep gives the <i>interface</i> more time, so a sluggish couple looks <i>better</i> at low &upsilon;, not worse. EC<sub>2</sub> would shift 19.7 mV per decade. CE lowers i<sub>p</sub>/&radic;&upsilon; and does not kill a return peak."},
+
+ {q:"You suspect a dimerisation. The peak shift is 20 mV per decade of scan rate &mdash; close to 19.7, but your peaks are broad and you do not trust 3 mV. What single further experiment settles it?",
+  o:["Repeat the scan-rate series at a tenfold lower concentration: EC<sub>2</sub> moves 19.7 mV per decade of C*, EC does not move at all",
+     "Repeat it at a tenfold lower temperature, since the two mechanisms have different activation energies",
+     "Measure the peak ratio precisely: a dimerisation gives exactly 0.5 where an EC gives 0",
+     "Switch to a smaller electrode, because the second-order reaction layer scales with area"],
+  a:0,
+  w:"K<sub>2</sub> = k<sub>2</sub>C*(RT/F)/&upsilon; carries the <b>concentration</b>, and K<sub>1</sub> = k<sub>1</sub>(RT/F)/&upsilon; does not. So a decade of C* shifts an EC<sub>2</sub> peak by the same 19.7 mV that a decade of &upsilon; does, while a first-order follow-up does not care how much B there is and does not move at all. <b>The test turns a 3 mV argument into a 20 mV one</b>, and it is easier to run than a two-decade scan-rate series. Temperature moves everything at once and is not diagnostic. The peak ratio has no such fixed value for either mechanism &mdash; it depends on K. And the reaction layer is a thickness set by &radic;(D/k), nothing to do with the electrode's area."},
+
+ {q:"A wave gives &psi;<sub>p</sub> = 0.31 where a freely diffusing one-electron couple would give 0.446, and &psi;<sub>p</sub> falls further as the scan rate rises. The return peak is present with a ratio near 1. What is going on?",
+  o:["CE &mdash; a slow chemical step ahead of the electron transfer cannot resupply A fast enough, and a quicker sweep gives it less time",
+     "EC&prime; &mdash; the catalytic cycle is only partly turning over at this scan rate",
+     "The electrode is partly blocked, so the true area is about 70 % of the geometric one",
+     "Quasi-reversible kinetics, which always lower the peak below Randles&ndash;Sevcik"],
+  a:0,
+  w:"The <b>direction of travel</b> is the diagnostic. Only a preceding chemical step makes i<sub>p</sub>/&radic;&upsilon; <em>fall</em> as &upsilon; rises: the sweep is over sooner, so there is less time for Y to become A, and the already sub-Nernstian current drops further. EC&prime; does the opposite &mdash; it drives &psi; far <em>above</em> 0.446 and flattens the peak into a plateau. A blocked electrode would scale every scan rate by the same 70 % and leave i<sub>p</sub>/&radic;&upsilon; flat, which is exactly why that explanation can be tested and dismissed. Quasi-reversibility does lower the peak, but it also pulls &Delta;E<sub>p</sub> open, and here the return peak is still at a ratio of 1."},
+
+ {q:"You are measuring k<sub>1</sub> of an EC from the peak shift. On a glassy carbon electrode you get a clean 29 mV per decade. On the same solution at a different electrode, where &Delta;E<sub>p</sub> is 180 mV at every scan rate, E<sub>p</sub> does not move with &upsilon; at all. Has the chemistry changed?",
+  o:["No &mdash; &Lambda; &lt;&lt; 1 at the second electrode, so the electron transfer is the rate-determining step and the follow-up chemistry can no longer reach back through it",
+     "Yes &mdash; the second electrode must be catalysing the decomposition of B, so k<sub>1</sub> is now too fast to measure",
+     "Yes &mdash; k<sub>1</sub> has fallen to zero, which is why there is nothing left to shift the peak",
+     "No &mdash; the second electrode has a larger area, and the shift is diluted by the larger current"],
+  a:0,
+  w:"k&deg; belongs to the <b>interface</b>, not to the solution, so changing the electrode changes &Lambda; while leaving k<sub>1</sub> untouched. A &Delta;E<sub>p</sub> of 180 mV that does not depend on &upsilon; is the fingerprint of a nearly irreversible electron transfer, and once that is the slow step, <b>what happens to B afterwards cannot alter the rate</b>: E<sub>p</sub> stops responding to K altogether and the voltammogram behaves as though K were infinite. This is the deck's &Lambda; = 0.1 case. The chemistry is the same &mdash; the method has stopped working, which is a very different thing, and the honest move is to diagnose from the return peak and i<sub>p</sub>/&radic;&upsilon; instead, or to go back to the first electrode. Area cancels out of both &Delta;E<sub>p</sub> and the shift."}
+];
+
+
+/* ================= CONCEPT CHECKS =======================================
+   Two checks, each a separate attempt with its own student-ID lock,
+   storage key, receipt and submission label. The keys differ from the
+   Lecture 12 page's, so two pages cannot load each other's answers on
+   the same browser.                                                      */
+var LETTERS = "ABCD";
+var SUBMIT_URL = "https://script.google.com/macros/s/AKfycbxPm7WrbttFu6-gnTi__IcUPt-816GthK0eI8TPuwOZyYlcRW3RAWJlmsr791moxBc5GA/exec";
+
+function code(str){
+  var h=0x811c9dc5;
+  for(var i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=(h+((h<<1)+(h<<4)+(h<<7)+(h<<8)+(h<<24)))>>>0; }
+  return ("0000000"+h.toString(16).toUpperCase()).slice(-8);
+}
+
+/* n: 1 or 2, the suffix on every element id of that check's panel */
+function makeQuiz(n, QZ, label, STORE){
+  function E(id){ return document.getElementById(id + n); }
+  var picks=new Array(QZ.length).fill(-1);
+  var sId=E("sId"), elTally=E("tally"), elBar=E("scorebar"), elScore=E("scoreNum"),
+      elWho=E("whoLine"), elIdHint=E("idHint"), dlBtn=E("dlBtn"), dlHint=E("dlHint"),
+      sendBtn=E("sendBtn"), root=E("quiz");
+  var startedAt=null, finishedAt=null;
+
+  function save(){
+    try{ localStorage.setItem(STORE,JSON.stringify({i:sId.value,p:picks,s:startedAt,t:finishedAt})); }catch(e){}
+  }
+  function loadState(){
+    try{
+      var d=JSON.parse(localStorage.getItem(STORE)||"null");
+      if(d){ sId.value=d.i||""; if(Array.isArray(d.p)&&d.p.length===QZ.length) picks=d.p.slice();
+             startedAt=d.s||null; finishedAt=d.t||null; }
+    }catch(e){}
+  }
+  function started(){ return picks.some(function(p){return p>=0;}); }
+  function scoreOf(){ var s=0; for(var i=0;i<QZ.length;i++) if(picks[i]===QZ[i].a) s++; return s; }
+  function answered(){ return picks.filter(function(p){return p>=0;}).length; }
+
+  function receipt(){
+    var s=scoreOf(), pct=Math.round(s/QZ.length*100), id=(sId.value||"").trim();
+    var stamp=finishedAt||new Date().toISOString();
+    var vc=code(id+"|"+stamp+"|"+picks.join(""));
+    var head=["lecture","student_id","completed_utc","score","total","percent","verification"];
+    var row=[label,id,stamp,s,QZ.length,pct,vc];
+    for(var i=0;i<QZ.length;i++){ head.push("a"+(i+1)); row.push(picks[i]>=0?LETTERS[picks[i]]:"-"); }
+    for(var j=0;j<QZ.length;j++){ head.push("ok"+(j+1)); row.push(picks[j]===QZ[j].a?1:0); }
+    function cell(v){ v=String(v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
+    return {csv:head.join(",")+"\n"+row.map(cell).join(",")+"\n", vcode:vc, score:s, pct:pct, id:id};
+  }
+
+  function render(){
+    var done=answered(), all=(done===QZ.length);
+    elTally.textContent=done+" / "+QZ.length+" answered";
+    elBar.hidden=!all;
+    sId.readOnly=started();
+    elIdHint.innerHTML = all
+      ? "<strong>Attempt complete.</strong> Your answers are final. Every question now shows the correct answer and why — read them before you close this page."
+      : started() ? "<strong>Attempt in progress.</strong><span class=\"locked\">ID locked</span><br>Each answer is final."
+                  : "<strong>One attempt.</strong> Enter your student ID before you begin — it locks once you answer the first question.";
+    if(all){
+      if(!finishedAt){ finishedAt=new Date().toISOString(); save(); }
+      var r=receipt();
+      elScore.innerHTML=r.score+' <small>/ '+QZ.length+'  ·  '+r.pct+' %</small>';
+      elWho.innerHTML="Student ID <b>"+esc(r.id||"—")+"</b> &nbsp;·&nbsp; Verification <b>"+r.vcode+"</b>";
+    }
+    for(var i=0;i<QZ.length;i++){
+      var box=root.querySelector('.opts[data-q="'+i+'"]');
+      var kids=[].slice.call(box.children), why=box.parentNode.querySelector(".why");
+      if(picks[i]<0){ kids.forEach(function(o){o.disabled=false;o.className="opt";}); why.hidden=true; }
+      else{
+        (function(qi){ kids.forEach(function(o,j){
+          o.disabled=true;
+          o.className="opt"+(j===QZ[qi].a?" right":(j===picks[qi]?" wrong":""));
+        }); })(i);
+        var _note=(picks[i]!==QZ[i].a)
+          ? '<span class="misc">You chose <b>'+LETTERS[picks[i]]+'</b>. '
+            + 'The correct answer is <b>'+LETTERS[QZ[i].a]+'</b>.</span>'
+          : "";
+        why.innerHTML=_note+QZ[i].w; why.hidden=false;
+      }
+    }
+  }
+
+  root.innerHTML=QZ.map(function(item,i){
+    return '<div class="card q"><div class="card-b">'
+      +'<p class="stem"><b style="font-family:IBM Plex Mono,monospace;color:var(--muted);font-size:12px">Q'+(i+1)+'</b>  '+item.q+'</p>'
+      +'<div class="opts" data-q="'+i+'">'+item.o.map(function(o,j){
+          return '<button class="opt" data-i="'+j+'"><span class="ltr">'+LETTERS[j]+'</span><span>'+o+'</span></button>';
+        }).join("")+'</div><p class="why" hidden></p></div></div>';
+  }).join("");
+
+  [].slice.call(root.querySelectorAll(".opts")).forEach(function(box){
+    box.addEventListener("click",function(ev){
+      var b=ev.target.closest(".opt");
+      if(!b||b.disabled) return;
+      var qi=+box.getAttribute("data-q");
+      if(picks[qi]>=0) return;
+      if(!(sId.value||"").trim()){
+        elIdHint.innerHTML="<strong style=\"color:var(--stop)\">Enter your student ID first.</strong> It is written into the result file you submit.";
+        sId.focus(); return;
+      }
+      if(!startedAt) startedAt=new Date().toISOString();
+      picks[qi]=+b.getAttribute("data-i");
+      save(); render();
+    });
+  });
+  sId.addEventListener("input",save);
+
+  dlBtn.addEventListener("click",function(){
+    var id=(sId.value||"").trim();
+    if(!id){ dlHint.textContent="Enter your student ID first — it goes into the file."; return; }
+    var r=receipt();
+    try{
+      var blob=new Blob([r.csv],{type:"text/csv;charset=utf-8"});
+      var url=URL.createObjectURL(blob);
+      var a=document.createElement("a");
+      a.href=url; a.download="CH40051-"+label+"-check_"+id.replace(/[^A-Za-z0-9_-]/g,"")+".csv";
+      a.style.display="none";
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(function(){URL.revokeObjectURL(url);},1000);
+      dlHint.textContent="Saved. Hand it in as your instructor directs.";
+    }catch(e){
+      dlHint.textContent="Your browser blocked the download. Screenshot this panel and submit that instead.";
+    }
+  });
+
+  /* ---- submit straight to the course sheet -------------------------------- */
+  if(SUBMIT_URL){
+    sendBtn.hidden=false;
+    dlHint.textContent="Press Submit to send your result to the course. The download is a backup.";
+  }
+  sendBtn.addEventListener("click",function(){
+    var id=(sId.value||"").trim();
+    if(!id){ dlHint.textContent="Enter your student ID first."; return; }
+    var r=receipt();
+    var payload={
+      lecture:label, student_id:id, completed_utc:finishedAt||new Date().toISOString(),
+      score:r.score, total:QZ.length, percent:r.pct, verification:r.vcode,
+      answers:picks.map(function(p){ return p>=0?LETTERS[p]:"-"; }),
+      ok:picks.map(function(p,i){ return p===QZ[i].a?1:0; })
+    };
+    sendBtn.disabled=true;
+    dlHint.textContent="Sending...";
+    fetch(SUBMIT_URL,{
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(payload)
+    })
+    .then(function(res){ return res.json(); })
+    .then(function(j){
+      if(j && j.ok){
+        sendBtn.textContent="Submitted ✓";
+        dlHint.textContent="Recorded for student ID "+id+". You can close this page.";
+      }else{
+        sendBtn.disabled=false;
+        sendBtn.textContent="Submit to the course";
+        dlHint.textContent="Not recorded — "+((j && j.error) || "the course sheet refused it.")
+          + " Keep the downloaded file and tell your instructor if this looks wrong.";
+      }
+    })
+    .catch(function(){
+      fetch(SUBMIT_URL,{method:"POST",mode:"no-cors",
+        headers:{"Content-Type":"text/plain;charset=utf-8"},
+        body:JSON.stringify(payload)}).catch(function(){});
+      sendBtn.disabled=false;
+      sendBtn.textContent="Submit to the course";
+      dlHint.textContent="Sent, but the confirmation did not come back. "
+        + "Download the file as well and keep it - it is your proof of submission.";
+    });
+  });
+
+  loadState();
+  render();
+}makeQuiz(1, QZ1, "L13-1", "ch40051-l13-check1-v1");
+makeQuiz(2, QZ2, "L13-2", "ch40051-l13-check2-v1");
+
+})();
+</script>
+</body>
+</html>
