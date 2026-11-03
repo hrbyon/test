@@ -252,7 +252,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
           <span class="cnc">m<sub>T</sub> = D/&delta; &asymp; &radic;(DF&upsilon;/RT)</span>&nbsp;&nbsp;&middot;&nbsp;&nbsp;
           <span class="cnc">&Lambda; = k&deg;/m<sub>T</sub></span>
           <small>the sweep sets how fast mass transport is, so &upsilon; decides which of k&deg; and m<sub>T</sub> is the slow one</small><br>
-          <span class="mix">&Delta;E<sub>p</sub> = E<sub>p,a</sub> &minus; E<sub>p,c</sub> &rarr; 57/n mV</span>&nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="mix">&Delta;E<sub>p</sub> = E<sub>p,a</sub> &minus; E<sub>p,c</sub> &rarr; 59/n mV</span>&nbsp;&nbsp;&middot;&nbsp;&nbsp;
           <span class="mix">|i<sub>p,a</sub>/i<sub>p,c</sub>| &rarr; 1</span>
           <small>the two reversibility tests &mdash; and both of them fail in their own characteristic way</small>
         </div>
@@ -366,7 +366,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
         <div class="eqbig" style="white-space:normal">
           <span class="cnc">&Lambda; = k&deg; / &radic;(DF&upsilon;/RT)</span>
           <small>one dimensionless number decides the shape &mdash; everything else is cosmetic</small><br>
-          <span class="go">&Lambda; &gt; 15</span>: Nernst holds at the surface &rarr; &Delta;E<sub>p</sub> = 57/n mV, fixed&nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="go">&Lambda; &gt; 15</span>: Nernst holds at the surface &rarr; &Delta;E<sub>p</sub> = 59/n mV, fixed&nbsp;&nbsp;&middot;&nbsp;&nbsp;
           <span class="ohm">0.3 &lt; &Lambda; &lt; 15</span>: quasi-reversible &rarr; &Delta;E<sub>p</sub> grows with &upsilon;&nbsp;&nbsp;&middot;&nbsp;&nbsp;
           <span class="act">&Lambda; &lt; 0.3</span>: irreversible &rarr; no return peak at all
           <small>and because &Lambda; &prop; &upsilon;<sup>&minus;1/2</sup>, <b>the same couple moves between all three</b> as you turn the scan rate up</small>
@@ -428,7 +428,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
                aria-label="Peak separation plotted against the logarithm of lambda, with the current condition marked; this is the curve used to extract a rate constant from a measured peak separation."></svg>
           <div class="glegend">
             <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><path d="M2 2 C8 3 12 11 24 12" fill="none" stroke="var(--red-)" stroke-width="2.2"/></svg><span><b class="cnc">The curve</b> &mdash; &Delta;E<sub>p</sub> as a function of &Lambda;, recomputed here by the same simulator that draws the trace rather than copied out of the 1965 table, so that it can be checked.</span></span>
-            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="2" y1="7" x2="24" y2="7" stroke="var(--go)" stroke-width="2" stroke-dasharray="4 3"/></svg><span><b>57 mV</b> &mdash; the floor, 2.218RT/nF. The curve comes down to it and never goes below.</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="2" y1="7" x2="24" y2="7" stroke="var(--go)" stroke-width="2" stroke-dasharray="4 3"/></svg><span><b>57 mV &mdash; the limit</b>, 2.218RT/nF. The curve settles onto it from above and never crosses it. What you <em>measure</em> is a little more than this, and the panel at the foot of this tab says why.</span></span>
             <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><line x1="13" y1="1" x2="13" y2="13" stroke="var(--ion-k)" stroke-width="1.2" stroke-dasharray="3 2"/><circle cx="13" cy="7" r="4" fill="var(--ion-k)"/></svg><span><b class="mix">you are here</b> &mdash; the &Lambda; and the &Delta;E<sub>p</sub> of the trace beside it, dropped onto the curve.</span></span>
             <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><rect x="2" y="2" width="22" height="10" fill="var(--stop)" opacity="0.3"/></svg><span><b>&Lambda; &lt; 0.3 &mdash; irreversible.</b> The return peak has gone, so there is no &Delta;E<sub>p</sub> to measure at all; the curve is drawn pinned to the top of the frame to say so, not because &Delta;E<sub>p</sub> is really 320 mV.</span></span>
             <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><rect x="2" y="2" width="22" height="10" fill="var(--go)" opacity="0.32"/></svg><span><b>&Lambda; &gt; 15 &mdash; reversible.</b> The curve is flat: &Delta;E<sub>p</sub> has stopped depending on k&deg;, so measuring it carries no kinetic information. <b>Only the unshaded middle returns a k&deg;</b>, which is the whole reason the quasi-reversible window matters.</span></span>
@@ -459,6 +459,53 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
         </div>
       </div>
     </div>
+
+    <div class="card">
+      <div class="card-h"><h2>57 or 59? The gap is the switching potential</h2>
+        <span class="note">&Delta;E<sub>p</sub> &rarr; 2.218RT/nF, but only in the limit</span></div>
+      <div class="card-b stack" style="gap:13px">
+        <p class="hint" style="margin:0"><b>Where 2.218 comes from.</b> Nernst at the surface plus semi-infinite
+          diffusion collapses the whole reversible sweep to one convolution equation with no free parameters in it,
+          &int;<sub>0</sub><sup>s</sup>g(z)/&radic;(s&minus;z)dz = 1/(1+&theta;), and that equation has no closed-form
+          solution &mdash; it has to be integrated numerically, which is what Randles and &Scaron;ev&ccaron;&iacute;k
+          did in 1948. <b>One curve then gives three numbers at once</b>: its maximum is
+          &psi;<sub>p</sub> = <b>0.4463</b>, the Randles&ndash;Sevcik constant; that maximum sits at
+          E<sub>p</sub> &minus; E<sub>1/2</sub> = <b>&minus;1.109</b>RT/nF = &minus;28.5/n mV; and its half-height
+          width is 2.20RT/nF. <b>0.4463 and 1.109 are the y and the x of the same point</b> &mdash; neither is derived,
+          both are read off the same solution. Turn the sweep around far enough and the anodic peak is that point's
+          mirror image at +1.109RT/nF, and the separation between them is
+          <b>2 &times; 1.109 = 2.218RT/nF = 57.0/n mV</b>.</p>
+        <p class="hint" style="margin:0"><b>And why the trace never shows it.</b> That mirror is exact only if you
+          reverse <em>infinitely</em> far past the peak. At any real switching potential the anodic peak has not
+          finished developing when you catch it, and the separation comes out wider:</p>
+        <div class="sumwrap">
+          <table class="sumtbl">
+            <tr><th>reversed past E<sub>p</sub></th><th>&Delta;E<sub>p</sub>, n = 1, 25 &deg;C</th><th></th></tr>
+            <tr><td class="eq">49 mV</td><td class="eq">61.6 mV</td><td class="sy">too short — the anodic peak is still growing</td></tr>
+            <tr><td class="eq">84 mV</td><td class="eq">59.7 mV</td><td class="sy"></td></tr>
+            <tr><td class="eq">126 mV</td><td class="eq">58.7 mV</td><td class="sy">a normal experiment lives in here</td></tr>
+            <tr><td class="eq">177 mV</td><td class="eq">58.1 mV</td><td class="sy"></td></tr>
+            <tr><td class="eq">280 mV</td><td class="eq">57.6 mV</td><td class="sy"></td></tr>
+            <tr><td class="eq">485 mV</td><td class="eq">57.4 mV</td><td class="sy"></td></tr>
+            <tr><td class="eq">999 mV</td><td class="eq">57.1 mV</td><td class="sy">a volt past the peak, and still not 57.0</td></tr>
+            <tr><td class="eq">&infin;</td><td class="eq">57.0 mV</td><td class="sy">the mirror is exact: 2 &times; 1.109RT/nF</td></tr>
+          </table>
+        </div>
+        <p class="hint" style="margin:0"><b>So carry 59/n, and know what it is.</b> Reverse 100&ndash;300 mV past the
+          peak, which is what almost every real experiment does, and a perfectly reversible couple gives
+          <b>58&ndash;59/n mV</b>. That is why this page, the deck and most textbooks quote 59/n, why some quote 58.3,
+          and why the rigorous 57.0/n appears in none of your data: <b>it is where the number is heading, not what you
+          will see.</b> The dashed green line on the working curve above is drawn at 57 for exactly this reason
+          &mdash; the computed curve settles <em>onto</em> it from above, and the &Delta;E<sub>p</sub> readout beside
+          it says 58.</p>
+        <p class="hint" style="margin:0"><b>The useful consequence.</b> A couple of mV of this is switching potential
+          and nothing else. <b>If &Delta;E<sub>p</sub> is well above 60 mV, that is k&deg;</b> &mdash; and the working
+          curve above turns it into a number. Reversing further will not fix it, and neither will reversing less:
+          try it with the switching slider and watch &Delta;E<sub>p</sub> move by two or three mV while &Lambda;
+          moves it by two hundred.</p>
+      </div>
+    </div>
+
   </section>
 
   <!-- ====================== 3 · RANDLES–SEVCIK ====================== -->
@@ -788,7 +835,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
   <footer>
     Every voltammogram on this page is computed, not sketched: the diffusion equation is integrated on an expanding grid
     with the electrode condition solved from Butler&ndash;Volmer at each step &middot;
-    the simulation reproduces &psi;<sub>p</sub> = 0.4463 and 0.4958&radic;&alpha;, &Delta;E<sub>p</sub> = 57 mV,
+    the simulation reproduces &psi;<sub>p</sub> = 0.4463 and 0.4958&radic;&alpha;, &Delta;E<sub>p</sub> &rarr; 2.218RT/nF,
     Nicholson&rsquo;s &Delta;E<sub>p</sub>(&Lambda;) table to within 2 mV, and the 29.6 and 19.7 mV/decade peak shifts
     of the EC and EC<sub>2</sub> mechanisms &middot;
     treatment follows Bard &amp; Faulkner, <i>Electrochemical Methods</i>, chapters 6 and 12, Compton &amp; Banks,
@@ -1573,7 +1620,7 @@ function rvDraw(){
   });
   w += pth(d, "var(--red-)", 2.2);
   w += ln(wf.X0, wf.py(57), wf.X1, wf.py(57), "var(--go)", 1.3, "4 3", 0.9);
-  w += tx(wf.X0 + 6, wf.py(57) + 13, "57 mV, the reversible floor", "var(--go)", 9.5, null, 600);
+  w += tx(wf.X0 + 6, wf.py(57) + 13, "57 mV — the limit", "var(--go)", 9.5, null, 600);
   var lg = clamp(Math.log10(L), -1.2, 2.6);
   var dep = pk.ratio > 0.02 ? pk.dEp * 1000 : 320;
   w += ln(wf.px(lg), wf.Y0, wf.px(lg), wf.Y1, "var(--ion-k)", 1.2, "4 3", 0.8);
@@ -1742,7 +1789,7 @@ function rsDraw(){
                  function(v){ return tickNum(v * 1e6 / un.k); }, 0.2);
   /* the simulation is of one electron; a reversible n-electron wave is the
      same curve with the potential axis divided by n, which is where the
-     57/n mV peak separation comes from                                */
+     59/n mV peak separation comes from                                */
   pts.forEach(function(q, i){
     var sy = iScale(RS.n, RS.A, RS.C, RS.D, q.nu) * Math.sqrt(RS.n);
     s += pth(cvPath(f, q.r.th, q.r.psi, 1 / RS.n, sy), cols[i], 1.9);
@@ -2160,10 +2207,10 @@ var DIAG = [
 var RD_C = [
   {a:0, q:"Two scan rates a decade apart, currents divided by √υ. What is this?",
    mk:function(R){ return {runs:[{s:{mech:"E", L:600, al:0.5}}, {s:{mech:"E", L:600, al:0.5}}]}; },
-   w:"<b>Reversible.</b> The two traces superimpose exactly once the current is divided by √υ, ΔE<sub>p</sub> is at its 57 mV floor and the peak ratio is 1. Nothing about the trace depends on the scan rate, which is precisely what 'no slow step other than diffusion' means. Every other case on this page breaks that superposition somewhere."},
+   w:"<b>Reversible.</b> The two traces superimpose exactly once the current is divided by √υ, ΔE<sub>p</sub> is at its 59 mV floor and the peak ratio is 1. Nothing about the trace depends on the scan rate, which is precisely what 'no slow step other than diffusion' means. Every other case on this page breaks that superposition somewhere."},
   {a:1, q:"The same couple at two scan rates. What is limiting?",
    mk:function(R){ var k = 0.6 + R() * 1.4; return {runs:[{s:{mech:"E", L:k, al:0.5}}, {s:{mech:"E", L:k * 3.16, al:0.5}}]}; },
-   w:"<b>Quasi-reversible.</b> ΔE<sub>p</sub> is well above 57 mV and &mdash; the decisive point &mdash; it is <em>larger at the faster scan</em>, because Λ = k°/√(DFυ/RT) falls as υ rises. The peak ratio is still near 1, so the product is perfectly stable: nothing is reacting, the interface is simply slow. This is the only window in which k° can be measured."},
+   w:"<b>Quasi-reversible.</b> ΔE<sub>p</sub> is well above 59 mV and &mdash; the decisive point &mdash; it is <em>larger at the faster scan</em>, because Λ = k°/√(DFυ/RT) falls as υ rises. The peak ratio is still near 1, so the product is perfectly stable: nothing is reacting, the interface is simply slow. This is the only window in which k° can be measured."},
   {a:2, q:"What does the missing return peak mean here?",
    mk:function(R){ return {runs:[{s:{mech:"E", L:0.02, al:0.4 + R() * 0.2}}, {s:{mech:"E", L:0.0063, al:0.4 + R() * 0.2}}]}; },
    w:"<b>Totally irreversible electron transfer.</b> There is no return peak at either rate, the wave is broad, and E<sub>p</sub> marches negative as υ rises. Contrast this with EC, where the return peak comes <em>back</em> when you sweep faster: here sweeping faster makes things worse, not better, because the problem is the interface and not the chemistry."},
@@ -2175,19 +2222,19 @@ var RD_C = [
    w:"<b>EC′, catalytic.</b> ψ is far above 0.446 &mdash; it is heading for √K &mdash; the peak has flattened into a plateau, and there is no return peak. The plateau is the tell: an ordinary peak falls away after its maximum because the surface is being stripped, but here A is being remade as fast as it is consumed, so the current simply holds. Sweep faster and the advantage shrinks, because there is less time per sweep for the chemistry."},
   {a:5, q:"Two waves. Are they two species, or one species twice?",
    mk:function(R){ var d = -(0.15 + R() * 0.12); return {runs:[{s:{mech:"EE", L:600, L2:600, dE0:d * FRT, thS:-0.75 * FRT}}, {s:{mech:"EE", L:600, L2:600, dE0:d * FRT, thS:-0.75 * FRT}}], wide:true}; },
-   w:"<b>EE &mdash; one species, two successive one-electron steps.</b> Each wave is of unit height and both have the reversible 57 mV separation, and critically <b>the spacing does not change with scan rate</b>: it is ΔE° between the two couples, a thermodynamic quantity. A kinetic splitting would move. Two different species at these concentrations would be a coincidence; one molecule with two accessible oxidation states is not."},
+   w:"<b>EE &mdash; one species, two successive one-electron steps.</b> Each wave is of unit height and both have the reversible 59 mV separation, and critically <b>the spacing does not change with scan rate</b>: it is ΔE° between the two couples, a thermodynamic quantity. A kinetic splitting would move. Two different species at these concentrations would be a coincidence; one molecule with two accessible oxidation states is not."},
   {a:6, q:"One wave, but it is far too tall and far too narrow. What is it?",
    mk:function(R){ return {runs:[{s:{mech:"EE", L:600, L2:600, dE0:(0.15 + R() * 0.1) * FRT}}, {s:{mech:"EE", L:600, L2:600, dE0:(0.15 + R() * 0.1) * FRT}}]}; },
-   w:"<b>A two-electron wave with potential inversion.</b> ψ is about 1.26 &mdash; that is 2<sup>3/2</sup>×0.446, the n<sup>3/2</sup> of Randles&ndash;Sevcik &mdash; and ΔE<sub>p</sub> has fallen to about 29 mV, which is 57/n for n = 2. The second electron goes on more easily than the first, so the intermediate B never accumulates and the two steps merge into one. Both traces still superimpose: this is thermodynamics, not kinetics."},
+   w:"<b>A two-electron wave with potential inversion.</b> ψ is about 1.26 &mdash; that is 2<sup>3/2</sup>×0.446, the n<sup>3/2</sup> of Randles&ndash;Sevcik &mdash; and ΔE<sub>p</sub> has fallen to about 29 mV, which is the 59/n of a reversible wave with n = 2. The second electron goes on more easily than the first, so the intermediate B never accumulates and the two steps merge into one. Both traces still superimpose: this is thermodynamics, not kinetics."},
   {a:7, q:"The peak current is too small, and gets worse as you sweep faster. Why?",
    mk:function(R){ var K = 0.02 + R() * 0.08; return {runs:[{s:{mech:"CE", L:600, Keq:K, kchem:300}}, {s:{mech:"CE", L:600, Keq:K, kchem:30}}]}; },
    w:"<b>CE &mdash; a chemical step precedes the electron transfer.</b> Only a small equilibrium fraction of what is dissolved is actually electroactive, so ψ starts below 0.446; and because a faster sweep gives the preceding reaction less time to top the supply up, ψ falls further as υ rises. <b>Every other mechanism here either leaves ψ/√υ alone or raises it.</b> A current that is sub-Nernstian and worsens with scan rate is almost diagnostic on its own."},
   {a:8, q:"A second wave grows in at the slower scan rate. What is it?",
    mk:function(R){ var K = 4 + R() * 20; return {runs:[{s:{mech:"ECE", L:600, L2:600, dE0:-0.30 * FRT, K1:K / 10, thS:-0.78 * FRT}}, {s:{mech:"ECE", L:600, L2:600, dE0:-0.30 * FRT, K1:K, thS:-0.78 * FRT}}], wide:true}; },
    w:"<b>ECE.</b> The second wave is not a second species &mdash; it is the product of the chemical step, C, being reduced in its turn. It therefore <b>grows with time</b>: slow the sweep down and more C has been made by the time the potential reaches it. An EE pair would not do that; the two waves of an EE are both there at every scan rate, in the same ratio."},
-  {a:9, q:"ΔE_p is a textbook 57 mV, yet the whole wave sits in the wrong place. Why?",
+  {a:9, q:"ΔE_p is a textbook 59 mV, yet the whole wave sits in the wrong place. Why?",
    mk:function(R){ return {runs:[{s:{mech:"E", L:600, dB:0.08}}, {s:{mech:"E", L:600, dB:0.08}}]}; },
-   w:"<b>The product diffuses much more slowly than the starting material.</b> ΔE<sub>p</sub> is still 57 mV and the ratio is still 1 &mdash; the couple is perfectly reversible &mdash; but the midpoint of the two peaks is offset from E°′ by (RT/nF)ln√(D<sub>R</sub>/D<sub>O</sub>). With D<sub>R</sub> an order of magnitude down that is about &minus;30 mV &mdash; negative, because a product that leaves slowly piles up at the surface. The trap is to report this midpoint as a formal potential: it is not one, and nothing thermodynamic has changed."},
+   w:"<b>The product diffuses much more slowly than the starting material.</b> ΔE<sub>p</sub> is still 59 mV and the ratio is still 1 &mdash; the couple is perfectly reversible &mdash; but the midpoint of the two peaks is offset from E°′ by (RT/nF)ln√(D<sub>R</sub>/D<sub>O</sub>). With D<sub>R</sub> an order of magnitude down that is about &minus;30 mV &mdash; negative, because a product that leaves slowly piles up at the surface. The trap is to report this midpoint as a formal potential: it is not one, and nothing thermodynamic has changed."},
   {a:10, q:"The same couple, same scan rate, two solutions. What differs between them?",
    mk:function(R){ var dpH = 2 + Math.floor(R() * 3);
      return {runs:[{s:{mech:"E", L:600}, off:0, lab:"pH 2"},
@@ -2350,13 +2397,13 @@ var QZ1 = [
   a:0,
   w:"Straightness tests <b>diffusion control</b>, not reversibility. A totally irreversible wave is also proportional to &radic;&upsilon; &mdash; it simply carries 2.99&times;10<sup>5</sup>&radic;&alpha; in front instead of 2.69&times;10<sup>5</sup>, which for &alpha; = 0.5 makes the recovered D low by a factor of 1.6. The honest check is &Delta;E<sub>p</sub>, or &Lambda; at the <em>fastest</em> scan, and the Randles&ndash;Sevcik tab shows a case that is straight to R&sup2; = 0.999 and still gives a D that is 30 % wrong. An adsorbed layer would give i<sub>p</sub> &prop; &upsilon;, not &radic;&upsilon;, because the amount available to react is fixed instead of drawn from a layer that grows &mdash; so B, C and D are all safe."},
 
- {q:"A reversible reduction gives &Delta;E<sub>p</sub> = 29 mV, and its peak current is 2.8 times that of a known one-electron couple measured at the same concentration, area and scan rate. What do you conclude, and what are you <i>not</i> entitled to conclude?",
+ {q:"A reversible reduction gives &Delta;E<sub>p</sub> = 29 mV, and its peak current is 2.8 times that of a known one-electron couple measured at the same concentration, area and scan rate. Which conclusion is best supported by these two observations?",
   o:["n = 2 &mdash; and the two numbers say so independently, which is the point",
      "The electrode area is about 2.8 times what you assumed, which also narrows the wave",
      "The solution is about 2.8 times more concentrated than you were told",
      "The measurement was made near 50 &deg;C rather than 25 &deg;C"],
   a:0,
-  w:"<b>Two independent routes to the same n.</b> &Delta;E<sub>p</sub> = 57/n gives n = 2 from the <em>width</em>, and i<sub>p</sub> &prop; n<sup>3/2</sup> gives 2<sup>3/2</sup> = 2.83 from the <em>height</em> &mdash; and they agree. That agreement is what makes the conclusion safe, because the two numbers fail differently: a wrong <b>area</b> or a wrong <b>concentration</b> changes i<sub>p</sub> and leaves &Delta;E<sub>p</sub> at 57 mV, since neither A nor C* appears in the peak separation at all. Temperature moves it the wrong way: every one of these spacings carries RT/F, so 50 &deg;C would <em>widen</em> 29 mV to about 31, not narrow it. <b>What you may not conclude is that the two electrons go on in a single step.</b> n is the number of electrons the wave passes; how they are passed &mdash; together, or one after another with the second easier than the first &mdash; is a question this trace cannot answer, and it is where the next deck starts."}
+  w:"<b>Two independent routes to the same n.</b> &Delta;E<sub>p</sub> = 59/n gives n = 2 from the <em>width</em>, and i<sub>p</sub> &prop; n<sup>3/2</sup> gives 2<sup>3/2</sup> = 2.83 from the <em>height</em> &mdash; and they agree. That agreement is what makes the conclusion safe, because the two numbers fail differently: a wrong <b>area</b> or a wrong <b>concentration</b> changes i<sub>p</sub> and leaves &Delta;E<sub>p</sub> at 59 mV, since neither A nor C* appears in the peak separation at all. Temperature moves it the wrong way: every one of these spacings carries RT/F, so 50 &deg;C would <em>widen</em> 29 mV to about 31, not narrow it. <b>What you may not conclude is that the two electrons go on in a single step.</b> n is the number of electrons the wave passes; how they are passed &mdash; together, or one after another with the second easier than the first &mdash; is a question this trace cannot answer, and it is where the next deck starts."}
 ];
 
 var QZ2 = [
@@ -2392,13 +2439,13 @@ var QZ2 = [
   a:0,
   w:"k&deg; belongs to the <b>interface</b>, not to the solution, so changing the electrode changes &Lambda; while leaving k<sub>1</sub> untouched. A &Delta;E<sub>p</sub> of 180 mV that does not depend on &upsilon; is the fingerprint of a nearly irreversible electron transfer, and once that is the slow step, <b>what happens to B afterwards cannot alter the rate</b>: E<sub>p</sub> stops responding to K altogether and the voltammogram behaves as though K were infinite. This is the deck's &Lambda; = 0.1 case. The chemistry is the same &mdash; the method has stopped working, which is a very different thing, and the honest move is to diagnose from the return peak and i<sub>p</sub>/&radic;&upsilon; instead, or to go back to the first electrode. Area cancels out of both &Delta;E<sub>p</sub> and the shift."},
 
- {q:"An EE with &Delta;E&deg; = +180 mV is the textbook potential inversion: one wave, &Delta;E<sub>p</sub> = 57/2 = 29 mV, &psi;<sub>p</sub> = 2<sup>3/2</sup>&times;0.446 = 1.26. You set exactly that on the bench, at k&deg; = 0.1 cm/s and 100 mV/s, and the three traces do <i>not</i> lie on top of one another: &psi;<sub>p</sub> reads 1.20, 1.11 and 0.95 from the slowest sweep to the fastest. What is going on?",
-  o:["Nothing is wrong with the mechanism &mdash; 1.26 is the <i>reversible</i> limit, and a 29 mV wave needs a far larger &Lambda; than a 57 mV one before it reaches it",
+ {q:"An EE with &Delta;E&deg; = +180 mV is the textbook potential inversion: one wave, &Delta;E<sub>p</sub> halved to about 29 mV, &psi;<sub>p</sub> = 2<sup>3/2</sup>&times;0.446 = 1.26. You set exactly that on the bench, at k&deg; = 0.1 cm/s and 100 mV/s, and the three traces do <i>not</i> lie on top of one another: &psi;<sub>p</sub> reads 1.20, 1.11 and 0.95 from the slowest sweep to the fastest. What is going on?",
+  o:["Nothing is wrong with the mechanism &mdash; 1.26 is the <i>reversible</i> limit, and a 29 mV wave needs a far larger &Lambda; than a 59 mV one before it reaches it",
      "&Delta;E&deg; = +180 mV is not large enough: the two waves have not quite merged, and the missing height is the gap still between them",
      "The intermediate B is accumulating and being re-oxidised, which steals current from the forward peak",
      "A chemical step between the two electron transfers has become rate limiting at the faster sweeps"],
   a:0,
-  w:"<b>Thermodynamics sets the shape; kinetics decide whether you ever see it.</b> &psi;<sub>p</sub> = 1.26 and &Delta;E<sub>p</sub> = 29 mV are the limits an inverted EE <em>approaches when the electron transfers are fast</em>. A merged two-electron wave is half as wide as a one-electron one and pushes twice the flux through the same first step, so it is far more demanding of k&deg;: on this bench &psi; needs &Lambda; of several hundred to reach 1.25, where a one-electron wave is already at its 57 mV floor by &Lambda; = 15. At k&deg; = 0.1 cm/s and 100 mV/s the middle trace has &Lambda; = 16 &mdash; comfortably reversible for one electron, distinctly quasi-reversible for two &mdash; so the height is kinetically suppressed, and it falls further as &upsilon; rises and &Lambda; falls with it. Raise k&deg; a decade and the three close up on 1.25. <b>B is the trap</b>: at &Lambda; = 600 the <i>same</i> &Delta;E&deg; gives 1.25, so +180 mV is already deep in the merged regime and the missing height has nothing to do with it. There is no chemical step in an EE at all, and an accumulating B is the opposite of inversion &mdash; inversion is precisely the case where B never accumulates. <b>The height you measure here is a statement about k&deg;, not about &Delta;E&deg;.</b>"}
+  w:"<b>Thermodynamics sets the shape; kinetics decide whether you ever see it.</b> &psi;<sub>p</sub> = 1.26 and &Delta;E<sub>p</sub> = 29 mV are the limits an inverted EE <em>approaches when the electron transfers are fast</em>. A merged two-electron wave is half as wide as a one-electron one and pushes twice the flux through the same first step, so it is far more demanding of k&deg;: on this bench &psi; needs &Lambda; of several hundred to reach 1.25, where a one-electron wave is already at its 59 mV floor by &Lambda; = 15. At k&deg; = 0.1 cm/s and 100 mV/s the middle trace has &Lambda; = 16 &mdash; comfortably reversible for one electron, distinctly quasi-reversible for two &mdash; so the height is kinetically suppressed, and it falls further as &upsilon; rises and &Lambda; falls with it. Raise k&deg; a decade and the three close up on 1.25. <b>B is the trap</b>: at &Lambda; = 600 the <i>same</i> &Delta;E&deg; gives 1.25, so +180 mV is already deep in the merged regime and the missing height has nothing to do with it. There is no chemical step in an EE at all, and an accumulating B is the opposite of inversion &mdash; inversion is precisely the case where B never accumulates. <b>The height you measure here is a statement about k&deg;, not about &Delta;E&deg;.</b>"}
 ];
 
 
