@@ -259,8 +259,8 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
         <div class="notes2">
           <p class="hint"><b>Why a peak and not a plateau.</b> Walk the potential down and two things happen at once. The
             Nernst condition drags the surface ratio C<sub>O</sub>/C<sub>R</sub> down exponentially, which drives the
-            current <em>up</em>; and every electron taken costs one molecule of O from a layer that nothing is
-            replenishing, which drives the current <em>down</em>. The first wins early, the second wins late, and the
+            current <em>larger</em>; and every electron taken costs one molecule of O from a layer that nothing
+            is replenishing, which drives it <em>smaller</em>. The first wins early, the second wins late, and the
             crossing is the peak. Nothing about the peak is a property of the molecule alone.</p>
           <p class="hint"><b>Why &radic;&upsilon; and not &upsilon;.</b> The diffusion layer grows as &delta; &asymp;
             &radic;(Dt), and the experiment lasts t &asymp; RT/F&upsilon;. Sweep ten times faster and the layer is
@@ -587,9 +587,10 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
         <div class="card-b stack" style="gap:12px">
           <svg id="rsfit" viewBox="0 0 520 330" style="width:100%;height:auto" role="img"
                aria-label="Peak current plotted against the square root of scan rate, with a straight line fitted through the origin and the points that deviate from it shown."></svg>
-          <p class="hint" style="margin:0"><b>Same current axis as the trace above</b>, and held fixed for the same
-            reason: the six dots are the six peaks, read straight off those voltammograms, so a height here and a
-            height there are one quantity. The grey line is a least-squares fit <b>forced through the origin</b>,
+          <p class="hint" style="margin:0"><b>Same current scale as the trace above</b>, and held fixed for the
+            same reason: the six dots are the six peak <em>heights</em>, measured straight off those voltammograms.
+            The peaks there point downwards, because reduction is a cathodic current and this page draws anodic
+            current up; here they are plotted as the magnitudes |i<sub>p</sub>| that the equation is written in. The grey line is a least-squares fit <b>forced through the origin</b>,
             because the equation has no intercept; the faint green one is what the equation <b>predicts</b> from the
             n, A, C* and D that went in. <b>Now drag k&deg; down.</b> The points do not leave the line &mdash;
             R&sup2; hardly moves &mdash; the <b>line itself tilts away from the predicted one</b>, because slow
@@ -1346,31 +1347,33 @@ function swDraw(){
   var pk = cvPeaks(r.th, r.psi);
   var ipk = pk.ipc * sy, lim = ipk * 1.45;
 
-  var f = fr(62, 500, 24, 272, -SW_WIN, SW_WIN, -lim * 0.8, lim);
-  var s = axesCV(f, "E − E°′ / mV   (← reducing)", "i / µA   (cathodic ↑)",
+  var f = fr(62, 500, 24, 272, -SW_WIN, SW_WIN, -lim, lim * 0.8);
+  var s = axesCV(f, "E − E°′ / mV   (← reducing)", "i / µA   (anodic ↑)",
                  function(v){ return tickNum(v * 1e6); }, 0.1);
 
   /* the part already swept, solid; what is still to come, faint */
-  s += pth(cvPath(f, r.th.slice(0, k + 1), r.psi.slice(0, k + 1), 1, sy), "var(--ox)", 2.4);
-  s += pth(cvPath(f, r.th.slice(k), r.psi.slice(k), 1, sy), "var(--line-2)", 1.4, null, 0.8);
-  s += sweepArrow(f, r.th, r.psi, k, 1, sy, "var(--ox)");
+  s += pth(cvPath(f, r.th.slice(0, k + 1), r.psi.slice(0, k + 1), 1, -sy), "var(--ox)", 2.4);
+  s += pth(cvPath(f, r.th.slice(k), r.psi.slice(k), 1, -sy), "var(--line-2)", 1.4, null, 0.8);
+  s += sweepArrow(f, r.th, r.psi, k, 1, -sy, "var(--ox)");
 
   /* the two peaks, named once the sweep has passed them */
+  /* the cathodic peak is now the LOW point, so its label hangs below it
+     and the anodic one rides above                                    */
   if(k >= pk.iF){
-    s += cir(f.px(pk.Epc), f.py(pk.ipc * sy), 3.4, "var(--red-)");
-    s += ln(f.px(pk.Epc), f.py(pk.ipc * sy), f.px(pk.Epc), f.py(0), "var(--red-)", 1, "3 3", 0.8);
-    s += tx(f.px(pk.Epc) + 8, f.py(pk.ipc * sy) - 7,
+    s += cir(f.px(pk.Epc), f.py(-pk.ipc * sy), 3.4, "var(--red-)");
+    s += ln(f.px(pk.Epc), f.py(-pk.ipc * sy), f.px(pk.Epc), f.py(0), "var(--red-)", 1, "3 3", 0.8);
+    s += tx(f.px(pk.Epc) + 8, f.py(-pk.ipc * sy) + 1,
             "i_p,c " + (pk.ipc * sy * 1e6).toPrecision(3) + " µA", "var(--red-)", 10, null, 700);
-    s += tx(f.px(pk.Epc) + 8, f.py(pk.ipc * sy) + 6,
+    s += tx(f.px(pk.Epc) + 8, f.py(-pk.ipc * sy) + 14,
             "at " + (pk.Epc * 1000).toFixed(0) + " mV", "var(--red-)", 9.5);
   }
   if(k >= pk.iR){
-    s += cir(f.px(pk.Epa), f.py(pk.ipa * sy), 3.4, "var(--go)");
-    s += tx(f.px(pk.Epa) - 8, f.py(pk.ipa * sy) + 13,
+    s += cir(f.px(pk.Epa), f.py(-pk.ipa * sy), 3.4, "var(--go)");
+    s += tx(f.px(pk.Epa) - 8, f.py(-pk.ipa * sy) - 8,
             "i_p,a   ΔE_p " + (pk.dEp * 1000).toFixed(0) + " mV", "var(--go)", 10, "end", 700);
   }
   /* where we are */
-  var E = r.th[k] / FRT, I = r.psi[k] * sy;
+  var E = r.th[k] / FRT, I = -r.psi[k] * sy;
   if(E >= f.xlo && E <= f.xhi && I >= f.ylo && I <= f.yhi){
     s += cir(f.px(E), f.py(I), 5.4, "var(--ion-k)", 0.25);
     s += cir(f.px(E), f.py(I), 3.2, "var(--ion-k)");
@@ -1572,31 +1575,32 @@ function rvDraw(){
   var pk = cvPeaks(r.th, r.psi), rp = cvPeaks(ref.th, ref.psi);
   var sy = iScale(1, RV_A, RV_C, RV_D, RV.nu);
   var top = Math.max(pk.ipc, rp.ipc) * sy;
-  var f = fr(62, 500, 24, 282, -RV.sw - 0.02, 0.45, -top * 0.95, top * 1.2);
-  var s = axesCV(f, "E − E°′ / mV   (← reducing)", "i / µA   (cathodic ↑)",
+  var f = fr(62, 500, 24, 282, -RV.sw - 0.02, 0.45, -top * 1.2, top * 0.95);
+  var s = axesCV(f, "E − E°′ / mV   (← reducing)", "i / µA   (anodic ↑)",
                  function(v){ return tickNum(v * 1e6); }, 0.1);
-  s += pth(cvPath(f, ref.th, ref.psi, 1, sy), "var(--line-2)", 1.5, null, 0.85);
-  s += pth(cvPath(f, r.th, r.psi, 1, sy), "var(--ox)", 2.5);
+  s += pth(cvPath(f, ref.th, ref.psi, 1, -sy), "var(--line-2)", 1.5, null, 0.85);
+  s += pth(cvPath(f, r.th, r.psi, 1, -sy), "var(--ox)", 2.5);
 
-  /* the two measurements, drawn where they are made */
-  var yC = f.py(pk.ipc * sy), yA = f.py(pk.ipa * sy);
+  /* the two measurements, drawn where they are made. The whole picture is
+     mirrored now, so the ΔE_p bracket rides along the top              */
+  var yC = f.py(-pk.ipc * sy), yA = f.py(-pk.ipa * sy);
   s += cir(f.px(pk.Epc), yC, 3.4, "var(--red-)");
-  s += ln(f.px(pk.Epc), yC, f.px(pk.Epc), f.Y1 - 2, "var(--red-)", 1, "3 3", 0.7);
+  s += ln(f.px(pk.Epc), yC, f.px(pk.Epc), f.Y0 + 2, "var(--red-)", 1, "3 3", 0.7);
   if(pk.ratio > 0.02){
     s += cir(f.px(pk.Epa), yA, 3.4, "var(--go)");
-    s += ln(f.px(pk.Epa), yA, f.px(pk.Epa), f.Y1 - 2, "var(--go)", 1, "3 3", 0.7);
-    var xa = f.px(pk.Epa), xc = f.px(pk.Epc), ym = f.Y1 - 12;
+    s += ln(f.px(pk.Epa), yA, f.px(pk.Epa), f.Y0 + 2, "var(--go)", 1, "3 3", 0.7);
+    var xa = f.px(pk.Epa), xc = f.px(pk.Epc), ym = f.Y0 + 12;
     s += ln(xa, ym, xc, ym, "var(--ion-k)", 1.6);
-    s += tx((xa + xc) / 2, ym - 5, "ΔE_p " + (pk.dEp * 1000).toFixed(0) + " mV",
+    s += tx((xa + xc) / 2, ym + 13, "ΔE_p " + (pk.dEp * 1000).toFixed(0) + " mV",
             "var(--ion-k)", 10, "middle", 700);
   }else{
-    s += tx(f.px(pk.Epc) - 10, f.Y1 - 14, "no return peak", "var(--stop)", 10.5, "end", 700);
+    s += tx(f.px(pk.Epc) - 10, f.Y0 + 16, "no return peak", "var(--stop)", 10.5, "end", 700);
   }
   /* an irreversible peak sits at the right-hand edge, so the label has to
      be able to lean the other way                                     */
   var labIp = "i_p,c " + (pk.ipc * sy * 1e6).toPrecision(3) + " µA";
   var ipR = f.px(pk.Epc) + 8 + labIp.length * 6.1 < f.X1 - 2;
-  s += tx(f.px(pk.Epc) + (ipR ? 8 : -8), yC - 7, labIp,
+  s += tx(f.px(pk.Epc) + (ipR ? 8 : -8), yC + 14, labIp,
           "var(--red-)", 10, ipR ? null : "end", 700);
   document.getElementById("rvcv").innerHTML = s;
 
@@ -1784,23 +1788,23 @@ function rsDraw(){
   if(!RS.full) RS.full = iRange(need / 0.88);
   else if(need > RS.full || need < RS.full * 0.07) RS.full = iRange(need / 0.60);
   var un = iUnit(RS.full);
-  var f = fr(62, 500, 22, 272, -0.46, 0.46, -0.9 * RS.full, RS.full);
-  var s = axesCV(f, "E − E°′ / mV", "i / " + un.u,
+  var f = fr(62, 500, 22, 272, -0.46, 0.46, -RS.full, 0.9 * RS.full);
+  var s = axesCV(f, "E − E°′ / mV", "i / " + un.u + "   (anodic ↑)",
                  function(v){ return tickNum(v * 1e6 / un.k); }, 0.2);
   /* the simulation is of one electron; a reversible n-electron wave is the
      same curve with the potential axis divided by n, which is where the
      59/n mV peak separation comes from                                */
   pts.forEach(function(q, i){
     var sy = iScale(RS.n, RS.A, RS.C, RS.D, q.nu) * Math.sqrt(RS.n);
-    s += pth(cvPath(f, q.r.th, q.r.psi, 1 / RS.n, sy), cols[i], 1.9);
+    s += pth(cvPath(f, q.r.th, q.r.psi, 1 / RS.n, -sy), cols[i], 1.9);
   });
   /* the legend sits top right: the sweep begins at the far positive end
      with no faradaic current, so that corner is the one always empty */
   var LGX = f.X1 - 91;
-  s += rc(LGX, f.Y0 + 4, 86, 108, "var(--surface)", 0.9, 4);
+  s += rc(LGX, f.Y0 + 4, 86, 100, "var(--surface)", 0.9, 4);
   s += tx(LGX + 6, f.Y0 + 18, "scan rate υ", "var(--muted)", 9.5, null, 700);
   pts.forEach(function(q, i){
-    var ly = f.Y0 + 33 + i * 13;
+    var ly = f.Y0 + 31 + i * 12;
     s += ln(LGX + 6, ly - 3.5, LGX + 20, ly - 3.5, cols[i], 2.2);
     s += tx(LGX + 25, ly, fmtNu(q.nu), cols[i], 9.5, null, 600);
   });
@@ -1826,7 +1830,7 @@ function rsDraw(){
     q2 += tx(g.X0 - 6, g.py(gg) + 3.4, tickNum(gg * 1e6 / un.k), "var(--muted)", 9.5, "end");
   }
   q2 += xName(g.X0, g.X1, g.Y1 + 30, "√υ / (V/s)^½");
-  q2 += yName(16, g.Y0, g.Y1, "i_p / " + un.u);
+  q2 += yName(16, g.Y0, g.Y1, "|i_p| / " + un.u);
   q2 += ln(g.px(0), g.py(0), g.px(xm), g.py(mRS * xm), "var(--go)", 1.6, "2 4", 0.85);
   q2 += ln(g.px(0), g.py(0), g.px(xm), g.py(m * xm), "var(--line-2)", 1.6, "5 4");
   pts.forEach(function(q, i){
@@ -2000,11 +2004,11 @@ function mcDraw(){
   runs.forEach(function(r){ r.psi.forEach(function(v){ if(v > hi) hi = v; if(v < lo) lo = v; }); });
   hi = Math.max(hi, 0.55); lo = Math.min(lo, -0.3);
   var thS = runs[0].th[Math.floor(runs[0].th.length / 2)] / FRT;
-  var f = fr(62, 500, 24, 282, thS - 0.02, mcStart(), lo * 1.12, hi * 1.14);
+  var f = fr(62, 500, 24, 282, thS - 0.02, mcStart(), -hi * 1.14, -lo * 1.12);
   var s = axesCV(f, "E − E°′(A/B) / mV   (← reducing)", "ψ = i / nFAC*√(DFυ/RT)",
                  function(v){ return v.toFixed(1); }, 0.1);
   runs.forEach(function(r, k){
-    s += pth(cvPath(f, r.th, r.psi, 1, 1), cols[k], k === 1 ? 2.6 : 1.8, null, k === 1 ? 1 : 0.9);
+    s += pth(cvPath(f, r.th, r.psi, 1, -1), cols[k], k === 1 ? 2.6 : 1.8, null, k === 1 ? 1 : 0.9);
   });
   /* the legend goes top right: the sweep begins at the far positive end,
      which is drawn there, and no current flows yet                    */
@@ -2019,19 +2023,17 @@ function mcDraw(){
   });
   /* the peak of the middle trace, named */
   var pk = pks[1];
-  var pxx = f.px(pk.Epc), pyy = f.py(pk.ipc);
+  var pxx = f.px(pk.Epc), pyy = f.py(-pk.ipc);
   s += cir(pxx, pyy, 3.4, "var(--ion-k)");
   var plab = "ψ_p " + pk.ipc.toFixed(3) + " at " + (pk.Epc * 1000).toFixed(0) + " mV";
   var pw = plab.length * 6.1, pR = pxx + 8 + pw < f.X1 - 2;
   var l0 = pR ? pxx + 8 : pxx - 8 - pw;
-  var clash = l0 < LX + LW + 2 && l0 + pw > LX - 2 && pyy - 17 < LY + LH + 2;
-  /* dropping it by a line is not enough when the peak is as high as the
-     legend is deep: it has to clear the whole box                     */
-  s += tx(pR ? pxx + 8 : pxx - 8,
-          clash ? Math.max(pyy + 17, LY + LH + 13) : pyy - 7, plab,
+  /* the peak is the low point of the picture now, so the label hangs
+     under it and the legend overhead is no longer in the way         */
+  s += tx(pR ? pxx + 8 : pxx - 8, pyy + 15, plab,
           "var(--ion-k)", 10, pR ? null : "end", 700);
   s += ln(f.px(-0.0285), f.Y0 + 2, f.px(-0.0285), f.Y1 - 2, "var(--muted)", 1, "3 4", 0.6);
-  s += tx(f.px(-0.0285) - 5, f.Y1 - 6, "where a reversible E_p would be", "var(--muted)", 9, "end", 600);
+  s += tx(f.px(-0.0285) - 5, f.Y0 + 12, "where a reversible E_p would be", "var(--muted)", 9, "end", 600);
   document.getElementById("mccv").innerHTML = s;
 
   /* ---- the diagnosis ---- */
@@ -2276,12 +2278,12 @@ function rdRender(){
     xlo = Math.min(xlo, u.r.th[u.r.th.length >> 1] / FRT + u.off);
   });
   hi = Math.max(hi, 0.55);
-  var f = fr(62, 500, 26, 290, xlo - 0.02, xhi, lo * 1.14 - 0.05, hi * 1.16);
+  var f = fr(62, 500, 26, 290, xlo - 0.02, xhi, -hi * 1.16, -lo * 1.14 + 0.05);
   var s = axesCV(f, RD.case.pH ? "E / mV (arbitrary reference)" : "E − E°′ / mV   (← reducing)",
-                 "ψ = i / nFAC*√(DFυ/RT)", function(v){ return v.toFixed(1); }, 0.1);
+                 "ψ = i / nFAC*√(DFυ/RT)   (anodic ↑)", function(v){ return v.toFixed(1); }, 0.1);
   var cols = ["var(--ox)", "var(--red-)"];
   runs.forEach(function(u, k){
-    s += pth(cvPath(f, u.r.th, u.r.psi, 1, 1, u.off), cols[k], k ? 1.9 : 2.5, null, k ? 0.95 : 1);
+    s += pth(cvPath(f, u.r.th, u.r.psi, 1, -1, u.off), cols[k], k ? 1.9 : 2.5, null, k ? 0.95 : 1);
   });
   var ly = f.Y0 + 13;
   runs.forEach(function(u, k){
@@ -2314,23 +2316,23 @@ function rdAnnotate(f, runs){
   var c = RD_C[RD.k], s = "", p0 = cvPeaks(runs[0].r.th, runs[0].r.psi),
       p1 = cvPeaks(runs[1].r.th, runs[1].r.psi);
   function note(x, y, t, col){ return tx(x, y, t, col || "var(--ion-k)", 10, "middle", 700); }
-  var xC = f.px(p0.Epc + (runs[0].off || 0)), yC = f.py(p0.ipc);
+  var xC = f.px(p0.Epc + (runs[0].off || 0)), yC = f.py(-p0.ipc);
   s += cir(xC, yC, 3.6, "var(--ion-k)");
-  s += note(xC, yC - 10, "ψ_p " + p0.ipc.toFixed(2) + (p0.ratio > 0.02 ? "  ΔE_p " + (p0.dEp * 1000).toFixed(0) + " mV" : ""));
+  s += note(xC, yC + 16, "ψ_p " + p0.ipc.toFixed(2) + (p0.ratio > 0.02 ? "  ΔE_p " + (p0.dEp * 1000).toFixed(0) + " mV" : ""));
   if(c.a === 1 || c.a === 2)
-    s += note((f.X0 + f.X1) / 2, f.Y1 - 10,
+    s += note((f.X0 + f.X1) / 2, f.Y0 + 14,
       "ΔE_p: " + (p0.dEp * 1000).toFixed(0) + " mV at υ, " + (p1.ratio > 0.02 ? (p1.dEp * 1000).toFixed(0) + " mV" : "no return peak") + " at 10υ");
   if(c.a === 3 || c.a === 4)
-    s += note((f.X0 + f.X1) / 2, f.Y1 - 10,
+    s += note((f.X0 + f.X1) / 2, f.Y0 + 14,
       "return peak: " + p0.ratio.toFixed(2) + " at υ, " + p1.ratio.toFixed(2) + " at 10υ");
   if(c.a === 7)
-    s += note((f.X0 + f.X1) / 2, f.Y1 - 10,
+    s += note((f.X0 + f.X1) / 2, f.Y0 + 14,
       "ψ_p falls from " + p0.ipc.toFixed(3) + " to " + p1.ipc.toFixed(3) + " as υ rises");
   if(c.a === 10)
-    s += note((f.X0 + f.X1) / 2, f.Y1 - 10,
+    s += note((f.X0 + f.X1) / 2, f.Y0 + 14,
       "the whole wave moves " + (RD.case.pH * 59) + " mV over " + RD.case.pH + " pH units");
   if(c.a === 9)
-    s += note((f.X0 + f.X1) / 2, f.Y1 - 10,
+    s += note((f.X0 + f.X1) / 2, f.Y0 + 14,
       "midpoint " + (((p0.Epa + p0.Epc) / 2) * 1000).toFixed(0) + " mV, yet ΔE_p is " + (p0.dEp * 1000).toFixed(0) + " mV");
   return s;
 }
@@ -2380,7 +2382,7 @@ var QZ1 = [
      "Because the electron transfer becomes slower as the overpotential grows",
      "Because the double-layer charging current decays away after the peak"],
   a:0,
-  w:"Two things happen at once. Nernst drags the surface ratio down exponentially, which drives the current <em>up</em>; and every electron taken costs one molecule of O from a layer that only diffusion replenishes, which drives it <em>down</em>. The first wins early, the second wins late, and the peak is where they cross. After it, the surface has been empty for a while and the only thing still changing is the <b>thickness</b> of the depleted layer, &delta; &asymp; &radic;(Dt) &mdash; so the gradient, and the current, fall as 1/&radic;t. <b>Stirring is exactly what removes the peak</b>: a rotating disc holds &delta; fixed, so the current has nowhere to fall to and the wave becomes a plateau. Bulk depletion is negligible (a CV consumes a vanishing fraction of the cell), the kinetics get <em>faster</em> with overpotential, not slower, and charging current is a constant offset, not a peak."},
+  w:"Two things happen at once. Nernst drags the surface ratio down exponentially, which drives the current <em>larger</em>; and every electron taken costs one molecule of O from a layer that only diffusion replenishes, which drives it <em>smaller</em>. The first wins early, the second wins late, and the peak is where they cross. After it, the surface has been empty for a while and the only thing still changing is the <b>thickness</b> of the depleted layer, &delta; &asymp; &radic;(Dt) &mdash; so the gradient, and the current, fall as 1/&radic;t. <b>Stirring is exactly what removes the peak</b>: a rotating disc holds &delta; fixed, so the current has nowhere to fall to and the wave becomes a plateau. Bulk depletion is negligible (a CV consumes a vanishing fraction of the cell), the kinetics get <em>faster</em> with overpotential, not slower, and charging current is a constant offset, not a peak."},
 
  {q:"A couple gives &Delta;E<sub>p</sub> = 59 mV at 20 mV/s and 115 mV at 2 V/s, with |i<sub>p,a</sub>/i<sub>p,c</sub>| = 1.0 at both rates. What has changed?",
   o:["Nothing about the molecule &mdash; &Lambda; = k&deg;/&radic;(DF&upsilon;/RT) has fallen, so the electron transfer can no longer keep Nernst at the surface",
