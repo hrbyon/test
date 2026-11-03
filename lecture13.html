@@ -1234,12 +1234,12 @@ function iScale(n, A, Cs, D, nu){ return n * FARADAY * A * Cs * Math.sqrt(D * FR
 function xScale(D, nu){ return Math.sqrt(D / (FRT * nu)); }   /* cm per unit X */
 
 /* ---- one frame, one set of axes, used by every picture here ------------
-   x is a potential in volts and runs POSITIVE TO THE LEFT, so that the
-   forward (reducing) sweep travels left to right the way the deck draws it;
-   y is a current with the cathodic direction up.                        */
+   x increases to the right like any other plot, so a potential axis runs
+   NEGATIVE TO POSITIVE across the page and the forward (reducing) sweep
+   travels right to left; y is a current with the cathodic direction up.                        */
 function fr(X0, X1, Y0, Y1, xlo, xhi, ylo, yhi){
   return {X0:X0, X1:X1, Y0:Y0, Y1:Y1, xlo:xlo, xhi:xhi, ylo:ylo, yhi:yhi,
-    px:function(v){ return X0 + (xhi - v) / (xhi - xlo) * (X1 - X0); },
+    px:function(v){ return X0 + (v - xlo) / (xhi - xlo) * (X1 - X0); },
     py:function(v){ return Y1 - (v - ylo) / (yhi - ylo) * (Y1 - Y0); }};
 }
 /* an axis tick reads as a number: 100, not 1.0e+2 */
@@ -1347,7 +1347,7 @@ function swDraw(){
   var ipk = pk.ipc * sy, lim = ipk * 1.45;
 
   var f = fr(62, 500, 24, 272, -SW_WIN, SW_WIN, -lim * 0.8, lim);
-  var s = axesCV(f, "E − E°′ / mV   (reducing →)", "i / µA   (cathodic ↑)",
+  var s = axesCV(f, "E − E°′ / mV   (← reducing)", "i / µA   (cathodic ↑)",
                  function(v){ return tickNum(v * 1e6); }, 0.1);
 
   /* the part already swept, solid; what is still to come, faint */
@@ -1378,13 +1378,14 @@ function swDraw(){
   /* the triangle, inset, with the same marker on it */
   var g = fr(360, 494, 32, 92, 0, 1, -1.08, 1.08);
   s += rc(358, 30, 138, 64, "var(--surface)", 0.92, 4);
-  var tp = "M" + g.px(1).toFixed(1) + " " + g.py(1).toFixed(1)
+  /* this inset's x is time, not potential, and always ran forwards */
+  var tp = "M" + g.px(0).toFixed(1) + " " + g.py(1).toFixed(1)
          + "L" + g.px(0.5).toFixed(1) + " " + g.py(-1).toFixed(1)
-         + "L" + g.px(0).toFixed(1) + " " + g.py(1).toFixed(1);
+         + "L" + g.px(1).toFixed(1) + " " + g.py(1).toFixed(1);
   s += pth(tp, "var(--go)", 1.6);   /* --pot is a class, not a token */
   var fracT = k / (r.th.length - 1);
   var tri = fracT <= 0.5 ? 1 - 4 * fracT : 4 * fracT - 3;
-  s += cir(g.px(1 - fracT), g.py(tri), 3, "var(--ion-k)");
+  s += cir(g.px(fracT), g.py(tri), 3, "var(--ion-k)");
   s += tx(364, 104, "E against t", "var(--muted)", 9, null, 600);
   document.getElementById("swcv").innerHTML = s;
 
@@ -1393,7 +1394,6 @@ function swDraw(){
   var xs = xScale(SW_D, SW.nu);
   var xmaxCm = 6 * Math.sqrt(SW_D * (SW_WIN * 2) / SW.nu) * 0.42;
   var pfr = fr(58, 500, 24, 262, 0, xmaxCm * 1e4, 0, 1.08);
-  /* this frame alone runs the ordinary way round */
   pfr.px = function(v){ return 58 + (v - 0) / (xmaxCm * 1e4 - 0) * (500 - 58); };
   var q = rc(pfr.X0, pfr.Y0, pfr.X1 - pfr.X0, pfr.Y1 - pfr.Y0, "var(--surface-2)", 0.5, 4);
   var gstep = nice(xmaxCm * 1e4 / 4.5), gg;
@@ -1573,7 +1573,7 @@ function rvDraw(){
   var sy = iScale(1, RV_A, RV_C, RV_D, RV.nu);
   var top = Math.max(pk.ipc, rp.ipc) * sy;
   var f = fr(62, 500, 24, 282, -RV.sw - 0.02, 0.45, -top * 0.95, top * 1.2);
-  var s = axesCV(f, "E − E°′ / mV   (reducing →)", "i / µA   (cathodic ↑)",
+  var s = axesCV(f, "E − E°′ / mV   (← reducing)", "i / µA   (cathodic ↑)",
                  function(v){ return tickNum(v * 1e6); }, 0.1);
   s += pth(cvPath(f, ref.th, ref.psi, 1, sy), "var(--line-2)", 1.5, null, 0.85);
   s += pth(cvPath(f, r.th, r.psi, 1, sy), "var(--ox)", 2.5);
@@ -1794,14 +1794,15 @@ function rsDraw(){
     var sy = iScale(RS.n, RS.A, RS.C, RS.D, q.nu) * Math.sqrt(RS.n);
     s += pth(cvPath(f, q.r.th, q.r.psi, 1 / RS.n, sy), cols[i], 1.9);
   });
-  /* the legend sits top left: the sweep begins at the far positive end with
-     no faradaic current, so that corner is the one that is always empty */
-  s += rc(f.X0 + 5, f.Y0 + 4, 86, 108, "var(--surface)", 0.9, 4);
-  s += tx(f.X0 + 11, f.Y0 + 18, "scan rate υ", "var(--muted)", 9.5, null, 700);
+  /* the legend sits top right: the sweep begins at the far positive end
+     with no faradaic current, so that corner is the one always empty */
+  var LGX = f.X1 - 91;
+  s += rc(LGX, f.Y0 + 4, 86, 108, "var(--surface)", 0.9, 4);
+  s += tx(LGX + 6, f.Y0 + 18, "scan rate υ", "var(--muted)", 9.5, null, 700);
   pts.forEach(function(q, i){
     var ly = f.Y0 + 33 + i * 13;
-    s += ln(f.X0 + 11, ly - 3.5, f.X0 + 25, ly - 3.5, cols[i], 2.2);
-    s += tx(f.X0 + 30, ly, fmtNu(q.nu), cols[i], 9.5, null, 600);
+    s += ln(LGX + 6, ly - 3.5, LGX + 20, ly - 3.5, cols[i], 2.2);
+    s += tx(LGX + 25, ly, fmtNu(q.nu), cols[i], 9.5, null, 600);
   });
   document.getElementById("rscv").innerHTML = s;
   /* the full scale is announced in the header rather than in the corner of
@@ -2000,16 +2001,16 @@ function mcDraw(){
   hi = Math.max(hi, 0.55); lo = Math.min(lo, -0.3);
   var thS = runs[0].th[Math.floor(runs[0].th.length / 2)] / FRT;
   var f = fr(62, 500, 24, 282, thS - 0.02, mcStart(), lo * 1.12, hi * 1.14);
-  var s = axesCV(f, "E − E°′(A/B) / mV   (reducing →)", "ψ = i / nFAC*√(DFυ/RT)",
+  var s = axesCV(f, "E − E°′(A/B) / mV   (← reducing)", "ψ = i / nFAC*√(DFυ/RT)",
                  function(v){ return v.toFixed(1); }, 0.1);
   runs.forEach(function(r, k){
     s += pth(cvPath(f, r.th, r.psi, 1, 1), cols[k], k === 1 ? 2.6 : 1.8, null, k === 1 ? 1 : 0.9);
   });
-  /* the legend goes top left: the sweep begins at the far positive end,
+  /* the legend goes top right: the sweep begins at the far positive end,
      which is drawn there, and no current flows yet                    */
   var labs = nus.map(function(nu){ return fmtNu(nu) + (i.k ? "   K = " + fmtK(mcK(nu)) : ""); });
   var lw = 0; labs.forEach(function(t){ lw = Math.max(lw, t.length * 5.6); });
-  var LX = f.X0 + 5, LY = f.Y0 + 5, LW = lw + 30, LH = 13 * nus.length + 7;
+  var LW = lw + 30, LX = f.X1 - 5 - LW, LY = f.Y0 + 5, LH = 13 * nus.length + 7;
   s += rc(LX, LY, LW, LH, "var(--surface)", 0.92, 4);
   labs.forEach(function(t, k){
     var yy = LY + 12 + k * 13;
@@ -2276,7 +2277,7 @@ function rdRender(){
   });
   hi = Math.max(hi, 0.55);
   var f = fr(62, 500, 26, 290, xlo - 0.02, xhi, lo * 1.14 - 0.05, hi * 1.16);
-  var s = axesCV(f, RD.case.pH ? "E / mV (arbitrary reference)" : "E − E°′ / mV   (reducing →)",
+  var s = axesCV(f, RD.case.pH ? "E / mV (arbitrary reference)" : "E − E°′ / mV   (← reducing)",
                  "ψ = i / nFAC*√(DFυ/RT)", function(v){ return v.toFixed(1); }, 0.1);
   var cols = ["var(--ox)", "var(--red-)"];
   runs.forEach(function(u, k){
