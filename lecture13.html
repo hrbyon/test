@@ -265,7 +265,11 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
           <p class="hint"><b>Why &radic;&upsilon; and not &upsilon;.</b> The diffusion layer grows as &delta; &asymp;
             &radic;(Dt), and the experiment lasts t &asymp; RT/F&upsilon;. Sweep ten times faster and the layer is
             &radic;10 times thinner, so the gradient &mdash; and the current &mdash; is &radic;10 times steeper.
-            <b>The same total charge passes, in a tenth of the time.</b></p>
+            But the sweep is also over in a tenth of the time, so the <b>charge</b> goes the other way:
+            Q &asymp; i<sub>p</sub>t &prop; &radic;&upsilon;/&upsilon; = 1/&radic;&upsilon;. <b>Ten times the scan
+            rate passes &radic;10 times <em>less</em> charge</b> &mdash; which is the same statement as the thinner
+            layer, since Q = nFAC*&delta; is just the material taken out of it. A fast sweep is a smaller
+            experiment, not a bigger one, and that is why a CV can be run repeatedly on the same drop.</p>
         </div>
       </div>
     </div>
@@ -752,7 +756,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
     <div class="card" style="margin-bottom:16px">
       <div class="card-h">
         <h2>Concept check 2 &middot; what happens to the product afterwards</h2>
-        <span class="note">four questions on the coupled mechanisms &mdash; answer once per question; the reasoning appears immediately</span>
+        <span class="note">five questions on the coupled mechanisms &mdash; answer once per question; the reasoning appears immediately</span>
         <span class="tally" style="margin-left:auto" id="tally2"></span>
       </div>
       <div class="card-b">
@@ -1875,7 +1879,7 @@ var MCI = {
   EE:  {nm:"two one-electron steps on the same molecule",
         sch:"A + e⁻ ⇌ B &nbsp;·&nbsp; B + e⁻ ⇌ C &nbsp;&mdash;&nbsp; the second at ΔE° from the first",
         k:false, de0:true,
-        look:"ΔE° < −100 mV: two separate waves, each of unit height. ΔE° > +100 mV (<b>potential inversion</b>): one wave of 2.8× the height and about 29 mV separation, because the second electron is easier than the first and the intermediate never accumulates."},
+        look:"ΔE° < −100 mV: two separate waves, each of unit height. ΔE° > +100 mV (<b>potential inversion</b>): one wave of about 29 mV separation, because the second electron is easier than the first and the intermediate never accumulates. Its height tends to 2.8× a one-electron wave, but <b>only when k° is large</b> — a 29 mV wave needs Λ of several hundred to get there, so with the k° slider down you will see less, and see it change with υ."},
   EC:  {nm:"the product reacts away, first order",
         sch:"A + e⁻ ⇌ B &nbsp;·&nbsp; B → C &nbsp;(k₁, s⁻¹)",
         k:true, klab:"k₁ of B → C",
@@ -2010,11 +2014,29 @@ function mcDraw(){
   }else if(MC.m === "EE"){
     cls = "mixv";
     var np = cvAllPeaks(runs[1].th, runs[1].psi, Math.floor(runs[1].th.length / 2), 0.12).length;
+    var Lm = MC.k0 / Math.sqrt(1e-5 * FRT * MC.nu);
+    var sprd = Math.abs(pks[0].ipc - pks[2].ipc) / pks[1].ipc;
     msg = "<b>ΔE° = " + (MC.dE0 * 1000).toFixed(0) + " mV</b> gives " + (np > 1 ? "two separate waves" : "a single wave")
         + " of peak height ψ = " + pks[1].ipc.toFixed(2) + ". For reference a single one-electron wave gives 0.446 "
         + "and a fully inverted two-electron wave gives 1.26 &mdash; that is 2<sup>3/2</sup>, the n<sup>3/2</sup> of "
-        + "Randles&ndash;Sevcik. <b>Scan rate changes none of this</b>, which is how a thermodynamic splitting is "
-        + "told apart from a kinetic one.";
+        + "Randles&ndash;Sevcik. <b>The splitting itself is thermodynamic and has no clock</b>: ΔE° is where the two "
+        + "couples sit, and no scan rate will move them.";
+    /* the heights are another matter, and at a modest k° the student can
+       see them move - so say so rather than claim nothing depends on υ  */
+    if(sprd > 0.08){
+      msg += "<br><br><b>The three traces do not superimpose, though</b> &mdash; ψ runs " + pks[2].ipc.toFixed(2)
+          + " → " + pks[0].ipc.toFixed(2) + " from the slowest sweep to the fastest. That is not the splitting "
+          + "moving; it is the <b>kinetics</b>, and Λ = " + Lm.toPrecision(2) + " for the middle trace says so. "
+          + (np > 1
+             ? "Each of these is an ordinary one-electron wave, so Λ below about 15 costs it height in the ordinary "
+               + "way. The <em>spacing</em> is still ΔE° and still fixed &mdash; check it against the axis at all "
+               + "three rates. That is the part that is thermodynamic."
+             : "A merged two-electron wave is half as wide as a one-electron one and pushes twice the flux through "
+               + "the same first step, so it asks far more of k°: it needs <b>Λ of several hundred</b> to reach "
+               + "1.25, where one electron is already at its floor by Λ = 15. What you are reading here is "
+               + "kinetically suppressed &mdash; a statement about k°, not about ΔE°. Raise k° by a decade and "
+               + "watch the three traces close up on 1.26.");
+    }
   }else if(MC.m === "ECp"){
     cls = "stop";
     msg = "<b>Catalytic.</b> ψ reaches " + pks[1].ipc.toFixed(2) + " where a plain couple gives 0.446, and the "
@@ -2328,13 +2350,13 @@ var QZ1 = [
   a:0,
   w:"Straightness tests <b>diffusion control</b>, not reversibility. A totally irreversible wave is also proportional to &radic;&upsilon; &mdash; it simply carries 2.99&times;10<sup>5</sup>&radic;&alpha; in front instead of 2.69&times;10<sup>5</sup>, which for &alpha; = 0.5 makes the recovered D low by a factor of 1.6. The honest check is &Delta;E<sub>p</sub>, or &Lambda; at the <em>fastest</em> scan, and the Randles&ndash;Sevcik tab shows a case that is straight to R&sup2; = 0.999 and still gives a D that is 30 % wrong. An adsorbed layer would give i<sub>p</sub> &prop; &upsilon;, not &radic;&upsilon;, because the amount available to react is fixed instead of drawn from a layer that grows &mdash; so B, C and D are all safe."},
 
- {q:"A single reduction wave has &Delta;E<sub>p</sub> = 29 mV and a peak current 2.8 times that of a one-electron standard at the same concentration. Both numbers are unchanged from 10 mV/s to 1 V/s. What is it?",
-  o:["Two one-electron transfers in which the second is easier than the first &mdash; potential inversion",
-     "A one-electron transfer at an electrode with twice the area you assumed",
-     "An EC process fast enough that the chemistry has merged the two waves",
-     "A reversible one-electron couple measured at 50 &deg;C rather than 25 &deg;C"],
+ {q:"A reversible reduction gives &Delta;E<sub>p</sub> = 29 mV, and its peak current is 2.8 times that of a known one-electron couple measured at the same concentration, area and scan rate. What do you conclude, and what are you <i>not</i> entitled to conclude?",
+  o:["n = 2 &mdash; and the two numbers say so independently, which is the point",
+     "The electrode area is about 2.8 times what you assumed, which also narrows the wave",
+     "The solution is about 2.8 times more concentrated than you were told",
+     "The measurement was made near 50 &deg;C rather than 25 &deg;C"],
   a:0,
-  w:"Both numbers say n = 2 at once: &Delta;E<sub>p</sub> = 57/n = 29 mV, and i<sub>p</sub> &prop; n<sup>3/2</sup> = 2<sup>3/2</sup> = 2.83. A larger area would raise the current <i>without</i> narrowing &Delta;E<sub>p</sub>, and raising the temperature would <i>widen</i> it, since every one of these spacings carries RT/F. The mechanism is E&deg;(B/C) positive of E&deg;(A/B), so B is reduced as soon as it forms and never accumulates &mdash; <b>a single two-electron wave, with no sign at all that there were ever two steps</b>. That it is identical at both scan rates is the final check: this is a thermodynamic splitting, and thermodynamics has no clock. A kinetic merging, as in C, would change with &upsilon;."}
+  w:"<b>Two independent routes to the same n.</b> &Delta;E<sub>p</sub> = 57/n gives n = 2 from the <em>width</em>, and i<sub>p</sub> &prop; n<sup>3/2</sup> gives 2<sup>3/2</sup> = 2.83 from the <em>height</em> &mdash; and they agree. That agreement is what makes the conclusion safe, because the two numbers fail differently: a wrong <b>area</b> or a wrong <b>concentration</b> changes i<sub>p</sub> and leaves &Delta;E<sub>p</sub> at 57 mV, since neither A nor C* appears in the peak separation at all. Temperature moves it the wrong way: every one of these spacings carries RT/F, so 50 &deg;C would <em>widen</em> 29 mV to about 31, not narrow it. <b>What you may not conclude is that the two electrons go on in a single step.</b> n is the number of electrons the wave passes; how they are passed &mdash; together, or one after another with the second easier than the first &mdash; is a question this trace cannot answer, and it is where the next deck starts."}
 ];
 
 var QZ2 = [
@@ -2368,7 +2390,15 @@ var QZ2 = [
      "Yes &mdash; k<sub>1</sub> has fallen to zero, which is why there is nothing left to shift the peak",
      "No &mdash; the second electrode has a larger area, and the shift is diluted by the larger current"],
   a:0,
-  w:"k&deg; belongs to the <b>interface</b>, not to the solution, so changing the electrode changes &Lambda; while leaving k<sub>1</sub> untouched. A &Delta;E<sub>p</sub> of 180 mV that does not depend on &upsilon; is the fingerprint of a nearly irreversible electron transfer, and once that is the slow step, <b>what happens to B afterwards cannot alter the rate</b>: E<sub>p</sub> stops responding to K altogether and the voltammogram behaves as though K were infinite. This is the deck's &Lambda; = 0.1 case. The chemistry is the same &mdash; the method has stopped working, which is a very different thing, and the honest move is to diagnose from the return peak and i<sub>p</sub>/&radic;&upsilon; instead, or to go back to the first electrode. Area cancels out of both &Delta;E<sub>p</sub> and the shift."}
+  w:"k&deg; belongs to the <b>interface</b>, not to the solution, so changing the electrode changes &Lambda; while leaving k<sub>1</sub> untouched. A &Delta;E<sub>p</sub> of 180 mV that does not depend on &upsilon; is the fingerprint of a nearly irreversible electron transfer, and once that is the slow step, <b>what happens to B afterwards cannot alter the rate</b>: E<sub>p</sub> stops responding to K altogether and the voltammogram behaves as though K were infinite. This is the deck's &Lambda; = 0.1 case. The chemistry is the same &mdash; the method has stopped working, which is a very different thing, and the honest move is to diagnose from the return peak and i<sub>p</sub>/&radic;&upsilon; instead, or to go back to the first electrode. Area cancels out of both &Delta;E<sub>p</sub> and the shift."},
+
+ {q:"An EE with &Delta;E&deg; = +180 mV is the textbook potential inversion: one wave, &Delta;E<sub>p</sub> = 57/2 = 29 mV, &psi;<sub>p</sub> = 2<sup>3/2</sup>&times;0.446 = 1.26. You set exactly that on the bench, at k&deg; = 0.1 cm/s and 100 mV/s, and the three traces do <i>not</i> lie on top of one another: &psi;<sub>p</sub> reads 1.20, 1.11 and 0.95 from the slowest sweep to the fastest. What is going on?",
+  o:["Nothing is wrong with the mechanism &mdash; 1.26 is the <i>reversible</i> limit, and a 29 mV wave needs a far larger &Lambda; than a 57 mV one before it reaches it",
+     "&Delta;E&deg; = +180 mV is not large enough: the two waves have not quite merged, and the missing height is the gap still between them",
+     "The intermediate B is accumulating and being re-oxidised, which steals current from the forward peak",
+     "A chemical step between the two electron transfers has become rate limiting at the faster sweeps"],
+  a:0,
+  w:"<b>Thermodynamics sets the shape; kinetics decide whether you ever see it.</b> &psi;<sub>p</sub> = 1.26 and &Delta;E<sub>p</sub> = 29 mV are the limits an inverted EE <em>approaches when the electron transfers are fast</em>. A merged two-electron wave is half as wide as a one-electron one and pushes twice the flux through the same first step, so it is far more demanding of k&deg;: on this bench &psi; needs &Lambda; of several hundred to reach 1.25, where a one-electron wave is already at its 57 mV floor by &Lambda; = 15. At k&deg; = 0.1 cm/s and 100 mV/s the middle trace has &Lambda; = 16 &mdash; comfortably reversible for one electron, distinctly quasi-reversible for two &mdash; so the height is kinetically suppressed, and it falls further as &upsilon; rises and &Lambda; falls with it. Raise k&deg; a decade and the three close up on 1.25. <b>B is the trap</b>: at &Lambda; = 600 the <i>same</i> &Delta;E&deg; gives 1.25, so +180 mV is already deep in the merged regime and the missing height has nothing to do with it. There is no chemical step in an EE at all, and an accumulating B is the opposite of inversion &mdash; inversion is precisely the case where B never accumulates. <b>The height you measure here is a statement about k&deg;, not about &Delta;E&deg;.</b>"}
 ];
 
 
