@@ -1730,7 +1730,12 @@ function rvDraw(){
     s += tx((xa + xc) / 2, ym + 13, "ΔE_p " + (pk.dEp * 1000).toFixed(0) + " mV",
             "var(--ion-k)", 10, "middle", 700);
   }else{
-    s += tx(f.px(pk.Epc) - 10, f.Y0 + 16, "no return peak", "var(--stop)", 10.5, "end", 700);
+    /* k0 at the bottom of its range drags E_p to the far left, and this
+       label leans left, so it has to be able to lean the other way too */
+    var labNR = "no return peak", nw = labNR.length * 6.4;
+    var nL = f.px(pk.Epc) - 10 - nw > f.X0 + 2;
+    s += tx(f.px(pk.Epc) + (nL ? -10 : 10), f.Y0 + 16, labNR,
+            "var(--stop)", 10.5, nL ? "end" : null, 700);
   }
   /* an irreversible peak sits at the right-hand edge, so the label has to
      be able to lean the other way                                     */
@@ -2146,11 +2151,12 @@ function mcDraw(){
   runs.forEach(function(r, k){
     s += pth(cvPath(f, r.th, r.psi, 1, -1), cols[k], k === 1 ? 2.6 : 1.8, null, k === 1 ? 1 : 0.9);
   });
-  /* the legend goes top right: the sweep begins at the far positive end,
-     which is drawn there, and no current flows yet                    */
+  /* the legend goes bottom right. The sweep begins at the far positive end,
+     where no current flows yet, and the cathodic peaks are drawn downwards
+     well to the left of it, so this corner is the empty one              */
   var labs = nus.map(function(nu){ return fmtNu(nu) + (i.k ? "   K = " + fmtK(mcK(nu)) : ""); });
   var lw = 0; labs.forEach(function(t){ lw = Math.max(lw, t.length * 5.6); });
-  var LW = lw + 30, LX = f.X1 - 5 - LW, LY = f.Y0 + 5, LH = 13 * nus.length + 7;
+  var LW = lw + 30, LX = f.X1 - 5 - LW, LH = 13 * nus.length + 7, LY = f.Y1 - 5 - LH;
   s += rc(LX, LY, LW, LH, "var(--surface)", 0.92, 4);
   labs.forEach(function(t, k){
     var yy = LY + 12 + k * 13;
@@ -2162,11 +2168,20 @@ function mcDraw(){
   var pxx = f.px(pk.Epc), pyy = f.py(-pk.ipc);
   s += cir(pxx, pyy, 3.4, "var(--ion-k)");
   var plab = "ψ_p " + pk.ipc.toFixed(3) + " at " + (pk.Epc * 1000).toFixed(0) + " mV";
-  var pw = plab.length * 6.1, pR = pxx + 8 + pw < f.X1 - 2;
-  var l0 = pR ? pxx + 8 : pxx - 8 - pw;
-  /* the peak is the low point of the picture now, so the label hangs
-     under it and the legend overhead is no longer in the way         */
-  s += tx(pR ? pxx + 8 : pxx - 8, pyy + 15, plab,
+  /* the peak is the low point of the picture now, so the label hangs under
+     it. The legend is down here too, so: try the right of the peak, then
+     the left of it, and only lift the label clear of the legend if both
+     sides are blocked - raising it a line would not clear a 46px box   */
+  var pw = plab.length * 6.1;
+  function hits(x0, y){
+    return x0 + pw > LX - 2 && x0 < LX + LW + 2 && y + 4 > LY && y - 11 < LY + LH;
+  }
+  var pR = pxx + 8 + pw < f.X1 - 2, ly = pyy + 15;
+  if(hits(pR ? pxx + 8 : pxx - 8 - pw, ly)){
+    if(pxx - 8 - pw > f.X0 + 2 && !hits(pxx - 8 - pw, ly)) pR = false;
+    else ly = LY - 5;
+  }
+  s += tx(pR ? pxx + 8 : pxx - 8, ly, plab,
           "var(--ion-k)", 10, pR ? null : "end", 700);
   s += ln(f.px(-0.0285), f.Y0 + 2, f.px(-0.0285), f.Y1 - 2, "var(--muted)", 1, "3 4", 0.6);
   s += tx(f.px(-0.0285) - 5, f.Y0 + 12, "where a reversible E_p would be", "var(--muted)", 9, "end", 600);
