@@ -231,6 +231,13 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
 .bench>.ctl .readout .v{font-size:15px;text-align:right;min-width:0;overflow-wrap:anywhere}
 .bench>.ctl .slider-row .fld{line-height:1.4}
 .bench .wideF{grid-column:1 / -1}
+/* a bench whose control column ends in a readout card: the column takes the
+   height the figures set, and the card is pushed down to share their foot */
+.bench.footed{align-items:stretch}
+.bench.footed>.ctl>.card:last-child{margin-top:auto}
+.bench.footed>.figs{display:flex;flex-direction:column}
+.bench.footed>.figs>.card:last-child{flex:1 1 auto}
+@media(max-width:980px){.bench.footed>.ctl>.card:last-child{margin-top:0}}
 @media(max-width:1200px){.bench{grid-template-columns:minmax(236px,282px) minmax(0,1fr)}}
 @media(max-width:980px){.bench{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:700px){.bench>.figs{grid-template-columns:minmax(0,1fr)}}
@@ -338,16 +345,22 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
         </div>
         <div class="card">
           <div class="card-h"><h2>Why nothing is clean before 5&tau;</h2>
-            <span class="note">the first few &tau; magnified, then every decade at once</span></div>
+            <span class="note">one step in, two currents out &mdash; and 5&tau; in the same place in all three</span></div>
           <div class="card-b stack" style="gap:13px">
-            <svg id="ohFigWin" viewBox="0 0 520 520" style="width:100%;height:auto" role="img"
-                 aria-label="Above, the first eight time constants magnified: the charging current collapsing exponentially, the faradaic current emerging from under it, and their sum, with five time constants marked and everything before it shaded. Below, the same two currents over eleven decades of time on logarithmic axes, where the charging current falls as a straight-edged exponential cliff while the faradaic current falls only as the inverse square root of time, so the two must cross."></svg>
-            <p class="hint" style="margin:0"><b>Read the top panel first.</b> Its clock is measured in
-              &tau;, so the charging curve never moves and the sliders slide the faradaic one across it.
-              Up to about 5&tau; the thin grey line &mdash; the only thing an instrument ever sees &mdash;
-              is the charging current with the chemistry buried inside it; after 5&tau; the grey line and
-              the green one are the same curve. The panel below is the same race over every decade there
-              is, which is where you can see that the crossing is not a coincidence.</p>
+            <svg id="ohFigWin" viewBox="0 0 520 690" style="width:100%;height:auto" role="img"
+                 aria-label="Three panels on one clock. At the top, the input: the potential step you applied, flat, and the potential the electrode actually reached, which approaches it exponentially with time constant tau. In the middle, the output magnified onto the first few time constants: the charging current collapsing exponentially, the faradaic current emerging from under it, and their sum, with five time constants marked and everything before it shaded. At the bottom, the same two currents over eleven decades of time on logarithmic axes, where the charging current falls as a straight-edged exponential cliff while the faradaic current falls only as the inverse square root of time, so the two must cross. Five time constants fall at the same horizontal position in all three panels."></svg>
+            <p class="hint" style="margin:0"><b>One panel of input, two of output.</b> The top panel is
+              what you asked the instrument for: a step of &Delta;E, and the potential the electrode
+              actually reached, which is behind it by iR<sub>u</sub> until the double layer has charged.
+              The two below are what comes back for it. The middle one is magnified onto the first few
+              &tau;, where the charging curve never moves and the sliders slide the faradaic one across
+              it; up to about 5&tau; the thin grey line &mdash; the only thing an instrument ever sees
+              &mdash; is the charging current with the chemistry buried inside it, and after 5&tau; the
+              grey line and the green one are the same curve. The bottom one is that same race over
+              every decade there is, which is where you can see the crossing is not a coincidence.
+              <b>5&tau; is drawn at the same place in all three</b>: the middle panel's range in &tau;
+              is chosen from the logarithmic clock below it, so the shaded column is one column
+              through the whole figure.</p>
             <p class="hint" style="margin:0"><b>The two currents die at different speeds, and that is
               what makes the experiment possible.</b> i<sub>c</sub> falls exponentially,
               e<sup>&minus;t/&tau;</sup>; the faradaic current falls only as t<sup>&minus;1/2</sup>
@@ -719,7 +732,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
       </div>
     </div>
 
-    <div class="bench" style="margin-bottom:16px">
+    <div class="bench footed" style="margin-bottom:16px">
       <div class="ctl">
         <div class="card">
           <div class="card-h"><h2>The pulse programme</h2></div>
@@ -754,6 +767,20 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
             <p class="hint" style="margin:0" id="puNote">&mdash;</p>
           </div>
         </div>
+        <div class="card">
+          <div class="card-h"><h2>What it is worth</h2></div>
+          <div class="card-b stack" style="gap:12px">
+            <div class="readouts">
+              <div class="readout"><span class="k">peak (or plateau) current</span><span class="v" id="puIp">&mdash;</span></div>
+              <div class="readout"><span class="k">E<sub>p</sub> &minus; E<sub>1/2</sub></span><span class="v" id="puEp">&mdash;</span></div>
+              <div class="readout"><span class="k">W<sub>1/2</sub></span><span class="v" id="puW">&mdash;</span></div>
+              <div class="readout"><span class="k">&hellip; against 90.4/n mV</span><span class="v" id="puW0">&mdash;</span></div>
+              <div class="readout"><span class="k">charging current at t<sub>m</sub></span><span class="v" id="puIc">&mdash;</span></div>
+              <div class="readout"><span class="k">signal / charging</span><span class="v" id="puSN">&mdash;</span></div>
+            </div>
+            <div class="verdict" id="puVerdict">&mdash;</div>
+          </div>
+        </div>
       </div>
       <div class="figs">
         <div class="card wideF">
@@ -785,20 +812,6 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
               diffusion: the same solution gives a step under NPV and a peak under DPV. The panel above
               runs across the same potentials in the same direction, so a cycle up there is directly
               above the point it produced down here.</p>
-          </div>
-        </div>
-        <div class="card wideF">
-          <div class="card-h"><h2>What it is worth</h2></div>
-          <div class="card-b stack" style="gap:12px">
-            <div class="readouts">
-              <div class="readout"><span class="k">peak (or plateau) current</span><span class="v" id="puIp">&mdash;</span></div>
-              <div class="readout"><span class="k">E<sub>p</sub> &minus; E<sub>1/2</sub></span><span class="v" id="puEp">&mdash;</span></div>
-              <div class="readout"><span class="k">W<sub>1/2</sub></span><span class="v" id="puW">&mdash;</span></div>
-              <div class="readout"><span class="k">&hellip; against 90.4/n mV</span><span class="v" id="puW0">&mdash;</span></div>
-              <div class="readout"><span class="k">charging current at t<sub>m</sub></span><span class="v" id="puIc">&mdash;</span></div>
-              <div class="readout"><span class="k">signal / charging</span><span class="v" id="puSN">&mdash;</span></div>
-            </div>
-            <div class="verdict" id="puVerdict">&mdash;</div>
           </div>
         </div>
       </div>
@@ -1644,9 +1657,11 @@ function ohRCPic(tau){
     s += tx(f.px(M[0]), f.Y1 + 13, M[0] + "τ", "var(--ion-k)", 10, "middle", 700);
     s += tx(f.px(M[0]) + 6, f.py((y + 1) / 2) + 4, M[1], "var(--ion-k)", 9.5, null, 700);
   });
-  s += tx(f.X0 + 8, f.py(0.30), "E_elec = E(1 − e^(−t/τ))", "var(--go)", 10, null, 700);
-  s += tx(f.X0 + 8, f.py(0.16), "the gap is exactly iRᵤ,  τ = " + fmtT(tau),
-          "var(--ion-k)", 9.5, null, 600);
+  /* the bottom left corner is where the curve rises out of zero, so the
+     algebra goes in the bottom right, which the curve left long ago  */
+  s += tx(f.X1 - 8, f.py(0.30), "E_elec = E(1 − e^(−t/τ))", "var(--go)", 10, "end", 700);
+  s += tx(f.X1 - 8, f.py(0.16), "the gap is exactly iRᵤ,  τ = " + fmtT(tau),
+          "var(--ion-k)", 9.5, "end", 600);
   return s;
 }
 
@@ -1740,17 +1755,66 @@ function ohDraw(){
   var A = Math.PI * OH.a * OH.a, DCOT = 1e-5, CBULK = 1e-6;
   var cot = 96485 * A * Math.sqrt(DCOT) * CBULK / Math.sqrt(Math.PI);
 
-  /* ---- first, the same race magnified: eight tau, nothing else -------
+  /* ---- the input, and the two currents that answer it ---------------
+     Three panels on one clock. The lower two are the same race, once
+     magnified onto the first few tau and once over every decade there
+     is; above them is the programme that caused it, so the figure reads
+     input first and output after.
+
+     The magnified panel used to run 0 to 8 tau whatever the sliders
+     said, which put 5 tau at five eighths of its width while the
+     logarithmic panel put the same instant somewhere else entirely. The
+     logarithmic axis is the experiment's own clock and cannot be bent
+     to suit, so the magnified one is scaled to it instead: it runs to
+     5/f tau, where f is the fraction of the log axis at which 5 tau
+     falls. Both then mark 5 tau on the same pixel, and the shaded
+     column before it is one column through the whole figure.        */
+  var XL = 62, XR = 500, TLO = -9, THI = 2;
+  var imaxZ = OH.dE / Ru, dEw = OH.dE * 1000;
+  var lt5 = Math.log10(5 * tau), fr5 = (lt5 - TLO) / (THI - TLO);
+  var aligned = fr5 > 0.08 && fr5 < 0.95, ZU8 = aligned ? 5 / fr5 : 8;
+
+  /* ---- 1 - the input: what the instrument was told to do ----------- */
+  var ge = fr(XL, XR, 24, 100, TLO, THI, 0, 600);
+  var w = axMix(ge, "", "E / mV");
+  if(aligned){
+    w += rc(ge.X0, ge.Y0, ge.px(lt5) - ge.X0, ge.Y1 - ge.Y0, "var(--stop)", 0.10);
+    w += ln(ge.px(lt5), ge.Y0, ge.px(lt5), ge.Y1, "var(--stop)", 1.4, "4 3");
+  }
+  w += ln(ge.X0, ge.py(dEw), ge.X1, ge.py(dEw), "var(--red-)", 2, "5 4");
+  w += pth(curve(ge, function(x){
+             return dEw * (1 - Math.exp(-Math.pow(10, x) / tau));
+           }, ge.xlo, ge.xhi, 320), "var(--go)", 2.3);
+  /* the tau marker moves with the sliders, so the two names take the side
+     of the frame it is not on */
+  var lte = Math.log10(tau), onE = lte > ge.xlo + 0.3 && lte < ge.xhi - 0.3;
+  var mxe = ge.px(lte), rightE = onE && mxe > (ge.X0 + ge.X1) / 2;
+  w += tx(rightE ? ge.X0 + 8 : ge.X1 - 4, ge.py(dEw) - 6, "what you applied",
+          "var(--red-)", 9.5, rightE ? null : "end", 700);
+  w += tx(rightE ? ge.X0 + 8 : ge.X1 - 4, ge.py(dEw * 0.17), "what the electrode got",
+          "var(--go)", 9.5, rightE ? null : "end", 700);
+  if(onE){
+    /* the gap between the two IS iR_u, and at t = tau it is DE/e */
+    var leftE = mxe > ge.X0 + 70;
+    w += ln(mxe, ge.py(dEw * (1 - Math.exp(-1))), mxe, ge.py(dEw), "var(--ion-k)", 1.6);
+    w += tx(mxe + (leftE ? -6 : 6), ge.py(dEw * 0.84), "iRᵤ", "var(--ion-k)", 10.5,
+            leftE ? "end" : null, 700);
+    w += tx(mxe, ge.Y1 - 4, "τ", "var(--ion-k)", 10, "middle", 700);
+  }
+  w += legend(ge.X0, 512, ge.Y1 + 32, [
+    {t:"the input — one potential step, \u0394E = " + dEw.toFixed(0)
+       + " mV; the two panels below are what comes back"}]);
+
+  /* ---- 2 - the output, magnified onto the first few tau -------------
      On a clock measured in tau the charging curve stands still while the
      sliders move and the faradaic one slides across it, which is the whole
      of what tau does. The current is read against the first current the
      cell can draw, dE/Ru, so that axis is fixed as well.             */
-  var imaxZ = OH.dE / Ru, ZU8 = 8;
-  var gz = fr(62, 500, 24, 150, 0, ZU8, 0, 1.05);
-  var w = axLin(gz, "time after the step, in units of τ = RᵤCᵈˡ",
-                "i / (ΔE/Rᵤ)",
-                function(v){ return v.toFixed(0) + "τ"; },
-                function(v){ return v.toFixed(1); });
+  var gz = fr(XL, XR, 164, 290, 0, ZU8, 0, 1.05);
+  w += axLin(gz, "time after the step, in units of τ = RᵤCᵈˡ",
+             "i / (ΔE/Rᵤ)",
+             function(v){ return v.toFixed(0) + "τ"; },
+             function(v){ return v.toFixed(1); });
   w += rc(gz.X0, gz.Y0, gz.px(5) - gz.X0, gz.Y1 - gz.Y0, "var(--stop)", 0.10);
   w += ln(gz.px(5), gz.Y0, gz.px(5), gz.Y1, "var(--stop)", 1.4, "4 3");
   w += pth(curve(gz, function(u){ return Math.exp(-u); }, 1e-4, ZU8, 300),
@@ -1766,12 +1830,14 @@ function ohDraw(){
   w += legend(gz.X0, 512, gz.Y1 + 74, [
     {c:"var(--stop)", d:1, t:"5τ = " + fmtT(5 * tau)
        + " — before it the two cannot be separated"},
-    {t:"(τ = " + fmtT(tau) + ")"}]);
+    {t:"(τ = " + fmtT(tau) + ")"},
+    {t:aligned ? "— and it stands at the same place in all three panels"
+       : "— 5τ is off the clock below, so this panel keeps its own 8τ"}]);
 
-  /* ---- and then the same thing over every decade there is ----------- */
-  var g4 = fr(62, 500, 268, 436, -9, 2, -10, 1);
+  /* ---- 3 - the same output over every decade there is --------------- */
+  var g4 = fr(XL, XR, 416, 584, TLO, THI, -10, 1);
   w += axMix(g4, "time after the step / s", "i / A");
-  var t5 = 5 * tau, lt5 = Math.log10(t5);
+  var t5 = 5 * tau;
   if(lt5 > g4.xlo && lt5 < g4.xhi){
     w += rc(g4.X0, g4.Y0, Math.max(0, g4.px(lt5) - g4.X0), g4.Y1 - g4.Y0,
             "var(--stop)", 0.12);
@@ -2177,28 +2243,31 @@ function umDraw(){
   });
   var f = fr(62, 442, 22, 236, lo, hi, Math.floor(ylo) - 1, Math.ceil(yhi));
   s += axLog(f, "time after the step / s", "current / A");
-  /* the five plateau labels sit in the right margin; adjacent radii differ
-     by a factor of five, which at this scale can be fewer than ten pixels,
-     so they are pushed apart rather than drawn on top of one another    */
+  /* each label is placed where its own curve leaves the frame, not at the
+     plateau it is still heading for: at the right-hand edge a millimetre
+     disc is a factor of two above its steady state, and a key level with
+     nothing is a key you have to match by colour. Where two labels would
+     collide they are pushed apart, and the leader bends to follow     */
   var lbl = [];
   UM_SIZES.forEach(function(r, k){
     var col = ["var(--ion-k)", "var(--red-)", "var(--go)", "var(--stop)", "var(--ox)"][k];
     var w = Math.abs(r - UM.r0) < 1e-12 ? 2.8 : 1.6;
     s += pth(curve(f, function(x){ return Math.log10(umIt(r, Math.pow(10, x))); },
                    f.xlo, f.xhi, 260), col, w);
-    var y = Math.log10(iSS(UM.n, UM.D, UM.C, r, "disc"));
-    if(y > f.ylo && y < f.yhi) lbl.push({y:f.py(y), col:col, t:fmtLen15(r)});
+    var y = Math.log10(umIt(r, Math.pow(10, f.xhi)));
+    if(y > f.ylo && y < f.yhi) lbl.push({y0:f.py(y), y:f.py(y), col:col, t:fmtLen15(r)});
   });
   lbl.sort(function(a, b){ return a.y - b.y; });
   lbl.forEach(function(L, k){
-    if(k && L.y - lbl[k - 1].y < 14) L.y = lbl[k - 1].y + 14;
+    if(k && L.y - lbl[k - 1].y < 13) L.y = lbl[k - 1].y + 13;
     /* the frame is not the limit here - the viewBox is, and there are
        38 px of margin under it for exactly this                    */
     L.y = Math.min(L.y, 266);
   });
   lbl.forEach(function(L){
-    s += ln(f.X1 - 22, L.y, f.X1 + 2, L.y, L.col, 1.2, "3 2");
-    s += tx(f.X1 + 6, L.y + 3.4, L.t, L.col, 9.5, null, 700);
+    s += ln(f.X1, L.y0, f.X1 + 9, L.y0, L.col, 1.2, "3 2");
+    s += ln(f.X1 + 9, L.y0, f.X1 + 18, L.y, L.col, 1.2, "3 2");
+    s += tx(f.X1 + 22, L.y + 3.4, L.t, L.col, 9.5, null, 700);
   });
   s += legend(f.X0, 512, 292, [
     {t:"every curve is Cottrell first, then its own steady state"},
