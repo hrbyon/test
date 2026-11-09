@@ -1,0 +1,2953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script src="exam-lock.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Potential Step Bench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+:root{
+  --ground:#F1F3F2; --surface:#FFFFFF; --surface-2:#E9EDEB;
+  --ink:#14191B; --ink-2:#3E4A4D; --muted:#68767A; --line:#D6DDDA; --line-2:#C3CCC8;
+  --ox:#A85B33; --ox-soft:#F3E4DA;
+  --red-:#15618E; --red-soft:#DDE9F2;
+  --go:#2C7355; --go-soft:#DCEBE3;
+  --stop:#8A5F0C; --stop-soft:#F3E9D3;
+  --elec:#3E4A4D; --ion-k:#6E4C9B; --ion-k-soft:#EBE3F5;
+  --shadow:0 1px 2px rgba(20,25,27,.05),0 8px 24px -12px rgba(20,25,27,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+    --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+    --ox:#D08551; --ox-soft:#33231A;
+    --red-:#5AA6D4; --red-soft:#152833;
+    --go:#5DBB8D; --go-soft:#152A21;
+    --stop:#D6A33F; --stop-soft:#2B2415;
+    --elec:#AEBBBE; --ion-k:#B99BE0; --ion-k-soft:#241C33;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+  --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+  --ox:#D08551; --ox-soft:#33231A;
+  --red-:#5AA6D4; --red-soft:#152833;
+  --go:#5DBB8D; --go-soft:#152A21;
+  --stop:#D6A33F; --stop-soft:#2B2415;
+  --elec:#AEBBBE; --ion-k:#B99BE0; --ion-k-soft:#241C33;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:32px 20px 72px}
+.masthead{display:flex;flex-wrap:wrap;align-items:flex-end;gap:20px 32px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.eyebrow a{color:inherit}
+h1{font-family:"IBM Plex Serif",Georgia,serif;font-weight:600;font-size:clamp(28px,4.2vw,42px);line-height:1.12;margin:0;text-wrap:balance;letter-spacing:-.015em}
+.sub{margin:8px 0 0;color:var(--ink-2);font-size:15px;max-width:62ch}
+.tabs{display:flex;gap:2px;margin:24px 0 22px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{appearance:none;background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);
+  font-family:inherit;font-size:14.5px;font-weight:500;padding:11px 16px;cursor:pointer;white-space:nowrap;margin-bottom:-1px}
+.tab:hover{color:var(--ink-2)}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ox)}
+.tab:focus-visible{outline:2px solid var(--red-);outline-offset:-2px;border-radius:4px 4px 0 0}
+.panel[hidden]{display:none}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow)}
+.card-h{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.card-h h2{font-size:15px;font-weight:600;margin:0;letter-spacing:-.01em}
+.card-h .note{font-size:12.5px;color:var(--muted)}
+.card-b{padding:18px}
+.stack{display:flex;flex-direction:column;gap:16px}
+.two{display:grid;grid-template-columns:minmax(270px,1fr) minmax(330px,1.45fr);gap:16px;align-items:start}
+@media(max-width:900px){.two{grid-template-columns:1fr}}
+label.fld,span.fld{display:block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+select,input[type=text],input[type=number]{width:100%;font-family:inherit;font-size:14px;color:var(--ink);
+  background:var(--surface-2);border:1px solid var(--line-2);border-radius:7px;padding:9px 10px}
+input:read-only{background:var(--surface);color:var(--muted);cursor:not-allowed}
+select:focus-visible,input:focus-visible{outline:2px solid var(--red-);outline-offset:1px}
+input[type=range]{width:100%;accent-color:var(--ox)}
+input[type=range]:focus-visible{outline:2px solid var(--red-);outline-offset:3px}
+.slider-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;gap:10px}
+.slider-row .val{font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+.readout{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px dotted var(--line)}
+.readout:last-child{border-bottom:0}
+.readout .k{font-size:13px;color:var(--muted)}
+.rgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 32px}
+.rgrid .readout:last-child{border-bottom:1px dotted var(--line)}
+@media(max-width:620px){.rgrid{grid-template-columns:minmax(0,1fr)}}
+.readout .v{font-family:"IBM Plex Mono",monospace;font-size:16px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--ink)}
+.verdict{padding:12px 14px;border-radius:8px;font-size:13.5px;line-height:1.55}
+.verdict.go{background:var(--go-soft);color:var(--go)}
+.verdict.stop{background:var(--stop-soft);color:var(--stop)}
+.verdict.flat{background:var(--surface-2);color:var(--ink-2)}
+.verdict.mixv{background:var(--ion-k-soft);color:var(--ion-k)}
+.eqline{font-family:"IBM Plex Mono",monospace;font-size:13px;line-height:1.9;color:var(--ink-2);
+  background:var(--surface-2);border-radius:7px;padding:11px 13px}
+.eqline b{color:var(--ox);font-weight:600}
+svg{display:block;max-width:100%}
+.scrollx{overflow-x:auto}
+.solid{appearance:none;background:var(--ox);border:1px solid var(--ox);color:#fff;font-family:inherit;
+  font-size:13.5px;font-weight:500;padding:10px 16px;border-radius:7px;cursor:pointer}
+.solid:hover{filter:brightness(1.08)}
+.solid:disabled{background:var(--line-2);border-color:var(--line-2);color:var(--muted);cursor:not-allowed}
+.ghost{appearance:none;background:var(--surface-2);border:1px solid var(--line-2);color:var(--ink-2);
+  font-family:inherit;font-size:12.5px;padding:8px 12px;border-radius:7px;cursor:pointer;text-align:left}
+.ghost:hover{border-color:var(--ox);color:var(--ox)}
+table.ions{border-collapse:collapse;width:100%;font-size:13px}
+table.ions th,table.ions td{text-align:left;padding:8px 9px;border-bottom:1px solid var(--line);white-space:nowrap}
+table.ions th{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500}
+table.ions td.num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;text-align:right}
+table.ions tr.hi td{color:var(--ox);font-weight:500}
+table.ions tr.lo td{color:var(--red-)}
+.idgrid{display:grid;grid-template-columns:1fr;gap:14px;max-width:340px}
+.scorebar{display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;padding:14px 18px;border-top:1px solid var(--line)}
+.scorenum{font-family:"IBM Plex Mono",monospace;font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+.scorenum small{font-size:14px;font-weight:400;color:var(--muted)}
+.vcode{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted)}
+.vcode b{color:var(--ink);font-weight:600;letter-spacing:.08em}
+.quiz{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+@media(max-width:1100px){.quiz{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:720px){.quiz{grid-template-columns:minmax(0,1fr)}}
+.q .stem{font-size:14.5px;line-height:1.6;margin:0 0 12px}
+.q .stem code{font-family:"IBM Plex Mono",monospace;font-size:13px;background:var(--surface-2);padding:1px 5px;border-radius:4px}
+.opts{display:flex;flex-direction:column;gap:7px}
+.opt{appearance:none;text-align:left;font-family:inherit;font-size:13.5px;line-height:1.45;color:var(--ink);
+  background:var(--surface-2);border:1px solid transparent;border-radius:7px;padding:9px 12px;cursor:pointer;display:flex;gap:9px}
+.opt .ltr{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);flex:0 0 auto;padding-top:1px}
+.opt:hover:not(:disabled){border-color:var(--line-2)}
+.opt.right{background:var(--go-soft);color:var(--go);border-color:var(--go);font-weight:500}
+.opt.right .ltr{color:var(--go)}
+.opt.wrong{background:var(--stop-soft);color:var(--stop);border-color:var(--stop)}
+.opt.wrong .ltr{color:var(--stop)}
+.opt:disabled{cursor:default}
+.why{margin:12px 0 0;font-size:13px;line-height:1.65;color:var(--ink-2);border-left:2px solid var(--line-2);padding-left:12px}
+.misc{display:block;margin-top:10px;padding:9px 12px;border-radius:7px;background:var(--stop-soft);color:var(--stop);font-size:12.5px;line-height:1.6}
+.misc a{color:inherit;font-weight:600;white-space:nowrap}
+.why[hidden]{display:none}
+.tally{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.hint{font-size:12.5px;color:var(--muted);line-height:1.65;margin:10px 0 0}
+.locked{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;background:var(--go-soft);color:var(--go);padding:2px 7px;border-radius:4px;margin-left:8px}
+.pill-row{display:flex;gap:3px;background:var(--surface-2);border-radius:8px;padding:3px}
+.pill{flex:1;appearance:none;border:0;background:none;font-family:"IBM Plex Mono",monospace;font-size:12.5px;
+  font-weight:500;color:var(--muted);padding:7px 2px;border-radius:6px;cursor:pointer}
+.pill[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.pill:focus-visible{outline:2px solid var(--red-);outline-offset:1px}
+.pill-row.pw .pill{font-size:11.5px}
+/* nowrap + scroll: a formula broken across lines mid-term is harder to read
+   than one the reader has to nudge sideways.  Explicit <br> still breaks. */
+.eqbig{font-family:"IBM Plex Mono",monospace;font-size:13.5px;line-height:2.05;color:var(--ink);
+  background:var(--surface-2);border-radius:8px;padding:14px 15px;overflow-x:auto;white-space:nowrap}
+.eqbig small{color:var(--muted);font-size:11.5px;letter-spacing:.04em}
+/* one colour per loss term, used in prose, in the equations and in every picture */
+.act{color:var(--ox);font-weight:600}
+.cnc{color:var(--red-);font-weight:600}
+.ohm{color:var(--stop);font-weight:600}
+.pot{color:var(--go);font-weight:600}
+.mix{color:var(--ion-k);font-weight:600}
+.termtbl{border-collapse:collapse;width:100%;font-size:13px}
+.termtbl td,.termtbl th{padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+.termtbl th{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);font-weight:500;text-align:left}
+.termtbl td.num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;text-align:right}
+.termtbl tr.tot td{border-bottom:0;border-top:2px solid var(--line-2);font-weight:600}
+.sumwrap{overflow-x:auto}
+.sumtbl{border-collapse:collapse;width:100%;font-size:13px}
+.sumtbl td,.sumtbl th{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}
+.sumtbl th{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.sumtbl tr:last-child td{border-bottom:0}
+.sumtbl td.eq{font-family:"IBM Plex Mono",monospace;font-size:13.5px;color:var(--ink);white-space:nowrap}
+.sumtbl td.nm{color:var(--ink-2);white-space:nowrap;font-size:12.5px}
+.sumtbl td.sy{color:var(--muted);font-size:12.5px;line-height:1.5;white-space:normal}
+.symgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:4px 20px;font-size:12.5px;color:var(--ink-2);line-height:1.6}
+.symgrid b{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--ink)}
+.swatch{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px}
+.trio3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:stretch}
+.trio3>.card{display:flex;flex-direction:column}
+.trio3>.card>.card-b:last-child{flex:1 1 auto}
+@media(max-width:1000px){.trio3{grid-template-columns:1fr 1fr}}
+@media(max-width:720px){.trio3{grid-template-columns:1fr}}
+.two.eq{align-items:stretch}
+.two.wideL{grid-template-columns:minmax(330px,1.5fr) minmax(240px,1fr)}
+.two.eq>.card{display:flex;flex-direction:column}
+.two.eq>.card>.card-b:last-child{flex:1 1 auto}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap}
+.btnrow .ghost{flex:1 1 auto;text-align:center}
+.dfctl{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:14px 16px;align-items:end}
+.trio3 .dfctl{grid-template-columns:1fr}
+.dfctl-2{grid-template-columns:repeat(2,minmax(150px,1fr))}
+.dfctl-3{grid-template-columns:repeat(3,minmax(150px,1fr))}
+.dfctl-wide{grid-column:1 / -1}
+@media(max-width:820px){.dfctl{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.dfctl{grid-template-columns:1fr}}
+footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;line-height:1.8}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+.glegend{display:flex;flex-direction:column;gap:5px;font-size:12.5px;line-height:1.45;color:var(--ink-2)}
+.glegend.big{font-size:14.5px;line-height:1.5;gap:7px}
+.glegend.big > span > svg{flex:0 0 32px}
+.glegend > span{display:flex;align-items:flex-start;gap:8px}
+.glegend > span > svg{flex:0 0 26px;margin-top:3px}
+/* the loss waterfall: one row per term, number on the left of the bar */
+.wide1{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+.pairfig{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+.pairfig.eq{align-items:stretch}
+.pairfig.eq>.card{display:flex;flex-direction:column}
+.pairfig.eq>.card>.card-b:last-child{flex:1 1 auto}
+@media(max-width:880px){.pairfig{grid-template-columns:1fr}}
+/* terse notes, two to a row */
+.notes2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 22px}
+.notes2>p{margin:0}
+@media(max-width:760px){.notes2{grid-template-columns:1fr}}
+</style><style>
+.wrap{max-width:1480px}
+.trio3{grid-template-columns:minmax(230px,0.92fr) minmax(300px,1.34fr) minmax(300px,1.34fr)}
+@media(max-width:1180px){.trio3{grid-template-columns:minmax(230px,1fr) minmax(300px,1.4fr)}}
+@media(max-width:760px){.trio3{grid-template-columns:1fr}}
+/* two cards in one grid column, the lower one taking up the slack so
+   that the column ends level with the figure beside it */
+.colpair{display:flex;flex-direction:column;gap:16px}
+.colpair>.card{display:flex;flex-direction:column}
+.colpair>.card:last-child{flex:1 1 auto}
+.colpair>.card:last-child>.card-b:last-child{flex:1 1 auto}
+/* a bench row: one narrow column of controls down the left,
+   and the pictures beside it, two across. Three cards abreast at the
+   top of every tab, and the widest thing on the screen is always a
+   picture rather than a row of sliders.                              */
+.bench{display:grid;grid-template-columns:minmax(252px,316px) minmax(0,1fr);gap:16px;align-items:start}
+.bench>.figs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:stretch}
+.bench>.figs>.card,.bench>.figs>.colpair>.card{display:flex;flex-direction:column}
+.bench>.figs>.card>.card-b:last-child{flex:1 1 auto}
+.bench>.ctl{display:flex;flex-direction:column;gap:16px}
+/* a narrow column: let the name of a reading wrap, never its value */
+.bench>.ctl .readout{gap:10px;padding:8px 0}
+.bench>.ctl .readout .k{font-size:12px;line-height:1.4}
+.bench>.ctl .readout .v{font-size:15px;text-align:right;min-width:0;overflow-wrap:anywhere}
+.bench>.ctl .slider-row .fld{line-height:1.4}
+.bench .wideF{grid-column:1 / -1}
+@media(max-width:1200px){.bench{grid-template-columns:minmax(236px,282px) minmax(0,1fr)}}
+@media(max-width:980px){.bench{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:700px){.bench>.figs{grid-template-columns:minmax(0,1fr)}}
+</style>
+
+</head>
+<body>
+  <div class="wrap">
+  <header class="masthead">
+    <div style="flex:1 1 380px">
+      <p class="eyebrow"><a href="index.html">CH40051 Electroanalytical Chemistry</a> &middot; Lecture 14 &middot; Potential step and pulse methods</p>
+      <h1>Potential Step Bench</h1>
+      <p class="sub">Hold the potential still and watch the clock instead. Before anything else: the potential you set is not the one the electrode gets, because the current has to cross the solution to reach it. Then two currents come back at once &mdash; one charging the double layer and dying exponentially, one carrying the reaction and dying as 1/&radic;t &mdash; and almost everything in this lecture is the window between them where only the second is left. Shrink the electrode until that window never closes, and pulse the potential until the first current never appears.</p>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true"  aria-controls="p-ohm"   id="t-ohm">Ohmic error</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-cot"   id="t-cot">Cottrell</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-ume"   id="t-ume">Ultramicroelectrode</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-pulse" id="t-pulse">Pulse methods</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-quiz1" id="t-quiz1">Concept Check</button>
+  </div>
+
+  <!-- ====================== 0 · OHMIC ERROR ====================== -->
+  <section class="panel" id="p-ohm" role="tabpanel" aria-labelledby="t-ohm">
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>The potential you set is not the potential the electrode gets</h2>
+        <span class="note">and the difference grows with the current</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig" style="white-space:normal">
+          <span class="ohm">E(electrode) = E(applied) &minus; iR<sub>u</sub></span>
+          <small>the one equation of this tab &mdash; no current, no error; more current, more error</small><br>
+          <span class="act">R<sub>u</sub>(d) = (1/4&kappa;a)[1 &minus; (2/&pi;)arctan(a/d)]</span>
+          <small>a disc of radius a, the reference tip d away: it rises to 1/4&kappa;a and <b>stops</b></small><br>
+          <span class="cnc">&tau; = R<sub>u</sub>C<sub>dl</sub></span>&nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="mix">i<sub>max</sub> = &Delta;E/R<sub>u</sub></span>
+          <small>so R<sub>u</sub> also sets how fast you can step, and how large the first current can be</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="bench" style="margin-bottom:16px">
+      <div class="ctl">
+        <div class="card">
+          <div class="card-h"><h2>The cell</h2>
+            <span class="note">&kappa; held fixed</span></div>
+          <div class="card-b stack" style="gap:13px">
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">electrode radius a</span><span class="val" id="ohAv"></span></div>
+              <input type="range" id="ohA" min="-3.3" max="-0.5" step="0.02" value="-0.8239">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">reference tip distance d</span><span class="val" id="ohDv"></span></div>
+              <input type="range" id="ohD" min="-3" max="0.5" step="0.02" value="-1">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">double-layer capacitance</span><span class="val" id="ohCdv"></span></div>
+              <input type="range" id="ohCd" min="-7" max="-4" step="0.02" value="-5.301">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">step amplitude &Delta;E</span><span class="val" id="ohDEv"></span></div>
+              <input type="range" id="ohDE" min="0.05" max="0.6" step="0.01" value="0.3">
+            </div>
+            <div class="btnrow">
+              <button class="ghost" id="ohP1" type="button">a 3 mm disc, tip 1 cm out &middot; 100 µA</button>
+              <button class="ghost" id="ohP2" type="button">the same disc, Luggin at one radius &middot; 100 µA</button>
+              <button class="ghost" id="ohP3" type="button">a 5 µm UME, tip four radii out &middot; 100 nA</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>What it costs you</h2></div>
+          <div class="card-b stack" style="gap:12px">
+            <div class="readouts">
+              <div class="readout"><span class="k">R<sub>u</sub> at this tip position</span><span class="v" id="ohRu">&mdash;</span></div>
+              <div class="readout"><span class="k">1/4&kappa;a, the most it can be</span><span class="v" id="ohRinf">&mdash;</span></div>
+              <div class="readout"><span class="k">the same cell at &kappa; = 2 mS cm<sup>&minus;1</sup></span><span class="v" id="ohRres">&mdash;</span></div>
+              <div class="readout"><span class="k">so you are carrying</span><span class="v" id="ohFrac">&mdash;</span></div>
+              <div class="readout"><span class="k">a tip one radius out already carries</span><span class="v" id="ohOneR">&mdash;</span></div>
+              <div class="readout"><span class="k">iR<sub>u</sub> at <span id="ohIlab">&mdash;</span></span><span class="v" id="ohDrop">&mdash;</span></div>
+              <div class="readout"><span class="k">&tau; = R<sub>u</sub>C<sub>dl</sub></span><span class="v" id="ohTau">&mdash;</span></div>
+              <div class="readout"><span class="k">5&tau;, before which nothing is clean</span><span class="v" id="ohT5">&mdash;</span></div>
+              <div class="readout"><span class="k">largest current a step can draw</span><span class="v" id="ohImax">&mdash;</span></div>
+            </div>
+            <div class="verdict" id="ohVerdict">&mdash;</div>
+          </div>
+        </div>
+      </div>
+      <div class="figs">
+        <div class="colpair">
+        <div class="card">
+          <div class="card-h"><h2>The cell, and where the reference sits</h2>
+            <span class="note">0.1 M KCl, &kappa; = 0.05 S cm<sup>&minus;1</sup> &mdash; held fixed</span></div>
+          <div class="card-b stack" style="gap:13px">
+            <svg id="ohCell" viewBox="0 0 520 262" style="width:100%;height:auto" role="img"
+                 aria-label="A three-electrode cell in cross section. The working electrode is an inlaid disc in the floor, the counter electrode a plate at the right, and a Luggin capillary carrying the reference comes down the axis with its tip a distance d above the disc. Two dashed shells above the disc mark where half and nine tenths of the uncompensated resistance lie. The picture is drawn in units of the electrode radius, so only the tip moves as the sliders move."></svg>
+            <div class="eqbig" style="white-space:normal;margin:0">
+              <span class="act">Moving the reference closer, and where that stops helping</span>
+            </div>
+            <svg id="ohFig" viewBox="0 0 520 234" style="width:100%;height:auto" role="img"
+                 aria-label="Uncompensated resistance against the distance from the electrode to the reference tip, on a logarithmic distance axis. The curve rises steeply over the first electrode radius and then flattens onto the limiting value of one over four kappa a."></svg>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>Why nothing is clean before 5&tau;</h2>
+            <span class="note">the first few &tau; magnified, then every decade at once</span></div>
+          <div class="card-b stack" style="gap:13px">
+            <svg id="ohFigWin" viewBox="0 0 520 520" style="width:100%;height:auto" role="img"
+                 aria-label="Above, the first eight time constants magnified: the charging current collapsing exponentially, the faradaic current emerging from under it, and their sum, with five time constants marked and everything before it shaded. Below, the same two currents over eleven decades of time on logarithmic axes, where the charging current falls as a straight-edged exponential cliff while the faradaic current falls only as the inverse square root of time, so the two must cross."></svg>
+            <p class="hint" style="margin:0"><b>Read the top panel first.</b> Its clock is measured in
+              &tau;, so the charging curve never moves and the sliders slide the faradaic one across it.
+              Up to about 5&tau; the thin grey line &mdash; the only thing an instrument ever sees &mdash;
+              is the charging current with the chemistry buried inside it; after 5&tau; the grey line and
+              the green one are the same curve. The panel below is the same race over every decade there
+              is, which is where you can see that the crossing is not a coincidence.</p>
+            <p class="hint" style="margin:0"><b>The two currents die at different speeds, and that is
+              what makes the experiment possible.</b> i<sub>c</sub> falls exponentially,
+              e<sup>&minus;t/&tau;</sup>; the faradaic current falls only as t<sup>&minus;1/2</sup>
+              (Cottrell). An exponential beats any power law eventually, so there is always a time
+              after which the charging current has gone and the faradaic one has not &mdash; and it
+              arrives at about <b>5&tau;</b>. Before that the measured current is mostly the cell
+              charging itself and no analysis of it means anything; after it, what is left is
+              chemistry. This is why pulse methods <b>sample late</b> instead of integrating, and why
+              shrinking &tau; &mdash; a smaller electrode, more supporting electrolyte, a Luggin tip
+              &mdash; buys earlier access to the reaction.</p>
+          </div>
+        </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>What a step actually looks like at the electrode</h2>
+            <span class="note">the circuit, then what it does</span></div>
+          <div class="card-b stack" style="gap:13px">
+            <svg id="ohFigRC" viewBox="0 0 520 318" style="width:100%;height:auto" role="img"
+                 aria-label="Above, two equivalent circuits: with nothing able to react the cell is the uncompensated resistance in series with the double-layer capacitance alone, and with a reaction present a charge-transfer resistance and a Warburg element sit in parallel with that capacitance. Below, the fraction of the applied step that the electrode has actually reached, against time in units of the time constant, with one, three and five time constants marked and the gap still missing written at each."></svg>
+            <p class="hint" style="margin:0"><b>&tau; is how long the cell takes to obey you.</b>
+              The step has to charge C<sub>dl</sub> through R<sub>u</sub>, so the electrode arrives at
+              E(1 &minus; e<sup>&minus;t/&tau;</sup>) rather than at once, and what is still missing is
+              exactly iR<sub>u</sub>. One &tau; leaves 37 % of the step undelivered, three leave 5 %,
+              five leave 0.67 % &mdash; which is where the habit of discarding everything before
+              5&tau; comes from. The faradaic branch changes none of this: it is in parallel with
+              C<sub>dl</sub>, so at t = 0 the capacitor is a short circuit and the whole step still
+              falls across R<sub>u</sub>.</p>
+            <svg id="ohFig2" viewBox="0 0 520 274" style="width:100%;height:auto" role="img"
+                 aria-label="Above, the applied potential step as a dashed line and the potential actually reached at the electrode rising exponentially towards it, the gap between them being iR_u. Below, on the same time axis, the charging current decaying from delta E over R_u with five time constants marked."></svg>
+            <div class="eqbig" style="white-space:normal;text-align:left;margin:0">
+              <span class="cnc">&tau; = R<sub>u</sub>C<sub>dl</sub></span>
+              <small><b>the time constant of the cell</b> &mdash; an ohm times a farad is a second.
+                It is how long the step takes to charge the double layer through the solution
+                resistance, and it is the only time constant this circuit has.</small><br>
+              <span class="go">what the electrode got = E(1 &minus; e<sup>&minus;t/&tau;</sup>)</span>
+              <small><b>the potential the interface has actually reached</b> at time t &mdash; the
+                green curve. You command E; the electrode arrives at it, and only after a few
+                &tau;.</small><br>
+              <span class="ohm">iR<sub>u</sub> = E &minus; E(electrode)</span>
+              <small><b>the gap between the two curves</b>, at every instant: the current of that
+                instant times the uncompensated resistance. It is the error in your potential
+                axis, and it is zero only when the current is.</small><br>
+              <span class="mix">5&tau;</span>
+              <small><b>99.3 % of the step delivered</b>, so 0.67 % still missing &mdash; the
+                earliest time anything measured here means what you think it means. One &tau;
+                leaves 37 %, three leave 5 %.</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wide1">
+      <div class="card">
+        <div class="card-h"><h2>Three things the third electrode cannot do</h2></div>
+        <div class="card-b stack" style="gap:14px">
+          <p class="hint" style="margin:0"><b>It splits the two jobs, and that is all.</b> With two
+            electrodes, one of them both carries the current and acts as the reference, so the reading
+            contains its interface, its overpotential and the whole solution resistance. The third
+            electrode moves the current into a separate loop and leaves the reference drawing nothing,
+            so its own interface stays undisturbed. <b>What survives is R<sub>u</sub></b> &mdash; the
+            slice of solution between the working electrode and the reference tip, which is in the
+            measurement loop by construction. The potentiostat cannot know about it, because the drop
+            happens outside the point where it measures.</p>
+          <p class="hint" style="margin:0"><b>And moving the tip closer stops helping almost at once.</b>
+            Current funnels into a disc from every direction, so the lines are crowded right at the
+            electrode and spread out immediately: most of the resistance is in the first radius. The
+            curve above is (1/4&kappa;a)[1&minus;(2/&pi;)arctan(a/d)], and <b>at exactly one radius you
+            carry exactly half of it</b> &mdash; arctan(1) = &pi;/4 makes that exact, for any electrode
+            and any electrolyte. A Luggin capillary is worth building, but it buys a factor, not an order
+            of magnitude &mdash; and pushing it closer than about a tenth of a radius starts shielding
+            the electrode, which distorts the current distribution instead. <b>The term that actually
+            moves R<sub>u</sub> is &kappa;</b>, and &kappa; is supporting electrolyte.</p>
+          <p class="hint" style="margin:0"><b>It shows up differently in every technique on this page.</b>
+            In a <em>step</em> it is a delay: the electrode charges through R<sub>u</sub> with
+            &tau; = R<sub>u</sub>C<sub>dl</sub>, so the potential it actually sees creeps up over several
+            &tau; and nothing before 5&tau; means anything &mdash; that is the whole near end of the next
+            tab. In a <em>sweep</em> it is a stretch along the potential axis, proportional to current,
+            so peaks move apart and a reversible couple reads as a sluggish one. In a <em>pulse</em> it
+            sets how long you must wait before sampling. <b>Every number on the next four tabs has
+            R<sub>u</sub> inside it.</b></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 1 · THE STEP ====================== -->
+  <!-- ====================== 2 · COTTRELL ====================== -->
+  <section class="panel" id="p-cot" role="tabpanel" aria-labelledby="t-cot" hidden>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>A straight line in t<sup>&minus;1/2</sup>, or you have measured something else</h2>
+        <span class="note">where the Cottrell equation comes from, and what its plot tells you</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig" style="white-space:normal">
+          <span class="cnc">C(x,t) = C*&nbsp;erf[x/2&radic;(Dt)]</span>
+          <small>the solution of Fick&rsquo;s second law for a surface held at zero concentration</small><br>
+          <span class="act">i = nFAD(&part;C/&part;x)<sub>x=0</sub> = nFAD<sup>1/2</sup>C*/&radic;(&pi;t)</span>
+          <small>differentiate that at the wall and the Cottrell equation falls out &mdash; the current <b>is</b> the slope at x = 0</small><br>
+          <span class="pot">slope of i against t<sup>&minus;1/2</sup> = nFAD<sup>1/2</sup>C*/&radic;&pi;</span>&nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="mix">intercept = 0</span>
+          <small>so the plot gives D &mdash; and the intercept is the check that it is allowed to</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="bench" style="margin-bottom:16px">
+      <div class="ctl">
+        <div class="card">
+          <div class="card-h"><h2>The experiment</h2></div>
+          <div class="card-b stack" style="gap:13px">
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">cell time constant &tau;</span><span class="val" id="coTauv"></span></div>
+              <input type="range" id="coTau" min="-6" max="-2.5" step="0.02" value="-4.301">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">where you start sampling</span><span class="val" id="coT0v"></span></div>
+              <input type="range" id="coT0" min="-4" max="0.7" step="0.05" value="-2">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">&hellip; and where you stop</span><span class="val" id="coT1v"></span></div>
+              <input type="range" id="coT1" min="-2" max="2" step="0.05" value="0.7">
+            </div>
+            <p class="hint" style="margin:0">You can set the window three ways: with these two sliders, by
+              <b>dragging its edges on the time plot itself</b>, or with the buttons below, which walk it
+              there for you &mdash; watch the points slide along the line while the fitted D moves. All
+              three buttons move a window of <b>the same width</b>, so the only thing that differs between
+              them is <em>where</em> it sits.</p>
+            <div class="btnrow">
+              <button class="ghost" id="coP1" type="button">run: a clean window</button>
+              <button class="ghost" id="coP2" type="button">run: start too early</button>
+              <button class="ghost" id="coP3" type="button">run: stop too late</button>
+            </div>
+            <div class="readouts">
+              <div class="readout"><span class="k">fitted slope</span><span class="v" id="coSlope">&mdash;</span></div>
+              <div class="readout"><span class="k">intercept</span><span class="v" id="coInt">&mdash;</span></div>
+              <div class="readout"><span class="k">D from that slope</span><span class="v" id="coDfit">&mdash;</span></div>
+              <div class="readout"><span class="k">against the true D</span><span class="v" id="coErr">&mdash;</span></div>
+              <div class="readout"><span class="k">R&sup2;</span><span class="v" id="coR2">&mdash;</span></div>
+              <div class="readout"><span class="k">points</span><span class="v" id="coN">&mdash;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="figs">
+        <div class="colpair">
+          <div class="card">
+            <div class="card-h"><h2>The profile the equation came from</h2>
+              <span class="note">one instant, and its slope at the wall</span></div>
+            <div class="card-b stack" style="gap:12px">
+              <svg id="coprof" viewBox="0 0 520 288" style="width:100%;height:auto" role="img"
+                   aria-label="The error function concentration profile at one instant, the middle of the sampling window, with a dashed tangent drawn at the electrode surface. The tangent is the concentration gradient at the wall, which is what the current is proportional to, and it flattens as the window is dragged to later times."></svg>
+              <p class="hint" style="margin:0">The dashed tangent at the wall <b>is</b> the current. It
+                flattens as &radic;t, which is the Cottrell equation drawn rather than written. This is the
+                instant at the middle of your sampling window &mdash; <b>drag the window</b> and watch the
+                tangent tip over. The single orange ring on each plot to the right is this same instant.</p>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h2>Getting a number for D out of this</h2>
+              <span class="note">the slope, and where to put the window</span></div>
+            <div class="card-b stack" style="gap:13px">
+              <div class="eqbig" style="white-space:normal;text-align:left;margin:0">
+                <span class="act">slope m = nFAD<sup>1/2</sup>C*/&radic;&pi;</span>
+                <small><b>what the fitted line gives you</b> &mdash; i against t<sup>&minus;1/2</sup> is a
+                  straight line through the origin, and its slope is the only thing you measure.</small><br>
+                <span class="mix">D = (m&radic;&pi; / nFAC*)<sup>2</sup></span>
+                <small><b>the answer, rearranged</b>. Note the square: <b>every error in the slope, in A,
+                  or in C* is doubled</b> in D. A 10 % slope is a 21 % D.</small>
+              </div>
+              <p class="hint" style="margin:0"><b>The recipe.</b> Step to a potential well past
+                E<sup>0</sup>&prime; &mdash; far enough that the surface concentration is pinned at zero and
+                the current is diffusion-limited, which is the only condition under which Cottrell holds.
+                Sample the current over a window that <b>starts after 5&tau;</b> and <b>ends before the
+                shorter of</b> t<sub>edge</sub> = r<sub>0</sub><sup>2</sup>/2D, where the disc stops being
+                planar, and roughly 20 s, where the room starts stirring the solution. Plot i against
+                t<sup>&minus;1/2</sup>, fit, and read the slope. <b>Then look at the intercept before you
+                look at the slope.</b></p>
+            </div>
+          </div>
+        </div>
+        <div class="colpair">
+          <div class="card">
+            <div class="card-h"><h2>i against t<sup>&minus;1/2</sup></h2>
+              <span class="note">the diagnostic plot</span></div>
+            <div class="card-b stack" style="gap:12px">
+              <svg id="cofit" viewBox="0 0 520 306" style="width:100%;height:auto" role="img"
+                   aria-label="Sampled current against the inverse square root of time, with a least squares line through the points, the intercept marked at the origin end and the three instants of the profile picture ringed in their own colours."></svg>
+              <p class="hint" style="margin:0"><b>What this plot is for.</b> Its slope carries D, since
+                everything else in nFAD<sup>&frac12;</sup>C*/&radic;&pi; is known; and <b>the Cottrell
+                equation has no constant term</b>, so an intercept that is not zero says the data are not
+                Cottrell, whatever R&sup2; says. Sampling too early lifts the right-hand end (large
+                t<sup>&minus;1/2</sup>) and steepens the line; sampling too late lifts the left-hand end and
+                flattens it while pushing the intercept up. <b>D goes as the slope squared, so every error
+                is doubled.</b></p>
+            </div>
+          </div>
+        
+          <div class="card">
+            <div class="card-h"><h2>The same data against t</h2>
+              <span class="note">where in the decay that line came from</span></div>
+            <div class="card-b stack" style="gap:12px">
+              <svg id="cotime" viewBox="0 0 520 264" style="width:100%;height:auto" role="img"
+                   aria-label="The same current against time on a logarithmic time axis, with the sampling window shaded and the limits of five time constants, the electrode edge and convection marked, so that the fitted window can be seen in its place in the whole decay."></svg>
+              <p class="hint" style="margin:0"><b>Drag the handles.</b> Read this directly under the plot
+                opposite: the shaded band is the same window, shown where it actually sits in the decay. A window that looked like a fine
+                straight line can turn out to be sitting on top of the charging current, or out past the
+                point where the layer stopped growing.</p>
+            </div>
+          </div>
+        </div>
+        <div class="card wideF">
+          <div class="card-h"><h2>And the five ways the number comes out wrong</h2>
+            <span class="note">read the intercept before you read the slope</span></div>
+          <div class="card-b stack" style="gap:13px">
+              <p class="hint" style="margin:0"><b>Why the intercept is the real test.</b> A true Cottrell
+                plot passes through the origin, because i &rarr; 0 as t &rarr; &infin;. A finite intercept
+                means something in your current does <em>not</em> decay as t<sup>&minus;1/2</sup>: leftover
+                charging, a background reaction, an adsorbed layer stripping, or convection holding the
+                current up at long times. R<sup>2</sup> will not catch it &mdash; 1/&radic;t crushes the late
+                points together, so a plot can be visibly curved and still fit at R<sup>2</sup> = 0.999.
+                <b>Drag the window and watch D move:</b> if D depends on where you put the window, the
+                window is in the wrong place, not D.</p>
+              <div class="eqbig" style="white-space:normal;text-align:left;margin:0">
+                <span class="ohm">too early</span>
+                <small><b>D reads high.</b> Residual i<sub>c</sub> sits on top of the first points, which
+                  are also the ones with the largest t<sup>&minus;1/2</sup>, so they lever the slope
+                  up.</small><br>
+                <span class="ohm">too late</span>
+                <small><b>D reads high as well, for the opposite reason.</b> Convection, or radial
+                  diffusion at the edge of the disc, holds the current above the Cottrell line; the late
+                  points lift and the line pivots.</small><br>
+                <span class="ohm">the area A</span>
+                <small><b>the usual culprit.</b> A is the <em>electroactive</em> area, not what the
+                  calipers say. A roughness factor of 1.3 taken as 1.0 puts D out by 69 %. Calibrate A
+                  first with a couple whose D you already trust &mdash; that is what ferrocyanide is
+                  for.</small><br>
+                <span class="ohm">n and D together</span>
+                <small><b>one slope cannot separate them.</b> Cottrell measures nD<sup>1/2</sup>; you must
+                  know n from somewhere else (coulometry, the wave shape, the chemistry) before D means
+                  anything.</small><br>
+                <span class="ohm">C* and the surface</span>
+                <small><b>both have to be what you assumed.</b> C* is the bulk concentration, so the
+                  solution must be unstirred and the electrode must start from a clean, fully relaxed
+                  state &mdash; a step taken too soon after the last one meets solution that is still
+                  depleted, and reads low.</small>
+              </div>
+              <p class="hint" style="margin:0"><b>And report it honestly:</b> D depends on temperature by
+                about 2 % per kelvin and on the supporting electrolyte through viscosity, so a D without a
+                stated temperature and medium is not a measurement. Quote the window you fitted over, the
+                intercept, and how A was obtained &mdash; those three decide the number far more than the
+                regression does.</p>
+          </div>
+        </div>
+        <div class="card wideF">
+          <div class="card-h"><h2>What you would report</h2></div>
+          <div class="card-b"><div class="verdict" id="coVerdict">&mdash;</div></div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ====================== 3 · ULTRAMICROELECTRODE ====================== -->
+  <section class="panel" id="p-ume" role="tabpanel" aria-labelledby="t-ume" hidden>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>Make the electrode smaller than its own diffusion layer</h2>
+        <span class="note">and the current stops depending on the clock</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig" style="white-space:normal">
+          <span class="act">i<sub>ss</sub> = 4nFDC*r<sub>0</sub></span>
+          <small>a disc, once diffusion is radial: no t in it at all &mdash; and it goes as r<sub>0</sub>, not r<sub>0</sub><sup>2</sup></small><br>
+          <span class="cnc">&delta; &asymp; &radic;(2Dt) reaches r<sub>0</sub> at t &asymp; r<sub>0</sub><sup>2</sup>/&pi;D</span>
+          <small>which is microseconds on a 5 µm disc and minutes on a millimetre one</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="bench" style="margin-bottom:16px">
+      <div class="ctl">
+        <div class="card">
+          <div class="card-h"><h2>The electrode</h2></div>
+          <div class="card-b stack" style="gap:13px">
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">radius r<sub>0</sub></span><span class="val" id="umRv"></span></div>
+              <input type="range" id="umR" min="-4" max="-0.8" step="0.02" value="-3">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">diffusion coefficient D</span><span class="val" id="umDv"></span></div>
+              <input type="range" id="umD" min="-6" max="-4.3" step="0.02" value="-4.699">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">bulk concentration C*</span><span class="val" id="umCv"></span></div>
+              <input type="range" id="umC" min="-2" max="1.3" step="0.02" value="0">
+            </div>
+            <div>
+              <label class="fld" for="umG">geometry</label>
+              <select id="umG">
+                <option value="disc">inlaid disc &mdash; i<sub>ss</sub> = 4nFDC*r<sub>0</sub></option>
+                <option value="sphere">sphere &mdash; i<sub>ss</sub> = 4&pi;nFDC*r<sub>0</sub></option>
+              </select>
+            </div>
+            <div class="btnrow">
+              <button class="ghost" id="umP1" type="button">5 µm</button>
+              <button class="ghost" id="umP2" type="button">100 µm</button>
+              <button class="ghost" id="umP3" type="button">1.5 mm</button>
+            </div>
+            <div class="readouts">
+              <div class="readout"><span class="k">area</span><span class="v" id="umA">&mdash;</span></div>
+              <div class="readout"><span class="k">i<sub>ss</sub></span><span class="v" id="umIss">&mdash;</span></div>
+              <div class="readout"><span class="k">steady state by</span><span class="v" id="umTss">&mdash;</span></div>
+              <div class="readout"><span class="k">C<sub>dl</sub></span><span class="v" id="umCdl">&mdash;</span></div>
+              <div class="readout"><span class="k">&tau; at 100 &Omega;</span><span class="v" id="umTau">&mdash;</span></div>
+              <div class="readout"><span class="k">faster than this and you see a peak</span><span class="v" id="umNu">&mdash;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="figs">
+        <div class="card">
+          <div class="card-h"><h2>Every size on one pair of axes</h2>
+            <span class="note">5 µm to 1.5 mm, all at once</span></div>
+          <div class="card-b stack" style="gap:12px">
+            <svg id="umsizes" viewBox="0 0 520 304" style="width:100%;height:auto" role="img"
+                 aria-label="Current against time on logarithmic axes for five electrode radii from five micrometres to 1.5 millimetres. Every curve follows the same Cottrell line at short times and then levels onto its own steady state, the smallest electrode levelling first and lowest in absolute current."></svg>
+            <p class="hint" style="margin:0"><b>They all start on the same line.</b> At short times every
+              electrode is planar and every curve is Cottrell; what differs is <em>when</em> each one leaves
+              it. The smallest leaves first, which is why a UME reaches a steady state in microseconds while
+              a millimetre disc would need minutes it never gets.</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>And the voltammogram it gives</h2>
+            <span class="note">three scan rates</span></div>
+          <div class="card-b">
+            <svg id="umcv" viewBox="0 0 520 312" style="width:100%;height:auto" role="img"
+                 aria-label="Cyclic voltammograms at three scan rates on the chosen electrode, running from a sigmoid with a plateau at the steady-state current at slow sweeps to a peaked voltammogram at fast ones."></svg>
+          </div>
+        </div>
+        <div class="card wideF">
+          <div class="card-h"><h2>What the UME buys you</h2></div>
+          <div class="card-b"><div class="verdict" id="umVerdict">&mdash;</div></div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ====================== 4 · PULSE METHODS ====================== -->
+  <section class="panel" id="p-pulse" role="tabpanel" aria-labelledby="t-pulse" hidden>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>Wait for the charging current to die, then look</h2>
+        <span class="note">normal, differential and square-wave pulse voltammetry</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig" style="white-space:normal">
+          <span class="ohm">i<sub>c</sub> &prop; e<sup>&minus;t/R<sub>u</sub>C<sub>dl</sub></sup></span>&nbsp;&nbsp;vs&nbsp;&nbsp;
+          <span class="act">i<sub>F</sub> &prop; t<sup>&minus;1/2</sup></span>
+          <small>the whole idea in one line: one decays exponentially, the other does not, so sample late in the pulse</small><br>
+          <span class="pot">NPV: i(E) = i<sub>d</sub>/(1 + &theta;)</span>, &theta; = e<sup>nf(E&minus;E<sub>1/2</sub>)</sup>&nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="mix">DPV: &Delta;i = i(E+&Delta;E) &minus; i(E)</span>
+          <small>a sigmoid, and the difference of two points on it &mdash; which is why DPV is a peak</small><br>
+          <span class="mix">E<sub>p</sub> = E<sub>1/2</sub> &minus; &Delta;E/2</span> &mdash; &Delta;E is signed, so a cathodic pulse puts the peak <i>above</i> E<sub>1/2</sub>&nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="mix">W<sub>1/2</sub> &rarr; 3.52RT/nF = 90.4/n mV</span><br>
+          <span class="act">SWV: &Delta;i = i<sub>f</sub> &minus; i<sub>r</sub></span> &mdash; the reverse sample is <i>anodic</i>, so the two <b>add</b>
+          <small>about twice the DPV peak for the same amplitude, and the two halves kept apart are a reversibility test</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="bench" style="margin-bottom:16px">
+      <div class="ctl">
+        <div class="card">
+          <div class="card-h"><h2>The pulse programme</h2></div>
+          <div class="card-b stack" style="gap:13px">
+            <div class="pill-row" id="puPills">
+              <button class="pill" data-s="NPV" aria-pressed="false">NPV</button>
+              <button class="pill" data-s="DPV" aria-pressed="true">DPV</button>
+              <button class="pill" data-s="SWV" aria-pressed="false">SWV</button>
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0" id="puAmpLab">pulse amplitude</span><span class="val" id="puAmpv"></span></div>
+              <input type="range" id="puAmp" min="0.3" max="2.3" step="0.01" value="1.699">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">sampling time t<sub>m</sub> into the pulse</span><span class="val" id="puTmv"></span></div>
+              <input type="range" id="puTm" min="-4.3" max="-0.7" step="0.02" value="-1.602">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">&tau; = R<sub>u</sub>C<sub>dl</sub></span><span class="val" id="puTauv"></span></div>
+              <input type="range" id="puTau" min="-6" max="-2.5" step="0.02" value="-4.301">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">bulk concentration C*</span><span class="val" id="puCv"></span></div>
+              <input type="range" id="puC" min="-3" max="1.3" step="0.02" value="0">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">electrons n</span><span class="val" id="puNv"></span></div>
+              <input type="range" id="puN" min="1" max="3" step="1" value="1">
+            </div>
+            <div class="btnrow"><button class="ghost" type="button" id="puRunBtn">Run the scan &mdash; watch the dots build the voltammogram</button></div>
+            <div class="btnrow" id="puPresets"></div>
+            <p class="hint" style="margin:0" id="puNote">&mdash;</p>
+          </div>
+        </div>
+      </div>
+      <div class="figs">
+        <div class="card wideF">
+          <div class="card-h"><h2>What the instrument does</h2>
+            <span class="note">the whole scan: the programme above, the current below, one time axis</span></div>
+          <div class="card-b stack" style="gap:12px">
+            <svg id="puwave" viewBox="0 0 1040 322" style="width:100%;height:auto" role="img"
+                 aria-label="Above, the potential programme of the selected pulse method over the whole scan, every cycle of the staircase from one end of the potential range to the other. Below, on the same time axis, the current that flows during those cycles: inside every pulse the charging current decays away while the Faradaic current does not. A faint line drops from each sampling instant on the waveform to the current it takes."></svg>
+            <p class="hint" style="margin:0">This is the <b>whole scan</b>, every cycle of it, and it covers
+              exactly the potential range plotted in the panel below &mdash; a cycle here sits above its own
+              point there. Each dot is one instant the instrument samples, and the faint line drops it onto
+              the current it takes. <b class="act">Orange</b> is the sample at the end of a pulse,
+              <b>grey</b> the one just before it (DPV), <b class="cnc">green</b> the reverse half-cycle
+              (SWV). Press <b>Run the scan</b> and the shaded cycle walks from one end to the other, laying
+              down one point below for each cycle it passes.</p>
+          </div>
+        </div>
+        <div class="card wideF">
+          <div class="card-h"><h2>And what comes back</h2>
+            <span class="note">those samples, plotted against the potential they were taken at</span></div>
+          <div class="card-b stack" style="gap:12px">
+            <svg id="puresp" viewBox="0 0 1040 270" style="width:100%;height:auto" role="img"
+                 aria-label="The voltammogram the selected pulse method produces: a sigmoid for normal pulse with its plateau marked, or a peak for differential pulse and square wave with the peak potential and the width at half height marked. During a scan the curve fades and the points arrive one at a time, one for each cycle of the programme beside it."></svg>
+            <p class="hint" style="margin:0"><b>What this picture is.</b> It is not a current trace &mdash;
+              time has been thrown away. Every cycle of the programme beside it contributes <em>one number</em>
+              (NPV: the sample; DPV and SWV: the difference of two samples), and that number is plotted
+              against the base potential of its own cycle. So the x axis is the staircase, one point per
+              step, and the shape you get is a property of the <b>sampling scheme</b>, not of the
+              diffusion: the same solution gives a step under NPV and a peak under DPV. The panel above
+              runs across the same potentials in the same direction, so a cycle up there is directly
+              above the point it produced down here.</p>
+          </div>
+        </div>
+        <div class="card wideF">
+          <div class="card-h"><h2>What it is worth</h2></div>
+          <div class="card-b stack" style="gap:12px">
+            <div class="readouts">
+              <div class="readout"><span class="k">peak (or plateau) current</span><span class="v" id="puIp">&mdash;</span></div>
+              <div class="readout"><span class="k">E<sub>p</sub> &minus; E<sub>1/2</sub></span><span class="v" id="puEp">&mdash;</span></div>
+              <div class="readout"><span class="k">W<sub>1/2</sub></span><span class="v" id="puW">&mdash;</span></div>
+              <div class="readout"><span class="k">&hellip; against 90.4/n mV</span><span class="v" id="puW0">&mdash;</span></div>
+              <div class="readout"><span class="k">charging current at t<sub>m</sub></span><span class="v" id="puIc">&mdash;</span></div>
+              <div class="readout"><span class="k">signal / charging</span><span class="v" id="puSN">&mdash;</span></div>
+            </div>
+            <div class="verdict" id="puVerdict">&mdash;</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wide1">
+      <div class="card">
+        <div class="card-h"><h2>How each waveform does it</h2>
+          <span class="note">what is subtracted from what, and why</span></div>
+        <div class="card-b stack" style="gap:14px">
+
+          <p class="hint" style="margin:0"><b>The one move all three make.</b> The charging current dies
+            exponentially with its own time constant &tau; = R<sub>u</sub>C<sub>dl</sub>, while the Faradaic
+            current only falls as t<sup>&minus;1/2</sup>. So <b>do not integrate the pulse &mdash; sample it
+            late.</b> At t<sub>m</sub> = 5&tau; the charging current is down to e<sup>&minus;5</sup> = 0.7 % of
+            what it started at, while the Faradaic current has lost only a factor &radic;5. At 10&tau; it is
+            4.5&times;10<sup>&minus;3</sup> %. Waiting is almost free, and <b>everything below is bookkeeping on
+            top of that one fact</b> &mdash; what differs between the three methods is only how many times you
+            sample, and what you subtract from what.</p>
+
+          <svg viewBox="0 0 520 318" style="width:100%;height:auto" role="img"
+               aria-label="The potential waveforms of normal pulse, differential pulse and square wave voltammetry drawn one above the other against time, with a filled circle at every instant the current is sampled. Normal pulse returns to a fixed base between pulses and is sampled once, late in each pulse. Differential pulse rides a staircase and is sampled twice per step, just before the pulse and at its end. Square wave alternates about each step of a staircase and is sampled at the end of both the forward and the reverse half cycle.">
+          <text x="2.0" y="11.0" fill="var(--ox)" font-size="11.0" font-weight="700">NPV</text>
+          <text x="31.6" y="11.0" fill="var(--muted)" font-size="9.5">&#8212; a pulse from a base where nothing reacts, back to base every cycle</text>
+          <line x1="20.0" y1="94.0" x2="506.0" y2="94.0" stroke="var(--line)" stroke-width="1"/>
+          <text x="506.0" y="104.0" fill="var(--muted)" font-size="9.0" text-anchor="end">time &#8594;</text>
+          <line x1="20.0" y1="88.0" x2="506.0" y2="88.0" stroke="var(--line-2)" stroke-width="1" stroke-dasharray="3 3"/>
+          <path d="M20.0 88.0 L53.4 88.0 L53.4 80.8 L80.8 80.8 L80.8 88.0 L114.2 88.0 L114.2 73.5 L141.5 73.5 L141.5 88.0 L174.9 88.0 L174.9 66.2 L202.2 66.2 L202.2 88.0 L235.7 88.0 L235.7 59.0 L263.0 59.0 L263.0 88.0 L296.4 88.0 L296.4 51.8 L323.8 51.8 L323.8 88.0 L357.2 88.0 L357.2 44.5 L384.5 44.5 L384.5 88.0 L417.9 88.0 L417.9 37.2 L445.2 37.2 L445.2 88.0 L478.7 88.0 L478.7 30.0 L506.0 30.0 L506.0 88.0" fill="none" stroke="var(--ink-2)" stroke-width="1.6" stroke-linejoin="round"/>
+          <circle cx="76.8" cy="80.8" r="3" fill="var(--ox)"/>
+          <circle cx="137.5" cy="73.5" r="3" fill="var(--ox)"/>
+          <circle cx="198.2" cy="66.2" r="3" fill="var(--ox)"/>
+          <circle cx="259.0" cy="59.0" r="3" fill="var(--ox)"/>
+          <circle cx="319.8" cy="51.8" r="3" fill="var(--ox)"/>
+          <circle cx="380.5" cy="44.5" r="3" fill="var(--ox)"/>
+          <circle cx="441.2" cy="37.2" r="3" fill="var(--ox)"/>
+          <circle cx="502.0" cy="30.0" r="3" fill="var(--ox)"/>
+          <text x="2.0" y="115.0" fill="var(--ion-k)" font-size="11.0" font-weight="700">DPV</text>
+          <text x="31.6" y="115.0" fill="var(--muted)" font-size="9.5">&#8212; a small fixed pulse riding a staircase, sampled before it and at its end</text>
+          <line x1="20.0" y1="198.0" x2="506.0" y2="198.0" stroke="var(--line)" stroke-width="1"/>
+          <text x="506.0" y="208.0" fill="var(--muted)" font-size="9.0" text-anchor="end">time &#8594;</text>
+          <path d="M20.0 192.0 L53.4 192.0 L53.4 179.0 L80.8 179.0 L80.8 192.0 L80.8 185.1 L114.2 185.1 L114.2 172.1 L141.5 172.1 L141.5 185.1 L141.5 178.3 L174.9 178.3 L174.9 165.3 L202.2 165.3 L202.2 178.3 L202.2 171.4 L235.7 171.4 L235.7 158.4 L263.0 158.4 L263.0 171.4 L263.0 164.6 L296.4 164.6 L296.4 151.6 L323.8 151.6 L323.8 164.6 L323.8 157.7 L357.2 157.7 L357.2 144.7 L384.5 144.7 L384.5 157.7 L384.5 150.9 L417.9 150.9 L417.9 137.9 L445.2 137.9 L445.2 150.9 L445.2 144.0 L478.7 144.0 L478.7 131.0 L506.0 131.0 L506.0 144.0" fill="none" stroke="var(--ink-2)" stroke-width="1.6" stroke-linejoin="round"/>
+          <circle cx="49.4" cy="192.0" r="3" fill="var(--elec)"/>
+          <circle cx="76.8" cy="179.0" r="3" fill="var(--ox)"/>
+          <circle cx="110.2" cy="185.1" r="3" fill="var(--elec)"/>
+          <circle cx="137.5" cy="172.1" r="3" fill="var(--ox)"/>
+          <circle cx="170.9" cy="178.3" r="3" fill="var(--elec)"/>
+          <circle cx="198.2" cy="165.3" r="3" fill="var(--ox)"/>
+          <circle cx="231.7" cy="171.4" r="3" fill="var(--elec)"/>
+          <circle cx="259.0" cy="158.4" r="3" fill="var(--ox)"/>
+          <circle cx="292.4" cy="164.6" r="3" fill="var(--elec)"/>
+          <circle cx="319.8" cy="151.6" r="3" fill="var(--ox)"/>
+          <circle cx="353.2" cy="157.7" r="3" fill="var(--elec)"/>
+          <circle cx="380.5" cy="144.7" r="3" fill="var(--ox)"/>
+          <circle cx="413.9" cy="150.9" r="3" fill="var(--elec)"/>
+          <circle cx="441.2" cy="137.9" r="3" fill="var(--ox)"/>
+          <circle cx="474.7" cy="144.0" r="3" fill="var(--elec)"/>
+          <circle cx="502.0" cy="131.0" r="3" fill="var(--ox)"/>
+          <text x="2.0" y="219.0" fill="var(--go)" font-size="11.0" font-weight="700">SWV</text>
+          <text x="31.6" y="219.0" fill="var(--muted)" font-size="9.5">&#8212; a symmetric square wave on a staircase, both halves sampled</text>
+          <line x1="20.0" y1="302.0" x2="506.0" y2="302.0" stroke="var(--line)" stroke-width="1"/>
+          <text x="506.0" y="312.0" fill="var(--muted)" font-size="9.0" text-anchor="end">time &#8594;</text>
+          <path d="M20.0 275.0 L50.4 275.0 L50.4 297.0 L80.8 297.0 L80.8 269.0 L111.1 269.0 L111.1 291.0 L141.5 291.0 L141.5 263.0 L171.9 263.0 L171.9 285.0 L202.2 285.0 L202.2 257.0 L232.6 257.0 L232.6 279.0 L263.0 279.0 L263.0 251.0 L293.4 251.0 L293.4 273.0 L323.8 273.0 L323.8 245.0 L354.1 245.0 L354.1 267.0 L384.5 267.0 L384.5 239.0 L414.9 239.0 L414.9 261.0 L445.2 261.0 L445.2 233.0 L475.6 233.0 L475.6 255.0 L506.0 255.0" fill="none" stroke="var(--ink-2)" stroke-width="1.6" stroke-linejoin="round"/>
+          <circle cx="46.4" cy="275.0" r="3" fill="var(--ox)"/>
+          <circle cx="76.8" cy="297.0" r="3" fill="var(--go)"/>
+          <circle cx="107.1" cy="269.0" r="3" fill="var(--ox)"/>
+          <circle cx="137.5" cy="291.0" r="3" fill="var(--go)"/>
+          <circle cx="167.9" cy="263.0" r="3" fill="var(--ox)"/>
+          <circle cx="198.2" cy="285.0" r="3" fill="var(--go)"/>
+          <circle cx="228.6" cy="257.0" r="3" fill="var(--ox)"/>
+          <circle cx="259.0" cy="279.0" r="3" fill="var(--go)"/>
+          <circle cx="289.4" cy="251.0" r="3" fill="var(--ox)"/>
+          <circle cx="319.8" cy="273.0" r="3" fill="var(--go)"/>
+          <circle cx="350.1" cy="245.0" r="3" fill="var(--ox)"/>
+          <circle cx="380.5" cy="267.0" r="3" fill="var(--go)"/>
+          <circle cx="410.9" cy="239.0" r="3" fill="var(--ox)"/>
+          <circle cx="441.2" cy="261.0" r="3" fill="var(--go)"/>
+          <circle cx="471.6" cy="233.0" r="3" fill="var(--ox)"/>
+          <circle cx="502.0" cy="255.0" r="3" fill="var(--go)"/>
+          </svg>
+
+          <div class="glegend" style="margin-top:2px">
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><circle cx="13" cy="7" r="4" fill="var(--ox)"/></svg><span><b class="cnc">sampled at the end of the pulse</b> &mdash; the forward sample, in all three methods. Late enough that i<sub>c</sub> has gone.</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><circle cx="13" cy="7" r="4" fill="var(--elec)"/></svg><span><b>sampled just before the pulse</b> &mdash; DPV only. This is the sample that carries the background away with it.</span></span>
+            <span><svg viewBox="0 0 26 14" width="26" height="14" aria-hidden="true"><circle cx="13" cy="7" r="4" fill="var(--go)"/></svg><span><b>sampled at the end of the reverse half</b> &mdash; SWV only. This current is <em>anodic</em>, which is why subtracting it makes the peak bigger and not smaller.</span></span>
+          </div>
+
+          <p class="hint" style="margin:0"><b>NPV &mdash; one sample, and the solution is new every time.</b>
+            The base potential is held somewhere nothing reacts. Each cycle steps to a slightly more extreme
+            potential, holds, samples once near the end of the pulse, and <b>goes back to base</b>. That return
+            is the point: during the long base period the product diffuses away and the concentration profile
+            relaxes, so <b>every pulse meets essentially unperturbed solution</b>. Each point is therefore an
+            independent potential-step experiment at its own potential, and what you sample is the Cottrell
+            current at t<sub>m</sub> scaled by the Nernstian fraction reduced,
+            i = i<sub>d</sub>/(1 + &theta;). The result is a <b>sigmoid</b> &mdash; a polarogram without the
+            mercury drop &mdash; with the plateau at i<sub>d</sub> = nFAC*&radic;(D/&pi;t<sub>m</sub>). You read
+            E<sub>1/2</sub> off the half-height and i<sub>d</sub> off the plateau. What you do <em>not</em> get
+            is any cancellation: the charging current here is only waited out, never removed, so the floor is set
+            entirely by how completely e<sup>&minus;t<sub>m</sub>/&tau;</sup> has died.</p>
+
+          <p class="hint" style="margin:0"><b>DPV &mdash; two samples, and their difference is a derivative.</b>
+            The base is now a staircase that walks through the wave, with a small fixed pulse &Delta;E (10&ndash;50
+            mV) riding on each step. Sample twice: once just <b>before</b> the pulse, once at its <b>end</b>, and
+            plot the difference. Because those two samples sit at E and E+&Delta;E on the <em>same</em> sigmoid,
+            &Delta;i is a finite-difference derivative of it &mdash; and <b>the derivative of a sigmoid is a
+            peak</b>. That is the whole reason DPV gives a peak where NPV gives a step, and it puts the peak at
+            the midpoint of the two sampling potentials, E<sub>p</sub> = E<sub>1/2</sub> &minus; &Delta;E/2. Let
+            &Delta;E &rarr; 0 and the peak approaches the true derivative: the width falls to
+            3.52RT/nF = 90.4/n mV, <b>but the height falls linearly with &Delta;E</b>. That trade is the whole of
+            DPV method development. And the sensitivity comes from the <em>subtraction</em>, not the waiting:
+            both samples carry nearly the same residual charging current and the same background, so differencing
+            cancels them. That is what reaches 10<sup>&minus;8</sup> M, which no amount of waiting alone would.</p>
+
+          <p class="hint" style="margin:0"><b>SWV &mdash; two samples that add instead of cancelling.</b> A
+            symmetric square wave of amplitude E<sub>sw</sub> sits on the staircase, so every cycle has a forward
+            half and a reverse half, each sampled at its end, and what is plotted is
+            &Delta;i = i<sub>f</sub> &minus; i<sub>r</sub>. The forward pulse makes product <b>right at the
+            electrode</b>, and the reverse pulse immediately re-oxidises it, so i<sub>r</sub> is <b>anodic
+            &mdash; opposite in sign</b>. Subtracting it therefore <em>adds</em>. Both peak heights have closed
+            forms &mdash; DPV is tanh(nf&Delta;E/4) and SWV is tanh(nfE<sub>sw</sub>/2) &mdash; so the
+            ratio is <b>exactly 2 only in the small-pulse limit</b>, and it falls away as the pulse grows:
+            1.98 at 10 mV, 1.89 at 25 mV, <b>1.66 at 50 mV</b>. &ldquo;Twice the DPV peak&rdquo; is a
+            statement about small pulses, not a constant. Because the square wave is symmetric about each
+            step, the net peak sits
+            <b>at E<sub>1/2</sub></b>, with none of the half-pulse offset DPV carries. And since the reverse half
+            <em>uses</em> what the forward half just made, instead of needing it to be gone, nothing has to wait
+            for the diffusion layer to relax: the scan runs at 10&ndash;1000 Hz, so <b>what takes DPV minutes
+            takes SWV a second</b>. Keep i<sub>f</sub> and i<sub>r</sub> separately and you get something neither
+            of the others offers &mdash; a reversible couple gives a large reverse component, while an
+            irreversible one, or one with a fast following reaction, gives almost none and &Delta;i collapses
+            onto the forward curve alone. <b>That is the CV return peak, in a pulse experiment.</b></p>
+
+          <div class="sumwrap">
+            <table class="sumtbl">
+              <tr><th>method</th><th>samples per cycle</th><th>what is subtracted</th><th>what that removes</th><th>what is left</th></tr>
+              <tr><td class="nm"><b>NPV</b></td><td class="sy">one, late in the pulse</td><td class="sy">nothing &mdash; you only wait</td><td class="sy">i<sub>c</sub>, by e<sup>&minus;t<sub>m</sub>/&tau;</sup> alone</td><td class="sy">i<sub>d</sub>/(1+&theta;): a <b>sigmoid</b></td></tr>
+              <tr><td class="nm"><b>DPV</b></td><td class="sy">two &mdash; before the pulse, and at its end</td><td class="sy">the two samples from each other</td><td class="sy">the residual i<sub>c</sub> <em>and</em> the background, nearly equal at both instants</td><td class="sy">(dI/dE)&Delta;E: a <b>peak</b> at E<sub>1/2</sub>&minus;&Delta;E/2, &rarr;90.4/n mV wide</td></tr>
+              <tr><td class="nm"><b>SWV</b></td><td class="sy">two &mdash; end of the forward half, end of the reverse</td><td class="sy">the same, but the reverse sample is anodic</td><td class="sy">the same background, while the two Faradaic signals <b>add</b></td><td class="sy">i<sub>f</sub>&minus;i<sub>r</sub> = tanh(nfE<sub>sw</sub>/2): a <b>peak at E<sub>1/2</sub></b>, 2&times; DPV only for a small pulse, and far faster</td></tr>
+            </table>
+          </div>
+
+          <p class="hint" style="margin:0"><b>Why this is the tab an analyst lives in.</b> Cyclic voltammetry is
+            a mechanism instrument: it is read for shapes and shifts. The pulse methods are <em>measurement</em>
+            instruments, and all three exist for one reason &mdash; the charging current is what stands between
+            you and a low detection limit. NPV removes none of it and is read for E<sub>1/2</sub> and
+            i<sub>d</sub>; DPV differences it away and is read for concentration; SWV differences it away as
+            well, gets twice the signal for the trouble, and is read for concentration <em>and</em> for whether
+            the couple is reversible. Not one of the three alters the electrochemistry &mdash; <b>they only
+            change when you look.</b></p>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="wide1">
+      <div class="card">
+        <div class="card-h"><h2>The three methods side by side</h2><span class="note">what each one is for</span></div>
+        <div class="card-b"><div class="sumwrap"><table class="sumtbl" id="puTable"></table></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-quiz1" role="tabpanel" aria-labelledby="t-quiz1" hidden>
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h">
+        <h2>Concept check &middot; the ohmic term, the window, and what to do about it</h2>
+        <span class="note">six questions &mdash; answer once per question; the reasoning appears immediately</span>
+        <span class="tally" style="margin-left:auto" id="tally1"></span>
+      </div>
+      <div class="card-b">
+        <div class="idgrid">
+          <div>
+            <label class="fld" for="sId1">Student ID</label>
+            <input type="text" id="sId1" inputmode="numeric" placeholder="e.g. 20261234">
+          </div>
+        </div>
+        <p class="hint" id="idHint1"></p>
+      </div>
+      <div class="scorebar" id="scorebar1" hidden>
+        <div>
+          <div class="scorenum" id="scoreNum1">&mdash;</div>
+          <div class="vcode" style="margin-top:4px" id="whoLine1">&mdash;</div>
+        </div>
+        <div style="flex:1 1 300px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="solid" id="sendBtn1" type="button" hidden>Submit to the course</button>
+            <button class="ghost" id="dlBtn1" type="button">Download my result</button>
+          </div>
+          <p class="hint" id="dlHint1" style="margin-top:8px">Download the file and hand it in as your instructor directs.</p>
+        </div>
+      </div>
+    </div>
+    <div class="quiz" id="quiz1"></div>
+  </section>
+
+  <footer>
+    E(electrode) = E(applied) &minus; iR<sub>u</sub>, with R<sub>u</sub>(d) = (1/4&kappa;a)[1&minus;(2/&pi;)arctan(a/d)]
+    for an inlaid disc under a primary current distribution &middot;
+    the charging current, the Cottrell equation and the ultramicroelectrode steady state are as in
+    Bard &amp; Faulkner, <i>Electrochemical Methods</i>, chapters 1, 5 and 7; i<sub>c</sub> and i<sub>d</sub>
+    are treated as additive, which is the usual approximation and not exact &middot;
+    the pulse voltammograms are the reversible sampled-current limit, i(E) = i<sub>d</sub>/(1+&theta;),
+    differenced as the instrument differences them, and the current drawn under each programme is
+    illustrative of its shape rather than a solution of the moving boundary &middot;
+    W<sub>1/2</sub> &rarr; 3.52RT/nF and E<sub>p</sub> = E<sub>1/2</sub> &minus; &Delta;E/2 are small-pulse
+    limits and the page shows the departure from both &middot;
+    &kappa; = 0.05 S cm<sup>&minus;1</sup> throughout the ohmic tab, double-layer capacitance 20 µF/cm², D = 2&times;10<sup>&minus;5</sup> cm²/s, activity coefficients 1<br>
+    CH40051 Electroanalytical Chemistry &middot; Fall 2026 &mdash; companion to Lecture 14
+  </footer>
+</div>
+<script>
+(function(){
+"use strict";
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+/* ---------------- tabs ---------------- */
+var tabs=[].slice.call(document.querySelectorAll(".tab"));
+tabs.forEach(function(t){
+  t.addEventListener("click",function(){
+    tabs.forEach(function(o){
+      var on=(o===t);
+      o.setAttribute("aria-selected",on?"true":"false");
+      document.getElementById(o.getAttribute("aria-controls")).hidden=!on;
+    });
+  });
+});
+
+/* ================= SHARED CONSTANTS AND HELPERS =========================
+   Currents in A/cm2, potentials in V, lengths in cm unless a name says
+   otherwise. Everything on the page is derived from these.              */
+var QE = 1.602176634e-19, KB = 1.380649e-23, NA = 6.02214076e23;
+var FARADAY = QE * NA, RGAS = KB * NA, T25 = 298.15;
+var RTF = RGAS * T25 / FARADAY;            /* 0.025693 V                 */
+var DEC = RTF * Math.LN10;                 /* 0.059159 V per decade      */
+var MONO = 'font-family="IBM Plex Mono,monospace"';
+var SEC_YR = 3.15576e7;
+
+function pillGroup(id, cb){
+  var wrap = document.getElementById(id);
+  wrap.addEventListener("click", function(e){
+    var b = e.target.closest("button.pill");
+    if(!b) return;
+    [].slice.call(wrap.querySelectorAll("button.pill")).forEach(function(o){
+      o.setAttribute("aria-pressed", o === b ? "true" : "false");
+    });
+    cb(b.getAttribute("data-s"));
+  });
+}
+function pillSet(id, val){
+  [].slice.call(document.querySelectorAll("#" + id + " button.pill")).forEach(function(o){
+    o.setAttribute("aria-pressed", o.getAttribute("data-s") === val ? "true" : "false");
+  });
+}
+
+/* x as "1.84 × 10<sup>7</sup>", and the same with a tspan for inside an SVG */
+function sciH(x, d){
+  if(x === 0) return "0";
+  var e = Math.floor(Math.log10(Math.abs(x))), m = x / Math.pow(10, e);
+  if(Math.abs(+m.toFixed(d - 1)) >= 10){ m /= 10; e++; }
+  /* unicode, not <sup>: this string is written into SVG text as often
+     as into HTML, and <sup> is not an SVG element */
+  return m.toFixed(d - 1) + " × 10" + supr(e);
+}
+function sciSvg(x, d){
+  if(x === 0) return "0";
+  var e = Math.floor(Math.log10(Math.abs(x))), m = x / Math.pow(10, e);
+  if(Math.abs(+m.toFixed(d - 1)) >= 10){ m /= 10; e++; }
+  return m.toFixed(d - 1) + ' × 10<tspan baseline-shift="super" font-size="8">' + e + '</tspan>';
+}
+/* a current density, in whatever unit keeps it readable */
+function fmtJ(j){
+  var a = Math.abs(j);
+  if(a === 0) return "0";
+  if(a >= 1) return j.toFixed(2) + " A/cm²";
+  if(a >= 1e-3) return (j * 1e3).toFixed(2) + " mA/cm²";
+  if(a >= 1e-6) return (j * 1e6).toFixed(2) + " µA/cm²";
+  if(a >= 1e-9) return (j * 1e9).toFixed(2) + " nA/cm²";
+  return sciH(j, 2) + " A/cm²";
+}
+/* the same, for a current rather than a current density */
+function fmtA(i){
+  var a = Math.abs(i);
+  if(a === 0) return "0";
+  if(a >= 1) return i.toFixed(3) + " A";
+  if(a >= 1e-3) return (i * 1e3).toPrecision(3) + " mA";
+  if(a >= 1e-6) return (i * 1e6).toPrecision(3) + " µA";
+  if(a >= 1e-9) return (i * 1e9).toPrecision(3) + " nA";
+  return sciH(i, 2) + " A";
+}
+/* the same two, for an SVG <text>, where <sup> is not markup but a
+   mistake: everything from it to the end of the string disappears */
+function fmtJSvg(j){ var t = fmtJ(j); return t.indexOf("<sup>") < 0 ? t : sciSvg(j, 2) + " A/cm²"; }
+function fmtASvg(i){ var t = fmtA(i); return t.indexOf("<sup>") < 0 ? t : sciSvg(i, 2) + " A"; }
+function fmtV(v){
+  var a = Math.abs(v);
+  if(a < 1) return (v * 1000).toFixed(a < 0.01 ? 2 : 1) + " mV";
+  return v.toFixed(3) + " V";
+}
+function fmtR(r){
+  if(r >= 1e6) return (r / 1e6).toFixed(2) + " MΩ";
+  if(r >= 1e3) return (r / 1e3).toFixed(2) + " kΩ";
+  if(r >= 1) return r.toFixed(1) + " Ω";
+  return (r * 1000).toFixed(1) + " mΩ";
+}
+function clamp(v, a, b){ return v < a ? a : v > b ? b : v; }
+
+/* ---- the small SVG vocabulary every picture on this page is drawn in --- */
+function ln(x1, y1, x2, y2, col, w, dash, op){
+  return '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + x2.toFixed(1)
+       + '" y2="' + y2.toFixed(1) + '" stroke="' + col + '" stroke-width="' + (w || 1) + '"'
+       + (dash ? ' stroke-dasharray="' + dash + '"' : "")
+       + (op !== undefined ? ' opacity="' + op + '"' : "") + '/>';
+}
+function tx(x, y, s, col, size, anchor, weight){
+  return '<text x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" fill="' + col + '" ' + MONO
+       + ' font-size="' + (size || 10.5) + '"'
+       + (anchor ? ' text-anchor="' + anchor + '"' : "")
+       + (weight ? ' font-weight="' + weight + '"' : "") + '>' + s + '</text>';
+}
+/* an axis name that sits beside its axis rather than in a caption under
+   the frame: xName at the right end of the x axis, yName up the left */
+function xName(x0, x1, y, lab){ return tx((x0 + x1) / 2, y, lab, "var(--ink-2)", 11.5, "middle", 600); }
+function yName(x, y0, y1, lab){
+  var cy = (y0 + y1) / 2;
+  return tx(x, cy, lab, "var(--ink-2)", 11.5, "middle", 600)
+    .replace("<text", '<text data-yspan="' + (y1 - y0).toFixed(0)
+             + '" transform="rotate(-90 ' + x.toFixed(1) + ' ' + cy.toFixed(1) + ')"');
+}
+function pth(d, col, w, fill, op){
+  return '<path d="' + d + '" fill="' + (fill || "none") + '" stroke="' + (col || "none")
+       + '" stroke-width="' + (w || 2) + '"'
+       + (op !== undefined ? ' opacity="' + op + '"' : "") + ' stroke-linejoin="round"/>';
+}
+function rc(x, y, w, h, col, op, rx){
+  if(w <= 0 || h <= 0) return "";
+  return '<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + w.toFixed(1)
+       + '" height="' + h.toFixed(1) + '" fill="' + col + '"'
+       + (rx ? ' rx="' + rx + '"' : "")
+       + (op !== undefined ? ' opacity="' + op + '"' : "") + '/>';
+}
+function cir(x, y, r, col, op){
+  return '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + r.toFixed(2)
+       + '" fill="' + col + '"' + (op !== undefined ? ' opacity="' + op + '"' : "") + '/>';
+}
+/* a two-headed measure, used for every "this much" on the page */
+function arrowV(x, y1, y2, col, lab, side){
+  var s = ln(x, y1, x, y2, col, 1.6);
+  var d = y2 > y1 ? 1 : -1;
+  s += '<polygon points="' + x + ',' + y2 + ' ' + (x - 3) + ',' + (y2 - 4 * d) + ' ' + (x + 3) + ',' + (y2 - 4 * d) + '" fill="' + col + '"/>';
+  s += '<polygon points="' + x + ',' + y1 + ' ' + (x - 3) + ',' + (y1 + 4 * d) + ' ' + (x + 3) + ',' + (y1 + 4 * d) + '" fill="' + col + '"/>';
+  if(lab) s += tx(x + (side === "l" ? -6 : 6), (y1 + y2) / 2 + 3.5, lab, col, 10, side === "l" ? "end" : "start", 600);
+  return s;
+}
+
+
+
+/* ================= 7 - THE POTENTIAL STEP ==============================
+   Everything on this page is closed form. A step to where C_O(0,t) = 0
+   leaves no kinetics in the problem at all, so the current is
+
+       i_c = (dE/Ru) exp(-t/Ru*Cdl)        the double layer charging
+       i_d = nFA sqrt(D) C* / sqrt(pi t)   Cottrell, and nothing else
+
+   and the whole lecture is about the window between the first dying and
+   the second being spoilt - by the edge of the electrode, or by the room.
+   Shrink the electrode below its own diffusion layer and the Cottrell term
+   acquires a companion that does not decay, i_ss = 4nFDC*r0 on a disc.
+   The pulse methods are the same two currents sampled late, where one has
+   gone and the other has not.                                           */
+
+var FRT = FARADAY / (RGAS * T25);          /* 38.92 V^-1                 */
+var CDL_AREA = 20e-6;                      /* F/cm2, the usual figure    */
+var T_CONV = 20;                           /* s, when the room takes over */
+
+function iChg(dE, Ru, Cdl, t){ return (dE / Ru) * Math.exp(-t / (Ru * Cdl)); }
+function iCot(n, A, D, Cs, t){ return n * FARADAY * A * Math.sqrt(D) * Cs / Math.sqrt(Math.PI * t); }
+function iSS(n, D, Cs, r0, geom){
+  return (geom === "sphere" ? 4 * Math.PI : 4) * n * FARADAY * D * Cs * r0;
+}
+function areaOf(r0, geom){ return geom === "sphere" ? 4 * Math.PI * r0 * r0 : Math.PI * r0 * r0; }
+/* where the depleted layer has grown to the size of the electrode */
+function tEdge(r0, D){ return r0 * r0 / (2 * D); }
+function tSS(r0, D){ return r0 * r0 / (Math.PI * D); }
+function deltaOf(D, t){ return Math.sqrt(2 * D * t); }
+
+/* the shared fmtA stops at nanoamps; a UME does not */
+/* erf, Abramowitz and Stegun 7.1.26 - used by every concentration
+   profile on the page, so it lives with the shared helpers           */
+function erfA(z){
+  var sg = z < 0 ? -1 : 1, az = Math.abs(z);
+  var u = 1 / (1 + 0.3275911 * az);
+  return sg * (1 - (((((1.061405429 * u - 1.453152027) * u) + 1.421413741) * u
+       - 0.284496736) * u + 0.254829592) * u * Math.exp(-az * az));
+}
+
+function fmtI(i){
+  var a = Math.abs(i);
+  if(a === 0) return "0";
+  if(a >= 1) return i.toPrecision(3) + " A";
+  if(a >= 1e-3) return (i * 1e3).toPrecision(3) + " mA";
+  if(a >= 1e-6) return (i * 1e6).toPrecision(3) + " µA";
+  if(a >= 1e-9) return (i * 1e9).toPrecision(3) + " nA";
+  if(a >= 1e-12) return (i * 1e12).toPrecision(3) + " pA";
+  if(a >= 1e-15) return (i * 1e15).toPrecision(3) + " fA";
+  return sciH(i, 2) + " A";
+}
+function fmtT(t){
+  if(!isFinite(t)) return "—";
+  if(t >= 60) return (t / 60).toPrecision(3) + " min";
+  if(t >= 1) return t.toPrecision(3) + " s";
+  if(t >= 1e-3) return (t * 1e3).toPrecision(3) + " ms";
+  if(t >= 1e-6) return (t * 1e6).toPrecision(3) + " µs";
+  return sciH(t, 2) + " s";
+}
+function fmtF(c){
+  if(c >= 1e-6) return (c * 1e6).toPrecision(3) + " µF";
+  if(c >= 1e-9) return (c * 1e9).toPrecision(3) + " nF";
+  return (c * 1e12).toPrecision(3) + " pF";
+}
+function fmtLen15(cm){
+  var um = cm * 1e4;
+  if(um >= 1e4) return (um / 1e4).toPrecision(3) + " cm";
+  if(um >= 1000) return (um / 1000).toPrecision(3) + " mm";
+  if(um >= 1) return um.toPrecision(3) + " µm";
+  return (um * 1000).toPrecision(3) + " nm";
+}
+function tickNum(v){
+  var a = Math.abs(v);
+  if(a < 1e-9) return "0";
+  return (+v.toFixed(a >= 100 ? 0 : a >= 10 ? 1 : a >= 1 ? 2 : 3)) + "";
+}
+function nice(v){
+  var e = Math.pow(10, Math.floor(Math.log10(v))), m = v / e;
+  return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 2.5 ? 2.5 : m <= 5 ? 5 : 10) * e;
+}
+function iUnit(maxA){
+  var a = Math.abs(maxA);
+  return a >= 1e-3 ? {k:1e-3, u:"mA"} : a >= 1e-6 ? {k:1e-6, u:"µA"}
+       : a >= 1e-9 ? {k:1e-9, u:"nA"} : {k:1e-12, u:"pA"};
+}
+function supr(e){
+  var m = {"-":"⁻", "0":"⁰", "1":"¹", "2":"²", "3":"³", "4":"⁴",
+           "5":"⁵", "6":"⁶", "7":"⁷", "8":"⁸", "9":"⁹"};
+  return String(Math.round(e)).split("").map(function(c){ return m[c] || c; }).join("");
+}
+
+/* ---- a frame, and a decade frame for the log-log pictures -------------- */
+function fr(X0, X1, Y0, Y1, xlo, xhi, ylo, yhi){
+  return {X0:X0, X1:X1, Y0:Y0, Y1:Y1, xlo:xlo, xhi:xhi, ylo:ylo, yhi:yhi,
+    px:function(v){ return X0 + (v - xlo) / (xhi - xlo) * (X1 - X0); },
+    py:function(v){ return Y1 - (v - ylo) / (yhi - ylo) * (Y1 - Y0); }};
+}
+function axLin(f, xlab, ylab, fx, fy){
+  var s = rc(f.X0, f.Y0, f.X1 - f.X0, f.Y1 - f.Y0, "var(--surface-2)", 0.5, 4), g;
+  /* an axis is allowed to descend: the pulse voltammogram runs positive
+     to negative so that it reads the same way as the scan above it   */
+  var xA = Math.min(f.xlo, f.xhi), xB = Math.max(f.xlo, f.xhi);
+  var yA = Math.min(f.ylo, f.yhi), yB = Math.max(f.ylo, f.yhi);
+  var xs = nice((xB - xA) / 5), ys = nice((yB - yA) / 5);
+  for(g = Math.ceil(xA / xs) * xs; g <= xB + 1e-12; g += xs){
+    s += ln(f.px(g), f.Y0, f.px(g), f.Y1, "var(--line)", 1, "2 3", 0.75);
+    /* the first one would sit in the corner the y labels already use */
+    if(f.px(g) > f.X0 + 10)
+      s += tx(f.px(g), f.Y1 + 14, fx ? fx(g) : tickNum(g), "var(--muted)", 9.5, "middle");
+  }
+  for(g = Math.ceil(yA / ys) * ys; g <= yB + 1e-12; g += ys){
+    s += ln(f.X0, f.py(g), f.X1, f.py(g), "var(--line)", 1, "2 3", 0.75);
+    s += tx(f.X0 - 6, f.py(g) + 3.4, fy ? fy(g) : tickNum(g), "var(--muted)", 9.5, "end");
+  }
+  s += xName(f.X0, f.X1, f.Y1 + 30, xlab);
+  s += yName(14, f.Y0, f.Y1, ylab);
+  return s;
+}
+/* both axes in decades: the only honest way to show a current that runs
+   from microamps to picoamps over six orders of magnitude of time      */
+/* a decade label is about 15 units wide and 13 tall; when there are more
+   decades than that leaves room for, label every second or fifth     */
+function thin(decades, room, each){
+  var want = Math.ceil(decades * each / room);
+  return want <= 1 ? 1 : want <= 2 ? 2 : want <= 5 ? 5 : 10;
+}
+function axLog(f, xlab, ylab){
+  var s = rc(f.X0, f.Y0, f.X1 - f.X0, f.Y1 - f.Y0, "var(--surface-2)", 0.5, 4), g;
+  var sx = thin(f.xhi - f.xlo, f.X1 - f.X0, 30), sy = thin(f.yhi - f.ylo, f.Y1 - f.Y0, 15);
+  for(g = Math.ceil(f.xlo); g <= f.xhi + 1e-9; g++){
+    s += ln(f.px(g), f.Y0, f.px(g), f.Y1, "var(--line)", 1, "2 3", 0.75);
+    /* the leftmost one shares its corner with the lowest y label */
+    if(g % sx === 0 && f.px(g) > f.X0 + 12)
+      s += tx(f.px(g), f.Y1 + 14, "10" + supr(g), "var(--muted)", 9.5, "middle");
+  }
+  for(g = Math.ceil(f.ylo); g <= f.yhi + 1e-9; g++){
+    s += ln(f.X0, f.py(g), f.X1, f.py(g), "var(--line)", 1, "2 3", 0.75);
+    if(g % sy === 0) s += tx(f.X0 - 6, f.py(g) + 3.4, "10" + supr(g), "var(--muted)", 9.5, "end");
+  }
+  s += xName(f.X0, f.X1, f.Y1 + 30, xlab);
+  s += yName(14, f.Y0, f.Y1, ylab);
+  return s;
+}
+/* log decades across, linear up: the ohmic step picture needs both, so
+   that the time axis can be fixed over eleven decades while the
+   potential axis stays in millivolts                                   */
+function axMix(f, xlab, ylab, fy){
+  var s = rc(f.X0, f.Y0, f.X1 - f.X0, f.Y1 - f.Y0, "var(--surface-2)", 0.5, 4), g;
+  var sx = thin(f.xhi - f.xlo, f.X1 - f.X0, 30);
+  for(g = Math.ceil(f.xlo); g <= f.xhi + 1e-9; g++){
+    s += ln(f.px(g), f.Y0, f.px(g), f.Y1, "var(--line)", 1, "2 3", 0.75);
+    if(g % sx === 0 && f.px(g) > f.X0 + 12)
+      s += tx(f.px(g), f.Y1 + 14, "10" + supr(g), "var(--muted)", 9.5, "middle");
+  }
+  var ys = nice((f.yhi - f.ylo) / 5);
+  for(g = Math.ceil(f.ylo / ys) * ys; g <= f.yhi + 1e-12; g += ys){
+    s += ln(f.X0, f.py(g), f.X1, f.py(g), "var(--line)", 1, "2 3", 0.75);
+    s += tx(f.X0 - 6, f.py(g) + 3.4, fy ? fy(g) : tickNum(g), "var(--muted)", 9.5, "end");
+  }
+  s += xName(f.X0, f.X1, f.Y1 + 30, xlab);
+  s += yName(14, f.Y0, f.Y1, ylab);
+  return s;
+}
+/* a row of keys under a plot. Anything written inside a frame eventually
+   has a curve drawn through it, so the words live here instead: a swatch,
+   the text, and a second line when the first one fills up.            */
+function legend(X0, X1, y, items){
+  var out = '<g class="lgrow" data-x0="' + X0 + '" data-x1="' + X1 + '" data-y="' + y + '">';
+  items.forEach(function(it){
+    out += '<g class="lgi">';
+    if(it.c) out += ln(0, -3.5, 13, -3.5, it.c, it.d ? 1.6 : 2.4, it.d ? "3 2" : null);
+    out += tx(it.c ? 18 : 0, 0, it.t, it.c || "var(--muted)", 9.5, null, it.c ? 700 : 600);
+    out += '</g>';
+  });
+  return out + '</g>';
+}
+/* Put a drawing into the page, then lay out the parts of it whose size
+   only the browser knows. A legend key is as wide as its text actually
+   renders, not as wide as its letter count suggested, and an axis name
+   written up the side of a frame is shrunk when it is longer than the
+   frame is tall. The viewBox then becomes whatever the legend needed.  */
+function paint(id, markup){
+  var el = document.getElementById(id), i, j;
+  if(!el) return;
+  el.innerHTML = markup;
+  var bottom = 0, rows = el.getElementsByClassName("lgrow");
+  for(i = 0; i < rows.length; i++){
+    var row = rows[i];
+    var X0 = +row.getAttribute("data-x0"), X1 = +row.getAttribute("data-x1");
+    var y0 = +row.getAttribute("data-y"), x = X0, line = 0;
+    var its = row.getElementsByClassName("lgi");
+    for(j = 0; j < its.length; j++){
+      var gi = its[j], t = gi.getElementsByTagName("text")[0];
+      var sw = gi.getElementsByTagName("line").length ? 18 : 0;
+      var room = X1 - X0 - sw - 20, extra = 0;
+      /* a key wider than the whole row is broken into lines by words -
+         measuring each candidate line, because only the browser knows */
+      if(t.getComputedTextLength() > room && t.childNodes.length === 1){
+        var words = t.textContent.split(" "), lines = [], cur = "", z;
+        for(z = 0; z < words.length; z++){
+          var test = cur ? cur + " " + words[z] : words[z];
+          t.textContent = test;
+          if(t.getComputedTextLength() > room && cur){ lines.push(cur); cur = words[z]; }
+          else cur = test;
+        }
+        if(cur) lines.push(cur);
+        t.textContent = lines[0];
+        for(z = 1; z < lines.length; z++){
+          var sp = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
+          sp.setAttribute("x", t.getAttribute("x"));
+          sp.setAttribute("dy", "13");
+          sp.textContent = lines[z];
+          t.appendChild(sp);
+        }
+        extra = lines.length - 1;
+        if(x > X0){ x = X0; line++; }
+      }
+      var w = sw + t.getComputedTextLength() + 20;
+      if(x + w > X1 && x > X0){ x = X0; line++; }
+      gi.setAttribute("transform", "translate(" + x.toFixed(1) + ","
+                      + (y0 + line * 15).toFixed(1) + ")");
+      bottom = Math.max(bottom, y0 + line * 15 + extra * 13);
+      if(extra){ x = X0; line += extra + 1; } else x += w;
+    }
+    bottom = Math.max(bottom, y0 + line * 15);
+  }
+  var ys = el.getElementsByTagName("text");
+  for(i = 0; i < ys.length; i++){
+    var sp = ys[i].getAttribute("data-yspan");
+    if(!sp) continue;
+    var room = +sp - 8, L = ys[i].getComputedTextLength();
+    ys[i].setAttribute("font-size", L > room ? Math.max(7, 11.5 * room / L).toFixed(1) : 11.5);
+  }
+  if(bottom){
+    var vb = el.getAttribute("viewBox").split(/[ ,]+/), need = Math.ceil(bottom + 10);
+    if(need !== +vb[3]){ vb[3] = need; el.setAttribute("viewBox", vb.join(" ")); }
+  }
+}
+function curve(f, fn, lo, hi, npt){
+  var d = "", pen = false, N = npt || 200;
+  var yA = Math.min(f.ylo, f.yhi), yB = Math.max(f.ylo, f.yhi);
+  var xA = Math.min(f.xlo, f.xhi), xB = Math.max(f.xlo, f.xhi);
+  for(var i = 0; i <= N; i++){
+    var x = lo + (hi - lo) * i / N, y = fn(x);
+    if(!isFinite(y) || y < yA || y > yB || x < xA || x > xB){ pen = false; continue; }
+    d += (pen ? "L" : "M") + f.px(x).toFixed(1) + " " + f.py(y).toFixed(1) + " ";
+    pen = true;
+  }
+  return d;
+}
+var PEND = {};
+function later(key, fn){
+  if(PEND[key]) return;
+  PEND[key] = true;
+  window.requestAnimationFrame(function(){ PEND[key] = false; fn(); });
+}
+
+/* ======================= 0 - OHMIC ERROR ==============================
+   Nothing else on this page makes sense until this does. The potential
+   you set is not the potential the electrode gets: the current has to
+   cross the solution between the working electrode and the reference,
+   and every ohm of that costs iR_u volts.
+
+       E(electrode) = E(applied) - i R_u
+
+   For a disc of radius a in an electrolyte of conductivity kappa, with
+   the reference tip a distance d away on the axis, the primary current
+   distribution gives
+
+       R_u(d) = (1 / 4 kappa a) [1 - (2/pi) arctan(a/d)]
+
+   which rises to 1/(4 kappa a) and stops. That saturation is the whole
+   lesson: most of R_u lives within one radius of the electrode, so a
+   Luggin capillary helps only until it is about a radius away, and after
+   that moving it buys nothing at all.                                  */
+
+function ruOf(kappa, a, d){
+  return (1 / (4 * kappa * a)) * (1 - (2 / Math.PI) * Math.atan(a / d));
+}
+function ruInf(kappa, a){ return 1 / (4 * kappa * a); }
+
+/* kappa is a constant here, not a control. Two reasons: the figures
+   below are meant to keep fixed axes, and a conductivity slider moves
+   R_u by three and a half decades all on its own, which rescales
+   everything and hides the one thing the tab is about - the shape of
+   R_u(d). 0.05 S/cm is 0.1 M KCl at 25 C, the same value the Reference
+   Bench uses, and the organic case survives as a readout.            */
+var OH_KAPPA = 0.05, OH_KRES = 2e-3;
+var OH = {a:0.15, d:0.1, Cdl:5e-6, i:1e-4, dE:0.3};
+
+/* ---- the cell, drawn in units of the electrode radius ---------------
+   Fixed geometry: the disc is always 1 a wide and the frame always 10 a
+   tall, so the only thing that moves is the Luggin tip at d/a. The two
+   dashed shells are the surfaces inside which half and nine tenths of
+   R_u lie: for a disc, the fraction of R_u within z is (2/pi)arctan(z/a),
+   so z_f = a tan(pi f/2), and the shell through that point on the axis
+   has radius a sec(pi f/2).                                           */
+function ohCellPic(){
+  var CX = 196, YS = 188, TOP = 26, ZMAX = 162, s = "";
+  /* every label already on the picture, so the tip reading can dodge them */
+  var TAKEN = [];
+  function free(y){
+    for(var k = 0; k < 26; k++){
+      var step = Math.ceil((k + 1) / 2) * 13 * (k % 2 ? -1 : 1), c = k ? y + step : y;
+      if(c < TOP + 12 || c > 244) continue;
+      var ok = true;
+      for(var q = 0; q < TAKEN.length; q++) if(Math.abs(TAKEN[q] - c) < 13) ok = false;
+      if(ok){ TAKEN.push(c); return c; }
+    }
+    return y;
+  }
+
+  /* ---- the scale ----------------------------------------------------
+     Drawn to an absolute scale, so the radius slider resizes the disc and
+     the distance slider moves the tip. The view height is whichever is
+     larger: enough to show the disc comfortably, or enough to reach the
+     tip - but never more than two dozen radii, or a millimetre electrode
+     with the tip a centimetre out would shrink the disc to nothing and
+     the shells with it. Past that the tip goes off the top, as it did
+     before, and says so.                                             */
+  var aDec = Math.pow(10, Math.floor(Math.log10(OH.a)));
+  var view = 12 * aDec;                      /* centimetres shown vertically */
+  var S = ZMAX / view;                       /* pixels per centimetre */
+  var aPx = OH.a * S, dPx = OH.d * S;
+
+  s += '<clipPath id="ohClip"><rect x="84" y="' + TOP + '" width="376" height="190"/></clipPath>';
+  s += rc(84, 52, 376, 164, "var(--ion-k)", 0.07);
+  s += pth("M84 " + TOP + " L84 216 L460 216 L460 " + TOP, "var(--line)", 2);
+  s += ln(84, 52, 460, 52, "var(--ion-k)", 1.4);
+  s += tx(372, 120, "bulk — nothing left to drop here", "var(--muted)", 9, "middle");
+  TAKEN.push(120);
+
+  /* the counter electrode, doing all the current carrying */
+  s += rc(412, 76, 14, 124, "var(--ink-2)", 0.5);
+  s += ln(419, 76, 419, 20, "var(--ink-2)", 1.6);
+  s += tx(434, 142, "CE", "var(--ink-2)", 10.5, null, 700);
+
+  /* the shells: half of R_u, then nine tenths. For a disc the fraction
+     within z is (2/pi)arctan(z/a), so the shell through z on the axis has
+     radius a*sec(pi f/2) - both scale with the disc, as they should.  */
+  s += '<g clip-path="url(#ohClip)">';
+  [[0.9, 0.09, "90 % of Rᵤ is inside here"],
+   [0.5, 0.17, "half of it is inside here"]].forEach(function(F){
+    var R = aPx / Math.cos(Math.PI * F[0] / 2);
+    if(R < 4) return;
+    var arc = "M" + (CX - R).toFixed(1) + " " + YS + " A " + R.toFixed(1) + " "
+            + R.toFixed(1) + " 0 0 1 " + (CX + R).toFixed(1) + " " + YS;
+    s += '<path d="' + arc + ' Z" fill="var(--ion-k)" opacity="' + F[1] + '" stroke="none"/>';
+    s += '<path d="' + arc + '" fill="none" stroke="var(--ion-k)" stroke-width="1.5"'
+       + ' stroke-dasharray="5 4"/>';
+    var ly = YS - R - 5;
+    if(ly > TOP + 10){ s += tx(CX, ly, F[2], "var(--ion-k)", 9.5, "middle", 700); TAKEN.push(ly); }
+    else if(CX + R + 6 < 320) s += tx(CX + R + 6, free(YS - 6), F[2], "var(--ion-k)", 9.5, null, 700);
+    else s += tx(452, free(YS - 6), F[2], "var(--ion-k)", 9.5, "end", 700);
+  });
+
+  s += "</g>";
+
+  /* the working electrode: an inlaid disc in its sheath */
+  var sheath = Math.max(aPx + 18, 30);
+  s += pth("M" + (CX - sheath) + " " + YS + " L" + (CX - sheath) + " 234 L"
+         + (CX + sheath) + " 234 L" + (CX + sheath) + " " + YS,
+           "var(--line)", 1.4, "var(--surface-2)");
+  s += rc(CX - aPx, YS - 4, 2 * aPx, 4, "var(--ink)");
+  s += tx(CX, 230, "WE", "var(--ink-2)", 10.5, "middle", 700);
+  if(aPx > 12){
+    s += ln(CX, 196, CX + aPx, 196, "var(--ink-2)", 1.2);
+    s += ln(CX, 192.5, CX, 199.5, "var(--ink-2)", 1.2);
+    s += ln(CX + aPx, 192.5, CX + aPx, 199.5, "var(--ink-2)", 1.2);
+    s += tx(CX + aPx / 2, 211, "a", "var(--ink-2)", 10, "middle", 700);
+    TAKEN.push(211);
+  }
+  TAKEN.push(230);                 /* the WE caption under the disc */
+
+  /* and the reference. The tip stops above the surface whatever the
+     slider says: a capillary drawn through the electrode it is measuring
+     is worse than one drawn slightly too far away.                   */
+  var off = dPx > ZMAX, STAND = 5;
+  var yT = YS - Math.min(dPx, ZMAX);
+  var pinned = yT > YS - STAND;
+  if(pinned) yT = YS - STAND;
+  var w = Math.max(2.5, Math.min(aPx * 0.42, 6));
+  s += pth("M" + (CX - w) + " 18 L" + (CX - w) + " " + yT.toFixed(1)
+         + " L" + (CX + w) + " " + yT.toFixed(1) + " L" + (CX + w) + " 18",
+           "var(--ink-2)", 1.5, "var(--surface)");
+  s += cir(CX, yT, Math.min(2.6, w), "var(--go)");
+  s += tx(CX - 12, 30, "RE", "var(--ink-2)", 10.5, "end", 700);
+  s += tx(CX - 12, 41, "Luggin capillary", "var(--muted)", 9, "end");
+
+  var lab = "d = " + fmtLen15(OH.d) + " = " + (OH.d / OH.a).toPrecision(2) + " a";
+  if(off){
+    s += pth("M" + (CX - 7) + " " + (yT + 9) + " L" + CX + " " + (yT - 1)
+           + " L" + (CX + 7) + " " + (yT + 9), "var(--stop)", 2);
+    var lo1 = free(yT + 4);
+    s += tx(CX + 14, lo1, lab, "var(--stop)", 9.5, null, 700);
+    s += tx(CX + 14, free(lo1 + 13), "off the top of this picture",
+            "var(--stop)", 9, null, 600);
+  }else if(pinned){
+    var lp1 = free(yT - 10);
+    s += tx(CX + w + 10, lp1, lab, "var(--stop)", 9.5, null, 700);
+    s += tx(CX + w + 10, free(lp1 + 13), "closer than this picture can draw",
+            "var(--stop)", 9, null, 600);
+  }else{
+    var ly2 = free(yT + 4);
+    s += tx(CX + w + 10, ly2, lab, "var(--go)", 9.5, null, 700);
+    s += ln(CX + w + 2, yT, CX + w + 7, yT, "var(--go)", 1.2);
+    if(Math.abs(ly2 - (yT + 4)) > 5)
+      s += ln(CX + w + 7, yT, CX + w + 7, ly2 - 4, "var(--go)", 1, "2 2", 0.8);
+  }
+
+  /* the scale bar, so "to scale" is a claim the reader can check */
+  var want = view / 3, p = Math.pow(10, Math.floor(Math.log10(want))), m = want / p;
+  var barCm = (m >= 5 ? 5 : m >= 2 ? 2 : 1) * p, barPx = barCm * S;
+  s += ln(96, 250, 96 + barPx, 250, "var(--ink-2)", 2);
+  s += ln(96, 246, 96, 254, "var(--ink-2)", 2);
+  s += ln(96 + barPx, 246, 96 + barPx, 254, "var(--ink-2)", 2);
+  s += tx(96 + barPx + 8, 253, fmtLen15(barCm), "var(--ink-2)", 9.5, null, 700);
+  return s;
+}
+
+/* ---- the circuit, and the clock it sets -----------------------------
+   Two equivalent circuits and then the approach to the applied step on a
+   LINEAR t/tau axis. The log-time figure further down keeps the wide
+   view, but 1, 3 and 5 tau land within three quarters of a decade of one
+   another there, so the percentages that matter cannot be read off it. */
+function ohBox(x, y, w, h, lab, col){
+  return rc(x, y, w, h, "var(--surface)", 1, 3)
+       + '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h
+       + '" fill="none" stroke="' + col + '" stroke-width="1.8" rx="3"/>'
+       + tx(x + w / 2, y + h / 2 + 4, lab, col, 10.5, "middle", 700);
+}
+function ohCap(x, y, col, lab, left){
+  var s = ln(x - 13, y, x + 13, y, col, 2.2);
+  s += ln(x - 13, y + 7, x + 13, y + 7, col, 2.2);
+  s += tx(x + (left ? -20 : 20), y + 8, lab, col, 10.5, left ? "end" : null, 700);
+  return s;
+}
+function ohRCPic(tau){
+  var s = "";
+  /* ---------- left: nothing able to react ---------- */
+  function circuit(X, title, faradaic){
+    var t = "", x0 = X, y0 = 44, yb = 118;
+    t += tx(X + 96, 26, title, faradaic ? "var(--red-)" : "var(--go)", 10.5, "middle", 700);
+    /* source */
+    t += cir(x0, (y0 + yb) / 2, 11, "none");
+    t += '<circle cx="' + x0 + '" cy="' + ((y0 + yb) / 2) + '" r="11" fill="none"'
+       + ' stroke="var(--ink-2)" stroke-width="1.6"/>';
+    t += tx(x0, (y0 + yb) / 2 + 4, "E", "var(--ink-2)", 10.5, "middle", 700);
+    t += ln(x0, y0 + 25, x0, y0, "var(--ink-2)", 1.6);
+    t += ln(x0, yb, x0, yb + 20, "var(--ink-2)", 1.6);
+    t += ln(x0, y0, x0 + 34, y0, "var(--ink-2)", 1.6);
+    /* R_u */
+    t += ohBox(x0 + 34, y0 - 11, 46, 22, "Rᵤ", "var(--ox)");
+    t += ln(x0 + 80, y0, x0 + 128, y0, "var(--ink-2)", 1.6);
+    /* the capacitor branch */
+    t += ln(x0 + 128, y0, x0 + 128, y0 + 24, "var(--ink-2)", 1.6);
+    t += ohCap(x0 + 128, y0 + 24, "var(--red-)", "Cᵈˡ", faradaic);
+    t += ln(x0 + 128, y0 + 31, x0 + 128, yb, "var(--ink-2)", 1.6);
+    if(faradaic){
+      t += ln(x0 + 128, y0, x0 + 176, y0, "var(--ink-2)", 1.6);
+      t += ln(x0 + 176, y0, x0 + 176, y0 + 16, "var(--ink-2)", 1.6);
+      t += ohBox(x0 + 153, y0 + 16, 46, 20, "R_ct", "var(--red-)");
+      t += ln(x0 + 176, y0 + 36, x0 + 176, y0 + 48, "var(--ink-2)", 1.6);
+      t += ohBox(x0 + 153, y0 + 48, 46, 20, "Z_W", "var(--red-)");
+      t += ln(x0 + 176, y0 + 68, x0 + 176, yb, "var(--ink-2)", 1.6);
+      t += ln(x0 + 128, yb, x0 + 176, yb, "var(--ink-2)", 1.6);
+    }
+    t += ln(x0, yb, x0 + 128, yb, "var(--ink-2)", 1.6);
+    return t;
+  }
+  s += circuit(44, "nothing able to react", false);
+  s += circuit(286, "with a reaction present", true);
+  s += tx(140, 142, "τ = RᵤCᵈˡ — the only time constant",
+          "var(--go)", 10, "middle", 700);
+  s += tx(382, 142, "R_ct sits in parallel with Cᵈˡ",
+          "var(--red-)", 10, "middle", 700);
+
+  /* ---------- the approach, on a linear t/tau clock ---------- */
+  var f = fr(62, 500, 168, 282, 0, 6, 0, 1.08);
+  s += axLin(f, "time after the step / τ", "fraction charged",
+             function(v){ return v.toFixed(0); }, function(v){ return v.toFixed(1); });
+  s += ln(f.X0, f.py(1), f.X1, f.py(1), "var(--red-)", 2, "5 4");
+  s += tx(f.X1 - 4, f.py(1) - 6, "what you applied", "var(--red-)", 9.5, "end", 700);
+  s += pth(curve(f, function(x){ return 1 - Math.exp(-x); }, 0, 6, 240), "var(--go)", 2.4);
+  [[1, "37 % still missing"], [3, "5 %"], [5, "0.67 %"]].forEach(function(M){
+    var y = 1 - Math.exp(-M[0]);
+    s += ln(f.px(M[0]), f.py(y), f.px(M[0]), f.py(1), "var(--ion-k)", 1.6);
+    s += ln(f.px(M[0]), f.py(y), f.px(M[0]), f.Y1, "var(--ion-k)", 1, "3 3", 0.6);
+    s += tx(f.px(M[0]), f.Y1 + 13, M[0] + "τ", "var(--ion-k)", 10, "middle", 700);
+    s += tx(f.px(M[0]) + 6, f.py((y + 1) / 2) + 4, M[1], "var(--ion-k)", 9.5, null, 700);
+  });
+  s += tx(f.X0 + 8, f.py(0.30), "E_elec = E(1 − e^(−t/τ))", "var(--go)", 10, null, 700);
+  s += tx(f.X0 + 8, f.py(0.16), "the gap is exactly iRᵤ,  τ = " + fmtT(tau),
+          "var(--ion-k)", 9.5, null, 600);
+  return s;
+}
+
+function ohDraw(){
+  var Rinf = ruInf(OH_KAPPA, OH.a), Ru = ruOf(OH_KAPPA, OH.a, OH.d);
+  var tau = Ru * OH.Cdl;
+  paint("ohCell", ohCellPic());
+  paint("ohFigRC", ohRCPic(tau));
+
+  /* ---- R_u against where you put the reference tip ------------------
+     Fixed axes, both logarithmic: 1 µm to 10 cm across, 0.01 ohm to
+     100 kohm up. Every (a, d) the sliders allow lands inside that box,
+     so moving a slider moves the curve and nothing else - which is the
+     only way to see that the curve has a SHAPE rather than just a
+     value. The y axis has to be logarithmic for that, because 1/4ka
+     alone runs over nearly three decades as a goes from 5 µm to 3 mm. */
+  var s = "";
+  var f = fr(62, 500, 22, 196, -4, 1, -2, 5);
+  s += axLog(f, "reference tip to electrode / cm", "Rᵤ / Ω");
+  var lR = Math.log10(Rinf);
+  s += ln(f.X0, f.py(lR), f.X1, f.py(lR), "var(--muted)", 1.4, "5 4");
+  s += tx(f.X0 + 6, f.py(lR) - 6,
+          "1/4κa = " + Rinf.toPrecision(3) + " Ω — and it never gets past this",
+          "var(--muted)", 9.5, null, 600);
+  s += pth(curve(f, function(x){
+             return Math.log10(ruOf(OH_KAPPA, OH.a, Math.pow(10, x)));
+           }, f.xlo, f.xhi, 320), "var(--red-)", 2.3);
+  var rOne = ruOf(OH_KAPPA, OH.a, OH.a);
+  s += ln(f.px(Math.log10(OH.a)), f.Y0, f.px(Math.log10(OH.a)), f.Y1,
+          "var(--stop)", 1.3, "4 3");
+  s += tx(f.px(Math.log10(OH.a)), f.Y1 - 5, "a", "var(--stop)", 10.5, "middle", 700);
+  var mx = f.px(Math.log10(OH.d)), my = f.py(Math.log10(Ru));
+  s += cir(mx, my, 4, "var(--ion-k)");
+  var right = mx < f.X1 - 120, low = my > f.Y1 - 46;
+  s += tx(mx + (right ? 8 : -8), my + (low ? -10 : 15),
+          "you are here: " + Ru.toPrecision(3) + " Ω",
+          "var(--ion-k)", 10, right ? null : "end", 700);
+  paint("ohFig", s);
+
+  /* ---- and what that resistance does to a step ---------------------
+     Fixed axes again, and the time axis is logarithmic because tau runs
+     from nanoseconds to about a second over the sliders' range. On a log
+     clock the exponential approach is a step that slides left and right
+     as tau changes, which is precisely what the slider should look like.
+     The potential axis is 0 to 600 mV, the top of the DE slider.      */
+  var imax = OH.dE / Ru, dEmV = OH.dE * 1000;
+  var g2 = fr(62, 500, 22, 110, -9, 2, 0, 600);
+  var q = axMix(g2, "", "E / mV");
+  q += ln(g2.X0, g2.py(dEmV), g2.X1, g2.py(dEmV), "var(--red-)", 2, "5 4");
+  /* the tau marker moves with the sliders, so each name takes the side of
+     the frame the marker is not on */
+  var lt = Math.log10(tau), onPlot = lt > g2.xlo + 0.3 && lt < g2.xhi - 0.3;
+  var mx = g2.px(lt), markRight = onPlot && mx > (g2.X0 + g2.X1) / 2;
+  if(markRight) q += tx(g2.X0 + 8, g2.py(dEmV) - 6, "what you applied", "var(--red-)", 9.5, null, 700);
+  else          q += tx(g2.X1 - 4, g2.py(dEmV) - 6, "what you applied", "var(--red-)", 9.5, "end", 700);
+  q += pth(curve(g2, function(x){
+             return dEmV * (1 - Math.exp(-Math.pow(10, x) / tau));
+           }, g2.xlo, g2.xhi, 320), "var(--go)", 2.3);
+  q += tx(markRight ? g2.X0 + 8 : g2.X1 - 4, g2.py(dEmV * 0.17), "what the electrode got",
+          "var(--go)", 9.5, markRight ? null : "end", 700);
+  /* the gap between the two IS iR_u, and at t = tau it is DE/e */
+  if(onPlot){
+    q += ln(mx, g2.py(dEmV * (1 - Math.exp(-1))), mx, g2.py(dEmV), "var(--ion-k)", 1.6);
+    var iLeft = mx > g2.X0 + 70;
+    q += tx(mx + (iLeft ? -6 : 6), g2.py(dEmV * 0.84), "iRᵤ", "var(--ion-k)", 10.5,
+            iLeft ? "end" : null, 700);
+    q += tx(mx, g2.Y1 - 4, "τ", "var(--ion-k)", 10, "middle", 700);
+  }
+
+  var g3 = fr(62, 500, 142, 236, -9, 2, -6, 2);
+  q += axLog(g3, "time after the step / s", "i / A");
+  q += pth(curve(g3, function(x){
+             var t = Math.pow(10, x);
+             return Math.log10(OH.dE / Ru * Math.exp(-t / tau));
+           }, g3.xlo, g3.xhi, 320), "var(--ion-k)", 2.3);
+  q += tx(g3.X0 + 8, g3.Y0 + 16, "i = (ΔE/Rᵤ) e^(−t/τ),  τ = RᵤCᵈˡ = "
+          + fmtT(tau), "var(--ion-k)", 9.5, null, 700);
+  var l5 = Math.log10(5 * tau);
+  if(l5 > g3.xlo && l5 < g3.xhi){
+    q += ln(g3.px(l5), g3.Y0, g3.px(l5), g3.Y1, "var(--stop)", 1.3, "4 3");
+    q += tx(g3.px(l5) + 5, g3.Y1 - 8, "5τ", "var(--stop)", 10, null, 700);
+  }
+  paint("ohFig2", q);
+
+  /* ---- the race that opens the window -------------------------------
+     i_c dies as exp(-t/tau); the faradaic current dies only as t^(-1/2),
+     so the two must cross. A representative 1 mM solution with
+     D = 1e-5 cm2/s is used for the Cottrell line - the point is the
+     SHAPE of the two decays and where they cross, not the concentration,
+     which is why it is stated on the figure rather than put on a slider. */
+  var A = Math.PI * OH.a * OH.a, DCOT = 1e-5, CBULK = 1e-6;
+  var cot = 96485 * A * Math.sqrt(DCOT) * CBULK / Math.sqrt(Math.PI);
+
+  /* ---- first, the same race magnified: eight tau, nothing else -------
+     On a clock measured in tau the charging curve stands still while the
+     sliders move and the faradaic one slides across it, which is the whole
+     of what tau does. The current is read against the first current the
+     cell can draw, dE/Ru, so that axis is fixed as well.             */
+  var imaxZ = OH.dE / Ru, ZU8 = 8;
+  var gz = fr(62, 500, 24, 150, 0, ZU8, 0, 1.05);
+  var w = axLin(gz, "time after the step, in units of τ = RᵤCᵈˡ",
+                "i / (ΔE/Rᵤ)",
+                function(v){ return v.toFixed(0) + "τ"; },
+                function(v){ return v.toFixed(1); });
+  w += rc(gz.X0, gz.Y0, gz.px(5) - gz.X0, gz.Y1 - gz.Y0, "var(--stop)", 0.10);
+  w += ln(gz.px(5), gz.Y0, gz.px(5), gz.Y1, "var(--stop)", 1.4, "4 3");
+  w += pth(curve(gz, function(u){ return Math.exp(-u); }, 1e-4, ZU8, 300),
+           "var(--ion-k)", 2.3);
+  w += pth(curve(gz, function(u){ return cot / Math.sqrt(u * tau) / imaxZ; },
+                 1e-3, ZU8, 300), "var(--go)", 2.3);
+  w += pth(curve(gz, function(u){
+             return Math.exp(-u) + cot / Math.sqrt(u * tau) / imaxZ;
+           }, 1e-3, ZU8, 300), "var(--ink)", 1.3, null, 0.6);
+  w += legend(gz.X0, 512, gz.Y1 + 46, [
+    {c:"var(--ion-k)", t:"i_c, charging"}, {c:"var(--go)", t:"i_f, faradaic"},
+    {c:"var(--ink)", t:"their sum — all the instrument can measure"}]);
+  w += legend(gz.X0, 512, gz.Y1 + 74, [
+    {c:"var(--stop)", d:1, t:"5τ = " + fmtT(5 * tau)
+       + " — before it the two cannot be separated"},
+    {t:"(τ = " + fmtT(tau) + ")"}]);
+
+  /* ---- and then the same thing over every decade there is ----------- */
+  var g4 = fr(62, 500, 268, 436, -9, 2, -10, 1);
+  w += axMix(g4, "time after the step / s", "i / A");
+  var t5 = 5 * tau, lt5 = Math.log10(t5);
+  if(lt5 > g4.xlo && lt5 < g4.xhi){
+    w += rc(g4.X0, g4.Y0, Math.max(0, g4.px(lt5) - g4.X0), g4.Y1 - g4.Y0,
+            "var(--stop)", 0.12);
+    w += ln(g4.px(lt5), g4.Y0, g4.px(lt5), g4.Y1, "var(--stop)", 1.4, "4 3");
+    w += tx(g4.px(lt5) + 5, g4.Y0 + 13, "5τ = " + fmtT(t5), "var(--stop)", 10, null, 700);
+  }
+  w += pth(curve(g4, function(x){
+             return Math.log10(OH.dE / Ru * Math.exp(-Math.pow(10, x) / tau));
+           }, g4.xlo, g4.xhi, 320), "var(--ion-k)", 2.3);
+  w += pth(curve(g4, function(x){
+             return Math.log10(cot / Math.sqrt(Math.pow(10, x)));
+           }, g4.xlo, g4.xhi, 320), "var(--go)", 2.3);
+  /* the far end of the window: 5 tau is the near one, and the room is the
+     other. Past about twenty seconds the solution stirs itself and the
+     faradaic current stops falling as t^(-1/2) at all                */
+  var lcv = Math.log10(T_CONV);
+  if(lcv > g4.xlo && lcv < g4.xhi){
+    w += rc(g4.px(lcv), g4.Y0, g4.X1 - g4.px(lcv), g4.Y1 - g4.Y0, "var(--red-)", 0.10);
+    w += ln(g4.px(lcv), g4.Y0, g4.px(lcv), g4.Y1, "var(--red-)", 1.4, "4 3");
+    w += tx(g4.px(lcv) - 5, g4.Y0 + 29, "thermal convection — " + fmtT(T_CONV),
+            "var(--red-)", 10, "end", 700);
+  }
+  w += legend(g4.X0, 512, g4.Y1 + 46, [
+    {c:"var(--ion-k)", t:"i_c = (ΔE/Rᵤ) e^(−t/τ) — exponential"},
+    {c:"var(--go)", t:"i_f ∝ t^(−1/2) — Cottrell"},
+    {c:"var(--red-)", d:1, t:"thermal convection at " + fmtT(T_CONV)
+       + " — the far end of the window"}]);
+  w += legend(g4.X0, 512, g4.Y1 + 74, [
+    {t:"the faradaic line is drawn for 1 mM, D = 10⁻⁵ cm² s⁻¹, A = πa² "
+       + "— what matters is its slope, not its height"}]);
+  paint("ohFigWin", w);
+
+  /* ---- the numbers --------------------------------------------------- */
+  var set = function(id, t){ document.getElementById(id).innerHTML = t; };
+  set("ohRu", Ru.toPrecision(3) + " Ω");
+  set("ohRinf", Rinf.toPrecision(3) + " Ω");
+  set("ohRres", (Ru * OH_KAPPA / OH_KRES).toPrecision(3) + " Ω — "
+      + (OH.i * Ru * (OH_KAPPA / OH_KRES) * 1000).toPrecision(3) + " mV");
+  set("ohFrac", (Ru / Rinf * 100).toFixed(0) + " % of it");
+  set("ohOneR", (rOne / Rinf * 100).toFixed(0) + " % of the limit");
+  set("ohDrop", (OH.i * Ru * 1000).toPrecision(3) + " mV");
+  set("ohIlab", fmtI(OH.i));
+  set("ohImax", fmtI(OH.dE / Ru));
+  set("ohTau", fmtT(tau));
+  set("ohT5", fmtT(5 * tau));
+  set("ohAv", fmtLen15(OH.a));
+  set("ohDv", fmtLen15(OH.d) + " = " + (OH.d / OH.a).toPrecision(2) + " a");
+  set("ohCdv", fmtF(OH.Cdl));
+  set("ohDEv", (OH.dE * 1000).toFixed(0) + " mV");
+
+  var drop = OH.i * Ru * 1000, vd = document.getElementById("ohVerdict"), cls, msg;
+  if(drop < 2){
+    cls = "go";
+    msg = "<b>" + drop.toPrecision(2) + " mV of error.</b> Below a couple of millivolts the ohmic "
+        + "term is smaller than the other things you are not controlling, and you can report the "
+        + "applied potential as the electrode's. That is the condition to aim for, and the way to "
+        + "reach it is more supporting electrolyte &mdash; &kappa; is in the denominator of every "
+        + "term here.";
+  }else if(drop < 20){
+    cls = "stop";
+    msg = "<b>" + drop.toPrecision(2) + " mV of error.</b> That is already a tenth of a Tafel decade, "
+        + "so a kinetic analysis done on these potentials gives a transfer coefficient that is wrong "
+        + "by the same proportion &mdash; and the error grows with current, so it bends the Tafel plot "
+        + "rather than shifting it. Correct for it, or reduce it.";
+  }else{
+    cls = "mixv";
+    msg = "<b>" + drop.toPrecision(3) + " mV of error.</b> At this point the potential axis of your "
+        + "experiment is fiction: a voltammogram taken here is stretched along E in proportion to the "
+        + "current, so peaks move apart, waves lean over, and a reversible couple reads as a sluggish "
+        + "one. No amount of curve fitting recovers it, because the distortion is not a property of "
+        + "the chemistry.";
+  }
+  vd.className = "verdict " + cls;
+  vd.innerHTML = msg;
+}
+function ohSync(){ later("oh", ohDraw); }
+
+/* ======================= 2 - COTTRELL ================================== */
+var CO = {D:2e-5, C:1e-6, tau:5e-5, t0:1e-2, t1:5, r0:0.15, n:1, run:0};
+var CO_MINSPAN = 0.2;                     /* decades between the two ends  */
+
+function coPts(){
+  var A = Math.PI * CO.r0 * CO.r0, N = 24, out = [], i, t;
+  for(i = 0; i < N; i++){
+    t = CO.t0 * Math.pow(CO.t1 / CO.t0, i / (N - 1));
+    out.push({t:t, i:iCot(CO.n, A, CO.D, CO.C, t)
+                    + iChg(0.3, CO.tau / CO_CDL, CO_CDL, t)});
+  }
+  return out;
+}
+var CO_CDL = 5e-6;                        /* so tau can be a slider        */
+
+function coFit(pts){
+  var sx = 0, sy = 0, sxx = 0, sxy = 0, syy = 0, n = pts.length;
+  pts.forEach(function(p){
+    var x = 1 / Math.sqrt(p.t), y = p.i;
+    sx += x; sy += y; sxx += x * x; sxy += x * y; syy += y * y;
+  });
+  var m = (n * sxy - sx * sy) / (n * sxx - sx * sx);
+  var b = (sy - m * sx) / n;
+  var ssr = 0, sst = 0, ybar = sy / n;
+  pts.forEach(function(p){
+    var x = 1 / Math.sqrt(p.t), e = p.i - (m * x + b);
+    ssr += e * e; sst += (p.i - ybar) * (p.i - ybar);
+  });
+  return {m:m, b:b, r2: sst > 0 ? 1 - ssr / sst : 1};
+}
+
+function coDraw(){
+  var A = Math.PI * CO.r0 * CO.r0, pts = coPts(), fit = coFit(pts);
+  var Dfit = Math.pow(fit.m * Math.sqrt(Math.PI) / (CO.n * FARADAY * A * CO.C), 2);
+  var te = tEdge(CO.r0, CO.D), t5 = 5 * CO.tau;
+
+  /* ---- what the Cottrell equation is made of: the profile ----------- */
+  /* the middle of the sampling window, geometrically - one instant, and
+     the same one is ringed on both plots to the right  */
+  var tRep = Math.sqrt(CO.t0 * CO.t1), REP = "var(--ox)";
+  /* fixed against the window: the widest profile the physics allows, which
+     is the one at the moment convection takes the experiment away */
+  var xmax = deltaOf(CO.D, T_CONV) * 1.2;
+  var gp = fr(62, 500, 22, 196, 0, xmax * 1e4, 0, 1.06);
+  var p = axLin(gp, "distance from the electrode / µm", "C_O / C*", null,
+                function(v){ return v.toFixed(2); });
+  p += rc(gp.X0 - 7, gp.Y0, 7, gp.Y1 - gp.Y0, "var(--elec)", 0.5);
+  p += pth(curve(gp, function(xu){ return erfA(xu / 1e4 / (2 * Math.sqrt(CO.D * tRep))); },
+                 0, gp.xhi, 220), REP, 2.4);
+  /* the slope at the wall is what the current is */
+  var slR = 1 / (Math.sqrt(Math.PI * CO.D * tRep));         /* d(C/C*)/dx  */
+  var dxR = Math.min(gp.xhi * 0.45, 0.9 / slR * 1e4);
+  p += ln(gp.px(0), gp.py(0), gp.px(dxR), gp.py(Math.min(1, slR * dxR / 1e4)),
+          REP, 1.6, "3 2");
+  var delR = deltaOf(CO.D, tRep) * 1e4;
+  if(delR < gp.xhi){
+    p += ln(gp.px(delR), gp.py(0), gp.px(delR), gp.py(0.10), REP, 1.5);
+    p += cir(gp.px(delR), gp.py(0.10), 3.6, REP);
+    p += tx(gp.px(delR), gp.py(0.10) - 7, "δ \u2248 " + fmtLen15(deltaOf(CO.D, tRep)),
+            REP, 9, "middle", 700);
+  }
+  p += legend(gp.X0, 512, gp.Y1 + 46, [
+    {c:REP, t:"t = " + fmtT(tRep) + ", the middle of the sampling window"}]);
+  p += legend(gp.X0, 512, gp.Y1 + 74, [
+    {t:"— the one ring of this colour on each plot to the right is this same instant"}]);
+  p += legend(gp.X0, 512, gp.Y1 + 102, [
+    {c:REP, d:1, t:"the dashed tangent is the slope at the wall — that IS the current"}]);
+  paint("coprof", p);
+
+  /* ---- i against t^-1/2: the same three instants marked ------------- */
+  /* both axes fixed against the window. x reaches 1/sqrt(t) at the earliest
+     t0 the slider allows, y the Cottrell current at that same instant, so
+     nothing renumbers while the window is dragged or walked by a Run.     */
+  var CO_XHI = 105, CO_TMIN = 1e-4;
+  var ymax = iCot(CO.n, A, CO.D, CO.C, CO_TMIN) * 1.06;
+  var un = iUnit(ymax);
+  var f = fr(62, 500, 22, 214, 0, CO_XHI, 0, ymax / un.k);
+  var s = axLin(f, "t^−1/2 / s^−1/2", "i / " + un.u);
+  /* the fitted line, drawn across the fixed frame and clipped to it */
+  s += ln(f.px(0), f.py(clamp(fit.b / un.k, f.ylo, f.yhi)),
+          f.px(CO_XHI), f.py(clamp((fit.m * CO_XHI + fit.b) / un.k, f.ylo, f.yhi)),
+          "var(--red-)", 1.8, "5 4");
+  pts.forEach(function(q){ s += cir(f.px(1 / Math.sqrt(q.t)), f.py(q.i / un.k), 3, "var(--ink-2)"); });
+  var iRep = iCot(CO.n, A, CO.D, CO.C, tRep) + iChg(0.3, CO.tau / CO_CDL, CO_CDL, tRep);
+  s += cir(f.px(1 / Math.sqrt(tRep)), f.py(iRep / un.k), 5, REP);
+  var byp = clamp(fit.b / un.k, f.ylo, f.yhi);
+  s += cir(f.px(0), f.py(byp), 3.6, "var(--stop)");
+  s += tx(f.px(0) + 8, f.py(byp) - 8, "intercept " + fmtI(fit.b)
+          + (Math.abs(fit.b) > 0.03 * ymax ? " — should be zero" : " — good"),
+          "var(--stop)", 9.5, null, 700);
+  var wx0 = f.px(1 / Math.sqrt(CO.t1)), wx1 = f.px(1 / Math.sqrt(CO.t0));
+  s += rc(wx0, f.Y0, Math.max(1.5, wx1 - wx0), f.Y1 - f.Y0, "var(--go)", 0.10);
+  s += legend(f.X0, 512, f.Y1 + 46, [
+    {c:REP, t:"t = " + fmtT(tRep) + " — the profile drawn above"}]);
+  s += legend(f.X0, 512, f.Y1 + 74, [
+    {c:"var(--red-)", d:1, t:"the fitted line — its slope carries D"},
+    {c:"var(--go)", t:"the window you are fitting"},
+    {c:"var(--stop)", t:"the intercept, which should be zero"}]);
+  paint("cofit", s);
+
+  /* ---- the same data against t, directly underneath ----------------- */
+  /* a fixed clock: 10 us to 200 s holds every window, every 5tau and the
+     convection limit, so the band moves across it instead of it moving   */
+  var lo = -5, hi = 2.3;
+  var g = fr(62, 500, 22, 190, lo, hi, 0, ymax / un.k);
+  CO_FRAME = {X0:g.X0, X1:g.X1, lo:lo, hi:hi};
+  var q2 = axLin(g, "time / s", "i / " + un.u, function(v){ return "10" + supr(v); });
+  q2 += rc(g.px(Math.log10(CO.t0)), g.Y0, g.px(Math.log10(CO.t1)) - g.px(Math.log10(CO.t0)),
+           g.Y1 - g.Y0, "var(--go)", 0.13);
+  q2 += pth(curve(g, function(x){
+      var t = Math.pow(10, x);
+      return (iCot(CO.n, A, CO.D, CO.C, t) + iChg(0.3, CO.tau / CO_CDL, CO_CDL, t)) / un.k;
+    }, g.xlo, g.xhi, 300), "var(--ink)", 2.1);
+  [[t5, "5τ", "var(--stop)"], [te, "edge", "var(--stop)"],
+   [T_CONV, "convection", "var(--muted)"]].forEach(function(m, i){
+    var L = Math.log10(m[0]);
+    if(L < g.xlo || L > g.xhi) return;
+    q2 += ln(g.px(L), g.Y0, g.px(L), g.Y1, m[2], 1.3, "4 3", 0.9);
+    q2 += tx(g.px(L) + 4, g.Y0 + 14 + i * 13, m[1], m[2], 9.5, null, 700);
+  });
+  var LRep = Math.log10(tRep);
+  if(LRep >= g.xlo && LRep <= g.xhi) q2 += cir(g.px(LRep), g.py(iRep / un.k), 5, REP);
+  /* the edges are grabbable: a handle you can see is worth a sentence
+     telling you the sliders exist                                    */
+  [CO.t0, CO.t1].forEach(function(tt){
+    var X = g.px(Math.log10(tt));
+    q2 += ln(X, g.Y0, X, g.Y1, "var(--go)", 2);
+    q2 += rc(X - 3.5, (g.Y0 + g.Y1) / 2 - 11, 7, 22, "var(--go)", 1, 3);
+  });
+  q2 += legend(g.X0, 512, g.Y1 + 46, [
+    {c:"var(--go)", t:"the sampling window — drag either edge, or the band"},
+    {c:"var(--ink)", t:"the current you would measure"},
+    {c:REP, t:"t = " + fmtT(tRep) + ", the profile above"}]);
+  paint("cotime", q2);
+
+  /* ---- the numbers --------------------------------------------------- */
+  var err = (Dfit / CO.D - 1) * 100;
+  var set = function(id, t){ document.getElementById(id).innerHTML = t; };
+  set("coSlope", (fit.m / un.k).toPrecision(3) + " " + un.u + " s^½");
+  set("coInt", fmtI(fit.b));
+  set("coDfit", sciH(Dfit, 2) + " cm²/s");
+  set("coErr", (err >= 0 ? "+" : "") + err.toFixed(1) + " %");
+  set("coR2", fit.r2.toFixed(5));
+  set("coN", pts.length + " over " + (Math.log10(CO.t1 / CO.t0)).toFixed(1) + " decades");
+  set("coTauv", fmtT(CO.tau));
+  set("coT0v", fmtT(CO.t0));
+  set("coT1v", fmtT(CO.t1));
+
+  var vd = document.getElementById("coVerdict"), cls, msg;
+  if(CO.t0 < 5 * CO.tau){
+    cls = "mixv";
+    msg = "<b>Sampling starts inside the charging current.</b> t<sub>0</sub> is only "
+        + (CO.t0 / CO.tau).toPrecision(2) + "τ, so the first points carry i<sub>c</sub> as well "
+        + "as i<sub>d</sub>. Those points sit at large t<sup>&minus;1/2</sup>, lift the right-hand end "
+        + "of the line and steepen it, and D goes as the slope <b>squared</b> — so the error is "
+        + "doubled: " + (err >= 0 ? "+" : "") + err.toFixed(0) + " %.";
+  }else if(CO.t1 > Math.min(te * 0.25, T_CONV)){
+    cls = "mixv";
+    msg = "<b>Sampling runs past the end of linear diffusion.</b> By " + fmtT(CO.t1)
+        + " the layer is " + fmtLen15(deltaOf(CO.D, Math.min(CO.t1, T_CONV))) + " thick "
+        + (CO.t1 > te * 0.25 ? "against an electrode radius of " + fmtLen15(CO.r0)
+             + ", so material is arriving from the side" : "and the room is stirring it")
+        + ". Those points are too high, they sit at small t<sup>&minus;1/2</sup>, and they flatten "
+        + "the line while lifting the intercept to " + fmtI(fit.b) + ".";
+  }else if(Math.log10(CO.t1 / CO.t0) < 1){
+    cls = "stop";
+    msg = "<b>" + (Math.log10(CO.t1 / CO.t0)).toFixed(1) + " of a decade.</b> The points are clean "
+        + "but they are all crowded at one end of the axis, so the line is pinned by a short lever "
+        + "and the slope is poorly determined. Widen the window.";
+  }else{
+    cls = "go";
+    msg = "<b>D comes back as " + sciH(Dfit, 2) + " cm²/s, " + (err >= 0 ? "+" : "")
+        + err.toFixed(1) + " % from the truth,</b> from " + pts.length + " points over "
+        + (Math.log10(CO.t1 / CO.t0)).toFixed(1) + " decades with an intercept of " + fmtI(fit.b)
+        + ". Both ends of the window are inside the straight part, which is the only reason the "
+        + "number is trustworthy — R² would have been above 0.999 either way.";
+  }
+  vd.className = "verdict " + cls;
+  vd.innerHTML = msg;
+}
+function coSync(){ later("co", coDraw); }
+
+/* the two ends share a range, so they can be dragged onto each other. A
+   zero-width window puts every sampled point at the same t and the least
+   squares fit then divides by a zero variance. Keep a fifth of a decade
+   between them and push the other end out of the way.                  */
+function coWindow(which, v){
+  var e0 = document.getElementById("coT0"), e1 = document.getElementById("coT1");
+  var l0 = Math.log10(CO.t0), l1 = Math.log10(CO.t1);
+  if(which === 0){
+    l0 = v;
+    if(l1 < l0 + CO_MINSPAN) l1 = Math.min(+e1.max, l0 + CO_MINSPAN);
+    if(l1 - l0 < CO_MINSPAN) l0 = l1 - CO_MINSPAN;
+  }else{
+    l1 = v;
+    if(l1 < l0 + CO_MINSPAN) l0 = Math.max(+e0.min, l1 - CO_MINSPAN);
+    if(l1 - l0 < CO_MINSPAN) l1 = l0 + CO_MINSPAN;
+  }
+  CO.t0 = Math.pow(10, l0); CO.t1 = Math.pow(10, l1);
+  e0.value = l0; e1.value = l1;
+  later("co", coDraw);
+}
+
+/* ---- press the button and the window walks itself ------------------- */
+var coAnim = null;
+function coRun(mode){
+  if(coAnim){ clearInterval(coAnim); coAnim = null; }
+  var btn = null;                          /* this bench has no single Run button */
+  var t5 = 5 * CO.tau, tEdgeQ = Math.min(tEdge(CO.r0, CO.D) * 0.25, T_CONV);
+  /* all three windows are the same width - the width of the clean one -
+     so that what changes between the runs is where the window sits and
+     nothing else. Dropping only the near edge made the band wider as
+     well, and a wider band is not the mistake being shown.          */
+  var gl0 = Math.log10(t5 * 2), gl1 = Math.log10(tEdgeQ * 0.8);
+  var W = Math.max(0.8, gl1 - gl0);
+  var lateEnd = Math.log10(Math.min(60, tEdgeQ * 12));
+  var plan = mode === "good"
+    ? {l0: gl0, l1: gl1}
+    : mode === "early" ? {l0: Math.log10(CO.tau), l1: Math.log10(CO.tau) + W}
+    : {l0: lateEnd - W, l1: lateEnd};
+  var e0 = document.getElementById("coT0"), e1 = document.getElementById("coT1");
+  plan.l0 = clamp(plan.l0, +e0.min, +e0.max);
+  plan.l1 = clamp(plan.l1, +e1.min, +e1.max);
+  var a0 = Math.log10(CO.t0), a1 = Math.log10(CO.t1), k = 0, N = 28;
+  if(btn) btn.disabled = true;
+  coAnim = setInterval(function(){
+    k++;
+    var u = k / N, e = u < 0.5 ? 2 * u * u : 1 - 2 * (1 - u) * (1 - u);
+    CO.t0 = Math.pow(10, a0 + (plan.l0 - a0) * e);
+    CO.t1 = Math.pow(10, a1 + (plan.l1 - a1) * e);
+    e0.value = Math.log10(CO.t0); e1.value = Math.log10(CO.t1);
+    coDraw();
+    if(k >= N){ clearInterval(coAnim); coAnim = null; if(btn) btn.disabled = false; }
+    /* 80 ms a frame, not 40: the walk takes 2.2 s instead of 1.1, which is
+       long enough to watch the points slide along the line */
+  }, 80);
+}
+
+var CO_FRAME = null;
+
+/* ---- drag the window on the picture itself --------------------------
+   The sliders still work, but the thing being chosen is a region of a
+   graph, and choosing it on the graph is one less translation for the
+   reader to perform.                                                  */
+(function(){
+  var svg = document.getElementById("cotime");
+  if(!svg) return;
+  var mode = null, grabOff = 0;
+  function tAt(ev){
+    var r = svg.getBoundingClientRect();
+    var ux = (ev.clientX - r.left) / r.width * 520;
+    var f = CO_FRAME;
+    if(!f || ux < f.X0 || ux > f.X1) return null;
+    return f.lo + (ux - f.X0) / (f.X1 - f.X0) * (f.hi - f.lo);
+  }
+  svg.style.touchAction = "none";
+  svg.addEventListener("pointerdown", function(ev){
+    var L = tAt(ev);
+    if(L === null) return;
+    var l0 = Math.log10(CO.t0), l1 = Math.log10(CO.t1);
+    var span = CO_FRAME.hi - CO_FRAME.lo, near = span * 0.04;
+    if(Math.abs(L - l0) < near) mode = "lo";
+    else if(Math.abs(L - l1) < near) mode = "hi";
+    else if(L > l0 && L < l1){ mode = "pan"; grabOff = L - (l0 + l1) / 2; }
+    else return;
+    svg.setPointerCapture(ev.pointerId);
+    svg.style.cursor = mode === "pan" ? "grabbing" : "ew-resize";
+    ev.preventDefault();
+  });
+  svg.addEventListener("pointermove", function(ev){
+    var L = tAt(ev);
+    if(L === null) return;
+    if(!mode){
+      var l0 = Math.log10(CO.t0), l1 = Math.log10(CO.t1);
+      var near = (CO_FRAME.hi - CO_FRAME.lo) * 0.04;
+      svg.style.cursor = (Math.abs(L - l0) < near || Math.abs(L - l1) < near) ? "ew-resize"
+                       : (L > l0 && L < l1) ? "grab" : "default";
+      return;
+    }
+    if(mode === "lo") coWindow(0, clamp(L, +document.getElementById("coT0").min,
+                                           +document.getElementById("coT0").max));
+    else if(mode === "hi") coWindow(1, clamp(L, +document.getElementById("coT1").min,
+                                                +document.getElementById("coT1").max));
+    else{
+      var w = Math.log10(CO.t1) - Math.log10(CO.t0), c = L - grabOff;
+      coWindow(0, clamp(c - w / 2, +document.getElementById("coT0").min,
+                                   +document.getElementById("coT0").max));
+      coWindow(1, clamp(Math.log10(CO.t0) + w, +document.getElementById("coT1").min,
+                                               +document.getElementById("coT1").max));
+    }
+    ev.preventDefault();
+  });
+  ["pointerup", "pointercancel"].forEach(function(e){
+    svg.addEventListener(e, function(ev){
+      mode = null; svg.style.cursor = "default";
+      try{ svg.releasePointerCapture(ev.pointerId); }catch(x){}
+    });
+  });
+})();
+
+/* ======================= 3 - ULTRAMICROELECTRODE ====================== */
+var UM = {r0:1e-3, D:2e-5, C:1e-6, g:"disc", n:1};
+var UM_SIZES = [5e-4, 2.5e-3, 1e-2, 5e-2, 0.15];        /* cm: 5 um .. 1.5 mm */
+
+function fmtNu15(v){
+  if(v >= 1e3) return sciH(v, 2) + " V/s";
+  if(v >= 1) return v.toPrecision(3) + " V/s";
+  return (v * 1000).toPrecision(3) + " mV/s";
+}
+function umIt(r0, t){
+  var A = areaOf(r0, "disc");
+  return iCot(UM.n, A, UM.D, UM.C, t) + iSS(UM.n, UM.D, UM.C, r0, UM.g);
+}
+
+function umDraw(){
+  var A = areaOf(UM.r0, UM.g), iss = iSS(UM.n, UM.D, UM.C, UM.r0, UM.g);
+  var tss = tSS(UM.r0, UM.D), s = "";
+
+  /* ---- every size on one pair of axes, so they can be compared ------ */
+  var lo = -6, hi = 2;
+  var ylo = 1e30, yhi = -1e30;
+  UM_SIZES.forEach(function(r){
+    [Math.pow(10, lo), Math.pow(10, hi)].forEach(function(t){
+      var L = Math.log10(umIt(r, t)); if(L < ylo) ylo = L; if(L > yhi) yhi = L;
+    });
+  });
+  var f = fr(62, 442, 22, 236, lo, hi, Math.floor(ylo) - 1, Math.ceil(yhi));
+  s += axLog(f, "time after the step / s", "current / A");
+  /* the five plateau labels sit in the right margin; adjacent radii differ
+     by a factor of five, which at this scale can be fewer than ten pixels,
+     so they are pushed apart rather than drawn on top of one another    */
+  var lbl = [];
+  UM_SIZES.forEach(function(r, k){
+    var col = ["var(--ion-k)", "var(--red-)", "var(--go)", "var(--stop)", "var(--ox)"][k];
+    var w = Math.abs(r - UM.r0) < 1e-12 ? 2.8 : 1.6;
+    s += pth(curve(f, function(x){ return Math.log10(umIt(r, Math.pow(10, x))); },
+                   f.xlo, f.xhi, 260), col, w);
+    var y = Math.log10(iSS(UM.n, UM.D, UM.C, r, "disc"));
+    if(y > f.ylo && y < f.yhi) lbl.push({y:f.py(y), col:col, t:fmtLen15(r)});
+  });
+  lbl.sort(function(a, b){ return a.y - b.y; });
+  lbl.forEach(function(L, k){
+    if(k && L.y - lbl[k - 1].y < 14) L.y = lbl[k - 1].y + 14;
+    /* the frame is not the limit here - the viewBox is, and there are
+       38 px of margin under it for exactly this                    */
+    L.y = Math.min(L.y, 266);
+  });
+  lbl.forEach(function(L){
+    s += ln(f.X1 - 22, L.y, f.X1 + 2, L.y, L.col, 1.2, "3 2");
+    s += tx(f.X1 + 6, L.y + 3.4, L.t, L.col, 9.5, null, 700);
+  });
+  s += legend(f.X0, 512, 292, [
+    {t:"every curve is Cottrell first, then its own steady state"},
+    {t:"— the thick one is the radius you chose"}]);
+  paint("umsizes", s);
+
+  /* ---- the same voltammogram question, at three scan rates ---------- */
+  var nus = [0.02, 0.2, 2];
+  var ipMax = 0;
+  nus.forEach(function(nu){
+    ipMax = Math.max(ipMax, 0.4463 * UM.n * FARADAY * A * UM.C
+            * Math.sqrt(UM.n * FARADAY * nu * UM.D / (RGAS * T25)));
+  });
+  /* the scale is the tallest curve the panel draws, so the axis numbers are
+     the same whatever the radius and no curve is ever cut off. Where the
+     dashed i_ss line falls inside the frame is the ratio being taught.   */
+  var iref = 0;
+  nus.forEach(function(nu){
+    var ip = 0.4463 * UM.n * FARADAY * A * UM.C
+           * Math.sqrt(UM.n * FARADAY * nu * UM.D / (RGAS * T25));
+    iref = Math.max(iref, iss * iss / (iss + ip) + ip);
+  });
+  iref *= 1.04;
+  var g = fr(62, 470, 22, 212, -0.3, 0.3, -0.3, 1.2);
+  var v = axLin(g, "E − E°′ / V", "i / i_max", null,
+                function(q){ return q.toFixed(1); });
+  nus.forEach(function(nu, k){
+    var col = ["var(--go)", "var(--red-)", "var(--ion-k)"][k];
+    var ip = 0.4463 * UM.n * FARADAY * A * UM.C
+           * Math.sqrt(UM.n * FARADAY * nu * UM.D / (RGAS * T25));
+    var lam = iss / (iss + ip);          /* how sigmoidal this one looks  */
+    v += pth(curve(g, function(E){
+        var th = 1 / (1 + Math.exp(-UM.n * FRT * E));
+        var sig = iss * th;
+        var pk = ip * Math.exp(-Math.pow((E + 0.028) / 0.075, 2));
+        return (lam * sig + (1 - lam) * (sig + pk)) / iref;
+      }, g.xlo, g.xhi, 240), col, 2.1);
+  });
+  var ySS = iss / iref;
+  v += ln(g.X0, g.py(ySS), g.X1, g.py(ySS), "var(--muted)", 1.3, "5 4");
+  v += tx(g.X0 + 8, g.py(ySS) - 6, "i_ss", "var(--muted)", 9.5, null, 600);
+  v += legend(g.X0, 512, g.Y1 + 46,
+    nus.map(function(nu, k){
+      return {c:["var(--go)", "var(--red-)", "var(--ion-k)"][k], t:fmtNu15(nu)};
+    }).concat([{c:"var(--muted)", d:1, t:"i_ss = " + fmtI(iss)}]));
+  v += legend(g.X0, 512, g.Y1 + 74, [
+    {t:"full scale = " + fmtI(iref) + "   ·   the tallest curve reaches the top, whatever "
+       + "the radius"},
+    {t:(iref / iss > 1.6
+        ? "— i_ss sits at " + (100 * ySS).toFixed(0) + " % of it: this electrode still peaks"
+        : "— i_ss is nearly the whole of it: this electrode has gone steady")}]);
+  paint("umcv", v);
+
+  /* ---- the numbers --------------------------------------------------- */
+  var Cdl = CDL_AREA * A, tau = 0 + Cdl * 100;
+  var set = function(id, t){ document.getElementById(id).innerHTML = t; };
+  set("umA", sciH(A, 2) + " cm²");
+  set("umIss", fmtI(iss));
+  set("umTss", fmtT(tss));
+  set("umCdl", fmtF(Cdl));
+  set("umTau", fmtT(tau));
+  set("umNu", fmtNu15(2 * UM.D / (UM.r0 * UM.r0) * RGAS * T25 / (UM.n * FARADAY)));
+  set("umRv", fmtLen15(UM.r0));
+  set("umDv", sciH(UM.D, 2) + " cm²/s");
+  set("umCv", (UM.C * 1e6).toPrecision(3) + " mM");
+
+  var vd = document.getElementById("umVerdict"), cls, msg;
+  if(UM.r0 <= 2.5e-3){
+    cls = "go";
+    msg = "<b>A true ultramicroelectrode.</b> The depleted layer passes the radius after "
+        + fmtT(tss) + ", and from then on the current does not change: " + fmtI(iss)
+        + ", held by geometry rather than by the clock. Nothing on this electrode has to be "
+        + "sampled at a particular moment, which is what makes it useful in a living cell or "
+        + "a moving stream.";
+  }else if(UM.r0 < 2e-2){
+    cls = "stop";
+    msg = "<b>Borderline.</b> Steady state arrives at " + fmtT(tss) + " — late enough that "
+        + "convection is a real competitor, and the plateau you measure may be partly stirred "
+        + "rather than purely radial.";
+  }else{
+    cls = "mixv";
+    msg = "<b>This is a macroelectrode.</b> Radial diffusion would take " + fmtT(tss)
+        + " to establish, by which time the room has stirred the solution. The current never "
+        + "stops falling, which is why it has to be sampled at a known time.";
+  }
+  vd.className = "verdict " + cls;
+  vd.innerHTML = msg;
+}
+
+function umSync(){
+  document.getElementById("umR").value = Math.log10(UM.r0);
+  document.getElementById("umD").value = Math.log10(UM.D);
+  document.getElementById("umC").value = Math.log10(UM.C * 1e6);
+  document.getElementById("umG").value = UM.g;
+  later("um", umDraw);
+}
+
+/* ======================= 4 - PULSE METHODS ============================
+   The waveform and the current are drawn on ONE time axis, one above the
+   other, with a line dropped from every sampling instant to the current
+   it takes. The whole of pulse voltammetry is the choice of those
+   instants, and that is unreadable if the two pictures do not line up. */
+
+var PU = {m:"DPV", amp:0.05, tm:0.025, tau:5e-5, C:1e-6, n:1, A:0.0707, D:2e-5};
+var PUI = {
+  NPV: {nm:"normal pulse voltammetry", amp:"pulse height from the base potential",
+        look:"One sample, late in each pulse, and back to base in between so every pulse meets fresh solution. The plot is a <b>sigmoid</b> whose plateau is the Cottrell current at t<sub>m</sub>."},
+  DPV: {nm:"differential pulse voltammetry", amp:"pulse amplitude ΔE",
+        look:"Two samples on each step — one just before the pulse, one at its end — and their <b>difference</b> is plotted. Differencing two points of a sigmoid is a derivative, and the derivative of a sigmoid is a <b>peak</b>."},
+  SWV: {nm:"square wave voltammetry", amp:"square-wave amplitude E_sw",
+        look:"Forward and reverse samples in every cycle, and their difference. The reverse sample re-oxidises what the forward one just made, so the two <b>add</b> rather than cancel: roughly twice the DPV height for the same amplitude, and far faster."}
+};
+var PUPRE = {
+  NPV: [["the plateau is i_d", {amp:0.15, tm:0.025}]],
+  DPV: [["small pulse: narrow and weak", {amp:0.01, tm:0.025}],
+        ["large pulse: tall and broad", {amp:0.15, tm:0.025}],
+        ["sampled too early", {amp:0.05, tm:2e-4}]],
+  SWV: [["twice the height of DPV", {amp:0.05, tm:0.005}],
+        ["fast: 200 Hz", {amp:0.025, tm:1.2e-3}]]
+};
+function puSig(E, n){ return 1 / (1 + Math.exp(n * FRT * E)); }
+function puResp(E){
+  var id = iCot(PU.n, PU.A, PU.D, PU.C, PU.tm);
+  if(PU.m === "NPV") return id * puSig(E, PU.n);
+  if(PU.m === "DPV") return id * (puSig(E - PU.amp, PU.n) - puSig(E, PU.n));
+  return id * (puSig(E - PU.amp, PU.n) - puSig(E + PU.amp, PU.n));
+}
+
+/* the programme, in units of one cycle: each entry is
+   [t_start, t_end, E_in_mV, "sample tag" or null]                      */
+/* the programme, in units of one cycle. Each entry carries the potential
+   it holds, how long it holds it, and which sample (if any) is taken at
+   the end of it. The staircase runs positive to negative, so the current
+   grows as the scan goes on, as it does in the real experiment.      */
+/* the whole scan, in volts of E - E_1/2: the staircase walks from the
+   positive end to the negative one, and the five cycles drawn are a
+   window onto it. Standing still, that window sits where it always did. */
+/* the whole scan, in volts of E - E_1/2, over exactly the range the
+   voltammogram plots: the staircase walks from the positive end to the
+   negative one, and every cycle of it is drawn.                       */
+var PU_NS = 28, PU_E0 = 0.28, PU_E1 = -0.28;
+var PU_SCAN = null, puAnim = null;
+function puBaseAt(k){ return (PU_E0 + (PU_E1 - PU_E0) * k / (PU_NS - 1)) * 1000; }
+function puProgramme(){
+  var NC = PU_NS, out = [], k, base, amp = PU.amp * 1000;
+  for(k = 0; k < NC; k++){
+    base = puBaseAt(k);
+    if(PU.m === "NPV"){
+      out.push({a:k + 0.00, b:k + 0.58, E:170, s:null, w:0.58});
+      out.push({a:k + 0.58, b:k + 1.00, E:base, s:"f", w:0.42});
+    }else if(PU.m === "DPV"){
+      out.push({a:k + 0.00, b:k + 0.62, E:base, s:"b", w:0.62});
+      out.push({a:k + 0.62, b:k + 1.00, E:base - amp, s:"f", w:0.38});
+    }else{
+      out.push({a:k + 0.00, b:k + 0.50, E:base - amp, s:"f", w:0.50});
+      out.push({a:k + 0.50, b:k + 1.00, E:base + amp, s:"r", w:0.50});
+    }
+  }
+  return out;
+}
+
+/* the current inside a segment: the charging spike left by the edge that
+   started it, plus the Faradaic current at THAT segment's potential. The
+   second term is why the two DPV samples differ at all.              */
+function puSegI(dEstep, Emv, tp){
+  var Cd = CDL_AREA * PU.A, Rp = PU.tau / Cd;
+  return (Math.abs(dEstep) / 1000 / Rp) * Math.exp(-tp / PU.tau)
+       + iCot(PU.n, PU.A, PU.D, PU.C, Math.max(tp, 1e-9)) * puSig(Emv / 1000, PU.n);
+}
+
+function puDraw(){
+  var i = PUI[PU.m], id = iCot(PU.n, PU.A, PU.D, PU.C, PU.tm);
+  var prog = puProgramme(), NC = PU_NS;
+  var Elo = 1e9, Ehi = -1e9;
+  prog.forEach(function(p){ Elo = Math.min(Elo, p.E); Ehi = Math.max(Ehi, p.E); });
+  var pad = (Ehi - Elo) * 0.22 + 8;
+
+  /* ================= the programme and the current it draws ========== */
+  var s = "";
+  var g1 = fr(62, 1020, 22, 136, 0, NC, Elo - pad, Ehi + pad);
+  s += axLin(g1, "", "E / mV", function(v){ return v.toFixed(1); });
+  var d = "", prev = null;
+  prog.forEach(function(p){
+    if(prev !== null) d += "L" + g1.px(p.a).toFixed(1) + " " + g1.py(p.E).toFixed(1) + " ";
+    d += (prev === null ? "M" : "L") + g1.px(p.a).toFixed(1) + " " + g1.py(p.E).toFixed(1) + " ";
+    d += "L" + g1.px(p.b).toFixed(1) + " " + g1.py(p.E).toFixed(1) + " ";
+    prev = p.E;
+  });
+  s += pth(d, "var(--ink-2)", 2);
+
+  /* the current within each segment: the charging spike dies, the
+     Faradaic part does not - and it is different on every step      */
+  var tp_pulse = PU.tm / 0.85;                 /* so t_m lands at 85 %  */
+  var prevE = prog[0].E, ymax = 0, k2;
+  /* scale to the SAMPLED currents, not to the charging spike: the spike
+     is ten times taller and would flatten the thing being measured into
+     the axis. It runs off the top of the frame instead, which is a fair
+     picture of why you have to wait for it.                          */
+  prog.forEach(function(p2){
+    p2.dstep = p2.E - prevE; p2.prevE = prevE; prevE = p2.E;
+    if(p2.s) ymax = Math.max(ymax, puSegI(p2.dstep, p2.E, PU.tm));
+  });
+  ymax = Math.max(ymax * 1.8, 1e-12);
+  var un = iUnit(ymax);
+  var g2 = fr(62, 1020, 178, 282, 0, NC, 0, ymax / un.k * 1.08);
+  s += axLin(g2, "time, in pulse cycles", "i / " + un.u, function(v){ return v.toFixed(0); });
+
+  var SCOL = {f:"var(--ox)", b:"var(--elec)", r:"var(--go)"};
+  var segd = "";
+  prog.forEach(function(p2){
+    var span = p2.b - p2.a, N = 44, frac, tp, val;
+    for(k2 = 0; k2 <= N; k2++){
+      frac = k2 / N;
+      tp = Math.max(1e-9, frac * tp_pulse / 0.85 * (span / p2.w));
+      val = Math.min(g2.yhi, puSegI(p2.dstep, p2.E, tp) / un.k);
+      segd += (k2 === 0 ? "M" : "L") + g2.px(p2.a + frac * span).toFixed(1)
+            + " " + g2.py(val).toFixed(1) + " ";
+    }
+  });
+  s += pth(segd, "var(--ink)", 1.6, null, 0.9);
+
+  /* while a scan is running, say which of the five cycles is being
+     sampled right now - it is the one whose number lands on the plot */
+  if(PU_SCAN){
+    var cw = PU_SCAN.j;
+    s += rc(g1.px(cw), g1.Y0, g1.px(cw + 1) - g1.px(cw), g1.Y1 - g1.Y0, "var(--ox)", 0.10);
+    s += rc(g2.px(cw), g2.Y0, g2.px(cw + 1) - g2.px(cw), g2.Y1 - g2.Y0, "var(--ox)", 0.10);
+    s += tx(g1.px(cw + 0.5), g1.Y0 - 6, "E = " + puBaseAt(PU_SCAN.j).toFixed(0) + " mV",
+            "var(--ox)", 9.5, "middle", 700);
+  }
+  /* the sampling instants, dropped from the waveform onto the current */
+  prog.forEach(function(p2){
+    if(!p2.s) return;
+    var xs = p2.a + (p2.b - p2.a) * 0.85;
+    var yv = Math.min(g2.yhi, puSegI(p2.dstep, p2.E, PU.tm) / un.k);
+    s += ln(g1.px(xs), g1.py(p2.E), g2.px(xs), g2.py(yv), SCOL[p2.s], 0.9, "2 3", 0.35);
+    s += cir(g1.px(xs), g1.py(p2.E), 2.4, SCOL[p2.s]);
+    s += cir(g2.px(xs), g2.py(yv), 2.6, SCOL[p2.s]);
+  });
+  s += legend(g1.X0, 1032, g2.Y1 + 46, [
+    {c:SCOL.f, t:"end of the pulse"},
+    PU.m === "DPV" ? {c:SCOL.b, t:"just before the pulse"}
+                   : PU.m === "SWV" ? {c:SCOL.r, t:"end of the reverse half"}
+                   : {c:"var(--ink)", t:"the current that flows"}]);
+  s += legend(g1.X0, 1032, g2.Y1 + 74, [
+    {t:PU.m === "DPV" ? "— the gap between the grey dot and the orange one is the plotted point"
+       : PU.m === "SWV" ? "— orange minus green is the plotted point"
+       : "— the orange dot is the plotted point"}]);
+  s += legend(g1.X0, 1032, g2.Y1 + 102, [
+    {t:"the charging spike runs off the top of the lower frame — that is why you wait"}]);
+  paint("puwave", s);
+
+  /* ================= what that set of samples plots out ============== */
+  var Es = [], vs = [], E, k3;
+  for(k3 = 0; k3 <= 260; k3++){
+    E = -0.30 + 0.60 * k3 / 260;
+    Es.push(E); vs.push(puResp(E));
+  }
+  var vmax = Math.max.apply(null, vs), vmin = Math.min.apply(null, vs);
+  var un3 = iUnit(Math.max(Math.abs(vmax), Math.abs(vmin)));
+  var pad3 = (vmax - vmin) * 0.16 + Math.abs(vmax) * 0.04;
+  /* positive at the left, negative at the right: the same order the
+     staircase above walks in, so cycle and point share a position  */
+  var f3 = fr(62, 1020, 22, 232, 0.30, -0.30,
+              (vmin - pad3) / un3.k, (vmax + pad3) / un3.k);
+  /* NPV plots the orange sample itself, so it keeps orange. DPV and SWV
+     plot a DIFFERENCE of two samples, which is neither of them: those
+     draw in a colour of their own, and the frame says what it is made of */
+  var RESP = PU.m === "NPV" ? "var(--ox)" : "var(--ion-k)";
+  var r = axLin(f3, "E − E₁₂ / V   — the scan runs left to right, "
+                + "positive first, exactly as in the panel above",
+                (PU.m === "NPV" ? "i / " : "Δi / ") + un3.u);
+  r += legend(f3.X0 + 12, f3.X1 - 10, f3.Y0 + 17, PU.m === "NPV" ? [
+    {c:RESP, t:"i(E) — the orange sample itself, plotted as it is taken"}] : [
+    {c:RESP, t:"Δi(E) = one sample minus the other, which is neither of them"},
+    {c:SCOL.f, t:PU.m === "SWV" ? "end of the forward half" : "end of the pulse"},
+    {t:"minus"},
+    {c:PU.m === "SWV" ? SCOL.r : SCOL.b,
+     t:PU.m === "SWV" ? "end of the reverse half" : "just before the pulse"}]);
+  if(f3.ylo < 0) r += ln(f3.X0, f3.py(0), f3.X1, f3.py(0), "var(--line-2)", 1.1);
+  /* standing still, the finished curve. Mid-scan, the curve is only the
+     faint thing the dots are landing on, and the dots are the measurement */
+  r += pth(curve(f3, function(x){ return puResp(x) / un3.k; }, -0.30, 0.30, 280),
+           RESP, PU_SCAN ? 1.4 : 2.4, null, PU_SCAN ? 0.22 : 1);
+  if(PU_SCAN){
+    var dd = "", kk;
+    for(kk = 0; kk < PU_SCAN.pts.length; kk++){
+      var pp = PU_SCAN.pts[kk];
+      dd += (kk ? "L" : "M") + f3.px(pp.E).toFixed(1) + " " + f3.py(pp.v / un3.k).toFixed(1) + " ";
+    }
+    if(PU_SCAN.pts.length > 1) r += pth(dd, RESP, 1.5, null, 0.55);
+    for(kk = 0; kk < PU_SCAN.pts.length; kk++){
+      var p4 = PU_SCAN.pts[kk], last = kk === PU_SCAN.pts.length - 1;
+      if(last) r += cir(f3.px(p4.E), f3.py(p4.v / un3.k), 8.5, RESP, 0.22);
+      r += cir(f3.px(p4.E), f3.py(p4.v / un3.k), last ? 4.6 : 3.2, RESP);
+    }
+  }
+  var ip = PU.m === "NPV" ? id : vmax, Ep = 0;
+  if(PU.m !== "NPV"){
+    var best = -1e30;
+    Es.forEach(function(e, j){ if(vs[j] > best){ best = vs[j]; Ep = e; } });
+    r += ln(f3.px(Ep), f3.py(0 > f3.ylo ? 0 : f3.ylo), f3.px(Ep), f3.py(best / un3.k),
+            "var(--stop)", 1.4, "4 3");
+    r += cir(f3.px(Ep), f3.py(best / un3.k), 3.6, "var(--stop)");
+    /* half-height width, measured on the drawn curve */
+    var half = best / 2, lft = null, rgt = null;
+    Es.forEach(function(e, j){
+      if(lft === null && vs[j] >= half) lft = e;
+      if(vs[j] >= half) rgt = e;
+    });
+    if(lft !== null && rgt !== null && rgt > lft){
+      var yh = f3.py(half / un3.k);
+      r += ln(f3.px(lft), yh, f3.px(rgt), yh, "var(--stop)", 1.6);
+      r += tx((f3.px(lft) + f3.px(rgt)) / 2, yh - 6,
+              "W½ = " + ((rgt - lft) * 1000).toFixed(0) + " mV", "var(--stop)", 9.5, "middle", 700);
+    }
+  }else{
+    r += ln(f3.X0, f3.py(id / un3.k), f3.X1, f3.py(id / un3.k), "var(--muted)", 1.3, "5 4");
+  }
+  r += legend(f3.X0, 1032, f3.Y1 + 46, PU_SCAN ? [
+    {c:RESP, t:PU_SCAN.pts.length + " of " + PU_NS
+       + " cycles sampled — one dot each"},
+    {t:"— the big ring is the cycle shaded in the panel above"}] : [
+    {c:RESP, t:PU.m === "NPV" ? "i(E), one sample per cycle"
+       : "Δi(E), the difference of the two samples in each cycle"},
+    {t:"— press Run the scan to watch the panel above lay it down, one cycle at a time"}]);
+  r += legend(f3.X0, 1032, f3.Y1 + 74, PU.m === "NPV" ? [
+    {c:"var(--muted)", d:1, t:"the plateau = i_d at t_m = " + fmtI(id)}] : [
+    {c:"var(--stop)", d:1, t:"Eₚ and W½, read off the peak"}]);
+  paint("puresp", r);
+
+  /* ---- the numbers --------------------------------------------------- */
+  var W = 0;
+  if(PU.m !== "NPV"){
+    var hb = Math.max.apply(null, vs) / 2, l2 = null, r2 = null;
+    Es.forEach(function(e, j){ if(l2 === null && vs[j] >= hb) l2 = e; if(vs[j] >= hb) r2 = e; });
+    W = (l2 !== null && r2 !== null) ? r2 - l2 : NaN;
+  }
+  var icm = (PU.amp / (PU.tau / (CDL_AREA * PU.A))) * Math.exp(-PU.tm / PU.tau);
+  var ipv = PU.m === "NPV" ? id : Math.max.apply(null, vs);
+  var set = function(idd, t){ document.getElementById(idd).innerHTML = t; };
+  set("puIp", fmtI(ipv));
+  set("puEp", PU.m === "NPV" ? "— (a step, not a peak)" : (Ep * 1000).toFixed(0) + " mV");
+  set("puW", PU.m === "NPV" ? "—" : (isFinite(W) ? (W * 1000).toFixed(0) + " mV" : "—"));
+  set("puW0", (3.52 / (PU.n * FRT) * 1000).toFixed(1) + " mV");
+  set("puIc", fmtI(icm));
+  set("puSN", icm > 0 ? (ipv / icm).toPrecision(3) : "∞");
+  set("puAmpv", (PU.amp * 1000).toFixed(0) + " mV");
+  set("puTmv", fmtT(PU.tm) + "  (" + (PU.tm / PU.tau).toPrecision(2) + " τ)");
+  set("puTauv", fmtT(PU.tau));
+  set("puCv", PU.C * 1e6 >= 1e-3 ? (PU.C * 1e6).toPrecision(3) + " mM" : sciH(PU.C * 1e3, 2) + " M");
+  set("puNv", PU.n + "");
+  set("puAmpLab", i.amp);
+  document.getElementById("puNote").innerHTML = "<b>" + PU.m + " — " + i.nm + ".</b> " + i.look;
+
+  var vd = document.getElementById("puVerdict"), cls, msg;
+  if(PU.tm < 5 * PU.tau){
+    cls = "mixv";
+    msg = "<b>Sampled too early.</b> t<sub>m</sub> is only " + (PU.tm / PU.tau).toPrecision(2)
+        + "τ, so the charging current is still " + fmtI(icm)
+        + " when the instrument looks — that is " + (icm / ipv * 100).toPrecision(2)
+        + " % of the signal. Every pulse method exists to avoid exactly this.";
+  }else if(PU.m === "NPV"){
+    cls = "go";
+    msg = "<b>A sigmoid, and its plateau is the Cottrell current at t<sub>m</sub>.</b> "
+        + "Each pulse returns to base, so the solution in front of the electrode is rebuilt "
+        + "between them and every point is an independent step experiment. You read "
+        + "E<sub>1/2</sub> off the half-height and i<sub>d</sub> = " + fmtI(id) + " off the top.";
+  }else if(PU.m === "SWV"){
+    cls = "go";
+    msg = "<b>The reverse sample is anodic, so subtracting it adds.</b> The peak is "
+        + fmtI(ipv) + " against a charging current of " + fmtI(icm) + " at the sampling instant. "
+        + "Keeping the forward and reverse currents apart also tells you whether the couple is "
+        + "reversible — an irreversible one has almost no reverse component.";
+  }else{
+    cls = "go";
+    msg = "<b>A peak, because a difference of two points on a sigmoid is a derivative.</b> It sits "
+        + (Ep * 1000).toFixed(0) + " mV from E<sub>1/2</sub>, half the pulse amplitude, and it is "
+        + (isFinite(W) ? (W * 1000).toFixed(0) : "—") + " mV wide against the small-pulse limit "
+        + "of " + (3.52 / (PU.n * FRT) * 1000).toFixed(0) + " mV. Shrink the pulse and it narrows "
+        + "towards that limit while losing height: that trade is the whole of method development.";
+  }
+  vd.className = "verdict " + cls;
+  vd.innerHTML = msg;
+}
+/* Walk the staircase across the whole wave, and let each cycle drop its
+   own number onto the plot beside it. Nothing here is a new calculation:
+   the dot that lands is puResp at that cycle's base potential, the same
+   function that draws the finished curve. That is the point - the curve
+   IS the dots, and watching them arrive is the only way to see it.     */
+function puRun(){
+  var btn = document.getElementById("puRunBtn");
+  if(puAnim){ clearInterval(puAnim); puAnim = null; }
+  PU_SCAN = {j:0, pts:[]};
+  if(btn) btn.disabled = true;
+  var step = function(){
+    var E = puBaseAt(PU_SCAN.j) / 1000;
+    PU_SCAN.pts.push({E:E, v:puResp(E)});
+    puDraw();
+    PU_SCAN.j++;
+    if(PU_SCAN.j >= PU_NS){
+      clearInterval(puAnim); puAnim = null;
+      /* leave the finished set on screen for a moment, then hand the
+         panel back to the smooth curve it has always drawn          */
+      window.setTimeout(function(){
+        PU_SCAN = null; puDraw(); if(btn) btn.disabled = false;
+      }, 900);
+    }
+  };
+  step();
+  /* a third of the speed it first ran at: twenty-six cycles at 270 ms is
+     about seven seconds, which is slow enough to follow each dot as it
+     lands rather than watch a curve appear */
+  puAnim = setInterval(step, 270);
+}
+function puPresets(){
+  var box = document.getElementById("puPresets");
+  box.innerHTML = "";
+  PUPRE[PU.m].forEach(function(p){
+    var b = document.createElement("button");
+    b.className = "ghost"; b.type = "button"; b.textContent = p[0];
+    b.addEventListener("click", function(){
+      Object.keys(p[1]).forEach(function(k){ PU[k] = p[1][k]; });
+      puSync();
+    });
+    box.appendChild(b);
+  });
+}
+function puSync(){
+  if(puAnim){ clearInterval(puAnim); puAnim = null; PU_SCAN = null;
+              var rb = document.getElementById("puRunBtn"); if(rb) rb.disabled = false; }
+  document.getElementById("puAmp").value = Math.log10(PU.amp * 1000);
+  document.getElementById("puTm").value = Math.log10(PU.tm);
+  document.getElementById("puTau").value = Math.log10(PU.tau);
+  document.getElementById("puC").value = Math.log10(PU.C * 1e6);
+  document.getElementById("puN").value = PU.n;
+  pillSet("puPills", PU.m);
+  later("pu", puDraw);
+}
+
+/* ======================= CONTROLS ====================================== */
+/* the pulse scan button, bound here with the rest of the controls */
+window.setTimeout(function(){
+  var b = document.getElementById("puRunBtn");
+  if(b) b.addEventListener("click", puRun);
+}, 0);
+
+function bindR(id, fn){
+  document.getElementById(id).addEventListener("input", function(){ fn(+this.value); });
+}
+
+bindR("ohA", function(v){ OH.a = Math.pow(10, v); ohSync(); });
+bindR("ohD", function(v){ OH.d = Math.pow(10, v); ohSync(); });
+bindR("ohCd", function(v){ OH.Cdl = Math.pow(10, v); ohSync(); });
+bindR("ohDE", function(v){ OH.dE = v; ohSync(); });
+[["ohP1", {a:0.15, d:1.0, i:1e-4}],
+ ["ohP2", {a:0.15, d:0.15, i:1e-4}],
+ ["ohP3", {a:5e-4, d:0.002, i:1e-7}]].forEach(function(p){
+  document.getElementById(p[0]).addEventListener("click", function(){
+    Object.keys(p[1]).forEach(function(k){ OH[k] = p[1][k]; });
+    document.getElementById("ohA").value = Math.log10(OH.a);
+    document.getElementById("ohD").value = Math.log10(OH.d);
+    ohSync();
+  });
+});
+
+bindR("coTau", function(v){ CO.tau = Math.pow(10, v); coSync(); });
+bindR("coT0", function(v){ coWindow(0, v); });
+bindR("coT1", function(v){ coWindow(1, v); });
+[["coP1", "good"], ["coP2", "early"], ["coP3", "late"]].forEach(function(p){
+  document.getElementById(p[0]).addEventListener("click", function(){ coRun(p[1]); });
+});
+
+bindR("umR", function(v){ UM.r0 = Math.pow(10, v); later("um", umDraw); });
+bindR("umD", function(v){ UM.D = Math.pow(10, v); later("um", umDraw); });
+bindR("umC", function(v){ UM.C = Math.pow(10, v) * 1e-6; later("um", umDraw); });
+document.getElementById("umG").addEventListener("change", function(){
+  UM.g = this.value; later("um", umDraw);
+});
+[["umP1", 5e-4], ["umP2", 1e-2], ["umP3", 0.15]].forEach(function(p){
+  document.getElementById(p[0]).addEventListener("click", function(){
+    UM.r0 = p[1]; umSync();
+  });
+});
+
+pillGroup("puPills", function(s){ PU.m = s; puPresets(); puSync(); });
+bindR("puAmp", function(v){ PU.amp = Math.pow(10, v) / 1000; later("pu", puDraw); });
+bindR("puTm", function(v){ PU.tm = Math.pow(10, v); later("pu", puDraw); });
+bindR("puTau", function(v){ PU.tau = Math.pow(10, v); later("pu", puDraw); });
+bindR("puC", function(v){ PU.C = Math.pow(10, v) * 1e-6; later("pu", puDraw); });
+bindR("puN", function(v){ PU.n = Math.round(v); later("pu", puDraw); });
+
+/* ---- panels drawn when first shown ----------------------------------- */
+var PANEL_SHOW = {}, SHOWN = {};
+[].slice.call(document.querySelectorAll(".tab")).forEach(function(t){
+  t.addEventListener("click", function(){
+    var id = t.getAttribute("aria-controls");
+    if(PANEL_SHOW[id] && !SHOWN[id]){ SHOWN[id] = 1; PANEL_SHOW[id](); }
+  });
+});
+PANEL_SHOW["p-cot"] = coSync;
+PANEL_SHOW["p-ume"] = umSync;
+PANEL_SHOW["p-pulse"] = function(){ puPresets(); puSync(); };
+
+ohSync();
+
+/* the comparison table, built once */
+document.getElementById("puTable").innerHTML =
+  "<tr><th>method</th><th>waveform</th><th>what comes back</th><th>what it is for</th></tr>"
+  + [["NPV", "a pulse from a base potential where nothing reacts, growing each cycle",
+      "a sigmoid; plateau = i_d at t_m", "E_1/2 and i_d without a sweep; the diffusion layer is rebuilt every cycle"],
+     ["DPV", "a small fixed pulse on top of a staircase ramp, sampled before and after",
+      "a peak at E_1/2 − ΔE/2, width → 90.4/n mV",
+      "trace analysis: the charging current is differenced away, which is what reaches 10⁻⁸ M"],
+     ["SWV", "a square wave on a staircase, sampled at the end of each half cycle",
+      "a peak about twice the DPV height, plus forward and reverse components",
+      "the same sensitivity, far faster, and the two components report on reversibility"]]
+    .map(function(r){
+      return '<tr><td class="nm"><b>' + r[0] + '</b></td><td class="sy">' + r[1]
+        + '</td><td class="sy">' + r[2] + '</td><td class="sy">' + r[3] + "</td></tr>";
+    }).join("");
+
+
+/* ================= CONCEPT CHECK ======================================
+   One check for the whole lecture: the ohmic term, the two currents and
+   the window between them, the Cottrell plot, the UME and the pulses.
+   Every answer is something a slider on this page can be made to show. */
+
+var QZ1 = [
+ {q:"You move the reference tip from ten electrode radii away to one radius away. Roughly what happens to R<sub>u</sub>?",
+  o:["It falls a little &mdash; most of R<sub>u</sub> is inside the first radius, so there is not much left to remove",
+     "It falls by about a factor of ten, in proportion to the distance",
+     "It falls to zero: the tip is now at the electrode",
+     "It does not change; R<sub>u</sub> depends only on &kappa; and the electrode area"],
+  a:0,
+  w:"R<sub>u</sub>(d) = (1/4&kappa;a)[1 &minus; (2/&pi;)arctan(a/d)] <b>saturates</b>. Current funnels into a disc from every direction, so the lines are crowded in the first radius and spread out immediately: by d = a you are already carrying most of 1/4&kappa;a, and the remaining distance is worth very little. That is why a Luggin capillary is worth a factor and not an order of magnitude &mdash; and why the term that actually moves R<sub>u</sub> is &kappa;, which means supporting electrolyte. Drag the distance slider on the first tab and watch the curve flatten."},
+
+ {q:"After a potential step, why does the charging current die away so much faster than the Faradaic one?",
+  o:["It decays exponentially with R<sub>u</sub>C<sub>dl</sub> while the Faradaic current only falls as t<sup>&minus;1/2</sup>",
+     "The double layer holds less charge than the diffusion layer",
+     "The charging current is not a real current, so it cannot be measured after the step",
+     "Both decay exponentially, but the double layer has the smaller time constant"],
+  a:0,
+  w:"i<sub>c</sub> = (&Delta;E/R<sub>u</sub>)e<sup>&minus;t/R<sub>u</sub>C<sub>dl</sub></sup> is an exponential and i<sub>d</sub> = nFAD<sup>&frac12;</sup>C*/&radic;(&pi;t) is a power law, and an exponential beats any power law eventually. That is the only reason a usable window exists at all: after about 5&tau; the first has lost 99.3 % and the second has lost almost nothing. The diffusion layer is not storing charge &mdash; it is being consumed, which is why its current has no time constant to decay with."},
+
+ {q:"A Cottrell plot of i against t<sup>&minus;1/2</sup> gives R&sup2; = 0.9997 and an intercept of &minus;4 µA. What should you conclude?",
+  o:["The data are not Cottrell: the equation has no constant term, so a non-zero intercept is a failure whatever R&sup2; says",
+     "The fit is excellent; report D from the slope",
+     "The intercept is the charging current and should simply be subtracted",
+     "The sign is wrong, so n must be 2 rather than 1"],
+  a:0,
+  w:"i = nFAD<sup>&frac12;</sup>C*/&radic;(&pi;t) passes through the origin by construction, so the intercept is a residual &mdash; it is the part of the data the model cannot account for. R&sup2; is almost useless here because a slightly curved line through crowded points still correlates beautifully. A <em>negative</em> intercept in particular is the signature of sampling too early: those points sit at large t<sup>&minus;1/2</sup>, carry leftover i<sub>c</sub>, and tilt the line steeper. And D goes as the slope <b>squared</b>, so the error is doubled."},
+
+ {q:"Why does the current at a 5 µm disc stop falling after a few milliseconds, while a 1.5 mm disc keeps falling for minutes?",
+  o:["Once the depleted layer is larger than the electrode it wraps into a hemisphere, and a hemisphere has a finite gradient however far it grows",
+     "The small electrode runs out of reactant, so the current has nowhere to fall to",
+     "The small electrode has a smaller R<sub>u</sub>C<sub>dl</sub>, so it settles sooner",
+     "Convection reaches the small electrode first and holds the layer at a fixed thickness"],
+  a:0,
+  w:"It is geometry, not kinetics and not stirring. While &delta; = &radic;(2Dt) is smaller than r<sub>0</sub> the layer is a flat slab, diffusion is linear and the current falls as Cottrell on <em>both</em> electrodes &mdash; the plot of every size on that tab shows them leaving the same line at different moments. Once &delta; passes r<sub>0</sub> the layer wraps round the edge, and radial diffusion delivers a finite flux no matter how large the layer becomes: i<sub>ss</sub> = 4nFDC*r<sub>0</sub>, with no t in it. On a 1.5 mm disc that would take minutes, and convection arrives first."},
+
+ {q:"DPV plots the difference between two samples taken on each step of a staircase. Why does that turn a step into a peak?",
+  o:["A difference of two nearby points on a curve is a derivative, and the derivative of a sigmoid is a peak",
+     "The second sample is taken after the Faradaic current has reversed sign",
+     "Subtracting removes the diffusion current and leaves only the kinetics",
+     "The staircase makes the concentration oscillate, and the peak is the resonance"],
+  a:0,
+  w:"The two samples sit at E and E+&Delta;E on the <em>same</em> sampled-current sigmoid, so &Delta;i is a finite-difference derivative of it. That also fixes where the peak sits &mdash; at the midpoint of the two sampling potentials, E<sub>1/2</sub> &minus; &Delta;E/2 &mdash; and what happens as you shrink &Delta;E: the peak approaches the true derivative, narrowing to 3.52RT/nF = 90.4/n mV while losing height in proportion. The sensitivity comes from the subtraction, which cancels the residual charging current and the background, not from the waiting."},
+
+ {q:"You need to measure a 10 µM analyte in a solution whose resistance gives &tau; = 3 ms. Which is the sound choice?",
+  o:["A pulse method, sampling tens of milliseconds into each pulse",
+     "A potential step, sampling at 1 ms to catch the current while it is still large",
+     "A Cottrell plot fitted from 0.1 ms to 10 ms",
+     "Cyclic voltammetry at 10 V/s, where the peak is tallest"],
+  a:0,
+  w:"&tau; = 3 ms means nothing before about 15 ms is free of charging current, which kills the second and third options outright &mdash; they both sample inside the decay, and at 10 µM the Faradaic current is small enough that i<sub>c</sub> would dominate completely. Fast cyclic voltammetry makes it worse: i<sub>c</sub> grows as &upsilon; while i<sub>p</sub> only grows as &radic;&upsilon;, so sweeping faster lowers the ratio you care about. A pulse method waits the charging current out and, in DPV and SWV, differences away what is left; that combination is what reaches the 10<sup>&minus;8</sup> M range."}
+];
+
+
+var LETTERS = "ABCD";
+var SUBMIT_URL = "https://script.google.com/macros/s/AKfycbxPm7WrbttFu6-gnTi__IcUPt-816GthK0eI8TPuwOZyYlcRW3RAWJlmsr791moxBc5GA/exec";
+
+function code(str){
+  var h=0x811c9dc5;
+  for(var i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=(h+((h<<1)+(h<<4)+(h<<7)+(h<<8)+(h<<24)))>>>0; }
+  return ("0000000"+h.toString(16).toUpperCase()).slice(-8);
+}
+
+/* n: 1 or 2, the suffix on every element id of that check's panel */
+function makeQuiz(n, QZ, label, STORE){
+  function E(id){ return document.getElementById(id + n); }
+  var picks=new Array(QZ.length).fill(-1);
+  var sId=E("sId"), elTally=E("tally"), elBar=E("scorebar"), elScore=E("scoreNum"),
+      elWho=E("whoLine"), elIdHint=E("idHint"), dlBtn=E("dlBtn"), dlHint=E("dlHint"),
+      sendBtn=E("sendBtn"), root=E("quiz");
+  var startedAt=null, finishedAt=null;
+
+  function save(){
+    try{ localStorage.setItem(STORE,JSON.stringify({i:sId.value,p:picks,s:startedAt,t:finishedAt})); }catch(e){}
+  }
+  function loadState(){
+    try{
+      var d=JSON.parse(localStorage.getItem(STORE)||"null");
+      if(d){ sId.value=d.i||""; if(Array.isArray(d.p)&&d.p.length===QZ.length) picks=d.p.slice();
+             startedAt=d.s||null; finishedAt=d.t||null; }
+    }catch(e){}
+  }
+  function started(){ return picks.some(function(p){return p>=0;}); }
+  function scoreOf(){ var s=0; for(var i=0;i<QZ.length;i++) if(picks[i]===QZ[i].a) s++; return s; }
+  function answered(){ return picks.filter(function(p){return p>=0;}).length; }
+
+  function receipt(){
+    var s=scoreOf(), pct=Math.round(s/QZ.length*100), id=(sId.value||"").trim();
+    var stamp=finishedAt||new Date().toISOString();
+    var vc=code(id+"|"+stamp+"|"+picks.join(""));
+    var head=["lecture","student_id","completed_utc","score","total","percent","verification"];
+    var row=[label,id,stamp,s,QZ.length,pct,vc];
+    for(var i=0;i<QZ.length;i++){ head.push("a"+(i+1)); row.push(picks[i]>=0?LETTERS[picks[i]]:"-"); }
+    for(var j=0;j<QZ.length;j++){ head.push("ok"+(j+1)); row.push(picks[j]===QZ[j].a?1:0); }
+    function cell(v){ v=String(v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
+    return {csv:head.join(",")+"\n"+row.map(cell).join(",")+"\n", vcode:vc, score:s, pct:pct, id:id};
+  }
+
+  function render(){
+    var done=answered(), all=(done===QZ.length);
+    elTally.textContent=done+" / "+QZ.length+" answered";
+    elBar.hidden=!all;
+    sId.readOnly=started();
+    elIdHint.innerHTML = all
+      ? "<strong>Attempt complete.</strong> Your answers are final. Every question now shows the correct answer and why — read them before you close this page."
+      : started() ? "<strong>Attempt in progress.</strong><span class=\"locked\">ID locked</span><br>Each answer is final."
+                  : "<strong>One attempt.</strong> Enter your student ID before you begin — it locks once you answer the first question.";
+    if(all){
+      if(!finishedAt){ finishedAt=new Date().toISOString(); save(); }
+      var r=receipt();
+      elScore.innerHTML=r.score+' <small>/ '+QZ.length+'  ·  '+r.pct+' %</small>';
+      elWho.innerHTML="Student ID <b>"+esc(r.id||"—")+"</b> &nbsp;·&nbsp; Verification <b>"+r.vcode+"</b>";
+    }
+    for(var i=0;i<QZ.length;i++){
+      var box=root.querySelector('.opts[data-q="'+i+'"]');
+      var kids=[].slice.call(box.children), why=box.parentNode.querySelector(".why");
+      if(picks[i]<0){ kids.forEach(function(o){o.disabled=false;o.className="opt";}); why.hidden=true; }
+      else{
+        (function(qi){ kids.forEach(function(o,j){
+          o.disabled=true;
+          o.className="opt"+(j===QZ[qi].a?" right":(j===picks[qi]?" wrong":""));
+        }); })(i);
+        var _note=(picks[i]!==QZ[i].a)
+          ? '<span class="misc">You chose <b>'+LETTERS[picks[i]]+'</b>. '
+            + 'The correct answer is <b>'+LETTERS[QZ[i].a]+'</b>.</span>'
+          : "";
+        why.innerHTML=_note+QZ[i].w; why.hidden=false;
+      }
+    }
+  }
+
+  root.innerHTML=QZ.map(function(item,i){
+    return '<div class="card q"><div class="card-b">'
+      +'<p class="stem"><b style="font-family:IBM Plex Mono,monospace;color:var(--muted);font-size:12px">Q'+(i+1)+'</b>  '+item.q+'</p>'
+      +'<div class="opts" data-q="'+i+'">'+item.o.map(function(o,j){
+          return '<button class="opt" data-i="'+j+'"><span class="ltr">'+LETTERS[j]+'</span><span>'+o+'</span></button>';
+        }).join("")+'</div><p class="why" hidden></p></div></div>';
+  }).join("");
+
+  [].slice.call(root.querySelectorAll(".opts")).forEach(function(box){
+    box.addEventListener("click",function(ev){
+      var b=ev.target.closest(".opt");
+      if(!b||b.disabled) return;
+      var qi=+box.getAttribute("data-q");
+      if(picks[qi]>=0) return;
+      if(!(sId.value||"").trim()){
+        elIdHint.innerHTML="<strong style=\"color:var(--stop)\">Enter your student ID first.</strong> It is written into the result file you submit.";
+        sId.focus(); return;
+      }
+      if(!startedAt) startedAt=new Date().toISOString();
+      picks[qi]=+b.getAttribute("data-i");
+      save(); render();
+    });
+  });
+  sId.addEventListener("input",save);
+
+  dlBtn.addEventListener("click",function(){
+    var id=(sId.value||"").trim();
+    if(!id){ dlHint.textContent="Enter your student ID first — it goes into the file."; return; }
+    var r=receipt();
+    try{
+      var blob=new Blob([r.csv],{type:"text/csv;charset=utf-8"});
+      var url=URL.createObjectURL(blob);
+      var a=document.createElement("a");
+      a.href=url; a.download="CH40051-"+label+"-check_"+id.replace(/[^A-Za-z0-9_-]/g,"")+".csv";
+      a.style.display="none";
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(function(){URL.revokeObjectURL(url);},1000);
+      dlHint.textContent="Saved. Hand it in as your instructor directs.";
+    }catch(e){
+      dlHint.textContent="Your browser blocked the download. Screenshot this panel and submit that instead.";
+    }
+  });
+
+  /* ---- submit straight to the course sheet -------------------------------- */
+  if(SUBMIT_URL){
+    sendBtn.hidden=false;
+    dlHint.textContent="Press Submit to send your result to the course. The download is a backup.";
+  }
+  sendBtn.addEventListener("click",function(){
+    var id=(sId.value||"").trim();
+    if(!id){ dlHint.textContent="Enter your student ID first."; return; }
+    var r=receipt();
+    var payload={
+      lecture:label, student_id:id, completed_utc:finishedAt||new Date().toISOString(),
+      score:r.score, total:QZ.length, percent:r.pct, verification:r.vcode,
+      answers:picks.map(function(p){ return p>=0?LETTERS[p]:"-"; }),
+      ok:picks.map(function(p,i){ return p===QZ[i].a?1:0; })
+    };
+    sendBtn.disabled=true;
+    dlHint.textContent="Sending...";
+    fetch(SUBMIT_URL,{
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(payload)
+    })
+    .then(function(res){ return res.json(); })
+    .then(function(j){
+      if(j && j.ok){
+        sendBtn.textContent="Submitted ✓";
+        dlHint.textContent="Recorded for student ID "+id+". You can close this page.";
+      }else{
+        sendBtn.disabled=false;
+        sendBtn.textContent="Submit to the course";
+        dlHint.textContent="Not recorded — "+((j && j.error) || "the course sheet refused it.")
+          + " Keep the downloaded file and tell your instructor if this looks wrong.";
+      }
+    })
+    .catch(function(){
+      fetch(SUBMIT_URL,{method:"POST",mode:"no-cors",
+        headers:{"Content-Type":"text/plain;charset=utf-8"},
+        body:JSON.stringify(payload)}).catch(function(){});
+      sendBtn.disabled=false;
+      sendBtn.textContent="Submit to the course";
+      dlHint.textContent="Sent, but the confirmation did not come back. "
+        + "Download the file as well and keep it - it is your proof of submission.";
+    });
+  });
+
+  loadState();
+  render();
+}makeQuiz(1, QZ1, "L14", "ch40051-l14-check1-v1");
+
+})();
+</script>
+</body>
+</html>
