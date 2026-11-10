@@ -146,6 +146,10 @@ table.ions tr.lo td{color:var(--red-)}
 .eqbig{font-family:"IBM Plex Mono",monospace;font-size:13.5px;line-height:2.05;color:var(--ink);
   background:var(--surface-2);border-radius:8px;padding:14px 15px;overflow-x:auto;white-space:nowrap}
 .eqbig small{color:var(--muted);font-size:11.5px;letter-spacing:.04em}
+/* a block of eqbig that is prose rather than stacked equations takes
+   the leading of the verdict text beside it, not the 2.05 that keeps
+   equations apart */
+.eqbig.prose,.eqbig.prose small{line-height:1.55}
 /* one colour per loss term, used in prose, in the equations and in every picture */
 .act{color:var(--ox);font-weight:600}
 .cnc{color:var(--red-);font-weight:600}
@@ -336,50 +340,33 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
           <div class="card-b stack" style="gap:13px">
             <svg id="ohCell" viewBox="0 0 520 262" style="width:100%;height:auto" role="img"
                  aria-label="A three-electrode cell in cross section. The working electrode is an inlaid disc in the floor, the counter electrode a plate at the right, and a Luggin capillary carrying the reference comes down the axis with its tip a distance d above the disc. Two dashed shells above the disc mark where half and nine tenths of the uncompensated resistance lie. The picture is drawn in units of the electrode radius, so only the tip moves as the sliders move."></svg>
-            <div class="eqbig" style="white-space:normal;margin:0">
-              <span class="act">Moving the reference closer, and where that stops helping</span>
+            <div class="eqbig prose" style="white-space:normal;margin:0">
+              <small>The same R<sub>u</sub> from the other side: the <b>Ohmic Error</b> bench of
+                <a href="lecture03.html">Lecture 3 &middot; Reference Bench</a> puts it into the
+                potential you report. Here the same resistance is read as a clock instead:
+                R<sub>u</sub>C<sub>dl</sub> is how long the cell takes to obey you.</small>
             </div>
             <svg id="ohFig" viewBox="0 0 520 234" style="width:100%;height:auto" role="img"
                  aria-label="Uncompensated resistance against the distance from the electrode to the reference tip, on a logarithmic distance axis. The curve rises steeply over the first electrode radius and then flattens onto the limiting value of one over four kappa a."></svg>
           </div>
         </div>
         <div class="card">
-          <div class="card-h"><h2>Why nothing is clean before 5&tau;</h2>
-            <span class="note">one step in, two currents out &mdash; and 5&tau; in the same place in all three</span></div>
-          <div class="card-b stack" style="gap:13px">
-            <svg id="ohFigWin" viewBox="0 0 520 690" style="width:100%;height:auto" role="img"
-                 aria-label="Three panels on one clock. At the top, the input: the potential step you applied, flat, and the potential the electrode actually reached, which approaches it exponentially with time constant tau. In the middle, the output magnified onto the first few time constants: the charging current collapsing exponentially, the faradaic current emerging from under it, and their sum, with five time constants marked and everything before it shaded. At the bottom, the same two currents over eleven decades of time on logarithmic axes, where the charging current falls as a straight-edged exponential cliff while the faradaic current falls only as the inverse square root of time, so the two must cross. Five time constants fall at the same horizontal position in all three panels."></svg>
-            <p class="hint" style="margin:0"><b>One panel of input, two of output.</b> The top panel is
-              what you asked the instrument for: a step of &Delta;E, and the potential the electrode
-              actually reached, which is behind it by iR<sub>u</sub> until the double layer has charged.
-              The two below are what comes back for it. The middle one is magnified onto the first few
-              &tau;, where the charging curve never moves and the sliders slide the faradaic one across
-              it; up to about 5&tau; the thin grey line &mdash; the only thing an instrument ever sees
-              &mdash; is the charging current with the chemistry buried inside it, and after 5&tau; the
-              grey line and the green one are the same curve. The bottom one is that same race over
-              every decade there is, which is where you can see the crossing is not a coincidence.
-              <b>5&tau; is drawn at the same place in all three</b>: the middle panel's range in &tau;
-              is chosen from the logarithmic clock below it, so the shaded column is one column
-              through the whole figure.</p>
-            <p class="hint" style="margin:0"><b>The two currents die at different speeds, and that is
-              what makes the experiment possible.</b> i<sub>c</sub> falls exponentially,
-              e<sup>&minus;t/&tau;</sup>; the faradaic current falls only as t<sup>&minus;1/2</sup>
-              (Cottrell). An exponential beats any power law eventually, so there is always a time
-              after which the charging current has gone and the faradaic one has not &mdash; and it
-              arrives at about <b>5&tau;</b>. Before that the measured current is mostly the cell
-              charging itself and no analysis of it means anything; after it, what is left is
-              chemistry. This is why pulse methods <b>sample late</b> instead of integrating, and why
-              shrinking &tau; &mdash; a smaller electrode, more supporting electrolyte, a Luggin tip
-              &mdash; buys earlier access to the reaction.</p>
-          </div>
-        </div>
-        </div>
-        <div class="card">
           <div class="card-h"><h2>What a step actually looks like at the electrode</h2>
-            <span class="note">the circuit, then what it does</span></div>
+            <span class="note">how much of it has arrived, and when</span></div>
           <div class="card-b stack" style="gap:13px">
-            <svg id="ohFigRC" viewBox="0 0 520 318" style="width:100%;height:auto" role="img"
-                 aria-label="Above, two equivalent circuits: with nothing able to react the cell is the uncompensated resistance in series with the double-layer capacitance alone, and with a reaction present a charge-transfer resistance and a Warburg element sit in parallel with that capacitance. Below, the fraction of the applied step that the electrode has actually reached, against time in units of the time constant, with one, three and five time constants marked and the gap still missing written at each."></svg>
+            <svg id="ohStep" viewBox="0 0 520 300" style="width:100%;height:auto" role="img"
+                 aria-label="Two cells side by side, each stepped from E1 to E2. On the left E2 stays below the redox potential, so nothing can react; on the right it passes it. Under each potential programme is the solution next to the electrode, drawn with the wall end magnified: counter-ions build up in the double layer as the cell charges, and on the right the reactant is consumed at the wall and the depletion it leaves spreads outward with the square root of time. A cursor marks the instant being drawn."></svg>
+            <div class="btnrow"><button class="ghost" type="button" id="ohStepBtn">Run the step &mdash; watch the double layer fill, then the reactant go</button></div>
+            <p class="hint" style="margin:0"><b>The same step, two different solutions.</b> Both cells
+              charge their double layer in the first few &tau; and neither can tell you anything while
+              that is happening. After it, the left-hand cell is finished &mdash; the pile of
+              counter-ions is built and nothing else moves, which is the whole of a non-faradaic step.
+              The right-hand cell has only started: the reaction holds the reactant at zero on the wall,
+              and the hole spreads out as &radic;(2Dt), which is the Cottrell current seen from the
+              side. The wall end is magnified so a nanometre and sixty microns can be drawn together;
+              the break marks the change of scale.</p>
+            <svg id="ohFigRC" viewBox="0 0 520 200" style="width:100%;height:auto" role="img"
+                 aria-label="The fraction of the applied step that the electrode has actually reached, against time in units of the time constant, with one, three and five time constants marked and the gap still missing written at each."></svg>
             <p class="hint" style="margin:0"><b>&tau; is how long the cell takes to obey you.</b>
               The step has to charge C<sub>dl</sub> through R<sub>u</sub>, so the electrode arrives at
               E(1 &minus; e<sup>&minus;t/&tau;</sup>) rather than at once, and what is still missing is
@@ -388,8 +375,6 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
               5&tau; comes from. The faradaic branch changes none of this: it is in parallel with
               C<sub>dl</sub>, so at t = 0 the capacitor is a short circuit and the whole step still
               falls across R<sub>u</sub>.</p>
-            <svg id="ohFig2" viewBox="0 0 520 274" style="width:100%;height:auto" role="img"
-                 aria-label="Above, the applied potential step as a dashed line and the potential actually reached at the electrode rising exponentially towards it, the gap between them being iR_u. Below, on the same time axis, the charging current decaying from delta E over R_u with five time constants marked."></svg>
             <div class="eqbig" style="white-space:normal;text-align:left;margin:0">
               <span class="cnc">&tau; = R<sub>u</sub>C<sub>dl</sub></span>
               <small><b>the time constant of the cell</b> &mdash; an ohm times a farad is a second.
@@ -408,6 +393,38 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
                 earliest time anything measured here means what you think it means. One &tau;
                 leaves 37 %, three leave 5 %.</small>
             </div>
+          </div>
+        </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>Why nothing is clean before 5&tau;</h2>
+            <span class="note">one step in, two currents out &mdash; and 5&tau; in the same place in all three</span></div>
+          <div class="card-b stack" style="gap:13px">
+            <svg id="ohFigWin" viewBox="0 0 520 852" style="width:100%;height:auto" role="img"
+                 aria-label="At the head of the figure, two equivalent circuits: with nothing able to react the cell is the uncompensated resistance in series with the double-layer capacitance alone, and with a reaction present a charge-transfer resistance and a Warburg element sit in parallel with that capacitance. Under them, two frames on one time axis, and a third below them. The upper frame is the input: the potential step you applied, flat, and the potential the electrode actually reached, which approaches it exponentially with time constant tau, the gap between them being iR_u. Directly beneath it, sharing the same decades of time, the output: the charging current falling as a straight-edged exponential cliff and the faradaic current falling only as the inverse square root of time, so the two must cross; one time constant and five are marked on both frames, and everything before five time constants is shaded in one column through the pair. At the foot of the figure the same race again, magnified onto the first few time constants on a clock measured in tau, with the charging current, the faradaic current and their sum, which is all an instrument can measure. Five time constants stand at the same horizontal position in every panel."></svg>
+            <p class="hint" style="margin:0"><b>The whole argument, read downwards.</b> At the top is the circuit a stepped cell actually is: R<sub>u</sub> in series with C<sub>dl</sub>, and the faradaic branch hanging in parallel with the capacitor, which is why it changes none of the timing. Under it, the pair that shares one clock. Above the gap
+              is what you asked the instrument for &mdash; one step of &Delta;E &mdash; and the
+              potential the electrode actually reached, which trails it by iR<sub>u</sub> until the
+              double layer has charged. Below the gap, on the <b>same clock</b>, is what comes back
+              for it: the charging current falling off a cliff and the faradaic current falling only
+              as t<sup>&minus;1/2</sup>. &tau; and 5&tau; are marked on both halves at the same place,
+              because there is only one time axis between them. The panel at the foot is the same race
+              magnified onto the first few &tau;, where the charging curve never moves and the sliders
+              slide the faradaic one across it; up to about 5&tau; the thin grey line &mdash; the only
+              thing an instrument ever sees &mdash; is the charging current with the chemistry buried
+              inside it, and after 5&tau; the grey line and the green one are the same curve. Its
+              range in &tau; is taken from the clock above, so <b>5&tau; stands in the same column in
+              every panel</b>.</p>
+            <p class="hint" style="margin:0"><b>The two currents die at different speeds, and that is
+              what makes the experiment possible.</b> i<sub>c</sub> falls exponentially,
+              e<sup>&minus;t/&tau;</sup>; the faradaic current falls only as t<sup>&minus;1/2</sup>
+              (Cottrell). An exponential beats any power law eventually, so there is always a time
+              after which the charging current has gone and the faradaic one has not &mdash; and it
+              arrives at about <b>5&tau;</b>. Before that the measured current is mostly the cell
+              charging itself and no analysis of it means anything; after it, what is left is
+              chemistry. This is why pulse methods <b>sample late</b> instead of integrating, and why
+              shrinking &tau; &mdash; a smaller electrode, more supporting electrolyte, a Luggin tip
+              &mdash; buys earlier access to the reaction.</p>
           </div>
         </div>
       </div>
@@ -497,6 +514,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
             <div class="readouts">
               <div class="readout"><span class="k">fitted slope</span><span class="v" id="coSlope">&mdash;</span></div>
               <div class="readout"><span class="k">intercept</span><span class="v" id="coInt">&mdash;</span></div>
+            <div class="readout"><span class="k">&hellip; the edge alone, &pi;nFDC*a</span><span class="v" id="coEdge">&mdash;</span></div>
               <div class="readout"><span class="k">D from that slope</span><span class="v" id="coDfit">&mdash;</span></div>
               <div class="readout"><span class="k">against the true D</span><span class="v" id="coErr">&mdash;</span></div>
               <div class="readout"><span class="k">R&sup2;</span><span class="v" id="coR2">&mdash;</span></div>
@@ -553,9 +571,11 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
                 everything else in nFAD<sup>&frac12;</sup>C*/&radic;&pi; is known; and <b>the Cottrell
                 equation has no constant term</b>, so an intercept that is not zero says the data are not
                 Cottrell, whatever R&sup2; says. Sampling too early lifts the right-hand end (large
-                t<sup>&minus;1/2</sup>) and steepens the line; sampling too late lifts the left-hand end and
-                flattens it while pushing the intercept up. <b>D goes as the slope squared, so every error
-                is doubled.</b></p>
+                t<sup>&minus;1/2</sup>) and steepens the line, so <b>D reads high</b>. Sampling too late
+                lifts the left-hand end, but what follows depends on <em>why</em>: the electrode edge adds
+                a <em>constant</em>, which raises the intercept and leaves the slope alone, while
+                convection stops the current falling at all, which flattens the line and makes <b>D read
+                low</b>. <b>D goes as the slope squared, so every slope error is doubled.</b></p>
             </div>
           </div>
         
@@ -589,10 +609,16 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
                 <small><b>D reads high.</b> Residual i<sub>c</sub> sits on top of the first points, which
                   are also the ones with the largest t<sup>&minus;1/2</sup>, so they lever the slope
                   up.</small><br>
-                <span class="ohm">too late</span>
-                <small><b>D reads high as well, for the opposite reason.</b> Convection, or radial
-                  diffusion at the edge of the disc, holds the current above the Cottrell line; the late
-                  points lift and the line pivots.</small><br>
+                <span class="ohm">too late &mdash; the edge</span>
+                <small><b>D is untouched; the intercept moves.</b> Radial diffusion at the rim adds
+                  &pi;nFDC*a to the current, and that is a <em>constant</em>: on this plot it shifts the
+                  whole line up without tilting it. The slope, and so D, survives &mdash; which is
+                  exactly why the intercept is the test and the slope is not.</small><br>
+                <span class="ohm">too late &mdash; the room</span>
+                <small><b>D reads low.</b> Once natural convection holds the layer at a fixed thickness
+                  the current stops falling at all. Those points sit at the <em>smallest</em>
+                  t<sup>&minus;1/2</sup>, so they flatten the line, and D goes as the slope
+                  <b>squared</b>.</small><br>
                 <span class="ohm">the area A</span>
                 <small><b>the usual culprit.</b> A is the <em>electroactive</em> area, not what the
                   calipers say. A roughness factor of 1.3 taken as 1.0 puts D out by 69 %. Calibrate A
@@ -1196,6 +1222,41 @@ function tEdge(r0, D){ return r0 * r0 / (2 * D); }
 function tSS(r0, D){ return r0 * r0 / (Math.PI * D); }
 function deltaOf(D, t){ return Math.sqrt(2 * D * t); }
 
+/* ---- the disc is not a plane ----------------------------------------
+   Cottrell is the semi-infinite LINEAR solution: one coordinate, no r in
+   it anywhere. A real inlaid disc also collects from the side, and the
+   standard expression for it is Shoup and Szabo's, exact to 0.6 % at
+   every time:
+
+       i = 4nFDC*a f(x),  x = 4Dt/a²
+       f = 0.7854 + 0.8862 x^-1/2 + 0.2146 exp(-0.7823 x^-1/2)
+
+   0.8862 is sqrt(pi)/2, and that term alone IS Cottrell. Expand the rest
+   at short time and the edge contributes
+
+       i_edge = pi n F D C* a,   a CONSTANT
+
+   so on a plot of i against t^-1/2 the edge effect shifts the whole line
+   up without tilting it: it moves the INTERCEPT and leaves the slope,
+   and therefore D, exactly alone. What flattens the slope is the other
+   late-time mistake, convection, and that one makes D read LOW.      */
+function szF(x){
+  var u = 1 / Math.sqrt(x);
+  return 0.7854 + 0.8862 * u + 0.2146 * Math.exp(-0.7823 * u);
+}
+function iDisc(n, r0, D, Cs, t){
+  return 4 * n * FARADAY * D * Cs * r0 * szF(4 * D * t / (r0 * r0));
+}
+function iEdge(n, r0, D, Cs){ return Math.PI * n * FARADAY * D * Cs * r0; }
+/* and once the room takes over the layer stops growing, so the current
+   stops falling                                                       */
+function iMeas(n, r0, D, Cs, t){
+  return Math.max(iDisc(n, r0, D, Cs, t), iDisc(n, r0, D, Cs, T_CONV));
+}
+/* the time at which the edge is worth this fraction of the Cottrell
+   current: i/i_Cottrell = 1 + delta/a with delta = sqrt(pi D t)       */
+function tEdgePct(r0, D, frac){ return frac * frac * r0 * r0 / (Math.PI * D); }
+
 /* the shared fmtA stops at nanoamps; a UME does not */
 /* erf, Abramowitz and Stegun 7.1.26 - used by every concentration
    profile on the page, so it lives with the shared helpers           */
@@ -1292,8 +1353,10 @@ function thin(decades, room, each){
   var want = Math.ceil(decades * each / room);
   return want <= 1 ? 1 : want <= 2 ? 2 : want <= 5 ? 5 : 10;
 }
-function axLog(f, xlab, ylab){
-  var s = rc(f.X0, f.Y0, f.X1 - f.X0, f.Y1 - f.Y0, "var(--surface-2)", 0.5, 4), g;
+function axLog(f, xlab, ylab, opt){
+  opt = opt || {};
+  var s = rc(f.X0, f.Y0, f.X1 - f.X0, f.Y1 - f.Y0, "var(--surface-2)", 0.5,
+             opt.rx === undefined ? 4 : opt.rx), g;
   var sx = thin(f.xhi - f.xlo, f.X1 - f.X0, 30), sy = thin(f.yhi - f.ylo, f.Y1 - f.Y0, 15);
   for(g = Math.ceil(f.xlo); g <= f.xhi + 1e-9; g++){
     s += ln(f.px(g), f.Y0, f.px(g), f.Y1, "var(--line)", 1, "2 3", 0.75);
@@ -1312,12 +1375,17 @@ function axLog(f, xlab, ylab){
 /* log decades across, linear up: the ohmic step picture needs both, so
    that the time axis can be fixed over eleven decades while the
    potential axis stays in millivolts                                   */
-function axMix(f, xlab, ylab, fy){
-  var s = rc(f.X0, f.Y0, f.X1 - f.X0, f.Y1 - f.Y0, "var(--surface-2)", 0.5, 4), g;
+/* opt.noX: this frame is stacked directly on another that carries the
+   decade labels and the axis name for both. opt.rx: the corner radius of
+   the background, 0 where two frames meet on a straight edge.        */
+function axMix(f, xlab, ylab, fy, opt){
+  opt = opt || {};
+  var s = rc(f.X0, f.Y0, f.X1 - f.X0, f.Y1 - f.Y0, "var(--surface-2)", 0.5,
+             opt.rx === undefined ? 4 : opt.rx), g;
   var sx = thin(f.xhi - f.xlo, f.X1 - f.X0, 30);
   for(g = Math.ceil(f.xlo); g <= f.xhi + 1e-9; g++){
     s += ln(f.px(g), f.Y0, f.px(g), f.Y1, "var(--line)", 1, "2 3", 0.75);
-    if(g % sx === 0 && f.px(g) > f.X0 + 12)
+    if(!opt.noX && g % sx === 0 && f.px(g) > f.X0 + 12)
       s += tx(f.px(g), f.Y1 + 14, "10" + supr(g), "var(--muted)", 9.5, "middle");
   }
   var ys = nice((f.yhi - f.ylo) / 5);
@@ -1325,7 +1393,7 @@ function axMix(f, xlab, ylab, fy){
     s += ln(f.X0, f.py(g), f.X1, f.py(g), "var(--line)", 1, "2 3", 0.75);
     s += tx(f.X0 - 6, f.py(g) + 3.4, fy ? fy(g) : tickNum(g), "var(--muted)", 9.5, "end");
   }
-  s += xName(f.X0, f.X1, f.Y1 + 30, xlab);
+  if(!opt.noX) s += xName(f.X0, f.X1, f.Y1 + 30, xlab);
   s += yName(14, f.Y0, f.Y1, ylab);
   return s;
 }
@@ -1603,7 +1671,9 @@ function ohCap(x, y, col, lab, left){
   s += tx(x + (left ? -20 : 20), y + 8, lab, col, 10.5, left ? "end" : null, 700);
   return s;
 }
-function ohRCPic(tau){
+/* the two equivalent circuits, drawn between y = 20 and y = 150 so that
+   they can head a figure without being moved                         */
+function ohCircuitPic(){
   var s = "";
   /* ---------- left: nothing able to react ---------- */
   function circuit(X, title, faradaic){
@@ -1642,9 +1712,13 @@ function ohRCPic(tau){
           "var(--go)", 10, "middle", 700);
   s += tx(382, 142, "R_ct sits in parallel with Cᵈˡ",
           "var(--red-)", 10, "middle", 700);
+  return s;
+}
 
-  /* ---------- the approach, on a linear t/tau clock ---------- */
-  var f = fr(62, 500, 168, 282, 0, 6, 0, 1.08);
+/* ---------- the approach, on a linear t/tau clock ---------- */
+function ohRCPic(tau){
+  var s = "";
+  var f = fr(62, 500, 24, 148, 0, 6, 0, 1.08);
   s += axLin(f, "time after the step / τ", "fraction charged",
              function(v){ return v.toFixed(0); }, function(v){ return v.toFixed(1); });
   s += ln(f.X0, f.py(1), f.X1, f.py(1), "var(--red-)", 2, "5 4");
@@ -1665,11 +1739,162 @@ function ohRCPic(tau){
   return s;
 }
 
+/* ---- what the step does to the solution, while it is doing it -------
+   The double layer is about a nanometre and the diffusion layer tens of
+   microns; nothing can draw both on one linear axis, so the wall end is
+   magnified and a break says where the scale changes. The clock is the
+   logarithmic one of the figure below.                              */
+var OHS = {lt:0};
+var ohsAnim = null;
+var OHS_LO = -8, OHS_HI = 0, OHS_N = 56;
+
+function ohsPanel(X0, X1, title, farad, t, f, delt, redox){
+  var s = "", i;
+  var W0 = X0 + 26, Y0 = 102, Y1 = 232;
+  var wall = W0 + 15, dlEnd = W0 + 50, brk = dlEnd + 7, solEnd = X1;
+  var DLNM = 3, SOLUM = 60, CT = 1.25;
+  var py = function(v){ return Y1 - v / CT * (Y1 - Y0); };
+  var pdl = function(x){ return wall + (dlEnd - wall) * x / DLNM; };
+  var pso = function(x){ return brk + (solEnd - brk) * x / SOLUM; };
+
+  s += tx((X0 + X1) / 2, 13, title, farad ? "var(--ox)" : "var(--go)", 10.5, "middle", 700);
+
+  /* ---- the programme, as a pictogram: no numbers, just the move ---- */
+  var E0 = 24, E1 = 74, xs = W0 + (X1 - W0) * 0.26;
+  s += rc(W0, E0, X1 - W0, E1 - E0, "var(--surface-2)", 0.5, 4);
+  var yR = farad ? E1 - 14 : E0 + 10, yE2 = farad ? E0 + 14 : E1 - 28, yE1 = E1 - 8;
+  s += ln(W0, yR, X1, yR, "var(--muted)", 1.2, "5 4");
+  s += tx(X1 - 4, yR - 4, "E_redox", "var(--muted)", 9, "end", 600);
+  s += pth("M" + W0 + " " + yE1 + " L" + xs.toFixed(1) + " " + yE1
+         + " L" + xs.toFixed(1) + " " + yE2 + " L" + X1 + " " + yE2, "var(--ink)", 2.2);
+  s += tx(W0 + 4, yE1 - 4, "E\u2081", "var(--ink-2)", 9, null, 700);
+  s += tx(xs + 4, yE2 - 4, "E\u2082", "var(--ink-2)", 9, null, 700);
+  s += tx(X0 + 12, (E0 + E1) / 2 + 4, "E", "var(--ink-2)", 10.5, "middle", 700);
+  /* the cursor: where on the log clock the picture below is drawn */
+  var u = (OHS.lt - OHS_LO) / (OHS_HI - OHS_LO), xc = xs + (X1 - xs) * u;
+  s += ln(xc, E0, xc, E1, "var(--stop)", 1.6);
+  s += tx(xc, E1 + 11, "t", "var(--stop)", 9.5, "middle", 700);
+
+  /* ---- and the solution at that instant ---------------------------- */
+  s += rc(W0, Y0, X1 - W0, Y1 - Y0, "var(--surface-2)", 0.5, 4);
+  s += rc(wall, Y0, dlEnd - wall, Y1 - Y0, "var(--ion-k)", 0.06);
+  /* the electrode */
+  s += rc(W0, Y0, wall - W0, Y1 - Y0, "var(--ink-2)", 0.42);
+  for(i = 0; i < 5; i++)
+    s += tx((W0 + wall) / 2, Y0 + 22 + i * 22, "\u2212", "var(--surface)", 10, "middle", 700);
+  /* the break in the distance axis */
+  s += rc(dlEnd, Y0, brk - dlEnd, Y1 - Y0, "var(--surface)", 1);
+  for(i = 0; i < 2; i++){
+    var bx = dlEnd + i * 4;
+    s += pth("M" + bx + " " + (Y1 - 2) + " L" + (bx + 5) + " " + (Y1 - 12)
+           + " L" + bx + " " + (Y1 - 22), "var(--line-2)", 1.2);
+    s += pth("M" + bx + " " + (Y0 + 22) + " L" + (bx + 5) + " " + (Y0 + 12)
+           + " L" + bx + " " + (Y0 + 2), "var(--line-2)", 1.2);
+  }
+
+  /* the counter-ion pile, full once the cell has charged */
+  var dd = "M" + wall + " " + py(f).toFixed(1);
+  for(i = 1; i <= 40; i++){
+    var xn = DLNM * i / 40;
+    dd += " L" + pdl(xn).toFixed(1) + " " + py(f * Math.exp(-xn / 0.9)).toFixed(1);
+  }
+  s += pth(dd + " L" + pdl(DLNM).toFixed(1) + " " + py(0) + " L" + wall + " " + py(0) + " Z",
+           "none", 0, "var(--ion-k)", 0.16);
+  s += pth(dd, "var(--ion-k)", 2.2);
+  /* a few of them drawn as ions, as the lecture's picture does */
+  for(i = 0; i < 4; i++){
+    var iy = Y0 + 26 + i * 28, ix = wall + 7 + (i % 2) * 9;
+    s += cir(ix, iy, 6, "var(--red-)", 0.14 + 0.5 * f);
+    s += tx(ix, iy + 3.2, "+", "var(--red-)", 9.5, "middle", 700);
+  }
+
+  /* and out in the solution */
+  var conc = function(x){            /* x in um */
+    if(!farad || delt <= 0) return 1;
+    return erfA(x * 1e-4 / (2 * Math.sqrt(1e-5 * t)));
+  };
+  var cd = "", pd = "";
+  for(i = 0; i <= 60; i++){
+    var xu = SOLUM * i / 60, c = conc(xu);
+    cd += (i ? " L" : "M") + pso(xu).toFixed(1) + " " + py(c).toFixed(1);
+    if(farad) pd += (i ? " L" : "M") + pso(xu).toFixed(1) + " " + py(1 - c).toFixed(1);
+  }
+  s += pth(cd, "var(--ox)", 2.4);
+  if(farad) s += pth(pd, "var(--go)", 2.2);
+  /* the molecules themselves, thinning where the profile has thinned */
+  var spots = [[7, 24], [15, 52], [10, 86], [26, 34], [33, 70], [24, 104],
+               [44, 46], [51, 92], [38, 18], [57, 66]];
+  spots.forEach(function(q){
+    var c2 = conc(q[0]), yy = Y0 + 14 + q[1];
+    if(yy > Y1 - 8) return;
+    s += cir(pso(q[0]), yy, 4.2, "var(--ox)", 0.18 + 0.62 * c2);
+    if(farad && 1 - c2 > 0.08)
+      s += cir(pso(q[0]) + 9, yy + 7, 3.6, "var(--go)", 0.18 + 0.62 * (1 - c2));
+  });
+
+  /* where the hole has reached */
+  if(farad && delt > 0.4 && delt < SOLUM){
+    s += ln(pso(delt), Y0, pso(delt), Y1, "var(--ox)", 1.2, "4 3");
+    /* once the hole has spread the mark is near the right-hand edge, so
+       the reading takes whichever side of the line still has room   */
+    var dRight = pso(delt) < X1 - 62;
+    s += tx(pso(delt) + (dRight ? 4 : -4), Y0 + 12,
+            "\u03b4 = " + delt.toPrecision(2) + " \u00b5m",
+            "var(--ox)", 9, dRight ? null : "end", 700);
+  }
+
+  /* the distance ticks */
+  s += tx((wall + dlEnd) / 2, Y1 + 13, "0\u20133 nm", "var(--muted)", 8.5, "middle");
+  [0, 20, 40, 60].forEach(function(v){
+    if(pso(v) > brk + 10) s += tx(pso(v), Y1 + 13, v + (v ? "" : " \u00b5m"),
+                                  "var(--muted)", 8.5, "middle");
+  });
+  return s;
+}
+
+function ohStepDraw(){
+  var Ru = ruOf(OH_KAPPA, OH.a, OH.d), tau = Ru * OH.Cdl;
+  var t = Math.pow(10, OHS.lt), f = 1 - Math.exp(-t / tau);
+  var delt = Math.sqrt(2 * 1e-5 * t) * 1e4;         /* um */
+  var s = ohsPanel(10, 250, "nothing able to react", false, t, f, delt);
+  s += ohsPanel(272, 512, "the reaction switched on", true, t, f, delt);
+  s += legend(10, 512, 262, [
+    {t:"distance from the electrode, left to right \u2014 the wall end is magnified and the break "
+       + "marks the change of scale, because a nanometre and sixty microns cannot share an axis"}]);
+  s += legend(10, 512, 304, [
+    {c:"var(--ion-k)", t:"counter-ions in the double layer \u2014 " + (100 * f).toFixed(0)
+       + " % charged at t = " + fmtT(t)},
+    {c:"var(--ox)", t:"the reactant"},
+    {c:"var(--go)", t:"the product"}]);
+  s += legend(10, 512, 336, [
+    {t:"\u03c4 = " + fmtT(tau) + ", so the pile is built by 5\u03c4 = " + fmtT(5 * tau)
+       + "; the hole in the reactant is still spreading as \u221a(2Dt), drawn for D = 10\u207b\u2075 cm\u00b2 s\u207b\u00b9"}]);
+  paint("ohStep", s);
+}
+
+function ohStepRun(){
+  var btn = document.getElementById("ohStepBtn"), j = 0;
+  if(ohsAnim){ window.clearInterval(ohsAnim); ohsAnim = null; }
+  if(btn) btn.disabled = true;
+  OHS.lt = OHS_LO;
+  ohStepDraw();
+  ohsAnim = window.setInterval(function(){
+    j++;
+    OHS.lt = OHS_LO + (OHS_HI - OHS_LO) * j / OHS_N;
+    ohStepDraw();
+    if(j >= OHS_N){
+      window.clearInterval(ohsAnim); ohsAnim = null;
+      if(btn) btn.disabled = false;
+    }
+  }, 75);
+}
+
 function ohDraw(){
   var Rinf = ruInf(OH_KAPPA, OH.a), Ru = ruOf(OH_KAPPA, OH.a, OH.d);
   var tau = Ru * OH.Cdl;
   paint("ohCell", ohCellPic());
   paint("ohFigRC", ohRCPic(tau));
+  ohStepDraw();
 
   /* ---- R_u against where you put the reference tip ------------------
      Fixed axes, both logarithmic: 1 µm to 10 cm across, 0.01 ohm to
@@ -1701,51 +1926,6 @@ function ohDraw(){
           "var(--ion-k)", 10, right ? null : "end", 700);
   paint("ohFig", s);
 
-  /* ---- and what that resistance does to a step ---------------------
-     Fixed axes again, and the time axis is logarithmic because tau runs
-     from nanoseconds to about a second over the sliders' range. On a log
-     clock the exponential approach is a step that slides left and right
-     as tau changes, which is precisely what the slider should look like.
-     The potential axis is 0 to 600 mV, the top of the DE slider.      */
-  var imax = OH.dE / Ru, dEmV = OH.dE * 1000;
-  var g2 = fr(62, 500, 22, 110, -9, 2, 0, 600);
-  var q = axMix(g2, "", "E / mV");
-  q += ln(g2.X0, g2.py(dEmV), g2.X1, g2.py(dEmV), "var(--red-)", 2, "5 4");
-  /* the tau marker moves with the sliders, so each name takes the side of
-     the frame the marker is not on */
-  var lt = Math.log10(tau), onPlot = lt > g2.xlo + 0.3 && lt < g2.xhi - 0.3;
-  var mx = g2.px(lt), markRight = onPlot && mx > (g2.X0 + g2.X1) / 2;
-  if(markRight) q += tx(g2.X0 + 8, g2.py(dEmV) - 6, "what you applied", "var(--red-)", 9.5, null, 700);
-  else          q += tx(g2.X1 - 4, g2.py(dEmV) - 6, "what you applied", "var(--red-)", 9.5, "end", 700);
-  q += pth(curve(g2, function(x){
-             return dEmV * (1 - Math.exp(-Math.pow(10, x) / tau));
-           }, g2.xlo, g2.xhi, 320), "var(--go)", 2.3);
-  q += tx(markRight ? g2.X0 + 8 : g2.X1 - 4, g2.py(dEmV * 0.17), "what the electrode got",
-          "var(--go)", 9.5, markRight ? null : "end", 700);
-  /* the gap between the two IS iR_u, and at t = tau it is DE/e */
-  if(onPlot){
-    q += ln(mx, g2.py(dEmV * (1 - Math.exp(-1))), mx, g2.py(dEmV), "var(--ion-k)", 1.6);
-    var iLeft = mx > g2.X0 + 70;
-    q += tx(mx + (iLeft ? -6 : 6), g2.py(dEmV * 0.84), "iRᵤ", "var(--ion-k)", 10.5,
-            iLeft ? "end" : null, 700);
-    q += tx(mx, g2.Y1 - 4, "τ", "var(--ion-k)", 10, "middle", 700);
-  }
-
-  var g3 = fr(62, 500, 142, 236, -9, 2, -6, 2);
-  q += axLog(g3, "time after the step / s", "i / A");
-  q += pth(curve(g3, function(x){
-             var t = Math.pow(10, x);
-             return Math.log10(OH.dE / Ru * Math.exp(-t / tau));
-           }, g3.xlo, g3.xhi, 320), "var(--ion-k)", 2.3);
-  q += tx(g3.X0 + 8, g3.Y0 + 16, "i = (ΔE/Rᵤ) e^(−t/τ),  τ = RᵤCᵈˡ = "
-          + fmtT(tau), "var(--ion-k)", 9.5, null, 700);
-  var l5 = Math.log10(5 * tau);
-  if(l5 > g3.xlo && l5 < g3.xhi){
-    q += ln(g3.px(l5), g3.Y0, g3.px(l5), g3.Y1, "var(--stop)", 1.3, "4 3");
-    q += tx(g3.px(l5) + 5, g3.Y1 - 8, "5τ", "var(--stop)", 10, null, 700);
-  }
-  paint("ohFig2", q);
-
   /* ---- the race that opens the window -------------------------------
      i_c dies as exp(-t/tau); the faradaic current dies only as t^(-1/2),
      so the two must cross. A representative 1 mM solution with
@@ -1756,31 +1936,47 @@ function ohDraw(){
   var cot = 96485 * A * Math.sqrt(DCOT) * CBULK / Math.sqrt(Math.PI);
 
   /* ---- the input, and the two currents that answer it ---------------
-     Three panels on one clock. The lower two are the same race, once
-     magnified onto the first few tau and once over every decade there
-     is; above them is the programme that caused it, so the figure reads
-     input first and output after.
-
-     The magnified panel used to run 0 to 8 tau whatever the sliders
-     said, which put 5 tau at five eighths of its width while the
-     logarithmic panel put the same instant somewhere else entirely. The
-     logarithmic axis is the experiment's own clock and cannot be bent
-     to suit, so the magnified one is scaled to it instead: it runs to
-     5/f tau, where f is the fraction of the log axis at which 5 tau
-     falls. Both then mark 5 tau on the same pixel, and the shaded
-     column before it is one column through the whole figure.        */
+     The input and the log-log output are on the same clock, so they are
+     joined into one stack: two frames meeting on a rule, one set of
+     decade labels underneath, and the 5-tau line drawn once through
+     both. Under them comes the same race magnified onto the first few
+     tau - a different clock, so it keeps its own axis, and it is scaled
+     so that 5 tau still falls on the column the joined pair puts it in.
+     The logarithmic axis is the experiment's own and cannot be bent to
+     suit; the magnified one runs to 5/f tau, where f is the fraction of
+     that axis at which 5 tau falls.                                 */
   var XL = 62, XR = 500, TLO = -9, THI = 2;
   var imaxZ = OH.dE / Ru, dEw = OH.dE * 1000;
   var lt5 = Math.log10(5 * tau), fr5 = (lt5 - TLO) / (THI - TLO);
   var aligned = fr5 > 0.08 && fr5 < 0.95, ZU8 = aligned ? 5 / fr5 : 8;
+  var t5 = 5 * tau, lcv = Math.log10(T_CONV);
 
-  /* ---- 1 - the input: what the instrument was told to do ----------- */
-  var ge = fr(XL, XR, 24, 100, TLO, THI, 0, 600);
-  var w = axMix(ge, "", "E / mV");
-  if(aligned){
-    w += rc(ge.X0, ge.Y0, ge.px(lt5) - ge.X0, ge.Y1 - ge.Y0, "var(--stop)", 0.10);
-    w += ln(ge.px(lt5), ge.Y0, ge.px(lt5), ge.Y1, "var(--stop)", 1.4, "4 3");
+  /* ---- 1 - the input, and 2 - the output, on one axis --------------- */
+  /* a gap between the two frames, not a seam: butted together they put
+     E's zero and the current's top decade on one line, and the shaded
+     column and the 5-tau line are drawn through the gap anyway, so the
+     pair still reads as one clock                                   */
+  var ge = fr(XL, XR, 176, 260, TLO, THI, 0, 600);
+  var g4 = fr(XL, XR, 282, 442, TLO, THI, -10, 1);
+  var w = ohCircuitPic();
+  w += axMix(ge, "", "E / mV", null, {noX:true});
+  w += axLog(g4, "time after the step / s", "i / A");
+  /* one shaded column and one dashed line for the pair: the same instant
+     cannot be in two places when there is only one axis             */
+  if(lt5 > ge.xlo && lt5 < ge.xhi){
+    w += rc(ge.X0, ge.Y0, ge.px(lt5) - ge.X0, g4.Y1 - ge.Y0, "var(--stop)", 0.11);
+    w += ln(ge.px(lt5), ge.Y0, ge.px(lt5), g4.Y1, "var(--stop)", 1.4, "4 3");
+    w += tx(g4.px(lt5) + 5, g4.Y0 + 13, "5τ = " + fmtT(t5), "var(--stop)", 10, null, 700);
   }
+  /* the far end of the window belongs to the current, not to the
+     potential, so it is marked on the lower half only              */
+  if(lcv > g4.xlo && lcv < g4.xhi){
+    w += rc(g4.px(lcv), g4.Y0, g4.X1 - g4.px(lcv), g4.Y1 - g4.Y0, "var(--red-)", 0.10);
+    w += ln(g4.px(lcv), g4.Y0, g4.px(lcv), g4.Y1, "var(--red-)", 1.4, "4 3");
+    w += tx(g4.px(lcv) - 5, g4.Y0 + 29, "thermal convection — " + fmtT(T_CONV),
+            "var(--red-)", 10, "end", 700);
+  }
+
   w += ln(ge.X0, ge.py(dEw), ge.X1, ge.py(dEw), "var(--red-)", 2, "5 4");
   w += pth(curve(ge, function(x){
              return dEw * (1 - Math.exp(-Math.pow(10, x) / tau));
@@ -1801,21 +1997,45 @@ function ohDraw(){
             leftE ? "end" : null, 700);
     w += tx(mxe, ge.Y1 - 4, "τ", "var(--ion-k)", 10, "middle", 700);
   }
-  w += legend(ge.X0, 512, ge.Y1 + 32, [
-    {t:"the input — one potential step, \u0394E = " + dEw.toFixed(0)
-       + " mV; the two panels below are what comes back"}]);
 
-  /* ---- 2 - the output, magnified onto the first few tau -------------
-     On a clock measured in tau the charging curve stands still while the
-     sliders move and the faradaic one slides across it, which is the whole
-     of what tau does. The current is read against the first current the
-     cell can draw, dE/Ru, so that axis is fixed as well.             */
-  var gz = fr(XL, XR, 164, 290, 0, ZU8, 0, 1.05);
+  w += pth(curve(g4, function(x){
+             return Math.log10(OH.dE / Ru * Math.exp(-Math.pow(10, x) / tau));
+           }, g4.xlo, g4.xhi, 320), "var(--ion-k)", 2.3);
+  w += pth(curve(g4, function(x){
+             return Math.log10(cot / Math.sqrt(Math.pow(10, x)));
+           }, g4.xlo, g4.xhi, 320), "var(--go)", 2.3);
+  /* tau itself, directly under the mark the input panel puts on it: one
+     time constant is where the charging current has fallen to 1/e and
+     where the electrode is still iR_u/e short of the step           */
+  if(onE){
+    w += ln(mxe, g4.Y0, mxe, g4.Y1, "var(--ion-k)", 1.1, "3 3", 0.7);
+    w += tx(mxe + 5, g4.Y1 - 6, "\u03c4", "var(--ion-k)", 10, null, 700);
+  }
+  w += legend(g4.X0, 512, g4.Y1 + 50, [
+    {t:"one clock, read downwards: above the gap the input — a single step of ΔE = "
+       + dEw.toFixed(0) + " mV — and below it the current that comes back for it"}]);
+  w += legend(g4.X0, 512, g4.Y1 + 78, [
+    {c:"var(--ion-k)", t:"i_c = (ΔE/Rᵤ) e^(−t/τ), τ = RᵤCᵈˡ = " + fmtT(tau)},
+    {c:"var(--go)", t:"i_f ∝ t^(−1/2) — Cottrell"}]);
+  w += legend(g4.X0, 512, g4.Y1 + 106, [
+    {c:"var(--red-)", d:1, t:"thermal convection at " + fmtT(T_CONV)
+       + " — the far end of the window"}]);
+  w += legend(g4.X0, 512, g4.Y1 + 134, [
+    {t:"the faradaic line is drawn for 1 mM, D = 10⁻⁵ cm² s⁻¹, A = πa² "
+       + "— what matters is its slope, not its height"}]);
+
+  /* ---- 3 - the same output, magnified onto the first few tau --------
+     A clock measured in tau is not the clock above, so this panel gets an
+     axis of its own. On it the charging curve never moves and the sliders
+     slide the faradaic one across it, which is the whole of what tau
+     does; the current is read against the first current the cell can
+     draw, dE/Ru, so that axis is fixed too.                        */
+  var gz = fr(XL, XR, 626, 752, 0, ZU8, 0, 1.05);
   w += axLin(gz, "time after the step, in units of τ = RᵤCᵈˡ",
              "i / (ΔE/Rᵤ)",
              function(v){ return v.toFixed(0) + "τ"; },
              function(v){ return v.toFixed(1); });
-  w += rc(gz.X0, gz.Y0, gz.px(5) - gz.X0, gz.Y1 - gz.Y0, "var(--stop)", 0.10);
+  w += rc(gz.X0, gz.Y0, gz.px(5) - gz.X0, gz.Y1 - gz.Y0, "var(--stop)", 0.11);
   w += ln(gz.px(5), gz.Y0, gz.px(5), gz.Y1, "var(--stop)", 1.4, "4 3");
   w += pth(curve(gz, function(u){ return Math.exp(-u); }, 1e-4, ZU8, 300),
            "var(--ion-k)", 2.3);
@@ -1828,46 +2048,11 @@ function ohDraw(){
     {c:"var(--ion-k)", t:"i_c, charging"}, {c:"var(--go)", t:"i_f, faradaic"},
     {c:"var(--ink)", t:"their sum — all the instrument can measure"}]);
   w += legend(gz.X0, 512, gz.Y1 + 74, [
-    {c:"var(--stop)", d:1, t:"5τ = " + fmtT(5 * tau)
+    {c:"var(--stop)", d:1, t:"5τ = " + fmtT(t5)
        + " — before it the two cannot be separated"},
     {t:"(τ = " + fmtT(tau) + ")"},
-    {t:aligned ? "— and it stands at the same place in all three panels"
-       : "— 5τ is off the clock below, so this panel keeps its own 8τ"}]);
-
-  /* ---- 3 - the same output over every decade there is --------------- */
-  var g4 = fr(XL, XR, 416, 584, TLO, THI, -10, 1);
-  w += axMix(g4, "time after the step / s", "i / A");
-  var t5 = 5 * tau;
-  if(lt5 > g4.xlo && lt5 < g4.xhi){
-    w += rc(g4.X0, g4.Y0, Math.max(0, g4.px(lt5) - g4.X0), g4.Y1 - g4.Y0,
-            "var(--stop)", 0.12);
-    w += ln(g4.px(lt5), g4.Y0, g4.px(lt5), g4.Y1, "var(--stop)", 1.4, "4 3");
-    w += tx(g4.px(lt5) + 5, g4.Y0 + 13, "5τ = " + fmtT(t5), "var(--stop)", 10, null, 700);
-  }
-  w += pth(curve(g4, function(x){
-             return Math.log10(OH.dE / Ru * Math.exp(-Math.pow(10, x) / tau));
-           }, g4.xlo, g4.xhi, 320), "var(--ion-k)", 2.3);
-  w += pth(curve(g4, function(x){
-             return Math.log10(cot / Math.sqrt(Math.pow(10, x)));
-           }, g4.xlo, g4.xhi, 320), "var(--go)", 2.3);
-  /* the far end of the window: 5 tau is the near one, and the room is the
-     other. Past about twenty seconds the solution stirs itself and the
-     faradaic current stops falling as t^(-1/2) at all                */
-  var lcv = Math.log10(T_CONV);
-  if(lcv > g4.xlo && lcv < g4.xhi){
-    w += rc(g4.px(lcv), g4.Y0, g4.X1 - g4.px(lcv), g4.Y1 - g4.Y0, "var(--red-)", 0.10);
-    w += ln(g4.px(lcv), g4.Y0, g4.px(lcv), g4.Y1, "var(--red-)", 1.4, "4 3");
-    w += tx(g4.px(lcv) - 5, g4.Y0 + 29, "thermal convection — " + fmtT(T_CONV),
-            "var(--red-)", 10, "end", 700);
-  }
-  w += legend(g4.X0, 512, g4.Y1 + 46, [
-    {c:"var(--ion-k)", t:"i_c = (ΔE/Rᵤ) e^(−t/τ) — exponential"},
-    {c:"var(--go)", t:"i_f ∝ t^(−1/2) — Cottrell"},
-    {c:"var(--red-)", d:1, t:"thermal convection at " + fmtT(T_CONV)
-       + " — the far end of the window"}]);
-  w += legend(g4.X0, 512, g4.Y1 + 74, [
-    {t:"the faradaic line is drawn for 1 mM, D = 10⁻⁵ cm² s⁻¹, A = πa² "
-       + "— what matters is its slope, not its height"}]);
+    {t:aligned ? "— drawn at the same place as the 5τ line above"
+       : "— 5τ is off the clock above, so this panel keeps its own 8τ"}]);
   paint("ohFigWin", w);
 
   /* ---- the numbers --------------------------------------------------- */
@@ -1923,7 +2108,7 @@ function coPts(){
   var A = Math.PI * CO.r0 * CO.r0, N = 24, out = [], i, t;
   for(i = 0; i < N; i++){
     t = CO.t0 * Math.pow(CO.t1 / CO.t0, i / (N - 1));
-    out.push({t:t, i:iCot(CO.n, A, CO.D, CO.C, t)
+    out.push({t:t, i:iMeas(CO.n, CO.r0, CO.D, CO.C, t)
                     + iChg(0.3, CO.tau / CO_CDL, CO_CDL, t)});
   }
   return out;
@@ -1949,7 +2134,7 @@ function coFit(pts){
 function coDraw(){
   var A = Math.PI * CO.r0 * CO.r0, pts = coPts(), fit = coFit(pts);
   var Dfit = Math.pow(fit.m * Math.sqrt(Math.PI) / (CO.n * FARADAY * A * CO.C), 2);
-  var te = tEdge(CO.r0, CO.D), t5 = 5 * CO.tau;
+  var tE10 = tEdgePct(CO.r0, CO.D, 0.1), t5 = 5 * CO.tau;
 
   /* ---- what the Cottrell equation is made of: the profile ----------- */
   /* the middle of the sampling window, geometrically - one instant, and
@@ -1997,8 +2182,18 @@ function coDraw(){
   s += ln(f.px(0), f.py(clamp(fit.b / un.k, f.ylo, f.yhi)),
           f.px(CO_XHI), f.py(clamp((fit.m * CO_XHI + fit.b) / un.k, f.ylo, f.yhi)),
           "var(--red-)", 1.8, "5 4");
-  pts.forEach(function(q){ s += cir(f.px(1 / Math.sqrt(q.t)), f.py(q.i / un.k), 3, "var(--ink-2)"); });
-  var iRep = iCot(CO.n, A, CO.D, CO.C, tRep) + iChg(0.3, CO.tau / CO_CDL, CO_CDL, tRep);
+  /* the frame is fixed on purpose, so a window dragged deep into the
+     charging current can put points above it. Say so rather than
+     drawing them outside the axes.                                 */
+  var above = 0;
+  pts.forEach(function(q){
+    if(q.i / un.k > f.yhi){ above++; return; }
+    s += cir(f.px(1 / Math.sqrt(q.t)), f.py(q.i / un.k), 3, "var(--ink-2)");
+  });
+  if(above) s += tx(f.X1 - 6, f.Y0 + 14, above + " of " + pts.length
+                    + " points are above this frame — they are charging current",
+                    "var(--stop)", 9.5, "end", 700);
+  var iRep = iMeas(CO.n, CO.r0, CO.D, CO.C, tRep) + iChg(0.3, CO.tau / CO_CDL, CO_CDL, tRep);
   s += cir(f.px(1 / Math.sqrt(tRep)), f.py(iRep / un.k), 5, REP);
   var byp = clamp(fit.b / un.k, f.ylo, f.yhi);
   s += cir(f.px(0), f.py(byp), 3.6, "var(--stop)");
@@ -2026,9 +2221,9 @@ function coDraw(){
            g.Y1 - g.Y0, "var(--go)", 0.13);
   q2 += pth(curve(g, function(x){
       var t = Math.pow(10, x);
-      return (iCot(CO.n, A, CO.D, CO.C, t) + iChg(0.3, CO.tau / CO_CDL, CO_CDL, t)) / un.k;
+      return (iMeas(CO.n, CO.r0, CO.D, CO.C, t) + iChg(0.3, CO.tau / CO_CDL, CO_CDL, t)) / un.k;
     }, g.xlo, g.xhi, 300), "var(--ink)", 2.1);
-  [[t5, "5τ", "var(--stop)"], [te, "edge", "var(--stop)"],
+  [[t5, "5τ", "var(--stop)"], [tE10, "edge +10 %", "var(--stop)"],
    [T_CONV, "convection", "var(--muted)"]].forEach(function(m, i){
     var L = Math.log10(m[0]);
     if(L < g.xlo || L > g.xhi) return;
@@ -2055,6 +2250,7 @@ function coDraw(){
   var set = function(id, t){ document.getElementById(id).innerHTML = t; };
   set("coSlope", (fit.m / un.k).toPrecision(3) + " " + un.u + " s^½");
   set("coInt", fmtI(fit.b));
+  set("coEdge", fmtI(iEdge(CO.n, CO.r0, CO.D, CO.C)));
   set("coDfit", sciH(Dfit, 2) + " cm²/s");
   set("coErr", (err >= 0 ? "+" : "") + err.toFixed(1) + " %");
   set("coR2", fit.r2.toFixed(5));
@@ -2071,14 +2267,24 @@ function coDraw(){
         + "as i<sub>d</sub>. Those points sit at large t<sup>&minus;1/2</sup>, lift the right-hand end "
         + "of the line and steepen it, and D goes as the slope <b>squared</b> — so the error is "
         + "doubled: " + (err >= 0 ? "+" : "") + err.toFixed(0) + " %.";
-  }else if(CO.t1 > Math.min(te * 0.25, T_CONV)){
+  }else if(CO.t1 > T_CONV){
     cls = "mixv";
-    msg = "<b>Sampling runs past the end of linear diffusion.</b> By " + fmtT(CO.t1)
-        + " the layer is " + fmtLen15(deltaOf(CO.D, Math.min(CO.t1, T_CONV))) + " thick "
-        + (CO.t1 > te * 0.25 ? "against an electrode radius of " + fmtLen15(CO.r0)
-             + ", so material is arriving from the side" : "and the room is stirring it")
-        + ". Those points are too high, they sit at small t<sup>&minus;1/2</sup>, and they flatten "
-        + "the line while lifting the intercept to " + fmtI(fit.b) + ".";
+    msg = "<b>The window runs into the convection limit.</b> Past " + fmtT(T_CONV)
+        + " the room is stirring the solution, the layer stops growing and the current stops falling "
+        + "at all. Those points sit at the <b>smallest</b> t<sup>&minus;1/2</sup>, so they flatten "
+        + "the line &mdash; and D goes as the slope <b>squared</b>, which is why it comes back "
+        + "<b>low</b> by " + Math.abs(err).toFixed(0) + " %. This is the one late-time mistake that "
+        + "moves D.";
+  }else if(CO.t1 > tE10){
+    cls = "stop";
+    msg = "<b>The edge is contributing &mdash; and it shows in the intercept, not in D.</b> By "
+        + fmtT(CO.t1) + " the Cottrell layer &radic;(&pi;Dt) is "
+        + (Math.sqrt(Math.PI * CO.D * CO.t1) / CO.r0 * 100).toFixed(0)
+        + " % of the electrode radius, so that much extra current is arriving from the side. Radial "
+        + "diffusion adds a <b>constant</b> &pi;nFDC*a = " + fmtI(iEdge(CO.n, CO.r0, CO.D, CO.C))
+        + " to this plot, which lifts the line without tilting it: the intercept is " + fmtI(fit.b)
+        + " while D is still only " + (err >= 0 ? "+" : "") + err.toFixed(1)
+        + " % out. Read the intercept.";
   }else if(Math.log10(CO.t1 / CO.t0) < 1){
     cls = "stop";
     msg = "<b>" + (Math.log10(CO.t1 / CO.t0)).toFixed(1) + " of a decade.</b> The points are clean "
@@ -2123,18 +2329,22 @@ var coAnim = null;
 function coRun(mode){
   if(coAnim){ clearInterval(coAnim); coAnim = null; }
   var btn = null;                          /* this bench has no single Run button */
-  var t5 = 5 * CO.tau, tEdgeQ = Math.min(tEdge(CO.r0, CO.D) * 0.25, T_CONV);
-  /* all three windows are the same width - the width of the clean one -
-     so that what changes between the runs is where the window sits and
-     nothing else. Dropping only the near edge made the band wider as
-     well, and a wider band is not the mistake being shown.          */
-  var gl0 = Math.log10(t5 * 2), gl1 = Math.log10(tEdgeQ * 0.8);
-  var W = Math.max(0.8, gl1 - gl0);
-  var lateEnd = Math.log10(Math.min(60, tEdgeQ * 12));
+  var t5 = 5 * CO.tau, tEdgeQ = Math.min(tEdgePct(CO.r0, CO.D, 0.1), T_CONV);
+  /* all three windows are the same width, so that what changes between
+     the runs is where the window sits and nothing else. 1.5 decades is
+     what the late one can have: the far slider stops at 100 s, and a
+     late window only shows anything once it is past the convection
+     limit. The early one starts at 4tau rather than tau - one time
+     constant too early is the mistake people actually make, it costs
+     64 % on D, and unlike a window starting at tau every point of it
+     still fits on the frame.                                        */
+  var W = 1.5;
   var plan = mode === "good"
-    ? {l0: gl0, l1: gl1}
-    : mode === "early" ? {l0: Math.log10(CO.tau), l1: Math.log10(CO.tau) + W}
-    : {l0: lateEnd - W, l1: lateEnd};
+    ? {l1: Math.log10(tEdgeQ * 0.8)}
+    : mode === "early" ? {l0: Math.log10(4 * CO.tau)}
+    : {l1: +document.getElementById("coT1").max};
+  if(plan.l0 === undefined) plan.l0 = plan.l1 - W;
+  if(plan.l1 === undefined) plan.l1 = plan.l0 + W;
   var e0 = document.getElementById("coT0"), e1 = document.getElementById("coT1");
   plan.l0 = clamp(plan.l0, +e0.min, +e0.max);
   plan.l1 = clamp(plan.l1, +e1.min, +e1.max);
@@ -2719,6 +2929,10 @@ function bindR(id, fn){
   document.getElementById(id).addEventListener("input", function(){ fn(+this.value); });
 }
 
+(function(){
+  var b = document.getElementById("ohStepBtn");
+  if(b) b.addEventListener("click", ohStepRun);
+})();
 bindR("ohA", function(v){ OH.a = Math.pow(10, v); ohSync(); });
 bindR("ohD", function(v){ OH.d = Math.pow(10, v); ohSync(); });
 bindR("ohCd", function(v){ OH.Cdl = Math.pow(10, v); ohSync(); });
@@ -2798,19 +3012,19 @@ document.getElementById("puTable").innerHTML =
 
 var QZ1 = [
  {q:"You move the reference tip from ten electrode radii away to one radius away. Roughly what happens to R<sub>u</sub>?",
-  o:["It falls a little &mdash; most of R<sub>u</sub> is inside the first radius, so there is not much left to remove",
+  o:["It does not change; R<sub>u</sub> depends only on &kappa; and the electrode area",
+     "It falls a little &mdash; most of R<sub>u</sub> is inside the first radius, so there is not much left to remove",
      "It falls by about a factor of ten, in proportion to the distance",
-     "It falls to zero: the tip is now at the electrode",
-     "It does not change; R<sub>u</sub> depends only on &kappa; and the electrode area"],
-  a:0,
+     "It falls to zero: the tip is now at the electrode"],
+  a:1,
   w:"R<sub>u</sub>(d) = (1/4&kappa;a)[1 &minus; (2/&pi;)arctan(a/d)] <b>saturates</b>. Current funnels into a disc from every direction, so the lines are crowded in the first radius and spread out immediately: by d = a you are already carrying most of 1/4&kappa;a, and the remaining distance is worth very little. That is why a Luggin capillary is worth a factor and not an order of magnitude &mdash; and why the term that actually moves R<sub>u</sub> is &kappa;, which means supporting electrolyte. Drag the distance slider on the first tab and watch the curve flatten."},
 
  {q:"After a potential step, why does the charging current die away so much faster than the Faradaic one?",
-  o:["It decays exponentially with R<sub>u</sub>C<sub>dl</sub> while the Faradaic current only falls as t<sup>&minus;1/2</sup>",
-     "The double layer holds less charge than the diffusion layer",
+  o:["The double layer holds less charge than the diffusion layer",
      "The charging current is not a real current, so it cannot be measured after the step",
-     "Both decay exponentially, but the double layer has the smaller time constant"],
-  a:0,
+     "Both decay exponentially, but the double layer has the smaller time constant",
+     "It decays exponentially with R<sub>u</sub>C<sub>dl</sub> while the Faradaic current only falls as t<sup>&minus;1/2</sup>"],
+  a:3,
   w:"i<sub>c</sub> = (&Delta;E/R<sub>u</sub>)e<sup>&minus;t/R<sub>u</sub>C<sub>dl</sub></sup> is an exponential and i<sub>d</sub> = nFAD<sup>&frac12;</sup>C*/&radic;(&pi;t) is a power law, and an exponential beats any power law eventually. That is the only reason a usable window exists at all: after about 5&tau; the first has lost 99.3 % and the second has lost almost nothing. The diffusion layer is not storing charge &mdash; it is being consumed, which is why its current has no time constant to decay with."},
 
  {q:"A Cottrell plot of i against t<sup>&minus;1/2</sup> gives R&sup2; = 0.9997 and an intercept of &minus;4 µA. What should you conclude?",
@@ -2822,28 +3036,28 @@ var QZ1 = [
   w:"i = nFAD<sup>&frac12;</sup>C*/&radic;(&pi;t) passes through the origin by construction, so the intercept is a residual &mdash; it is the part of the data the model cannot account for. R&sup2; is almost useless here because a slightly curved line through crowded points still correlates beautifully. A <em>negative</em> intercept in particular is the signature of sampling too early: those points sit at large t<sup>&minus;1/2</sup>, carry leftover i<sub>c</sub>, and tilt the line steeper. And D goes as the slope <b>squared</b>, so the error is doubled."},
 
  {q:"Why does the current at a 5 µm disc stop falling after a few milliseconds, while a 1.5 mm disc keeps falling for minutes?",
-  o:["Once the depleted layer is larger than the electrode it wraps into a hemisphere, and a hemisphere has a finite gradient however far it grows",
-     "The small electrode runs out of reactant, so the current has nowhere to fall to",
-     "The small electrode has a smaller R<sub>u</sub>C<sub>dl</sub>, so it settles sooner",
-     "Convection reaches the small electrode first and holds the layer at a fixed thickness"],
-  a:0,
+  o:["The small electrode has a smaller R<sub>u</sub>C<sub>dl</sub>, so it settles sooner",
+     "Convection reaches the small electrode first and holds the layer at a fixed thickness",
+     "Once the depleted layer is larger than the electrode it wraps into a hemisphere, and a hemisphere has a finite gradient however far it grows",
+     "The small electrode runs out of reactant, so the current has nowhere to fall to"],
+  a:2,
   w:"It is geometry, not kinetics and not stirring. While &delta; = &radic;(2Dt) is smaller than r<sub>0</sub> the layer is a flat slab, diffusion is linear and the current falls as Cottrell on <em>both</em> electrodes &mdash; the plot of every size on that tab shows them leaving the same line at different moments. Once &delta; passes r<sub>0</sub> the layer wraps round the edge, and radial diffusion delivers a finite flux no matter how large the layer becomes: i<sub>ss</sub> = 4nFDC*r<sub>0</sub>, with no t in it. On a 1.5 mm disc that would take minutes, and convection arrives first."},
 
  {q:"DPV plots the difference between two samples taken on each step of a staircase. Why does that turn a step into a peak?",
-  o:["A difference of two nearby points on a curve is a derivative, and the derivative of a sigmoid is a peak",
-     "The second sample is taken after the Faradaic current has reversed sign",
+  o:["The second sample is taken after the Faradaic current has reversed sign",
      "Subtracting removes the diffusion current and leaves only the kinetics",
-     "The staircase makes the concentration oscillate, and the peak is the resonance"],
-  a:0,
+     "The staircase makes the concentration oscillate, and the peak is the resonance",
+     "A difference of two nearby points on a curve is a derivative, and the derivative of a sigmoid is a peak"],
+  a:3,
   w:"The two samples sit at E and E+&Delta;E on the <em>same</em> sampled-current sigmoid, so &Delta;i is a finite-difference derivative of it. That also fixes where the peak sits &mdash; at the midpoint of the two sampling potentials, E<sub>1/2</sub> &minus; &Delta;E/2 &mdash; and what happens as you shrink &Delta;E: the peak approaches the true derivative, narrowing to 3.52RT/nF = 90.4/n mV while losing height in proportion. The sensitivity comes from the subtraction, which cancels the residual charging current and the background, not from the waiting."},
 
  {q:"You need to measure a 10 µM analyte in a solution whose resistance gives &tau; = 3 ms. Which is the sound choice?",
-  o:["A pulse method, sampling tens of milliseconds into each pulse",
+  o:["Cyclic voltammetry at 10 V/s, where the peak is tallest",
+     "A pulse method, sampling tens of milliseconds into each pulse",
      "A potential step, sampling at 1 ms to catch the current while it is still large",
-     "A Cottrell plot fitted from 0.1 ms to 10 ms",
-     "Cyclic voltammetry at 10 V/s, where the peak is tallest"],
-  a:0,
-  w:"&tau; = 3 ms means nothing before about 15 ms is free of charging current, which kills the second and third options outright &mdash; they both sample inside the decay, and at 10 µM the Faradaic current is small enough that i<sub>c</sub> would dominate completely. Fast cyclic voltammetry makes it worse: i<sub>c</sub> grows as &upsilon; while i<sub>p</sub> only grows as &radic;&upsilon;, so sweeping faster lowers the ratio you care about. A pulse method waits the charging current out and, in DPV and SWV, differences away what is left; that combination is what reaches the 10<sup>&minus;8</sup> M range."}
+     "A Cottrell plot fitted from 0.1 ms to 10 ms"],
+  a:1,
+  w:"&tau; = 3 ms means nothing before about 15 ms is free of charging current, which rules out both the 1 ms step and a fit that starts at 0.1 ms &mdash; they sample inside the decay, and at 10 µM the Faradaic current is small enough that i<sub>c</sub> would dominate completely. Fast cyclic voltammetry makes it worse: i<sub>c</sub> grows as &upsilon; while i<sub>p</sub> only grows as &radic;&upsilon;, so sweeping faster lowers the ratio you care about. A pulse method waits the charging current out and, in DPV and SWV, differences away what is left; that combination is what reaches the 10<sup>&minus;8</sup> M range."}
 ];
 
 
