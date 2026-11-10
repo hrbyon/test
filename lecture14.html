@@ -235,6 +235,25 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
 .bench>.ctl .readout .v{font-size:15px;text-align:right;min-width:0;overflow-wrap:anywhere}
 .bench>.ctl .slider-row .fld{line-height:1.4}
 .bench .wideF{grid-column:1 / -1}
+/* four cards in one row: the controls and the three pictures that answer
+   them, read left to right. At this width each is a quarter of the page,
+   so it is for a row of narrow pictures and nothing else. */
+/* one tall column of controls, and a two-by-two of pictures beside it.
+   align-items:stretch is what levels the bottom row: each card fills its
+   row, so the two below end together and with the foot of the controls */
+.cotgrid{display:grid;grid-template-columns:minmax(252px,316px) minmax(0,1fr) minmax(0,1fr);
+  gap:16px;align-items:stretch}
+.cotgrid>.card{display:flex;flex-direction:column}
+.cotgrid>.card>.card-b:last-child{flex:1 1 auto}
+.cotgrid>.card:first-child{grid-column:1;grid-row:1 / span 2}
+@media(max-width:1200px){
+  .cotgrid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .cotgrid>.card:first-child{grid-column:1 / -1;grid-row:auto}}
+@media(max-width:760px){.cotgrid{grid-template-columns:minmax(0,1fr)}}
+.duo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:stretch}
+.duo>.card{display:flex;flex-direction:column}
+.duo>.card>.card-b:last-child{flex:1 1 auto}
+@media(max-width:880px){.duo{grid-template-columns:minmax(0,1fr)}}
 /* a bench whose control column ends in a readout card: the column takes the
    height the figures set, and the card is pushed down to share their foot */
 .bench.footed{align-items:stretch}
@@ -448,167 +467,116 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
       </div>
     </div>
 
-    <div class="bench" style="margin-bottom:16px">
-      <div class="ctl">
-        <div class="card">
-          <div class="card-h"><h2>The experiment</h2></div>
-          <div class="card-b stack" style="gap:13px">
-            <div>
-              <div class="slider-row"><span class="fld" style="margin:0">cell time constant &tau;</span><span class="val" id="coTauv"></span></div>
-              <input type="range" id="coTau" min="-6" max="-2.5" step="0.02" value="-4.301">
-            </div>
-            <div>
-              <div class="slider-row"><span class="fld" style="margin:0">where you start sampling</span><span class="val" id="coT0v"></span></div>
-              <input type="range" id="coT0" min="-4" max="0.7" step="0.05" value="-2">
-            </div>
-            <div>
-              <div class="slider-row"><span class="fld" style="margin:0">&hellip; and where you stop</span><span class="val" id="coT1v"></span></div>
-              <input type="range" id="coT1" min="-2" max="2" step="0.05" value="0.7">
-            </div>
-            <p class="hint" style="margin:0">You can set the window three ways: with these two sliders, by
-              <b>dragging its edges on the time plot itself</b>, or with the buttons below, which walk it
-              there for you &mdash; watch the points slide along the line while the fitted D moves. All
-              three buttons move a window of <b>the same width</b>, so the only thing that differs between
-              them is <em>where</em> it sits.</p>
-            <div class="btnrow">
-              <button class="ghost" id="coP1" type="button">run: a clean window</button>
-              <button class="ghost" id="coP2" type="button">run: start too early</button>
-              <button class="ghost" id="coP3" type="button">run: stop too late</button>
-            </div>
-            <div class="readouts">
-              <div class="readout"><span class="k">fitted slope</span><span class="v" id="coSlope">&mdash;</span></div>
-              <div class="readout"><span class="k">intercept</span><span class="v" id="coInt">&mdash;</span></div>
-            <div class="readout"><span class="k">&hellip; the edge alone, &pi;nFDC*a</span><span class="v" id="coEdge">&mdash;</span></div>
-              <div class="readout"><span class="k">D from that slope</span><span class="v" id="coDfit">&mdash;</span></div>
-              <div class="readout"><span class="k">against the true D</span><span class="v" id="coErr">&mdash;</span></div>
-              <div class="readout"><span class="k">R&sup2;</span><span class="v" id="coR2">&mdash;</span></div>
-              <div class="readout"><span class="k">points</span><span class="v" id="coN">&mdash;</span></div>
-            </div>
+    <div class="cotgrid" style="margin-bottom:16px">
+      <div class="card">
+        <div class="card-h"><h2>The experiment</h2></div>
+        <div class="card-b stack" style="gap:13px">
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">cell time constant &tau;</span><span class="val" id="coTauv"></span></div>
+            <input type="range" id="coTau" min="-6" max="-2.5" step="0.02" value="-4.301">
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">where you start sampling</span><span class="val" id="coT0v"></span></div>
+            <input type="range" id="coT0" min="-4" max="0.7" step="0.05" value="-2">
+          </div>
+          <div>
+            <div class="slider-row"><span class="fld" style="margin:0">&hellip; and where you stop</span><span class="val" id="coT1v"></span></div>
+            <input type="range" id="coT1" min="-2" max="2" step="0.05" value="0.7">
+          </div>
+          <p class="hint" style="margin:0">You can set the window three ways: with these two sliders, by
+            <b>dragging its edges on the time plot itself</b>, or with the buttons below, which walk it
+            there for you &mdash; watch the points slide along the line while the fitted D moves. All
+            three buttons move a window of <b>the same width</b>, so the only thing that differs between
+            them is <em>where</em> it sits.</p>
+          <div class="btnrow">
+            <button class="ghost" id="coP1" type="button">run: a clean window</button>
+            <button class="ghost" id="coP2" type="button">run: start too early</button>
+            <button class="ghost" id="coP3" type="button">run: stop too late</button>
+          </div>
+          <div class="readouts">
+            <div class="readout"><span class="k">fitted slope</span><span class="v" id="coSlope">&mdash;</span></div>
+            <div class="readout"><span class="k">intercept</span><span class="v" id="coInt">&mdash;</span></div>
+          <div class="readout"><span class="k">&hellip; the edge alone, &pi;nFDC*a</span><span class="v" id="coEdge">&mdash;</span></div>
+            <div class="readout"><span class="k">D from that slope</span><span class="v" id="coDfit">&mdash;</span></div>
+            <div class="readout"><span class="k">against the true D</span><span class="v" id="coErr">&mdash;</span></div>
+            <div class="readout"><span class="k">R&sup2;</span><span class="v" id="coR2">&mdash;</span></div>
+            <div class="readout"><span class="k">points</span><span class="v" id="coN">&mdash;</span></div>
           </div>
         </div>
       </div>
-      <div class="figs">
-        <div class="colpair">
-          <div class="card">
-            <div class="card-h"><h2>The profile the equation came from</h2>
-              <span class="note">one instant, and its slope at the wall</span></div>
-            <div class="card-b stack" style="gap:12px">
-              <svg id="coprof" viewBox="0 0 520 288" style="width:100%;height:auto" role="img"
-                   aria-label="The error function concentration profile at one instant, the middle of the sampling window, with a dashed tangent drawn at the electrode surface. The tangent is the concentration gradient at the wall, which is what the current is proportional to, and it flattens as the window is dragged to later times."></svg>
-              <p class="hint" style="margin:0">The dashed tangent at the wall <b>is</b> the current. It
-                flattens as &radic;t, which is the Cottrell equation drawn rather than written. This is the
-                instant at the middle of your sampling window &mdash; <b>drag the window</b> and watch the
-                tangent tip over. The single orange ring on each plot to the right is this same instant.</p>
-            </div>
-          </div>
-          <div class="card">
-            <div class="card-h"><h2>Getting a number for D out of this</h2>
-              <span class="note">the slope, and where to put the window</span></div>
-            <div class="card-b stack" style="gap:13px">
-              <div class="eqbig" style="white-space:normal;text-align:left;margin:0">
-                <span class="act">slope m = nFAD<sup>1/2</sup>C*/&radic;&pi;</span>
-                <small><b>what the fitted line gives you</b> &mdash; i against t<sup>&minus;1/2</sup> is a
-                  straight line through the origin, and its slope is the only thing you measure.</small><br>
-                <span class="mix">D = (m&radic;&pi; / nFAC*)<sup>2</sup></span>
-                <small><b>the answer, rearranged</b>. Note the square: <b>every error in the slope, in A,
-                  or in C* is doubled</b> in D. A 10 % slope is a 21 % D.</small>
-              </div>
-              <p class="hint" style="margin:0"><b>The recipe.</b> Step to a potential well past
-                E<sup>0</sup>&prime; &mdash; far enough that the surface concentration is pinned at zero and
-                the current is diffusion-limited, which is the only condition under which Cottrell holds.
-                Sample the current over a window that <b>starts after 5&tau;</b> and <b>ends before the
-                shorter of</b> t<sub>edge</sub> = r<sub>0</sub><sup>2</sup>/2D, where the disc stops being
-                planar, and roughly 20 s, where the room starts stirring the solution. Plot i against
-                t<sup>&minus;1/2</sup>, fit, and read the slope. <b>Then look at the intercept before you
-                look at the slope.</b></p>
-            </div>
-          </div>
+
+      <div class="card">
+        <div class="card-h"><h2>The profile the equation came from</h2>
+          <span class="note">one instant, and its slope at the wall</span></div>
+        <div class="card-b stack" style="gap:12px">
+          <svg id="coprof" viewBox="0 0 520 288" style="width:100%;height:auto" role="img"
+               aria-label="The error function concentration profile at one instant, the middle of the sampling window, with a dashed tangent drawn at the electrode surface. The tangent is the concentration gradient at the wall, which is what the current is proportional to, and it flattens as the window is dragged to later times."></svg>
+          <p class="hint" style="margin:0">The dashed tangent at the wall <b>is</b> the current. It
+            flattens as &radic;t, which is the Cottrell equation drawn rather than written. This is the
+            instant at the middle of your sampling window &mdash; <b>drag the window</b> and watch the
+            tangent tip over. The single orange ring on each plot to the right is this same instant.</p>
         </div>
-        <div class="colpair">
-          <div class="card">
-            <div class="card-h"><h2>i against t<sup>&minus;1/2</sup></h2>
-              <span class="note">the diagnostic plot</span></div>
-            <div class="card-b stack" style="gap:12px">
-              <svg id="cofit" viewBox="0 0 520 306" style="width:100%;height:auto" role="img"
-                   aria-label="Sampled current against the inverse square root of time, with a least squares line through the points, the intercept marked at the origin end and the three instants of the profile picture ringed in their own colours."></svg>
-              <p class="hint" style="margin:0"><b>What this plot is for.</b> Its slope carries D, since
-                everything else in nFAD<sup>&frac12;</sup>C*/&radic;&pi; is known; and <b>the Cottrell
-                equation has no constant term</b>, so an intercept that is not zero says the data are not
-                Cottrell, whatever R&sup2; says. Sampling too early lifts the right-hand end (large
-                t<sup>&minus;1/2</sup>) and steepens the line, so <b>D reads high</b>. Sampling too late
-                lifts the left-hand end, but what follows depends on <em>why</em>: the electrode edge adds
-                a <em>constant</em>, which raises the intercept and leaves the slope alone, while
-                convection stops the current falling at all, which flattens the line and makes <b>D read
-                low</b>. <b>D goes as the slope squared, so every slope error is doubled.</b></p>
-            </div>
-          </div>
-        
-          <div class="card">
-            <div class="card-h"><h2>The same data against t</h2>
-              <span class="note">where in the decay that line came from</span></div>
-            <div class="card-b stack" style="gap:12px">
-              <svg id="cotime" viewBox="0 0 520 264" style="width:100%;height:auto" role="img"
-                   aria-label="The same current against time on a logarithmic time axis, with the sampling window shaded and the limits of five time constants, the electrode edge and convection marked, so that the fitted window can be seen in its place in the whole decay."></svg>
-              <p class="hint" style="margin:0"><b>Drag the handles.</b> Read this directly under the plot
-                opposite: the shaded band is the same window, shown where it actually sits in the decay. A window that looked like a fine
-                straight line can turn out to be sitting on top of the charging current, or out past the
-                point where the layer stopped growing.</p>
-            </div>
-          </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2>i against t<sup>&minus;1/2</sup></h2>
+          <span class="note">the diagnostic plot</span></div>
+        <div class="card-b stack" style="gap:12px">
+          <svg id="cofit" viewBox="0 0 520 306" style="width:100%;height:auto" role="img"
+               aria-label="Sampled current against the inverse square root of time, with a least squares line through the points, the intercept marked at the origin end and the three instants of the profile picture ringed in their own colours."></svg>
+          <p class="hint" style="margin:0"><b>What this plot is for.</b> Its slope carries D, since
+            everything else in nFAD<sup>&frac12;</sup>C*/&radic;&pi; is known; and <b>the Cottrell
+            equation has no constant term</b>, so an intercept that is not zero says the data are not
+            Cottrell, whatever R&sup2; says. Sampling too early lifts the right-hand end (large
+            t<sup>&minus;1/2</sup>) and steepens the line, so <b>D reads high</b>. Sampling too late
+            lifts the left-hand end, but what follows depends on <em>why</em>: the electrode edge adds
+            a <em>constant</em>, which raises the intercept and leaves the slope alone, while
+            convection stops the current falling at all, which flattens the line and makes <b>D read
+            low</b>. <b>D goes as the slope squared, so every slope error is doubled.</b></p>
         </div>
-        <div class="card wideF">
-          <div class="card-h"><h2>And the five ways the number comes out wrong</h2>
-            <span class="note">read the intercept before you read the slope</span></div>
-          <div class="card-b stack" style="gap:13px">
-              <p class="hint" style="margin:0"><b>Why the intercept is the real test.</b> A true Cottrell
-                plot passes through the origin, because i &rarr; 0 as t &rarr; &infin;. A finite intercept
-                means something in your current does <em>not</em> decay as t<sup>&minus;1/2</sup>: leftover
-                charging, a background reaction, an adsorbed layer stripping, or convection holding the
-                current up at long times. R<sup>2</sup> will not catch it &mdash; 1/&radic;t crushes the late
-                points together, so a plot can be visibly curved and still fit at R<sup>2</sup> = 0.999.
-                <b>Drag the window and watch D move:</b> if D depends on where you put the window, the
-                window is in the wrong place, not D.</p>
-              <div class="eqbig" style="white-space:normal;text-align:left;margin:0">
-                <span class="ohm">too early</span>
-                <small><b>D reads high.</b> Residual i<sub>c</sub> sits on top of the first points, which
-                  are also the ones with the largest t<sup>&minus;1/2</sup>, so they lever the slope
-                  up.</small><br>
-                <span class="ohm">too late &mdash; the edge</span>
-                <small><b>D is untouched; the intercept moves.</b> Radial diffusion at the rim adds
-                  &pi;nFDC*a to the current, and that is a <em>constant</em>: on this plot it shifts the
-                  whole line up without tilting it. The slope, and so D, survives &mdash; which is
-                  exactly why the intercept is the test and the slope is not.</small><br>
-                <span class="ohm">too late &mdash; the room</span>
-                <small><b>D reads low.</b> Once natural convection holds the layer at a fixed thickness
-                  the current stops falling at all. Those points sit at the <em>smallest</em>
-                  t<sup>&minus;1/2</sup>, so they flatten the line, and D goes as the slope
-                  <b>squared</b>.</small><br>
-                <span class="ohm">the area A</span>
-                <small><b>the usual culprit.</b> A is the <em>electroactive</em> area, not what the
-                  calipers say. A roughness factor of 1.3 taken as 1.0 puts D out by 69 %. Calibrate A
-                  first with a couple whose D you already trust &mdash; that is what ferrocyanide is
-                  for.</small><br>
-                <span class="ohm">n and D together</span>
-                <small><b>one slope cannot separate them.</b> Cottrell measures nD<sup>1/2</sup>; you must
-                  know n from somewhere else (coulometry, the wave shape, the chemistry) before D means
-                  anything.</small><br>
-                <span class="ohm">C* and the surface</span>
-                <small><b>both have to be what you assumed.</b> C* is the bulk concentration, so the
-                  solution must be unstirred and the electrode must start from a clean, fully relaxed
-                  state &mdash; a step taken too soon after the last one meets solution that is still
-                  depleted, and reads low.</small>
-              </div>
-              <p class="hint" style="margin:0"><b>And report it honestly:</b> D depends on temperature by
-                about 2 % per kelvin and on the supporting electrolyte through viscosity, so a D without a
-                stated temperature and medium is not a measurement. Quote the window you fitted over, the
-                intercept, and how A was obtained &mdash; those three decide the number far more than the
-                regression does.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2>The same data against t</h2>
+          <span class="note">where in the decay that line came from</span></div>
+        <div class="card-b stack" style="gap:12px">
+          <svg id="cotime" viewBox="0 0 520 264" style="width:100%;height:auto" role="img"
+               aria-label="The same current against time on a logarithmic time axis, with the sampling window shaded and the limits of five time constants, the electrode edge and convection marked, so that the fitted window can be seen in its place in the whole decay."></svg>
+          <p class="hint" style="margin:0"><b>Drag the handles.</b> Read this directly under the plot
+            opposite: the shaded band is the same window, shown where it actually sits in the decay. A window that looked like a fine
+            straight line can turn out to be sitting on top of the charging current, or out past the
+            point where the layer stopped growing.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2>Getting a number for D out of this</h2>
+          <span class="note">the slope, and where to put the window</span></div>
+        <div class="card-b stack" style="gap:13px">
+          <div class="eqbig" style="white-space:normal;text-align:left;margin:0">
+            <span class="act">slope m = nFAD<sup>1/2</sup>C*/&radic;&pi;</span>
+            <small><b>what the fitted line gives you</b> &mdash; i against t<sup>&minus;1/2</sup> is a
+              straight line through the origin, and its slope is the only thing you measure.</small><br>
+            <span class="mix">D = (m&radic;&pi; / nFAC*)<sup>2</sup></span>
+            <small><b>the answer, rearranged</b>. Note the square: <b>every error in the slope, in A,
+              or in C* is doubled</b> in D. A 10 % slope is a 21 % D.</small>
           </div>
+          <p class="hint" style="margin:0"><b>The recipe.</b> Step to a potential well past
+            E<sup>0</sup>&prime; &mdash; far enough that the surface concentration is pinned at zero and
+            the current is diffusion-limited, which is the only condition under which Cottrell holds.
+            Sample the current over a window that <b>starts after 5&tau;</b> and <b>ends before the
+            shorter of</b> t<sub>edge</sub> = r<sub>0</sub><sup>2</sup>/2D, where the disc stops being
+            planar, and roughly 20 s, where the room starts stirring the solution. Plot i against
+            t<sup>&minus;1/2</sup>, fit, and read the slope. <b>Then look at the intercept before you
+            look at the slope.</b></p>
         </div>
-        <div class="card wideF">
-          <div class="card-h"><h2>What you would report</h2></div>
-          <div class="card-b"><div class="verdict" id="coVerdict">&mdash;</div></div>
-        </div>
+      </div>
+    </div>
+
+    <div class="wide1">
+      <div class="card wideF">
+        <div class="card-h"><h2>What you would report</h2></div>
+        <div class="card-b"><div class="verdict" id="coVerdict">&mdash;</div></div>
       </div>
     </div>
 
@@ -1129,6 +1097,13 @@ function yName(x, y0, y1, lab){
     .replace("<text", '<text data-yspan="' + (y1 - y0).toFixed(0)
              + '" transform="rotate(-90 ' + x.toFixed(1) + ' ' + cy.toFixed(1) + ')"');
 }
+/* a label turned on its side, reading upwards from (x, y): for writing
+   alongside a vertical line instead of across the top of a frame */
+function txV(x, y, s, col, size, anchor, weight){
+  return tx(x, y, s, col, size, anchor, weight)
+    .replace("<text", '<text transform="rotate(-90 ' + x.toFixed(1) + ' '
+             + y.toFixed(1) + ')"');
+}
 function pth(d, col, w, fill, op){
   return '<path d="' + d + '" fill="' + (fill || "none") + '" stroke="' + (col || "none")
        + '" stroke-width="' + (w || 2) + '"'
@@ -1436,12 +1411,17 @@ function paint(id, markup){
     if(need !== +vb[3]){ vb[3] = need; el.setAttribute("viewBox", vb.join(" ")); }
   }
 }
-function curve(f, fn, lo, hi, npt){
+/* `warp` bends the sampling, not the curve: pass s => s*s and the points
+   crowd towards `lo`. A t^-1/2 curve on a LINEAR axis needs that - with
+   an even grid its first sample already sits past the divergence, so the
+   whole steep left-hand end is simply missing from the path and the
+   curve appears to start partway down. */
+function curve(f, fn, lo, hi, npt, warp){
   var d = "", pen = false, N = npt || 200;
   var yA = Math.min(f.ylo, f.yhi), yB = Math.max(f.ylo, f.yhi);
   var xA = Math.min(f.xlo, f.xhi), xB = Math.max(f.xlo, f.xhi);
   for(var i = 0; i <= N; i++){
-    var x = lo + (hi - lo) * i / N, y = fn(x);
+    var s = i / N, x = lo + (hi - lo) * (warp ? warp(s) : s), y = fn(x);
     if(!isFinite(y) || y < yA || y > yB || x < xA || x > xB){ pen = false; continue; }
     d += (pen ? "L" : "M") + f.px(x).toFixed(1) + " " + f.py(y).toFixed(1) + " ";
     pen = true;
@@ -1905,15 +1885,26 @@ function ohDraw(){
   if(lt5 > ge.xlo && lt5 < ge.xhi){
     w += rc(ge.X0, ge.Y0, ge.px(lt5) - ge.X0, g4.Y1 - ge.Y0, "var(--stop)", 0.11);
     w += ln(ge.px(lt5), ge.Y0, ge.px(lt5), g4.Y1, "var(--stop)", 1.4, "4 3");
-    w += tx(g4.px(lt5) + 5, g4.Y0 + 13, "5τ = " + fmtT(t5), "var(--stop)", 10, null, 700);
+    /* a log clock squeezes 1τ to 5τ into 0.70 of a decade, so the last
+       37 % of the rise happens in 6 % of the width and the eye reads the
+       electrode as having arrived at τ. The number has to be said,
+       because the picture cannot show it. Right of its own line when
+       there is room, and a row lower when it has to go left, so that it
+       never lands on the τ label beside it. */
+    var r5 = g4.px(lt5) < (g4.X0 + g4.X1) * 0.55;
+    w += tx(g4.px(lt5) + (r5 ? 5 : -5), g4.Y0 + (r5 ? 13 : 27),
+            "5τ = " + fmtT(t5) + " — 99.3 % of ΔE arrived",
+            "var(--stop)", 10, r5 ? null : "end", 700);
   }
   /* the far end of the window belongs to the current, not to the
      potential, so it is marked on the lower half only              */
   if(lcv > g4.xlo && lcv < g4.xhi){
     w += rc(g4.px(lcv), g4.Y0, g4.X1 - g4.px(lcv), g4.Y1 - g4.Y0, "var(--red-)", 0.10);
     w += ln(g4.px(lcv), g4.Y0, g4.px(lcv), g4.Y1, "var(--red-)", 1.4, "4 3");
-    w += tx(g4.px(lcv) - 5, g4.Y0 + 29, "thermal convection — " + fmtT(T_CONV),
-            "var(--red-)", 10, "end", 700);
+    /* written up the shaded strip the line opens, not across the top:
+       the strip is all the room there is past 20 s anyway            */
+    w += txV(g4.px(lcv) + 13, g4.Y1 - 6, "thermal convection",
+             "var(--red-)", 10, null, 700);
   }
 
   w += ln(ge.X0, ge.py(dEw), ge.X1, ge.py(dEw), "var(--red-)", 2, "5 4");
@@ -1934,6 +1925,8 @@ function ohDraw(){
     w += ln(mxe, ge.py(dEw * (1 - Math.exp(-1))), mxe, ge.py(dEw), "var(--ion-k)", 1.6);
     w += tx(mxe + (leftE ? -6 : 6), ge.py(dEw * 0.84), "iRᵤ", "var(--ion-k)", 10.5,
             leftE ? "end" : null, 700);
+    w += tx(mxe + (leftE ? -6 : 6), ge.py(dEw * 0.84) + 13, "37 % still missing",
+            "var(--ion-k)", 9.5, leftE ? "end" : null, 600);
     w += tx(mxe, ge.Y1 - 4, "τ", "var(--ion-k)", 10, "middle", 700);
   }
 
@@ -1948,7 +1941,9 @@ function ohDraw(){
      where the electrode is still iR_u/e short of the step           */
   if(onE){
     w += ln(mxe, g4.Y0, mxe, g4.Y1, "var(--ion-k)", 1.1, "3 3", 0.7);
-    w += tx(mxe + 5, g4.Y1 - 6, "\u03c4", "var(--ion-k)", 10, null, 700);
+    /* level with the 5\u03c4 label and on the other side of its own line,
+       so the two do not run together */
+    w += tx(mxe - 5, g4.Y0 + 13, "\u03c4", "var(--ion-k)", 10, "end", 700);
   }
   w += legend(g4.X0, 512, g4.Y1 + 50, [
     {t:"one clock, read downwards: above the gap the input — a single step of ΔE = "
@@ -1978,11 +1973,16 @@ function ohDraw(){
   w += ln(gz.px(5), gz.Y0, gz.px(5), gz.Y1, "var(--stop)", 1.4, "4 3");
   w += pth(curve(gz, function(u){ return Math.exp(-u); }, 1e-4, ZU8, 300),
            "var(--ion-k)", 2.3);
+  /* both of these go as u^-1/2 at the left, so they are sampled on a
+     squared grid - evenly spaced points would skip the divergence and
+     start the faradaic curve a third of the way down, which makes this
+     panel look like different physics from the log one above */
+  var QGRID = function(s){ return s * s; };
   w += pth(curve(gz, function(u){ return cot / Math.sqrt(u * tau) / imaxZ; },
-                 1e-3, ZU8, 300), "var(--go)", 2.3);
+                 1e-5, ZU8, 400, QGRID), "var(--go)", 2.3);
   w += pth(curve(gz, function(u){
              return Math.exp(-u) + cot / Math.sqrt(u * tau) / imaxZ;
-           }, 1e-3, ZU8, 300), "var(--ink)", 1.3, null, 0.6);
+           }, 1e-5, ZU8, 400, QGRID), "var(--ink)", 1.3, null, 0.6);
   w += legend(gz.X0, 512, gz.Y1 + 46, [
     {c:"var(--ion-k)", t:"i_c, charging"}, {c:"var(--go)", t:"i_f, faradaic"},
     {c:"var(--ink)", t:"their sum — all the instrument can measure"}]);
@@ -2926,6 +2926,19 @@ PANEL_SHOW["p-ume"] = umSync;
 PANEL_SHOW["p-pulse"] = function(){ puPresets(); puSync(); };
 
 ohSync();
+
+/* The legend rows are placed by measuring the text, and the mono font
+   comes from Google with display=swap: the first layout therefore uses
+   the fallback metrics, and when the real font lands the keys grow and
+   run into each other. Lay them out again once it has arrived. */
+if(window.document && document.fonts && document.fonts.ready){
+  document.fonts.ready.then(function(){
+    ohSync();
+    Object.keys(SHOWN).forEach(function(id){
+      if(PANEL_SHOW[id]) PANEL_SHOW[id]();
+    });
+  });
+}
 
 /* the comparison table, built once */
 document.getElementById("puTable").innerHTML =
