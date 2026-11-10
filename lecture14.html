@@ -352,47 +352,11 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
         </div>
         <div class="card">
           <div class="card-h"><h2>What a step actually looks like at the electrode</h2>
-            <span class="note">how much of it has arrived, and when</span></div>
+            <span class="note">the same step in two cells &mdash; one that cannot react, one that can</span></div>
           <div class="card-b stack" style="gap:13px">
             <svg id="ohStep" viewBox="0 0 520 300" style="width:100%;height:auto" role="img"
                  aria-label="Two cells side by side, each stepped from E1 to E2. On the left E2 stays below the redox potential, so nothing can react; on the right it passes it. Under each potential programme is the solution next to the electrode, drawn with the wall end magnified: counter-ions build up in the double layer as the cell charges, and on the right the reactant is consumed at the wall and the depletion it leaves spreads outward with the square root of time. A cursor marks the instant being drawn."></svg>
             <div class="btnrow"><button class="ghost" type="button" id="ohStepBtn">Run the step &mdash; watch the double layer fill, then the reactant go</button></div>
-            <p class="hint" style="margin:0"><b>The same step, two different solutions.</b> Both cells
-              charge their double layer in the first few &tau; and neither can tell you anything while
-              that is happening. After it, the left-hand cell is finished &mdash; the pile of
-              counter-ions is built and nothing else moves, which is the whole of a non-faradaic step.
-              The right-hand cell has only started: the reaction holds the reactant at zero on the wall,
-              and the hole spreads out as &radic;(2Dt), which is the Cottrell current seen from the
-              side. The wall end is magnified so a nanometre and sixty microns can be drawn together;
-              the break marks the change of scale.</p>
-            <svg id="ohFigRC" viewBox="0 0 520 200" style="width:100%;height:auto" role="img"
-                 aria-label="The fraction of the applied step that the electrode has actually reached, against time in units of the time constant, with one, three and five time constants marked and the gap still missing written at each."></svg>
-            <p class="hint" style="margin:0"><b>&tau; is how long the cell takes to obey you.</b>
-              The step has to charge C<sub>dl</sub> through R<sub>u</sub>, so the electrode arrives at
-              E(1 &minus; e<sup>&minus;t/&tau;</sup>) rather than at once, and what is still missing is
-              exactly iR<sub>u</sub>. One &tau; leaves 37 % of the step undelivered, three leave 5 %,
-              five leave 0.67 % &mdash; which is where the habit of discarding everything before
-              5&tau; comes from. The faradaic branch changes none of this: it is in parallel with
-              C<sub>dl</sub>, so at t = 0 the capacitor is a short circuit and the whole step still
-              falls across R<sub>u</sub>.</p>
-            <div class="eqbig" style="white-space:normal;text-align:left;margin:0">
-              <span class="cnc">&tau; = R<sub>u</sub>C<sub>dl</sub></span>
-              <small><b>the time constant of the cell</b> &mdash; an ohm times a farad is a second.
-                It is how long the step takes to charge the double layer through the solution
-                resistance, and it is the only time constant this circuit has.</small><br>
-              <span class="go">what the electrode got = E(1 &minus; e<sup>&minus;t/&tau;</sup>)</span>
-              <small><b>the potential the interface has actually reached</b> at time t &mdash; the
-                green curve. You command E; the electrode arrives at it, and only after a few
-                &tau;.</small><br>
-              <span class="ohm">iR<sub>u</sub> = E &minus; E(electrode)</span>
-              <small><b>the gap between the two curves</b>, at every instant: the current of that
-                instant times the uncompensated resistance. It is the error in your potential
-                axis, and it is zero only when the current is.</small><br>
-              <span class="mix">5&tau;</span>
-              <small><b>99.3 % of the step delivered</b>, so 0.67 % still missing &mdash; the
-                earliest time anything measured here means what you think it means. One &tau;
-                leaves 37 %, three leave 5 %.</small>
-            </div>
           </div>
         </div>
         </div>
@@ -1715,30 +1679,6 @@ function ohCircuitPic(){
   return s;
 }
 
-/* ---------- the approach, on a linear t/tau clock ---------- */
-function ohRCPic(tau){
-  var s = "";
-  var f = fr(62, 500, 24, 148, 0, 6, 0, 1.08);
-  s += axLin(f, "time after the step / τ", "fraction charged",
-             function(v){ return v.toFixed(0); }, function(v){ return v.toFixed(1); });
-  s += ln(f.X0, f.py(1), f.X1, f.py(1), "var(--red-)", 2, "5 4");
-  s += tx(f.X1 - 4, f.py(1) - 6, "what you applied", "var(--red-)", 9.5, "end", 700);
-  s += pth(curve(f, function(x){ return 1 - Math.exp(-x); }, 0, 6, 240), "var(--go)", 2.4);
-  [[1, "37 % still missing"], [3, "5 %"], [5, "0.67 %"]].forEach(function(M){
-    var y = 1 - Math.exp(-M[0]);
-    s += ln(f.px(M[0]), f.py(y), f.px(M[0]), f.py(1), "var(--ion-k)", 1.6);
-    s += ln(f.px(M[0]), f.py(y), f.px(M[0]), f.Y1, "var(--ion-k)", 1, "3 3", 0.6);
-    s += tx(f.px(M[0]), f.Y1 + 13, M[0] + "τ", "var(--ion-k)", 10, "middle", 700);
-    s += tx(f.px(M[0]) + 6, f.py((y + 1) / 2) + 4, M[1], "var(--ion-k)", 9.5, null, 700);
-  });
-  /* the bottom left corner is where the curve rises out of zero, so the
-     algebra goes in the bottom right, which the curve left long ago  */
-  s += tx(f.X1 - 8, f.py(0.30), "E_elec = E(1 − e^(−t/τ))", "var(--go)", 10, "end", 700);
-  s += tx(f.X1 - 8, f.py(0.16), "the gap is exactly iRᵤ,  τ = " + fmtT(tau),
-          "var(--ion-k)", 9.5, "end", 600);
-  return s;
-}
-
 /* ---- what the step does to the solution, while it is doing it -------
    The double layer is about a nanometre and the diffusion layer tens of
    microns; nothing can draw both on one linear axis, so the wall end is
@@ -1893,7 +1833,6 @@ function ohDraw(){
   var Rinf = ruInf(OH_KAPPA, OH.a), Ru = ruOf(OH_KAPPA, OH.a, OH.d);
   var tau = Ru * OH.Cdl;
   paint("ohCell", ohCellPic());
-  paint("ohFigRC", ohRCPic(tau));
   ohStepDraw();
 
   /* ---- R_u against where you put the reference tip ------------------
