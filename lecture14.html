@@ -383,21 +383,18 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
           <div class="card-h"><h2>Why nothing is clean before 5&tau;</h2>
             <span class="note">one step in, two currents out &mdash; and 5&tau; in the same place in all three</span></div>
           <div class="card-b stack" style="gap:13px">
-            <svg id="ohFigWin" viewBox="0 0 520 852" style="width:100%;height:auto" role="img"
-                 aria-label="At the head of the figure, two equivalent circuits: with nothing able to react the cell is the uncompensated resistance in series with the double-layer capacitance alone, and with a reaction present a charge-transfer resistance and a Warburg element sit in parallel with that capacitance. Under them, two frames on one time axis, and a third below them. The upper frame is the input: the potential step you applied, flat, and the potential the electrode actually reached, which approaches it exponentially with time constant tau, the gap between them being iR_u. Directly beneath it, sharing the same decades of time, the output: the charging current falling as a straight-edged exponential cliff and the faradaic current falling only as the inverse square root of time, so the two must cross; one time constant and five are marked on both frames, and everything before five time constants is shaded in one column through the pair. At the foot of the figure the same race again, magnified onto the first few time constants on a clock measured in tau, with the charging current, the faradaic current and their sum, which is all an instrument can measure. Five time constants stand at the same horizontal position in every panel."></svg>
-            <p class="hint" style="margin:0"><b>The whole argument, read downwards.</b> At the top is the circuit a stepped cell actually is: R<sub>u</sub> in series with C<sub>dl</sub>, and the faradaic branch hanging in parallel with the capacitor, which is why it changes none of the timing. Under it, the pair that shares one clock. Above the gap
-              is what you asked the instrument for &mdash; one step of &Delta;E &mdash; and the
-              potential the electrode actually reached, which trails it by iR<sub>u</sub> until the
-              double layer has charged. Below the gap, on the <b>same clock</b>, is what comes back
-              for it: the charging current falling off a cliff and the faradaic current falling only
-              as t<sup>&minus;1/2</sup>. &tau; and 5&tau; are marked on both halves at the same place,
-              because there is only one time axis between them. The panel at the foot is the same race
-              magnified onto the first few &tau;, where the charging curve never moves and the sliders
-              slide the faradaic one across it; up to about 5&tau; the thin grey line &mdash; the only
-              thing an instrument ever sees &mdash; is the charging current with the chemistry buried
-              inside it, and after 5&tau; the grey line and the green one are the same curve. Its
-              range in &tau; is taken from the clock above, so <b>5&tau; stands in the same column in
-              every panel</b>.</p>
+            <svg id="ohFigWin" viewBox="0 0 520 644" style="width:100%;height:auto" role="img"
+                 aria-label="At the head of the figure, two equivalent circuits: with nothing able to react the cell is the uncompensated resistance in series with the double-layer capacitance alone, and with a reaction present a charge-transfer resistance and a Warburg element sit in parallel with that capacitance. Under them, two frames sharing one logarithmic time axis. The upper frame is the input: the potential step you applied, flat, and the potential the electrode actually reached, which approaches it exponentially with time constant tau, the gap between them being iR_u. Directly beneath it, on the same decades of time, the output: the charging current falling as a straight-edged exponential cliff and the faradaic current falling only as the inverse square root of time, so the two must cross; a small ring marks the instant they cross, one time constant and five are marked on both frames, and everything before five time constants is shaded in one column through the pair."></svg>
+            <p class="hint" style="margin:0">At the top is the circuit a stepped cell actually
+              is: R<sub>u</sub> in series with C<sub>dl</sub>, and the faradaic branch hanging in
+              parallel with the capacitor, which is why it changes none of the timing. Under it, the
+              pair that shares one clock. Above the gap is what you asked the instrument for
+              &mdash; one step of &Delta;E &mdash; and the potential the electrode actually reached,
+              which trails it by iR<sub>u</sub> until the double layer has charged. Below the gap, on
+              the <b>same clock</b>, is what comes back for it: the charging current falling off a
+              cliff and the faradaic current falling only as t<sup>&minus;1/2</sup>. &tau; and
+              5&tau; are marked on both halves at the same place, because there is only one time
+              axis between them.</p>
             <p class="hint" style="margin:0"><b>The two currents die at different speeds, and that is
               what makes the experiment possible.</b> i<sub>c</sub> falls exponentially,
               e<sup>&minus;t/&tau;</sup>; the faradaic current falls only as t<sup>&minus;1/2</sup>
@@ -1336,6 +1333,42 @@ function axMix(f, xlab, ylab, fy, opt){
   s += yName(14, f.Y0, f.Y1, ylab);
   return s;
 }
+/* linear across, decades up - the other way round from axMix. The
+   magnified step panel needs this one: its clock is in units of tau, but
+   by the end of it the two currents it compares are four decades apart,
+   and on a linear current axis the faradaic one lies flat on the floor.
+   The panel then says the opposite of the log-log panel above it, which
+   is the single thing most likely to be misread on this page.        */
+function axYLog(f, xlab, ylab, fx){
+  var s = rc(f.X0, f.Y0, f.X1 - f.X0, f.Y1 - f.Y0, "var(--surface-2)", 0.5, 4), g;
+  var xA = Math.min(f.xlo, f.xhi), xB = Math.max(f.xlo, f.xhi);
+  var xs = nice((xB - xA) / 5), sy = thin(f.yhi - f.ylo, f.Y1 - f.Y0, 15);
+  for(g = Math.ceil(xA / xs) * xs; g <= xB + 1e-12; g += xs){
+    s += ln(f.px(g), f.Y0, f.px(g), f.Y1, "var(--line)", 1, "2 3", 0.75);
+    if(f.px(g) > f.X0 + 10)
+      s += tx(f.px(g), f.Y1 + 14, fx ? fx(g) : tickNum(g), "var(--muted)", 9.5, "middle");
+  }
+  for(g = Math.ceil(f.ylo); g <= f.yhi + 1e-9; g++){
+    s += ln(f.X0, f.py(g), f.X1, f.py(g), "var(--line)", 1, "2 3", 0.75);
+    if(g % sy === 0) s += tx(f.X0 - 6, f.py(g) + 3.4, "10" + supr(g), "var(--muted)", 9.5, "end");
+  }
+  s += xName(f.X0, f.X1, f.Y1 + 30, xlab);
+  s += yName(14, f.Y0, f.Y1, ylab);
+  return s;
+}
+/* Where the two decays cross: e^-u = k u^(-1/2), u = t/tau. Taking logs
+   it is u - (1/2)ln u = -ln k, whose right-hand branch is the crossing
+   that matters - before it the charging current is on top, after it the
+   faradaic one is. The fixed point u = -ln k + (1/2)ln u is a
+   contraction wherever u > 1/2, so iterating it from u = 1 lands on that
+   branch. The branch exists only while the charging current gets on top
+   at all: the two curves touch at u = 1/2, which needs k < e^(-0.847). */
+function uCross(k){
+  if(!(k > 0) || Math.log(k) >= -0.8466) return NaN;
+  var u = Math.max(1, -Math.log(k)), i;
+  for(i = 0; i < 200; i++) u = -Math.log(k) + 0.5 * Math.log(u);
+  return u;
+}
 /* a row of keys under a plot. Anything written inside a frame eventually
    has a curve drawn through it, so the words live here instead: a swatch,
    the text, and a second line when the first one fills up.            */
@@ -1866,9 +1899,13 @@ function ohDraw(){
      that axis at which 5 tau falls.                                 */
   var XL = 62, XR = 500, TLO = -9, THI = 2;
   var imaxZ = OH.dE / Ru, dEw = OH.dE * 1000;
-  var lt5 = Math.log10(5 * tau), fr5 = (lt5 - TLO) / (THI - TLO);
-  var aligned = fr5 > 0.08 && fr5 < 0.95, ZU8 = aligned ? 5 / fr5 : 8;
+  var lt5 = Math.log10(5 * tau);
   var t5 = 5 * tau, lcv = Math.log10(T_CONV);
+  /* where the two currents change places, in units of tau. It is ringed
+     on the current panel; whether there is anything to ring at all is
+     decided here, and the frame test is done at the drawing site.    */
+  var kz = cot / Math.sqrt(tau) / imaxZ, uc = uCross(kz);
+  var ucOn = isFinite(uc) && uc > 0.4;
 
   /* ---- 1 - the input, and 2 - the output, on one axis --------------- */
   /* a gap between the two frames, not a seam: butted together they put
@@ -1891,7 +1928,10 @@ function ohDraw(){
        because the picture cannot show it. Right of its own line when
        there is room, and a row lower when it has to go left, so that it
        never lands on the τ label beside it. */
-    var r5 = g4.px(lt5) < (g4.X0 + g4.X1) * 0.55;
+    /* the words are about 190 units wide: written rightwards they fit
+       only while their own line is in the left half of the FRAME, which
+       is not the same as 0.55 of X0 + X1 */
+    var r5 = g4.px(lt5) < g4.X1 - 200;
     w += tx(g4.px(lt5) + (r5 ? 5 : -5), g4.Y0 + (r5 ? 13 : 27),
             "5τ = " + fmtT(t5) + " — 99.3 % of ΔE arrived",
             "var(--stop)", 10, r5 ? null : "end", 700);
@@ -1920,13 +1960,21 @@ function ohDraw(){
   w += tx(rightE ? ge.X0 + 8 : ge.X1 - 4, ge.py(dEw * 0.17), "what the electrode got",
           "var(--go)", 9.5, rightE ? null : "end", 700);
   if(onE){
-    /* the gap between the two IS iR_u, and at t = tau it is DE/e */
-    var leftE = mxe > ge.X0 + 70;
+    /* the gap between the two IS iR_u, and at t = tau it is DE/e.
+       The potential axis is fixed at 0-600 mV so that the sliders cannot
+       rescale it, which means a 50 mV step occupies the bottom twelfth of
+       the frame and these two labels have almost no room: each is written
+       only where it has some. Leftwards needs clearance from the y
+       labels, and the second line needs clearance from the name of the
+       curve it is annotating. */
+    var leftE = mxe > ge.X0 + 110;
+    var roomE = ge.py(dEw * 0.17) - (ge.py(dEw * 0.84) + 13) > 24;
     w += ln(mxe, ge.py(dEw * (1 - Math.exp(-1))), mxe, ge.py(dEw), "var(--ion-k)", 1.6);
     w += tx(mxe + (leftE ? -6 : 6), ge.py(dEw * 0.84), "iRᵤ", "var(--ion-k)", 10.5,
             leftE ? "end" : null, 700);
-    w += tx(mxe + (leftE ? -6 : 6), ge.py(dEw * 0.84) + 13, "37 % still missing",
-            "var(--ion-k)", 9.5, leftE ? "end" : null, 600);
+    if(roomE)
+      w += tx(mxe + (leftE ? -6 : 6), ge.py(dEw * 0.84) + 13, "37 % still missing",
+              "var(--ion-k)", 9.5, leftE ? "end" : null, 600);
     w += tx(mxe, ge.Y1 - 4, "τ", "var(--ion-k)", 10, "middle", 700);
   }
 
@@ -1945,6 +1993,14 @@ function ohDraw(){
        so the two do not run together */
     w += tx(mxe - 5, g4.Y0 + 13, "\u03c4", "var(--ion-k)", 10, "end", 700);
   }
+  /* the crossing, ringed: at this scale it sits a few pixels from the
+     tau line, so the ring goes on and the words go in the legend. */
+  if(ucOn){
+    var lcx = Math.log10(uc * tau), lcy = Math.log10(imaxZ * Math.exp(-uc));
+    if(lcx > g4.xlo && lcx < g4.xhi && lcy > g4.ylo && lcy < g4.yhi)
+      w += '<circle cx="' + g4.px(lcx).toFixed(1) + '" cy="' + g4.py(lcy).toFixed(1)
+         + '" r="4.6" fill="none" stroke="var(--stop)" stroke-width="1.8"/>';
+  }
   w += legend(g4.X0, 512, g4.Y1 + 50, [
     {t:"one clock, read downwards: above the gap the input — a single step of ΔE = "
        + dEw.toFixed(0) + " mV — and below it the current that comes back for it"}]);
@@ -1955,43 +2011,13 @@ function ohDraw(){
     {c:"var(--red-)", d:1, t:"thermal convection at " + fmtT(T_CONV)
        + " — the far end of the window"}]);
   w += legend(g4.X0, 512, g4.Y1 + 134, [
+    {c:"var(--stop)", t:"the ring — where the two currents change places"
+       + (ucOn ? ", at " + uc.toFixed(1) + "τ = " + fmtT(uc * tau)
+               : " (not inside this window on these settings)")}]);
+  w += legend(g4.X0, 512, g4.Y1 + 162, [
     {t:"the faradaic line is drawn for 1 mM, D = 10⁻⁵ cm² s⁻¹, A = πa² "
        + "— what matters is its slope, not its height"}]);
 
-  /* ---- 3 - the same output, magnified onto the first few tau --------
-     A clock measured in tau is not the clock above, so this panel gets an
-     axis of its own. On it the charging curve never moves and the sliders
-     slide the faradaic one across it, which is the whole of what tau
-     does; the current is read against the first current the cell can
-     draw, dE/Ru, so that axis is fixed too.                        */
-  var gz = fr(XL, XR, 626, 752, 0, ZU8, 0, 1.05);
-  w += axLin(gz, "time after the step, in units of τ = RᵤCᵈˡ",
-             "i / (ΔE/Rᵤ)",
-             function(v){ return v.toFixed(0) + "τ"; },
-             function(v){ return v.toFixed(1); });
-  w += rc(gz.X0, gz.Y0, gz.px(5) - gz.X0, gz.Y1 - gz.Y0, "var(--stop)", 0.11);
-  w += ln(gz.px(5), gz.Y0, gz.px(5), gz.Y1, "var(--stop)", 1.4, "4 3");
-  w += pth(curve(gz, function(u){ return Math.exp(-u); }, 1e-4, ZU8, 300),
-           "var(--ion-k)", 2.3);
-  /* both of these go as u^-1/2 at the left, so they are sampled on a
-     squared grid - evenly spaced points would skip the divergence and
-     start the faradaic curve a third of the way down, which makes this
-     panel look like different physics from the log one above */
-  var QGRID = function(s){ return s * s; };
-  w += pth(curve(gz, function(u){ return cot / Math.sqrt(u * tau) / imaxZ; },
-                 1e-5, ZU8, 400, QGRID), "var(--go)", 2.3);
-  w += pth(curve(gz, function(u){
-             return Math.exp(-u) + cot / Math.sqrt(u * tau) / imaxZ;
-           }, 1e-5, ZU8, 400, QGRID), "var(--ink)", 1.3, null, 0.6);
-  w += legend(gz.X0, 512, gz.Y1 + 46, [
-    {c:"var(--ion-k)", t:"i_c, charging"}, {c:"var(--go)", t:"i_f, faradaic"},
-    {c:"var(--ink)", t:"their sum — all the instrument can measure"}]);
-  w += legend(gz.X0, 512, gz.Y1 + 74, [
-    {c:"var(--stop)", d:1, t:"5τ = " + fmtT(t5)
-       + " — before it the two cannot be separated"},
-    {t:"(τ = " + fmtT(tau) + ")"},
-    {t:aligned ? "— drawn at the same place as the 5τ line above"
-       : "— 5τ is off the clock above, so this panel keeps its own 8τ"}]);
   paint("ohFigWin", w);
 
   /* ---- the numbers --------------------------------------------------- */
