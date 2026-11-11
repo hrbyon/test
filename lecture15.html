@@ -1,0 +1,2746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script src="exam-lock.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>ECSA Bench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+:root{
+  --ground:#F1F3F2; --surface:#FFFFFF; --surface-2:#E9EDEB;
+  --ink:#14191B; --ink-2:#3E4A4D; --muted:#68767A; --line:#D6DDDA; --line-2:#C3CCC8;
+  --ox:#A85B33; --ox-soft:#F3E4DA;
+  --red-:#15618E; --red-soft:#DDE9F2;
+  --go:#2C7355; --go-soft:#DCEBE3;
+  --stop:#8A5F0C; --stop-soft:#F3E9D3;
+  --elec:#3E4A4D; --ion-k:#6E4C9B; --ion-k-soft:#EBE3F5;
+  --shadow:0 1px 2px rgba(20,25,27,.05),0 8px 24px -12px rgba(20,25,27,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+    --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+    --ox:#D08551; --ox-soft:#33231A;
+    --red-:#5AA6D4; --red-soft:#152833;
+    --go:#5DBB8D; --go-soft:#152A21;
+    --stop:#D6A33F; --stop-soft:#2B2415;
+    --elec:#AEBBBE; --ion-k:#B99BE0; --ion-k-soft:#241C33;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+  --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+  --ox:#D08551; --ox-soft:#33231A;
+  --red-:#5AA6D4; --red-soft:#152833;
+  --go:#5DBB8D; --go-soft:#152A21;
+  --stop:#D6A33F; --stop-soft:#2B2415;
+  --elec:#AEBBBE; --ion-k:#B99BE0; --ion-k-soft:#241C33;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:32px 20px 72px}
+.masthead{display:flex;flex-wrap:wrap;align-items:flex-end;gap:20px 32px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.eyebrow a{color:inherit}
+h1{font-family:"IBM Plex Serif",Georgia,serif;font-weight:600;font-size:clamp(28px,4.2vw,42px);line-height:1.12;margin:0;text-wrap:balance;letter-spacing:-.015em}
+.sub{margin:8px 0 0;color:var(--ink-2);font-size:15px;max-width:62ch}
+.tabs{display:flex;gap:2px;margin:24px 0 22px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{appearance:none;background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);
+  font-family:inherit;font-size:14.5px;font-weight:500;padding:11px 16px;cursor:pointer;white-space:nowrap;margin-bottom:-1px}
+.tab:hover{color:var(--ink-2)}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ox)}
+.tab:focus-visible{outline:2px solid var(--red-);outline-offset:-2px;border-radius:4px 4px 0 0}
+.panel[hidden]{display:none}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow)}
+.card-h{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.card-h h2{font-size:15px;font-weight:600;margin:0;letter-spacing:-.01em}
+.card-h .note{font-size:12.5px;color:var(--muted)}
+.card-b{padding:18px}
+.stack{display:flex;flex-direction:column;gap:16px}
+.two{display:grid;grid-template-columns:minmax(270px,1fr) minmax(330px,1.45fr);gap:16px;align-items:start}
+@media(max-width:900px){.two{grid-template-columns:1fr}}
+label.fld,span.fld{display:block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+select,input[type=text],input[type=number]{width:100%;font-family:inherit;font-size:14px;color:var(--ink);
+  background:var(--surface-2);border:1px solid var(--line-2);border-radius:7px;padding:9px 10px}
+input:read-only{background:var(--surface);color:var(--muted);cursor:not-allowed}
+select:focus-visible,input:focus-visible{outline:2px solid var(--red-);outline-offset:1px}
+input[type=range]{width:100%;accent-color:var(--ox)}
+input[type=range]:focus-visible{outline:2px solid var(--red-);outline-offset:3px}
+.slider-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;gap:10px}
+.slider-row .val{font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+.readout{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px dotted var(--line)}
+.readout:last-child{border-bottom:0}
+.readout .k{font-size:13px;color:var(--muted)}
+.rgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 32px}
+.rgrid .readout:last-child{border-bottom:1px dotted var(--line)}
+@media(max-width:620px){.rgrid{grid-template-columns:minmax(0,1fr)}}
+.readout .v{font-family:"IBM Plex Mono",monospace;font-size:16px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--ink)}
+.verdict{padding:12px 14px;border-radius:8px;font-size:13.5px;line-height:1.55}
+.verdict.go{background:var(--go-soft);color:var(--go)}
+.verdict.stop{background:var(--stop-soft);color:var(--stop)}
+.verdict.flat{background:var(--surface-2);color:var(--ink-2)}
+.verdict.mixv{background:var(--ion-k-soft);color:var(--ion-k)}
+.eqline{font-family:"IBM Plex Mono",monospace;font-size:13px;line-height:1.9;color:var(--ink-2);
+  background:var(--surface-2);border-radius:7px;padding:11px 13px}
+.eqline b{color:var(--ox);font-weight:600}
+svg{display:block;max-width:100%}
+.scrollx{overflow-x:auto}
+.solid{appearance:none;background:var(--ox);border:1px solid var(--ox);color:#fff;font-family:inherit;
+  font-size:13.5px;font-weight:500;padding:10px 16px;border-radius:7px;cursor:pointer}
+.solid:hover{filter:brightness(1.08)}
+.solid:disabled{background:var(--line-2);border-color:var(--line-2);color:var(--muted);cursor:not-allowed}
+.ghost{appearance:none;background:var(--surface-2);border:1px solid var(--line-2);color:var(--ink-2);
+  font-family:inherit;font-size:12.5px;padding:8px 12px;border-radius:7px;cursor:pointer;text-align:left}
+.ghost:hover{border-color:var(--ox);color:var(--ox)}
+table.ions{border-collapse:collapse;width:100%;font-size:13px}
+table.ions th,table.ions td{text-align:left;padding:8px 9px;border-bottom:1px solid var(--line);white-space:nowrap}
+table.ions th{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500}
+table.ions td.num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;text-align:right}
+table.ions tr.hi td{color:var(--ox);font-weight:500}
+table.ions tr.lo td{color:var(--red-)}
+.idgrid{display:grid;grid-template-columns:1fr;gap:14px;max-width:340px}
+.scorebar{display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;padding:14px 18px;border-top:1px solid var(--line)}
+.scorenum{font-family:"IBM Plex Mono",monospace;font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+.scorenum small{font-size:14px;font-weight:400;color:var(--muted)}
+.vcode{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted)}
+.vcode b{color:var(--ink);font-weight:600;letter-spacing:.08em}
+/* six questions as three files of two: the grid is filled down each
+   column, so 1 and 2 stand in the first, 3 and 4 in the second, 5 and 6
+   in the third. Narrower, it falls to two files of three and then one  */
+.quiz{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  grid-template-rows:repeat(2,auto);grid-auto-flow:column;gap:16px}
+@media(max-width:1180px){.quiz{grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-template-rows:repeat(3,auto)}}
+@media(max-width:760px){.quiz{grid-template-columns:minmax(0,1fr);
+  grid-template-rows:none;grid-auto-flow:row}}
+.q .stem{font-size:14.5px;line-height:1.6;margin:0 0 12px}
+.q .stem code{font-family:"IBM Plex Mono",monospace;font-size:13px;background:var(--surface-2);padding:1px 5px;border-radius:4px}
+.opts{display:flex;flex-direction:column;gap:7px}
+.opt{appearance:none;text-align:left;font-family:inherit;font-size:13.5px;line-height:1.45;color:var(--ink);
+  background:var(--surface-2);border:1px solid transparent;border-radius:7px;padding:9px 12px;cursor:pointer;display:flex;gap:9px}
+.opt .ltr{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);flex:0 0 auto;padding-top:1px}
+.opt:hover:not(:disabled){border-color:var(--line-2)}
+.opt.right{background:var(--go-soft);color:var(--go);border-color:var(--go);font-weight:500}
+.opt.right .ltr{color:var(--go)}
+.opt.wrong{background:var(--stop-soft);color:var(--stop);border-color:var(--stop)}
+.opt.wrong .ltr{color:var(--stop)}
+.opt:disabled{cursor:default}
+.why{margin:12px 0 0;font-size:13px;line-height:1.65;color:var(--ink-2);border-left:2px solid var(--line-2);padding-left:12px}
+.misc{display:block;margin-top:10px;padding:9px 12px;border-radius:7px;background:var(--stop-soft);color:var(--stop);font-size:12.5px;line-height:1.6}
+.misc a{color:inherit;font-weight:600;white-space:nowrap}
+.why[hidden]{display:none}
+.tally{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.hint{font-size:12.5px;color:var(--muted);line-height:1.65;margin:10px 0 0}
+.locked{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;background:var(--go-soft);color:var(--go);padding:2px 7px;border-radius:4px;margin-left:8px}
+.pill-row{display:flex;gap:3px;background:var(--surface-2);border-radius:8px;padding:3px}
+.pill{flex:1;appearance:none;border:0;background:none;font-family:"IBM Plex Mono",monospace;font-size:12.5px;
+  font-weight:500;color:var(--muted);padding:7px 2px;border-radius:6px;cursor:pointer}
+.pill[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.pill:focus-visible{outline:2px solid var(--red-);outline-offset:1px}
+.pill-row.pw .pill{font-size:11.5px}
+/* nowrap + scroll: a formula broken across lines mid-term is harder to read
+   than one the reader has to nudge sideways.  Explicit <br> still breaks. */
+.eqbig{font-family:"IBM Plex Mono",monospace;font-size:13.5px;line-height:2.05;color:var(--ink);
+  background:var(--surface-2);border-radius:8px;padding:14px 15px;overflow-x:auto;white-space:nowrap}
+.eqbig small{color:var(--muted);font-size:11.5px;letter-spacing:.04em}
+/* one colour per loss term, used in prose, in the equations and in every picture */
+.act{color:var(--ox);font-weight:600}
+.cnc{color:var(--red-);font-weight:600}
+.ohm{color:var(--stop);font-weight:600}
+.pot{color:var(--go);font-weight:600}
+.mix{color:var(--ion-k);font-weight:600}
+.termtbl{border-collapse:collapse;width:100%;font-size:13px}
+.termtbl td,.termtbl th{padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+.termtbl th{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);font-weight:500;text-align:left}
+.termtbl td.num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;text-align:right}
+.termtbl tr.tot td{border-bottom:0;border-top:2px solid var(--line-2);font-weight:600}
+.sumwrap{overflow-x:auto}
+.sumtbl{border-collapse:collapse;width:100%;font-size:13px}
+.sumtbl td,.sumtbl th{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}
+.sumtbl th{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.sumtbl tr:last-child td{border-bottom:0}
+.sumtbl td.eq{font-family:"IBM Plex Mono",monospace;font-size:13.5px;color:var(--ink);white-space:nowrap}
+.sumtbl td.nm{color:var(--ink-2);white-space:nowrap;font-size:12.5px}
+.sumtbl td.sy{color:var(--muted);font-size:12.5px;line-height:1.5;white-space:normal}
+.symgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:4px 20px;font-size:12.5px;color:var(--ink-2);line-height:1.6}
+.symgrid b{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--ink)}
+.swatch{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px}
+.trio3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:stretch}
+.trio3>.card{display:flex;flex-direction:column}
+.trio3>.card>.card-b:last-child{flex:1 1 auto}
+@media(max-width:1000px){.trio3{grid-template-columns:1fr 1fr}}
+@media(max-width:720px){.trio3{grid-template-columns:1fr}}
+.two.eq{align-items:stretch}
+.two.wideL{grid-template-columns:minmax(330px,1.5fr) minmax(240px,1fr)}
+.two.eq>.card{display:flex;flex-direction:column}
+.two.eq>.card>.card-b:last-child{flex:1 1 auto}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap}
+.btnrow .ghost{flex:1 1 auto;text-align:center}
+.dfctl{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:14px 16px;align-items:end}
+.trio3 .dfctl{grid-template-columns:1fr}
+.dfctl-2{grid-template-columns:repeat(2,minmax(150px,1fr))}
+.dfctl-3{grid-template-columns:repeat(3,minmax(150px,1fr))}
+.dfctl-wide{grid-column:1 / -1}
+@media(max-width:820px){.dfctl{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.dfctl{grid-template-columns:1fr}}
+footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;line-height:1.8}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+.glegend{display:flex;flex-direction:column;gap:5px;font-size:12.5px;line-height:1.45;color:var(--ink-2)}
+.glegend.big{font-size:14.5px;line-height:1.5;gap:7px}
+.glegend.big > span > svg{flex:0 0 32px}
+.glegend > span{display:flex;align-items:flex-start;gap:8px}
+.glegend > span > svg{flex:0 0 26px;margin-top:3px}
+/* the loss waterfall: one row per term, number on the left of the bar */
+.wide1{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+.pairfig{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+.pairfig.eq{align-items:stretch}
+.pairfig.eq>.card{display:flex;flex-direction:column}
+.pairfig.eq>.card>.card-b:last-child{flex:1 1 auto}
+@media(max-width:880px){.pairfig{grid-template-columns:1fr}}
+/* terse notes, two to a row */
+.notes2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 22px}
+.notes2>p{margin:0}
+@media(max-width:760px){.notes2{grid-template-columns:1fr}}
+</style><style>
+.wrap{max-width:1480px}
+.trio3{grid-template-columns:minmax(230px,0.92fr) minmax(300px,1.34fr) minmax(300px,1.34fr)}
+@media(max-width:1180px){.trio3{grid-template-columns:minmax(230px,1fr) minmax(300px,1.4fr)}}
+@media(max-width:760px){.trio3{grid-template-columns:1fr}}
+/* two cards in one grid column, the lower one taking up the slack so
+   that the column ends level with the figure beside it */
+.colpair{display:flex;flex-direction:column;gap:16px}
+.colpair>.card{display:flex;flex-direction:column}
+.colpair>.card:last-child{flex:1 1 auto}
+.colpair>.card:last-child>.card-b:last-child{flex:1 1 auto}
+/* a bench row: one narrow column of controls down the left, and the
+   pictures beside it, two across. The widest thing on the screen is
+   always a picture rather than a row of sliders.                     */
+.bench{display:grid;grid-template-columns:minmax(252px,316px) minmax(0,1fr);gap:16px;align-items:start}
+.bench>.figs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:stretch}
+.bench>.figs>.card{display:flex;flex-direction:column}
+.bench>.figs>.card>.card-b:last-child{flex:1 1 auto}
+.bench>.ctl{display:flex;flex-direction:column;gap:16px}
+/* a narrow column: let the name of a reading wrap, never its value */
+.bench>.ctl .readout{gap:10px;padding:8px 0}
+.bench>.ctl .readout .k{font-size:12px;line-height:1.4}
+.bench>.ctl .readout .v{font-size:15px;text-align:right;min-width:0;overflow-wrap:anywhere}
+.bench>.ctl .slider-row .fld{line-height:1.4}
+.bench .wideF{grid-column:1 / -1}
+@media(max-width:1200px){.bench{grid-template-columns:minmax(236px,282px) minmax(0,1fr)}}
+@media(max-width:980px){.bench{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:700px){.bench>.figs{grid-template-columns:minmax(0,1fr)}}
+</style>
+
+</head>
+<body>
+  <div class="wrap">
+  <header class="masthead">
+    <div style="flex:1 1 380px">
+      <p class="eyebrow"><a href="index.html">CH40051 Electroanalytical Chemistry</a> &middot; Lecture 15 &middot; Pt catalysis and electrochemically active surface area</p>
+      <h1>ECSA Bench</h1>
+      <p class="sub">A catalyst&rsquo;s activity is a current divided by an area &mdash; and the area is the hard part. The geometric area is not it, the BET area is not it, and what you want is the number of atoms the electrolyte can actually reach. On platinum you can count them: one hydrogen adsorbs on each, one electron each, so a charge becomes an atom count and an atom count becomes square centimetres. Here is that voltammogram, built from the surface waves rather than traced, with the integral in your hands &mdash; then the same question asked with carbon monoxide, and then asked on a material that has nothing to adsorb at all.</p>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true"  aria-controls="p-cv"    id="t-cv">The Pt voltammogram</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-hupd"  id="t-hupd">H<sub>upd</sub> &amp; CO &rarr; ECSA</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-cap"   id="t-cap">Capacitance</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-probe" id="t-probe">Other metals</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-her"   id="t-her">HER &amp; the volcano</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-quiz1" id="t-quiz1">Concept Check 1</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-quiz2" id="t-quiz2">Concept Check 2</button>
+  </div>
+
+  <!-- ====================== 1 · THE Pt VOLTAMMOGRAM ====================== -->
+    <section class="panel" id="p-cv" role="tabpanel" aria-labelledby="t-cv">
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>Watch the surface, not the trace</h2>
+        <span class="note">polycrystalline Pt &middot; 1 M HClO<sub>4</sub> &middot; Ar &mdash; after W. Sheng, MIT 2010</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig" style="white-space:normal">
+          <span class="cnc">Pt&ndash;H<sub>upd</sub> &rlhar; Pt + H<sup>+</sup> + e<sup>&minus;</sup></span>
+          <small>below about 0.4 V every site carries a hydrogen atom; the anodic sweep takes them off, one electron each</small><br>
+          <span class="ohm">Pt + H<sub>2</sub>O &rlhar; Pt&ndash;OH<sub>ad</sub> + H<sup>+</sup> + e<sup>&minus;</sup></span>
+          <small>above about 0.8 V water is discharged onto those same sites, and the way back puts it on again as water</small><br>
+          <span class="act">and between them, nothing reacts at all</span>
+          <small>bare metal with a few spectator anions on it, and the only current is &upsilon;C<sub>dl</sub>A &mdash; the double layer</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="bench">
+      <div class="ctl">
+        <div class="card">
+          <div class="card-h"><h2>Drive the scan</h2></div>
+          <div class="card-b stack" style="gap:13px">
+            <div class="btnrow"><button class="ghost" id="cvRunBtn" type="button">Run the cycle &mdash; watch the surface fill and empty</button></div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">or walk it yourself</span><span class="val" id="cvPosv"></span></div>
+              <input type="range" id="cvPos" min="0" max="1.998" step="0.002" value="0">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">scan rate &upsilon;</span><span class="val" id="cvNuv"></span></div>
+              <input type="range" id="cvNu" min="-2.3" max="-0.7" step="0.01" value="-1.301">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">roughness factor</span><span class="val" id="cvRfv"></span></div>
+              <input type="range" id="cvRf" min="0" max="2.3" step="0.01" value="0.2553">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">upper limit E<sub>&lambda;</sub></span><span class="val" id="cvElamv"></span></div>
+              <input type="range" id="cvElam" min="0.70" max="1.55" step="0.01" value="1.20">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">lower limit</span><span class="val" id="cvElov"></span></div>
+              <input type="range" id="cvElo" min="0.00" max="0.15" step="0.005" value="0.05">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">double-layer capacitance</span><span class="val" id="cvCdlv"></span></div>
+              <input type="range" id="cvCdl" min="10" max="80" step="1" value="40">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">split between the two H<sub>upd</sub> peaks</span><span class="val" id="cvSplitv"></span></div>
+              <input type="range" id="cvSplit" min="0.2" max="0.7" step="0.01" value="0.45">
+            </div>
+            <div class="btnrow">
+              <button class="ghost" id="cvP1" type="button">a clean scan</button>
+              <button class="ghost" id="cvP2" type="button">swept too far anodic</button>
+              <button class="ghost" id="cvP3" type="button">into HER</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h2>Where the scan is</h2></div>
+          <div class="card-b stack" style="gap:12px">
+            <div class="readouts">
+              <div class="readout"><span class="k">potential now</span><span class="v" id="cvEnow">&mdash;</span></div>
+              <div class="readout"><span class="k">sweeping</span><span class="v" id="cvDirv">&mdash;</span></div>
+              <div class="readout"><span class="k">region</span><span class="v" id="cvRegv">&mdash;</span></div>
+              <div class="readout"><span class="k">current now</span><span class="v" id="cvInow">&mdash;</span></div>
+              <div class="readout"><span class="k">&theta; of H<sub>upd</sub></span><span class="v" id="cvThH">&mdash;</span></div>
+              <div class="readout"><span class="k">&theta; of OH<sub>ad</sub></span><span class="v" id="cvThOx">&mdash;</span></div>
+              <div class="readout"><span class="k">spectator anions</span><span class="v" id="cvThAn">&mdash;</span></div>
+              <div class="readout"><span class="k">real Pt area</span><span class="v" id="cvAreal">&mdash;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="figs">
+        <div class="card">
+          <div class="card-h"><h2>The voltammogram</h2>
+            <span class="note">the dot is the instant drawn beside it</span></div>
+          <div class="card-b">
+            <svg id="cvFig" viewBox="0 0 520 312" style="width:100%;height:auto" role="img"
+                 aria-label="A cyclic voltammogram of polycrystalline platinum in acid, with the hydrogen underpotential deposition region, the double layer region and the oxide region shaded and labelled, and a moving dot marking the potential and current of the instant drawn in the panel beside it."></svg>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h2>And the surface at that instant</h2>
+            <span class="note">one adsorbate per Pt site &mdash; that is the whole of the measurement</span></div>
+          <div class="card-b stack" style="gap:12px">
+            <svg id="cvSurf" viewBox="0 0 520 336" style="width:100%;height:auto" role="img"
+                 aria-label="A close-packed platinum surface drawn as rows of spheres. Depending on where the scan is, the topmost row carries a hydrogen atom on every site, or is bare with a few adsorbed anions on it, or carries adsorbed OH; arrows above the surface show the species leaving on the anodic sweep and arriving on the cathodic one."></svg>
+            <p class="hint" style="margin:0" id="cvNote">&mdash;</p>
+          </div>
+        </div>
+
+        <div class="card wideF">
+          <div class="card-h"><h2>One cycle, four things happening to one layer of atoms</h2>
+            <span class="note">and only the first of them counts the atoms</span></div>
+          <div class="card-b stack" style="gap:14px">
+            <div class="notes2">
+              <p class="hint"><b class="cnc">Up through 0.05 &rarr; 0.4 V: the hydrogen comes off.</b>
+                The surface starts saturated &mdash; one H per Pt, put there below 0.4 V at a potential
+                <i>above</i> where bulk H<sub>2</sub> would form, which is what <em>underpotential</em>
+                means. The sweep strips it in two waves because the weakly and the strongly bound sites
+                let go at different potentials. One electron leaves per atom, so the charge under this
+                region is an atom count and nothing else. <b>This is the only part of the cycle you can
+                turn into an area.</b></p>
+              <p class="hint"><b class="act">0.4 &rarr; 0.8 V: nothing reacts.</b> The metal is bare. A
+                few anions from the electrolyte sit on it as spectators, and the current is the double
+                layer charging alone &mdash; a flat box of &upsilon;C<sub>dl</sub>A that does not move
+                when you change the potential, only when you change the sweep rate. <b>That flat box is
+                the baseline every integration on this page depends on</b>, and it is the only place in
+                the cycle where you can honestly read it.</p>
+              <p class="hint"><b class="ohm">0.8 V and up: water is discharged onto the same sites.</b>
+                OH goes down where H used to be, and with enough potential and enough time it goes on to
+                PtO and deeper. <b>That is why the oxide charge is not an area:</b> the number of
+                electrons per surface atom depends on how far you swept and how long you waited, so
+                there is no constant to divide by. The further you go, the more the surface rearranges
+                when you strip it off again &mdash; the electrode you measure on the tenth cycle is
+                rougher than the one you started with.</p>
+              <p class="hint"><b>Back down: the same film, taken off in a different shape.</b>
+                The oxide comes off in one sharper peak near 0.78 V rather than over the broad range it
+                grew across, which is the signature of a reduction that only starts once it is driven;
+                then the bare double layer again, and then hydrogen re-adsorbing into the same two waves
+                it left from. <b>Q<sub>ads</sub> and Q<sub>des</sub> should agree</b>, and their average
+                is what the next tab divides by 210 &micro;C cm<sup>&minus;2</sup>.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ====================== 2 · Hupd INTO AN AREA ====================== -->
+  <section class="panel" id="p-hupd" role="tabpanel" aria-labelledby="t-hupd" hidden>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>One division, and three ways to get it wrong</h2>
+        <span class="note">the baseline, the window, and which constant you chose</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig" style="white-space:normal">
+          <span class="mix">Q<sub>H&ndash;upd</sub> = (Q<sub>ads</sub> + Q<sub>des</sub>)/2</span>&nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="act">Q = I&middot;s = I&middot;V / (V s<sup>&minus;1</sup>) = &int;i dE / &upsilon;</span>
+          <small>integrate the peak against E, divide by the scan rate, and the volts cancel into coulombs</small><br>
+          <span class="pot">ECSA (cm<sup>2</sup>) = Q<sub>H&ndash;upd</sub> / q*</span>&nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="cnc">roughness factor = ECSA / A<sub>geo</sub></span>
+          <small>q* = 210 µC cm<sup>&minus;2</sup> by convention, 197 if you use the average of the three faces</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="bench">
+      <div class="ctl">
+        <div class="card">
+        <div class="card-h"><h2>Integrate it yourself</h2></div>
+        <div class="card-b stack" style="gap:13px">
+        <div>
+        <div class="slider-row"><span class="fld" style="margin:0">scan rate &upsilon;</span><span class="val" id="huNuv"></span></div>
+        <input type="range" id="huNu" min="-2.3" max="-0.7" step="0.01" value="-1.301">
+        </div>
+        <div>
+        <div class="slider-row"><span class="fld" style="margin:0">roughness factor</span><span class="val" id="huRfv"></span></div>
+        <input type="range" id="huRf" min="0" max="2.3" step="0.01" value="0.2553">
+        </div>
+        <div>
+        <div class="slider-row"><span class="fld" style="margin:0">where you put the baseline</span><span class="val" id="huBasev"></span></div>
+        <input type="range" id="huBase" min="0.2" max="2.2" step="0.02" value="1">
+        </div>
+        <div>
+        <div class="slider-row"><span class="fld" style="margin:0">integrate from</span><span class="val" id="huLov"></span></div>
+        <input type="range" id="huLo" min="0.00" max="0.14" step="0.005" value="0.05">
+        </div>
+        <div>
+        <div class="slider-row"><span class="fld" style="margin:0">&hellip; up to</span><span class="val" id="huHiv"></span></div>
+        <input type="range" id="huHi" min="0.26" max="0.52" step="0.005" value="0.40">
+        </div>
+        <div>
+        <div class="slider-row"><span class="fld" style="margin:0">Pt loading</span><span class="val" id="huLoadv"></span></div>
+        <input type="range" id="huLoad" min="-3" max="-0.7" step="0.02" value="-1.699">
+        </div>
+        <div>
+        <label class="fld" for="huQ">the constant you divide by</label>
+        <div class="pill-row pw" id="huQ">
+        <button class="pill" type="button" data-s="210" aria-pressed="true">210 µC cm&#8315;&#178;</button>
+        <button class="pill" type="button" data-s="197" aria-pressed="false">197 µC cm&#8315;&#178;</button>
+        </div>
+        </div>
+        <div class="btnrow">
+        <button class="ghost" id="huP1" type="button">done properly</button>
+        <button class="ghost" id="huP2" type="button">baseline too low</button>
+        <button class="ghost" id="huP3" type="button">window into HER</button>
+        </div>
+        </div>
+        </div>
+        <div class="card">
+        <div class="card-h"><h2>What you get</h2></div>
+        <div class="card-b stack" style="gap:12px">
+        <div class="readouts">
+        <div class="readout"><span class="k">Q<sub>des</sub></span><span class="v" id="huQdes">&mdash;</span></div>
+        <div class="readout"><span class="k">Q<sub>ads</sub></span><span class="v" id="huQads">&mdash;</span></div>
+        <div class="readout"><span class="k">Q<sub>H&ndash;upd</sub>, the average</span><span class="v" id="huQavg">&mdash;</span></div>
+        <div class="readout"><span class="k">the monolayer really there</span><span class="v" id="huTrue">&mdash;</span></div>
+        <div class="readout"><span class="k">the window collects</span><span class="v" id="huCapt">&mdash;</span></div>
+        <div class="readout"><span class="k">so the answer is off by</span><span class="v" id="huErr">&mdash;</span></div>
+        <div class="readout"><span class="k">ECSA</span><span class="v" id="huEcsa">&mdash;</span></div>
+        <div class="readout"><span class="k">roughness factor</span><span class="v" id="huRfOut">&mdash;</span></div>
+        <div class="readout"><span class="k">area per gram of Pt</span><span class="v" id="huMass">&mdash;</span></div>
+        </div>
+        <p class="hint" style="margin:0" id="huNote">&mdash;</p>
+        </div>
+        </div>
+      </div>
+      <div class="figs">
+        <div class="card">
+        <div class="card-h"><h2>The area you are calling H<sub>upd</sub></h2>
+        <span class="note">shaded between the trace and your baseline</span></div>
+        <div class="card-b">
+        <svg id="huFig" viewBox="0 0 520 274" style="width:100%;height:auto" role="img"
+        aria-label="The hydrogen underpotential deposition region of the platinum voltammogram, with the chosen double-layer baseline drawn as a dashed line and the area between it and the anodic trace shaded: that shaded area is the charge being integrated."></svg>
+        </div>
+        </div>
+        <div class="card">
+        <div class="card-h"><h2>Charge against scan rate</h2>
+        <span class="note">over two decades of &upsilon;</span></div>
+        <div class="card-b">
+        <svg id="huFig2" viewBox="0 0 520 246" style="width:100%;height:auto" role="img"
+        aria-label="The integrated hydrogen charge and the peak current plotted against scan rate over two decades. The charge is flat while the peak current rises in proportion to the scan rate."></svg>
+        </div>
+        </div>
+        <div class="card wideF">
+        <div class="card-h"><h2>Why the number is quoted to two figures</h2></div>
+        <div class="card-b stack" style="gap:14px">
+        <p class="hint" style="margin:0"><b>The baseline is a guess, and it is the largest term you
+        control.</b> The double-layer line is read off 0.4&ndash;0.6 V, where the Pt is bare, and then
+        extended back under the H<sub>upd</sub> peaks, where it is covered in hydrogen &mdash; a
+        different surface with a different capacitance. Nothing in the trace tells you how different.
+        Drag the baseline across its range above and watch a number that looked like a measurement move
+        by tens of percent without the voltammogram changing shape at all.</p>
+        <p class="hint" style="margin:0"><b>The window loses charge at one end and invents it at the
+        other.</b> The weakly bound peak runs down under the negative limit, so a window that stops at
+        0.05 V never collects all of it &mdash; the readout above says how much. Push the limit down to
+        recover the tail and hydrogen evolution comes up to meet you, adding charge that was never on
+        the surface. <b>These two errors have opposite signs, which is why a sloppy integration can
+        look accurate</b>; they do not cancel reliably, and the one that wins depends on the catalyst.
+        Averaging Q<sub>ads</sub> and Q<sub>des</sub> helps, because HER contaminates the cathodic sweep
+        more than the anodic one.</p>
+        <p class="hint" style="margin:0"><b>And then there is the constant.</b> 210 and 197 µC cm<sup>&minus;2</sup>
+        differ by 6.6 %, and switching between them with the pills above changes every area reported
+        from this electrode by that much, with no new measurement and no indication in the data. The
+        deck's slide on the facet densities derives both; the supplement behind it shows that the same
+        slide also pairs 210 with the 2.04 nmol cm<sup>&minus;2</sup> that belongs to 197. <b>State which
+        constant you used.</b> Most of the disagreement between two papers on the same catalyst is
+        here, in these three choices, and not in the catalyst.</p>
+        </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>The same atoms, counted with carbon monoxide instead</h2>
+        <span class="note">a second count is the only check the first one has</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <p class="hint" style="margin:0">Everything above divides a charge by a charge per
+          square centimetre, and every one of the ways it goes wrong &mdash; a baseline that is a
+          guess, a window that clips the monolayer, a constant that is a convention &mdash; leaves
+          the voltammogram looking exactly the same. <b>The only way to catch it is to count the
+          same atoms a second time by a different route.</b> CO is that route: one monolayer you
+          put there on purpose, oxidised off in one sharp peak that sits by itself. Where the two
+          counts agree, both assumptions held; where they disagree, one of them broke, and the
+          first thing to check is whether H<sub>upd</sub> was fully suppressed in the first cycle.</p>
+      </div>
+    </div>
+
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>A monolayer you put there on purpose</h2>
+        <span class="note">and two electrons for every molecule of it</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig" style="white-space:normal">
+          <span class="act">CO + H<sub>2</sub>O &rarr; CO<sub>2</sub> + 2H<sup>+</sup> + 2e<sup>&minus;</sup></span>&nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="pot">ECSA = Q<sub>CO</sub> / (2 &times; 210 µC cm<sup>&minus;2</sup>)</span>
+          <small>two electrons per CO, so one CO on every Pt atom strips at 420 µC cm<sup>&minus;2</sup></small><br>
+          <span class="mix">bridged CO: one molecule, two sites</span>&nbsp;&nbsp;&rarr;&nbsp;&nbsp;
+          <span class="ohm">Q = 420(1 &minus; x/2) µC cm<sup>&minus;2</sup></span>
+          <small>x is the fraction of sites bridged, and no part of the voltammogram tells you what it is</small>
+        </div>
+        <p class="hint" style="margin:0"><b>Q<sub>CO</sub> is the <em>difference</em> between the two cycles.</b> The first scan grows Pt oxide over the same window as the CO peak &mdash; here that is tens of microcoulombs, comparable with the strip itself. Subtracting the second, CO-free cycle cancels the oxide and the double layer exactly and leaves only the CO. Integrating the first cycle on its own against a flat baseline overstates the area by a quarter.</p>
+      </div>
+    </div>
+
+    <div class="bench">
+      <div class="ctl">
+        <div class="card">
+        <div class="card-h"><h2>Strip the layer</h2></div>
+        <div class="card-b stack" style="gap:13px">
+        <div>
+        <div class="slider-row"><span class="fld" style="margin:0">scan rate &upsilon;</span><span class="val" id="csNuv"></span></div>
+        <input type="range" id="csNu" min="-2.3" max="-1.0" step="0.01" value="-1.699">
+        </div>
+        <div>
+        <div class="slider-row"><span class="fld" style="margin:0">roughness factor</span><span class="val" id="csRfv"></span></div>
+        <input type="range" id="csRf" min="0" max="2.3" step="0.01" value="0.2553">
+        </div>
+        <div>
+        <div class="slider-row"><span class="fld" style="margin:0">sites carrying <b>bridged</b> CO</span><span class="val" id="csBridgev"></span></div>
+        <input type="range" id="csBridge" min="0" max="1" step="0.01" value="0">
+        </div>
+        <div class="btnrow">
+        <button class="ghost" id="csP1" type="button">all atop</button>
+        <button class="ghost" id="csP2" type="button">half bridged</button>
+        <button class="ghost" id="csP3" type="button">all bridged</button>
+        </div>
+        <div class="readouts">
+        <div class="readout"><span class="k">CO per Pt site</span><span class="v" id="csNco">&mdash;</span></div>
+        <div class="readout"><span class="k">Q<sub>CO</sub></span><span class="v" id="csQco">&mdash;</span></div>
+        <div class="readout"><span class="k">per cm² of real Pt</span><span class="v" id="csQspec">&mdash;</span></div>
+        <div class="readout"><span class="k">ECSA from CO / 420</span><span class="v" id="csEcsaCO">&mdash;</span></div>
+        <div class="readout"><span class="k">ECSA from H<sub>upd</sub></span><span class="v" id="csEcsaH">&mdash;</span></div>
+        <div class="readout"><span class="k">the real area</span><span class="v" id="csTrue">&mdash;</span></div>
+        <div class="readout"><span class="k">CO answer / truth</span><span class="v" id="csRatio">&mdash;</span></div>
+        </div>
+        </div>
+        </div>
+      </div>
+      <div class="figs">
+        <div class="card">
+        <div class="card-h"><h2>First cycle, then the clean one</h2>
+        <span class="note">grey is the CO-free scan behind it</span></div>
+        <div class="card-b stack" style="gap:12px">
+        <svg id="csFig" viewBox="0 0 520 300" style="width:100%;height:auto" role="img"
+        aria-label="The first anodic scan of a carbon monoxide covered platinum electrode, showing a sharp CO oxidation peak near 0.76 volts and no hydrogen underpotential deposition, drawn over the clean platinum voltammogram in grey."></svg>
+        <p class="hint" style="margin:0" id="csNote">&mdash;</p>
+        </div>
+        </div>
+        <div class="card">
+        <div class="card-h"><h2>What CO buys, and what it costs</h2></div>
+        <div class="card-b stack" style="gap:14px">
+        <p class="hint" style="margin:0"><b>What it buys is a clean integral.</b> The CO oxidation peak
+        sits by itself in the double-layer region with nothing underneath it &mdash; no overlapping
+        second peak, no HER running under one end, and a baseline that is genuinely flat on both sides.
+        Compare that with the H<sub>upd</sub> tab, where the baseline choice alone moved the answer by
+        tens of percent. CO also works on alloys and on supported nanoparticles where H<sub>upd</sub> is
+        distorted or absent, and the suppression of H<sub>upd</sub> in the first cycle is itself the
+        check that the layer was complete.</p>
+        <p class="hint" style="margin:0"><b>What it costs is that you no longer know what you counted.</b>
+        H<sub>upd</sub> counts Pt atoms: one hydrogen on each, one electron each, and the only constant
+        you need is how many atoms fit in a cm<sup>2</sup>. CO counts <em>molecules</em>, and how many
+        molecules fit on an atom is the question. Atop CO is one per Pt and strips at 420 µC
+        cm<sup>&minus;2</sup>; bridged CO is one per two Pt and strips at 210. Divide by 420 regardless
+        and the slider above shows the result: <b>the reported area falls linearly to exactly half the
+        truth as the layer goes from all atop to all bridged</b>, following 1 &minus; x/2. It is an
+        underestimate, never an overestimate, because bridging can only remove molecules.</p>
+        <p class="hint" style="margin:0"><b>So use both, and treat the gap as the error bar.</b> The two
+        methods rest on different assumptions &mdash; H<sub>upd</sub> on a baseline you drew, CO on a
+        binding geometry you assumed &mdash; and they fail in different directions, so agreement between
+        them is real evidence and disagreement tells you which assumption broke. On clean
+        polycrystalline Pt they typically land within 10 %. <b>A paper that reports one without the
+        other is reporting a number with no way to check it</b>, which is why the better catalysis
+        papers show the CO strip and the H<sub>upd</sub> scan on the same axes.</p>
+        </div>
+        </div>
+      </div>
+    </div>
+</section>
+
+  <!-- ====================== 3 · CO STRIPPING ====================== -->
+  
+
+  <!-- ====================== 4 · CAPACITANCE ====================== -->
+  <section class="panel" id="p-cap" role="tabpanel" aria-labelledby="t-cap" hidden>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>When there is nothing to adsorb, measure the double layer</h2>
+        <span class="note">everything that is not Pt</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig" style="white-space:normal">
+          <span class="act">i<sub>c</sub> = &upsilon;C<sub>dl</sub></span>&nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="cnc">cf. i<sub>p</sub> = (2.69&times;10<sup>5</sup>)n<sup>3/2</sup>AD<sup>1/2</sup>C*&upsilon;<sup>1/2</sup></span>
+          <small>&upsilon; and not &radic;&upsilon; &mdash; the slope of i against &upsilon; is the whole measurement</small><br>
+          <span class="pot">ECSA = C<sub>dl</sub> / C<sub>s</sub></span>
+          <small>C<sub>s</sub> is the capacitance of one cm<sup>2</sup> of the same material, atomically flat, in the same electrolyte</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="bench">
+      <div class="ctl">
+        <div class="card">
+        <div class="card-h"><h2>Sweep a featureless window</h2></div>
+        <div class="card-b stack" style="gap:13px">
+        <div>
+        <div class="slider-row"><span class="fld" style="margin:0">the sample's C<sub>dl</sub> per real cm²</span><span class="val" id="cpCdlv"></span></div>
+        <input type="range" id="cpCdl" min="10" max="80" step="1" value="35">
+        </div>
+        <div>
+        <div class="slider-row"><span class="fld" style="margin:0">the C<sub>s</sub> you looked up</span><span class="val" id="cpCsv"></span></div>
+        <input type="range" id="cpCs" min="10" max="80" step="1" value="35">
+        </div>
+        <div>
+        <div class="slider-row"><span class="fld" style="margin:0">roughness factor</span><span class="val" id="cpRfv"></span></div>
+        <input type="range" id="cpRf" min="0" max="2.3" step="0.01" value="1.0792">
+        </div>
+        <div class="btnrow">
+        <button class="ghost" id="cpP1" type="button">C<sub>s</sub> exactly right</button>
+        <button class="ghost" id="cpP2" type="button">C<sub>s</sub> from the wrong paper</button>
+        </div>
+        <div class="readouts">
+        <div class="readout"><span class="k">measured C<sub>dl</sub></span><span class="v" id="cpC">&mdash;</span></div>
+        <div class="readout"><span class="k">ECSA = C<sub>dl</sub>/C<sub>s</sub></span><span class="v" id="cpEcsa">&mdash;</span></div>
+        <div class="readout"><span class="k">the real area</span><span class="v" id="cpTrue">&mdash;</span></div>
+        <div class="readout"><span class="k">roughness factor reported</span><span class="v" id="cpRfOut">&mdash;</span></div>
+        </div>
+        </div>
+        </div>
+      </div>
+      <div class="figs">
+        <div class="card">
+        <div class="card-h"><h2>Rectangles, one per scan rate</h2>
+        <span class="note">a capacitive electrode has no peaks at all</span></div>
+        <div class="card-b stack" style="gap:12px">
+        <svg id="cpFig" viewBox="0 0 520 252" style="width:100%;height:auto" role="img"
+        aria-label="Six rectangular cyclic voltammograms of a purely capacitive electrode, one for each scan rate, with a dashed vertical line marking the potential at which the current is read."></svg>
+        </div>
+        </div>
+        <div class="card">
+        <div class="card-h"><h2>And the slope that gives C<sub>dl</sub></h2>
+        <span class="note">read at the dashed line beside it</span></div>
+        <div class="card-b stack" style="gap:12px">
+        <svg id="cpFig2" viewBox="0 0 520 246" style="width:100%;height:auto" role="img"
+        aria-label="The capacitive current read at that potential plotted against scan rate: a straight line through the origin whose slope is the double layer capacitance."></svg>
+        <p class="hint" style="margin:0" id="cpNote">&mdash;</p>
+        </div>
+        </div>
+        <div class="card wideF">
+        <div class="card-h"><h2>The three methods, side by side</h2>
+        <span class="note">what each one counts, and what it has to assume</span></div>
+        <div class="card-b stack" style="gap:14px">
+        <div class="sumwrap">
+        <table class="sumtbl">
+        <tr><th>method</th><th>what it counts</th><th>the constant</th><th>what it assumes</th><th>how it fails</th></tr>
+        <tr><td class="nm"><b>H<sub>upd</sub></b></td><td class="sy">one H per Pt surface atom</td>
+        <td class="sy">210 µC cm<sup>&minus;2</sup> (197 as an average)</td>
+        <td class="sy">that you can draw the double-layer baseline under the peaks</td>
+        <td class="sy">either sign: the clipped tail loses charge, HER adds it</td></tr>
+        <tr><td class="nm"><b>CO stripping</b></td><td class="sy">CO molecules, 2e<sup>&minus;</sup> each</td>
+        <td class="sy">420 µC cm<sup>&minus;2</sup></td>
+        <td class="sy">that every CO sits atop a single Pt</td>
+        <td class="sy">one sign only: bridging reports 1&minus;x/2 of the truth, to half</td></tr>
+        <tr><td class="nm"><b>Capacitance</b></td><td class="sy">nothing &mdash; it measures the interface</td>
+        <td class="sy">C<sub>s</sub>, 20&ndash;60 µF cm<sup>&minus;2</sup></td>
+        <td class="sy">that a flat sample of the same material has the C<sub>s</sub> you looked up</td>
+        <td class="sy">either sign, and in proportion: the area is C<sub>dl</sub>/C<sub>s</sub></td></tr>
+        </table>
+        </div>
+        <p class="hint" style="margin:0"><b>Only the first two count something.</b> H<sub>upd</sub> and CO
+        stripping both end in a number of atoms: a charge, divided by the charge one atom is worth, and
+        the divisor comes from a lattice constant you can look up and check. Capacitance counts nothing.
+        It compares your interface with somebody else's flat one, and C<sub>s</sub> for the same
+        material spans 20 to 60 µF cm<sup>&minus;2</sup> across the literature &mdash; <b>a factor of
+        three sitting in the denominator of every area that rests on it</b>. That is why it is the
+        method of last resort, used where there is no adsorbate to count: oxides, carbides, sulfides,
+        carbons. Report it as a <i>relative</i> area between samples you measured the same way, where
+        C<sub>s</sub> cancels, and the method is sound again.</p>
+        <p class="hint" style="margin:0"><b>And none of the three is the geometric area.</b> That is the
+        point of the whole lecture: a 5 mm disc has A<sub>geo</sub> = 0.196 cm², and the roughness
+        factor above says how many times more Pt than that the electrolyte can actually reach. Divide a
+        current by A<sub>geo</sub> and you get a number that depends on how rough your electrode happened
+        to be; divide by the ECSA and you get a specific activity that can be compared with somebody
+        else's. Divide instead by the mass of Pt and you get the mass activity, which is what decides
+        how much platinum a stack needs &mdash; <b>i<sub>m</sub> &prop; i<sub>s</sub> &times; A<sub>Pt,ECSA</sub></b>,
+        so the dispersion is what links the two.</p>
+        </div>
+        </div>
+      </div>
+    </div>
+</section>
+
+
+  <!-- ====================== OTHER METALS, OTHER MONOLAYERS ============== -->
+  <section class="panel" id="p-probe" role="tabpanel" aria-labelledby="t-probe" hidden>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>H<sub>upd</sub> counts hydrogen on platinum. Most catalysts are not platinum.</h2>
+        <span class="note">what to count instead, and how far the answers spread</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig" style="white-space:normal">
+          <span class="act">ECSA = Q / q<sub>mono</sub></span>
+          <small>every method on this page is this one division &mdash; the argument is only ever about the divisor</small><br>
+          <span class="pot">q<sub>mono</sub> = n F &Gamma;<sub>sites</sub></span>
+          <small>an electron count times a site density. Change what you adsorb and you change both:
+            one H per Pt at one electron is 210 µC cm<sup>&minus;2</sup>; one Cu per Pt at two is 420</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="bench">
+      <div class="ctl">
+        <div class="card">
+          <div class="card-h"><h2>One sample, four probes</h2></div>
+          <div class="card-b stack" style="gap:13px">
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">the sample's true roughness</span><span class="val" id="pbRfv"></span></div>
+              <input type="range" id="pbRf" min="0" max="2.3" step="0.01" value="1.0792">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">H<sub>upd</sub>: where you drew the baseline</span><span class="val" id="pbHv"></span></div>
+              <input type="range" id="pbH" min="-20" max="20" step="0.5" value="0">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">CO: fraction sitting bridged</span><span class="val" id="pbXv"></span></div>
+              <input type="range" id="pbX" min="0" max="1" step="0.01" value="0">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">Cu UPD: monolayer actually laid down</span><span class="val" id="pbCuv"></span></div>
+              <input type="range" id="pbCu" min="0.8" max="1" step="0.005" value="1">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">capacitance: the C<sub>s</sub> you looked up</span><span class="val" id="pbCsv"></span></div>
+              <input type="range" id="pbCs" min="10" max="80" step="1" value="35">
+            </div>
+            <div class="btnrow">
+              <button class="ghost" id="pbP1" type="button">all four done right</button>
+              <button class="ghost" id="pbP2" type="button">the usual mistakes</button>
+            </div>
+            <div class="readouts">
+              <div class="readout"><span class="k">the real area</span><span class="v" id="pbTrue">&mdash;</span></div>
+              <div class="readout"><span class="k">H<sub>upd</sub> reports</span><span class="v" id="pbQh">&mdash;</span></div>
+              <div class="readout"><span class="k">CO stripping reports</span><span class="v" id="pbQco">&mdash;</span></div>
+              <div class="readout"><span class="k">Cu UPD reports</span><span class="v" id="pbQcu">&mdash;</span></div>
+              <div class="readout"><span class="k">capacitance reports</span><span class="v" id="pbQcs">&mdash;</span></div>
+              <div class="readout"><span class="k">widest disagreement</span><span class="v" id="pbSpread">&mdash;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="figs">
+        <div class="card">
+          <div class="card-h"><h2>The same sample, seen by four monolayers</h2>
+            <span class="note">the dashed line is the area that is actually there</span></div>
+          <div class="card-b stack" style="gap:12px">
+            <svg id="pbFig" viewBox="0 0 520 268" style="width:100%;height:auto" role="img"
+                 aria-label="Four horizontal bars, one per probe, showing the roughness factor each one reports for the same sample, against a dashed vertical line at the true value. Each bar carries the percentage by which that probe is out."></svg>
+            <p class="hint" style="margin:0"><b>Only disagreement is informative.</b> Each probe is
+              one division, so each error passes straight through to the area &mdash; none of them is
+              a fit that could average a mistake away. What you can do is count twice with two
+              different atoms: the errors above are unrelated to one another, so two probes that land
+              on the same number are evidence, and two that do not tell you which assumption broke.</p>
+          </div>
+        </div>
+        <div class="card wideF">
+          <div class="card-h"><h2>What you would report</h2></div>
+          <div class="card-b"><div class="verdict" id="pbVerdict">&mdash;</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wide1" style="margin-bottom:16px">
+      <div class="card">
+        <div class="card-h"><h2>Which monolayer, on which metal</h2>
+          <span class="note">the divisor, and what buying it costs you</span></div>
+        <div class="card-b scrollx">
+          <table class="sumtbl">
+            <tr><th>metal</th><th>what you count</th><th>q<sub>mono</sub></th><th>what it assumes, and how it breaks</th></tr>
+            <tr><td class="nm">Pt, Pt skins</td><td class="sy">H<sub>upd</sub>, 1 e<sup>&minus;</sup></td>
+              <td class="sy">210 µC cm<sup>&minus;2</sup></td>
+              <td class="sy">one H per surface Pt. The baseline under the peaks is a judgement, and on alloys the H binds too weakly to fill the layer at all.</td></tr>
+            <tr><td class="nm">Pt, Ru, PtRu</td><td class="sy">CO stripping, 2 e<sup>&minus;</sup></td>
+              <td class="sy">420 µC cm<sup>&minus;2</sup></td>
+              <td class="sy">every CO atop a single atom. Bridged CO removes molecules, so it reports 1&minus;x/2 of the truth &mdash; one sign only, down to half.</td></tr>
+            <tr><td class="nm">Pt, Au, Pd, Ru</td><td class="sy"><b>Cu UPD</b>, 2 e<sup>&minus;</sup></td>
+              <td class="sy">420 µC cm<sup>&minus;2</sup><br>(410 is also used on polycrystalline Pt)</td>
+              <td class="sy">one Cu per site. The standard cross-check for platinum, and the one method that separates the Pt from the Ru in PtRu. An incomplete layer under-reports in proportion.</td></tr>
+            <tr><td class="nm">Au</td><td class="sy">oxide reduction, 1 O per Au</td>
+              <td class="sy">386 µC cm<sup>&minus;2</sup></td>
+              <td class="sy">a convention, not a constant: 400 and 482 µC cm<sup>&minus;2</sup> are both in print for the same layer.</td></tr>
+            <tr><td class="nm">Au</td><td class="sy">Pb UPD</td>
+              <td class="sy">&asymp; 290 µC cm<sup>&minus;2</sup></td>
+              <td class="sy">a second adsorbate for the same surface, which is the point of running it.</td></tr>
+            <tr><td class="nm">Cu &mdash; CO<sub>2</sub> reduction</td><td class="sy">Pb UPD, 2 e<sup>&minus;</sup></td>
+              <td class="sy">&asymp; 310 µC cm<sup>&minus;2</sup></td>
+              <td class="sy">Cu and Pb alloy irreversibly while the layer is down, so the number describes the surface the measurement left behind, not the one you started with.</td></tr>
+            <tr><td class="nm">oxides, carbides, carbons</td><td class="sy">nothing &mdash; the interface itself</td>
+              <td class="sy">C<sub>s</sub> = 20&ndash;60 µF cm<sup>&minus;2</sup></td>
+              <td class="sy">that a flat sample of your material has the C<sub>s</sub> you looked up. Relative areas only.</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="wide1">
+      <div class="card">
+        <div class="card-h"><h2>What the last few years settled</h2>
+          <span class="note">four results worth knowing before you quote an area</span></div>
+        <div class="card-b stack" style="gap:14px">
+          <p class="hint" style="margin:0"><b>1 &middot; Two monolayers that agree are the measurement; one on its own is a number.</b>
+            A 2025 study replaced the usual sweep with a <em>potential-holding</em> step and then compared
+            two independent probes on the same platinum: the roughness factor came back as
+            <b>1.93 from H<sub>upd</sub> and 1.97 from Cu UPD</b>, two per cent apart. Nothing links
+            those two errors &mdash; one is a baseline drawn under hydrogen peaks, the other is a
+            copper layer plated on and stripped off &mdash; so their agreement is the evidence.
+            This is why Cu UPD is worth the extra experiment even on a metal where H<sub>upd</sub>
+            already works.</p>
+          <p class="hint" style="margin:0"><b>2 &middot; Capacitance is worse than the slope makes it look.</b>
+            ECSA = C<sub>dl</sub>/C<sub>s</sub> is a division, so the whole uncertainty in
+            C<sub>s</sub> lands on the area: a perspective on oxygen evolution puts the error from a
+            mis-taken C<sub>s</sub> at up to a <b>factor of 10<sup>3</sup></b> once it is carried into
+            a per-site turnover. And for poorly conducting nickel oxides and hydroxides the
+            &ldquo;non-Faradaic&rdquo; window is not capacitive in the first place, so the
+            C<sub>dl</sub> a CV returns is not a measurement of the interface at all. Used as a
+            <em>relative</em> area between samples you prepared and measured the same way, where
+            C<sub>s</sub> cancels, it is sound; used as an absolute area it is an order of magnitude.</p>
+          <p class="hint" style="margin:0"><b>3 &middot; There is no single ECSA: the area depends on the reaction.</b>
+            Which atoms count as active depends on what you are asking them to do and at what
+            potential &mdash; a site that adsorbs hydrogen is not automatically a site that evolves
+            oxygen. So the same electrode has more than one honest area, and an area quoted without
+            its probe is not reproducible. Report the probe, the constant and the electrolyte
+            <em>with</em> the cm², and when you compare two papers, check they counted the same
+            thing before you believe the difference.</p>
+          <p class="hint" style="margin:0"><b>4 &middot; One particle at a time: scanning electrochemical cell microscopy.</b>
+            Every number on this page is an average over an electrode. SECCM instead lands a droplet
+            a few hundred nanometres across on <em>one</em> particle and measures only that, then
+            normalises it by the area the droplet actually wetted &mdash; taken from the capacitive
+            current inside the droplet, or from a freely diffusing redox couple carried along as an
+            internal standard. On an Fe&ndash;N&ndash;C oxygen-reduction catalyst that separation
+            mattered: agglomerates of very different size gave the <em>same</em> current density once
+            each was divided by its own ECSA, which an ensemble measurement would have reported as a
+            difference in intrinsic activity.</p>
+          <p class="hint" style="margin:0;color:var(--muted)"><b>Sources.</b>
+            Potential holding and the H<sub>upd</sub>/Cu-UPD comparison: <i>Electrochimica Acta</i> (2025),
+            <a href="https://www.sciencedirect.com/science/article/pii/S0013468625016068">S0013468625016068</a> &middot;
+            the C<sub>dl</sub> critique: <a href="https://www.sciencedirect.com/science/article/abs/pii/S2468606923000151">Mater. Today Energy perspective</a>
+            and <a href="https://doi.org/10.3390/ma17030556">Materials <b>17</b>, 556</a> &middot;
+            seven steps to a reliable C<sub>dl</sub>: <a href="https://iopscience.iop.org/article/10.1088/2515-7655/abee33">J. Phys. Energy <b>3</b>, 032010</a> &middot;
+            Cu UPD on gold: <a href="https://www.mdpi.com/2079-6412/2/2/20">Surfaces <b>2</b>, 20</a> &middot;
+            Pb UPD on copper and the surface alloying: <a href="https://pubs.acs.org/doi/10.1021/acs.chemrev.8b00705">Chem. Rev. <b>119</b>, 7610</a> &middot;
+            SECCM on Fe&ndash;N&ndash;C: <a href="https://chemistry-europe.onlinelibrary.wiley.com/doi/10.1002/celc.202201095">ChemElectroChem (2023)</a>,
+            and the wetted-area standard: <a href="https://onlinelibrary.wiley.com/doi/full/10.1002/anie.201908021">Angew. Chem. <b>58</b>, 14265</a>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 5 - HER AND THE VOLCANO ==================== -->
+  <section class="panel" id="p-her" role="tabpanel" aria-labelledby="t-her" hidden>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>What the area was for: a current per site, and the step that sets it</h2>
+        <span class="note">looking ahead to Lecture 16 &middot; HER on a metal surface</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig" style="white-space:normal">
+          <span class="cnc">Volmer: H<sup>+</sup> + e<sup>&minus;</sup> &rarr; H<sub>ad</sub></span>
+          &nbsp;(alkaline: H<sub>2</sub>O + e<sup>&minus;</sup> &rarr; H<sub>ad</sub> + OH<sup>&minus;</sup>)
+          <small>the discharge every route has to go through first &mdash; and the atom the last tab counted</small><br>
+          <span class="act">Heyrovsky: H<sub>ad</sub> + H<sup>+</sup> + e<sup>&minus;</sup> &rarr; H<sub>2</sub></span>&nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="mix">Tafel: H<sub>ad</sub> + H<sub>ad</sub> &rarr; H<sub>2</sub></span>
+          <small>two ways to finish: one more electron on an occupied site, or two occupied sites meeting</small><br>
+          <span class="pot">b = &part;&eta; / &part;log|j|</span>
+          <small>and the slope of the Tafel line names which of the three is holding everything up &mdash; if you read it honestly</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="bench">
+      <div class="ctl">
+        <div class="card">
+          <div class="card-h"><h2>Pick the step and the metal</h2></div>
+          <div class="card-b stack" style="gap:13px">
+            <div>
+              <label class="fld" for="heRds">which step is rate-determining</label>
+              <div class="pill-row pw" id="heRds">
+                <button class="pill" type="button" data-s="V" aria-pressed="true">Volmer</button>
+                <button class="pill" type="button" data-s="H" aria-pressed="false">Heyrovsky</button>
+                <button class="pill" type="button" data-s="T" aria-pressed="false">Tafel</button>
+              </div>
+            </div>
+            <div>
+              <label class="fld" for="hePh">electrolyte</label>
+              <div class="pill-row pw" id="hePh">
+                <button class="pill" type="button" data-s="acid" aria-pressed="true">acid</button>
+                <button class="pill" type="button" data-s="base" aria-pressed="false">alkaline</button>
+              </div>
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">&Delta;G<sub>H</sub> &mdash; how hard it holds H</span><span class="val" id="heDGv"></span></div>
+              <input type="range" id="heDG" min="-0.65" max="0.65" step="0.01" value="-0.09">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">transfer coefficient &alpha;</span><span class="val" id="heAlv"></span></div>
+              <input type="range" id="heAl" min="0.25" max="0.75" step="0.01" value="0.5">
+            </div>
+            <div class="btnrow">
+              <button class="ghost" id="heP1" type="button">Pt in acid</button>
+              <button class="ghost" id="heP2" type="button">Ni in alkali</button>
+              <button class="ghost" id="heP3" type="button">Au &mdash; binds too weakly</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h2>What that gives you</h2></div>
+          <div class="card-b stack" style="gap:12px">
+            <div class="readouts">
+              <div class="readout"><span class="k">nearest metal</span><span class="v" id="heMetal">&mdash;</span></div>
+              <div class="readout"><span class="k">j<sub>0</sub> per real cm&sup2;</span><span class="v" id="heJ0">&mdash;</span></div>
+              <div class="readout"><span class="k">&theta;<sub>H</sub> at 10 mA cm<sup>&minus;2</sup></span><span class="v" id="heTh">&mdash;</span></div>
+              <div class="readout"><span class="k">Tafel slope there</span><span class="v" id="heB">&mdash;</span></div>
+              <div class="readout"><span class="k">&eta; at 10 mA cm<sup>&minus;2</sup></span><span class="v" id="heEta">&mdash;</span></div>
+              <div class="readout"><span class="k">slope at &eta; &rarr; 0</span><span class="v" id="heB0">&mdash;</span></div>
+            </div>
+            <p class="hint" style="margin:0" id="heNote">&mdash;</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="figs">
+        <div class="card">
+          <div class="card-h"><h2>The Tafel plot</h2>
+            <span class="note">&eta; against log|j|, per <b>real</b> area</span></div>
+          <div class="card-b">
+            <svg id="heTafel" viewBox="0 0 520 300" style="width:100%;height:auto" role="img"
+                 aria-label="Overpotential against the logarithm of current density for hydrogen evolution. The line is straight where the coverage is not changing and bends where it is; a tangent is drawn at ten milliamps per square centimetre and its slope in millivolts per decade is written beside it."></svg>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h2>and the coverage underneath it</h2>
+            <span class="note">why the same step can give two slopes</span></div>
+          <div class="card-b">
+            <svg id="heCov" viewBox="0 0 520 300" style="width:100%;height:auto" role="img"
+                 aria-label="The coverage of adsorbed hydrogen against overpotential, rising from near zero to saturation, with the region where the surface is nearly full shaded and the slope the Tafel plot shows in each region written on it."></svg>
+          </div>
+        </div>
+
+        <div class="card wideF">
+          <div class="card-h"><h2>The volcano &mdash; Sabatier with a number on it</h2>
+            <span class="note">j<sub>0</sub> against the one descriptor, after Trasatti 1972 and N&oslash;rskov 2005</span></div>
+          <div class="card-b stack" style="gap:12px">
+            <svg id="heVolc" viewBox="0 0 1040 290" style="width:100%;height:auto" role="img"
+                 aria-label="The exchange current density for hydrogen evolution plotted against the free energy of hydrogen adsorption, forming a volcano with its maximum at zero. Metals are marked along it, with the strong binding ones on the left leg, the weak binding ones on the right, and platinum at the top."></svg>
+            <div class="notes2">
+              <p class="hint"><b class="cnc">The left leg binds too strongly.</b> The surface fills with
+                H and stays full. There is no free site for a Tafel recombination and no empty neighbour
+                for a Heyrovsky step, so whichever finishes the reaction becomes the bottleneck and the
+                current stops responding to potential. Watch &theta;<sub>H</sub> pin at 100 % as you drag
+                &Delta;G<sub>H</sub> left, and watch the slope run away with it.</p>
+              <p class="hint"><b class="act">The right leg binds too weakly.</b> There is almost no
+                adsorbed H to react, so the discharge itself &mdash; the Volmer step &mdash; is what is
+                slow, and j<sub>0</sub> falls off a cliff. Gold and silver sit here; they are not bad
+                metals, they are metals that will not hold the intermediate.</p>
+              <p class="hint"><b>The top is &Delta;G<sub>H</sub> &asymp; 0.</b> Enough coverage to react
+                and a weak enough bond to let go. Pt, Ir and Rh sit within 0.1 eV of it, and that is the
+                whole of why Pt is the catalyst this lecture has been measuring the area of.</p>
+              <p class="hint"><b>Where the descriptor comes from.</b> H(1s) mixes with the metal d band
+                into a bonding and an antibonding level; the more of the antibonding level that sits
+                below E<sub>F</sub> and is filled, the weaker the bond. One number, computed, predicting
+                an electrochemical rate &mdash; which is why the plot is drawn this way round at all.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card wideF">
+          <div class="card-h"><h2>Reading a Tafel slope without fooling yourself</h2>
+            <span class="note">three corrections, and one ambiguity that no correction removes</span></div>
+          <div class="card-b stack" style="gap:14px">
+            <div class="notes2">
+              <p class="hint"><b>120 mV/dec does not name one step.</b> 2.303RT/&alpha;F is the Volmer
+                answer at &alpha; = 0.5 &mdash; and it is also the Heyrovsky answer once
+                &theta;<sub>H</sub> has saturated, because a coverage that can no longer rise stops
+                contributing to the potential dependence. Switch the rds pills with &Delta;G<sub>H</sub>
+                held strongly negative and watch two different mechanisms give the same number. <b>The
+                slope has to be argued together with a coverage</b>, and the coverage is what the
+                H<sub>upd</sub> tab measures.</p>
+              <p class="hint"><b class="ohm">Subtract iR<sub>u</sub> first.</b> A Tafel plot that curves
+                upward at high current is uncompensated resistance far more often than it is a change of
+                mechanism &mdash; the same R<sub>u</sub> that set &tau; in Lecture 14. At 10 mA over
+                1 cm&sup2; and 10 &Omega;, 100 mV of your overpotential is not on the electrode at all.</p>
+              <p class="hint"><b>Divide by the real area, not the disc.</b> j<sub>0</sub> per geometric
+                area rewards a rough electrode for being rough. Everything on this page &mdash;
+                H<sub>upd</sub>, CO stripping, C<sub>dl</sub>/C<sub>s</sub> &mdash; exists so that this
+                division can be done, and a volcano plotted on geometric current is a plot of surface
+                areas wearing a catalysis label.</p>
+              <p class="hint"><b class="cnc">The hydrogen that evolves is not the hydrogen you
+                counted.</b> H<sub>upd</sub> is bound too strongly to be the intermediate &mdash; it is
+                still there at potentials where no H<sub>2</sub> forms at all. The reactive species is
+                the weakly bound, overpotential-deposited H that only exists below 0 V vs RHE, and it is
+                its &Delta;G that the volcano is drawn against. H<sub>upd</sub> still earns its place:
+                it counts the sites that species has to work with, which is the denominator of every
+                current on this tab.</p>
+              <p class="hint"><b>And fit over a decade.</b> A slope read across half a decade of current,
+                near equilibrium where the back reaction still matters, or up where transport is taking
+                over, is a number with no mechanism attached. Fit in the straight part, say where it was,
+                and quote &eta; at 10 mA cm<sup>&minus;2</sup> beside it &mdash; that one is hard to
+                misreport.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-quiz1" role="tabpanel" aria-labelledby="t-quiz1" hidden>
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h">
+        <h2>Concept check &middot; counting the atoms you can reach</h2>
+        <span class="note">six questions &mdash; answer once per question; the reasoning appears immediately</span>
+        <span class="tally" style="margin-left:auto" id="tally1"></span>
+      </div>
+      <div class="card-b">
+        <div class="idgrid">
+          <div>
+            <label class="fld" for="sId1">Student ID</label>
+            <input type="text" id="sId1" inputmode="numeric" placeholder="e.g. 20261234">
+          </div>
+        </div>
+        <p class="hint" id="idHint1"></p>
+      </div>
+      <div class="scorebar" id="scorebar1" hidden>
+        <div>
+          <div class="scorenum" id="scoreNum1">&mdash;</div>
+          <div class="vcode" style="margin-top:4px" id="whoLine1">&mdash;</div>
+        </div>
+        <div style="flex:1 1 300px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="solid" id="sendBtn1" type="button" hidden>Submit to the course</button>
+            <button class="ghost" id="dlBtn1" type="button">Download my result</button>
+          </div>
+          <p class="hint" id="dlHint1" style="margin-top:8px">Download the file and hand it in as your instructor directs.</p>
+        </div>
+      </div>
+    </div>
+    <div class="quiz" id="quiz1"></div>
+  </section>
+
+  <section class="panel" id="p-quiz2" role="tabpanel" aria-labelledby="t-quiz2" hidden>
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h">
+        <h2>Concept check 2 &middot; the step, the slope and the volcano</h2>
+        <span class="note">six questions &mdash; answer once per question; the reasoning appears immediately</span>
+        <span class="tally" style="margin-left:auto" id="tally2"></span>
+      </div>
+      <div class="card-b">
+        <div class="idgrid">
+          <div>
+            <label class="fld" for="sId2">Student ID</label>
+            <input type="text" id="sId2" inputmode="numeric" placeholder="e.g. 20261234">
+          </div>
+        </div>
+        <p class="hint" id="idHint2"></p>
+      </div>
+      <div class="scorebar" id="scorebar2" hidden>
+        <div>
+          <div class="scorenum" id="scoreNum2">&mdash;</div>
+          <div class="vcode" style="margin-top:4px" id="whoLine2">&mdash;</div>
+        </div>
+        <div style="flex:1 1 300px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="solid" id="sendBtn2" type="button" hidden>Submit to the course</button>
+            <button class="ghost" id="dlBtn2" type="button">Download my result</button>
+          </div>
+          <p class="hint" id="dlHint2" style="margin-top:8px">Download the file and hand it in as your instructor directs.</p>
+        </div>
+      </div>
+    </div>
+    <div class="quiz" id="quiz2"></div>
+  </section>
+
+  <footer>
+    Each adsorption feature is one reversible surface wave, i = w(F/RT)FA&Gamma;&upsilon;&theta;(1&minus;&theta;), whose
+    integral is exactly FA&Gamma; whatever its width &mdash; so the page always knows the monolayer charge it drew,
+    and can tell you how far your integration landed from it &middot;
+    the two H<sub>upd</sub> peaks sit at 0.13 and 0.27 V vs RHE and the oxide at 1.10/0.78 V, widths chosen to match
+    polycrystalline Pt in 1 M HClO<sub>4</sub>; lateral interactions, anion adsorption and any transport limit on HER
+    are left out, and HER is a bare 30 mV/decade Tafel line anchored at 0 V vs RHE with no HOR branch, there being no
+    dissolved H<sub>2</sub> under Ar &middot;
+    210 µC cm<sup>&minus;2</sup> is the convention and 197 the equal-weight average of 208, 147 and 240 for Pt(100),
+    (110) and (111), each of which is that plane&rsquo;s atom density from a = 3.9242 &Aring; times e &middot;
+    CO stripping is taken as two electrons per molecule, 420 µC cm<sup>&minus;2</sup> for an all-atop layer<br>
+    CH40051 Electroanalytical Chemistry &middot; Fall 2026 &mdash; companion to Lecture 15
+  </footer>
+</div>
+<script>
+(function(){
+"use strict";
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+/* ---------------- tabs ---------------- */
+var tabs=[].slice.call(document.querySelectorAll(".tab"));
+tabs.forEach(function(t){
+  t.addEventListener("click",function(){
+    tabs.forEach(function(o){
+      var on=(o===t);
+      o.setAttribute("aria-selected",on?"true":"false");
+      document.getElementById(o.getAttribute("aria-controls")).hidden=!on;
+    });
+  });
+});
+
+/* ================= SHARED CONSTANTS AND HELPERS =========================
+   Currents in A/cm2, potentials in V, lengths in cm unless a name says
+   otherwise. Everything on the page is derived from these.              */
+var QE = 1.602176634e-19, KB = 1.380649e-23, NA = 6.02214076e23;
+var FARADAY = QE * NA, RGAS = KB * NA, T25 = 298.15;
+var RTF = RGAS * T25 / FARADAY;            /* 0.025693 V                 */
+var DEC = RTF * Math.LN10;                 /* 0.059159 V per decade      */
+var MONO = 'font-family="IBM Plex Mono,monospace"';
+var SEC_YR = 3.15576e7;
+
+function pillGroup(id, cb){
+  var wrap = document.getElementById(id);
+  wrap.addEventListener("click", function(e){
+    var b = e.target.closest("button.pill");
+    if(!b) return;
+    [].slice.call(wrap.querySelectorAll("button.pill")).forEach(function(o){
+      o.setAttribute("aria-pressed", o === b ? "true" : "false");
+    });
+    cb(b.getAttribute("data-s"));
+  });
+}
+function pillSet(id, val){
+  [].slice.call(document.querySelectorAll("#" + id + " button.pill")).forEach(function(o){
+    o.setAttribute("aria-pressed", o.getAttribute("data-s") === val ? "true" : "false");
+  });
+}
+
+/* ---- one requestAnimationFrame loop; a picture only ticks while shown -- */
+var REDUCED = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+var ANIM = [], animLast = 0;
+function animLoop(ts){
+  if(ts - animLast > 32){
+    animLast = ts;
+    ANIM.forEach(function(a){ if(!document.getElementById(a.panel).hidden) a.tick(ts); });
+  }
+  window.requestAnimationFrame(animLoop);
+}
+
+/* x as "1.84 × 10<sup>7</sup>", and the same with a tspan for inside an SVG */
+function sciH(x, d){
+  if(x === 0) return "0";
+  var e = Math.floor(Math.log10(Math.abs(x))), m = x / Math.pow(10, e);
+  if(Math.abs(+m.toFixed(d - 1)) >= 10){ m /= 10; e++; }
+  return m.toFixed(d - 1) + " × 10<sup>" + e + "</sup>";
+}
+function sciSvg(x, d){
+  if(x === 0) return "0";
+  var e = Math.floor(Math.log10(Math.abs(x))), m = x / Math.pow(10, e);
+  if(Math.abs(+m.toFixed(d - 1)) >= 10){ m /= 10; e++; }
+  return m.toFixed(d - 1) + ' × 10<tspan baseline-shift="super" font-size="8">' + e + '</tspan>';
+}
+/* a current density, in whatever unit keeps it readable */
+function fmtJ(j){
+  var a = Math.abs(j);
+  if(a === 0) return "0";
+  if(a >= 1) return j.toFixed(2) + " A/cm²";
+  if(a >= 1e-3) return (j * 1e3).toFixed(2) + " mA/cm²";
+  if(a >= 1e-6) return (j * 1e6).toFixed(2) + " µA/cm²";
+  if(a >= 1e-9) return (j * 1e9).toFixed(2) + " nA/cm²";
+  return sciH(j, 2) + " A/cm²";
+}
+/* the same, for a current rather than a current density */
+function fmtA(i){
+  var a = Math.abs(i);
+  if(a === 0) return "0";
+  if(a >= 1) return i.toFixed(3) + " A";
+  if(a >= 1e-3) return (i * 1e3).toPrecision(3) + " mA";
+  if(a >= 1e-6) return (i * 1e6).toPrecision(3) + " µA";
+  if(a >= 1e-9) return (i * 1e9).toPrecision(3) + " nA";
+  return sciH(i, 2) + " A";
+}
+/* the same two, for an SVG <text>, where <sup> is not markup but a
+   mistake: everything from it to the end of the string disappears */
+function fmtJSvg(j){ var t = fmtJ(j); return t.indexOf("<sup>") < 0 ? t : sciSvg(j, 2) + " A/cm²"; }
+function fmtASvg(i){ var t = fmtA(i); return t.indexOf("<sup>") < 0 ? t : sciSvg(i, 2) + " A"; }
+function fmtV(v){
+  var a = Math.abs(v);
+  if(a < 1) return (v * 1000).toFixed(a < 0.01 ? 2 : 1) + " mV";
+  return v.toFixed(3) + " V";
+}
+function fmtR(r){
+  if(r >= 1e6) return (r / 1e6).toFixed(2) + " MΩ";
+  if(r >= 1e3) return (r / 1e3).toFixed(2) + " kΩ";
+  if(r >= 1) return r.toFixed(1) + " Ω";
+  return (r * 1000).toFixed(1) + " mΩ";
+}
+function clamp(v, a, b){ return v < a ? a : v > b ? b : v; }
+
+/* ---- the small SVG vocabulary every picture on this page is drawn in --- */
+function ln(x1, y1, x2, y2, col, w, dash, op){
+  return '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + x2.toFixed(1)
+       + '" y2="' + y2.toFixed(1) + '" stroke="' + col + '" stroke-width="' + (w || 1) + '"'
+       + (dash ? ' stroke-dasharray="' + dash + '"' : "")
+       + (op !== undefined ? ' opacity="' + op + '"' : "") + '/>';
+}
+function tx(x, y, s, col, size, anchor, weight){
+  return '<text x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" fill="' + col + '" ' + MONO
+       + ' font-size="' + (size || 10.5) + '"'
+       + (anchor ? ' text-anchor="' + anchor + '"' : "")
+       + (weight ? ' font-weight="' + weight + '"' : "") + '>' + s + '</text>';
+}
+/* an axis name that sits beside its axis rather than in a caption under
+   the frame: xName at the right end of the x axis, yName up the left */
+function xName(x0, x1, y, lab){ return tx((x0 + x1) / 2, y, lab, "var(--ink-2)", 11.5, "middle", 600); }
+function yName(x, y0, y1, lab){
+  var cy = (y0 + y1) / 2;
+  return tx(x, cy, lab, "var(--ink-2)", 11.5, "middle", 600)
+    .replace("<text", '<text transform="rotate(-90 ' + x.toFixed(1) + ' ' + cy.toFixed(1) + ')"');
+}
+function pth(d, col, w, fill, op){
+  return '<path d="' + d + '" fill="' + (fill || "none") + '" stroke="' + (col || "none")
+       + '" stroke-width="' + (w || 2) + '"'
+       + (op !== undefined ? ' opacity="' + op + '"' : "") + ' stroke-linejoin="round"/>';
+}
+function rc(x, y, w, h, col, op, rx){
+  if(w <= 0 || h <= 0) return "";
+  return '<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + w.toFixed(1)
+       + '" height="' + h.toFixed(1) + '" fill="' + col + '"'
+       + (rx ? ' rx="' + rx + '"' : "")
+       + (op !== undefined ? ' opacity="' + op + '"' : "") + '/>';
+}
+function cir(x, y, r, col, op){
+  return '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + r.toFixed(2)
+       + '" fill="' + col + '"' + (op !== undefined ? ' opacity="' + op + '"' : "") + '/>';
+}
+/* a two-headed measure, used for every "this much" on the page */
+function arrowV(x, y1, y2, col, lab, side){
+  var s = ln(x, y1, x, y2, col, 1.6);
+  var d = y2 > y1 ? 1 : -1;
+  s += '<polygon points="' + x + ',' + y2 + ' ' + (x - 3) + ',' + (y2 - 4 * d) + ' ' + (x + 3) + ',' + (y2 - 4 * d) + '" fill="' + col + '"/>';
+  s += '<polygon points="' + x + ',' + y1 + ' ' + (x - 3) + ',' + (y1 + 4 * d) + ' ' + (x + 3) + ',' + (y1 + 4 * d) + '" fill="' + col + '"/>';
+  if(lab) s += tx(x + (side === "l" ? -6 : 6), (y1 + y2) / 2 + 3.5, lab, col, 10, side === "l" ? "end" : "start", 600);
+  return s;
+}
+
+
+
+/* ================= THE SURFACE, NOT THE SOLUTION =======================
+   Everything on this page is closed form, and all of it lives on the
+   electrode rather than in front of it. A species held at coverage Gamma
+   and swept at v gives a peak whose height goes as v and whose area does
+   not move at all - which is the whole difference between counting atoms
+   on a surface and counting molecules that diffuse to it.             */
+
+var FRT = FARADAY / (RGAS * T25);          /* 38.92 V^-1                 */
+
+/* the shared fmtA stops at nanoamps; a microcoulomb integral does not */
+function fmtI(i){
+  var a = Math.abs(i);
+  if(a === 0) return "0";
+  if(a >= 1) return i.toPrecision(3) + " A";
+  if(a >= 1e-3) return (i * 1e3).toPrecision(3) + " mA";
+  if(a >= 1e-6) return (i * 1e6).toPrecision(3) + " µA";
+  if(a >= 1e-9) return (i * 1e9).toPrecision(3) + " nA";
+  if(a >= 1e-12) return (i * 1e12).toPrecision(3) + " pA";
+  if(a >= 1e-15) return (i * 1e15).toPrecision(3) + " fA";
+  return sciH(i, 2) + " A";
+}
+function fmtT(t){
+  if(!isFinite(t)) return "—";
+  if(t >= 60) return (t / 60).toPrecision(3) + " min";
+  if(t >= 1) return t.toPrecision(3) + " s";
+  if(t >= 1e-3) return (t * 1e3).toPrecision(3) + " ms";
+  if(t >= 1e-6) return (t * 1e6).toPrecision(3) + " µs";
+  return sciH(t, 2) + " s";
+}
+function fmtF(c){
+  if(c >= 1e-6) return (c * 1e6).toPrecision(3) + " µF";
+  if(c >= 1e-9) return (c * 1e9).toPrecision(3) + " nF";
+  return (c * 1e12).toPrecision(3) + " pF";
+}
+function fmtLen15(cm){
+  var um = cm * 1e4;
+  if(um >= 1e4) return (um / 1e4).toPrecision(3) + " cm";
+  if(um >= 1000) return (um / 1000).toPrecision(3) + " mm";
+  if(um >= 1) return um.toPrecision(3) + " µm";
+  return (um * 1000).toPrecision(3) + " nm";
+}
+function tickNum(v){
+  var a = Math.abs(v);
+  if(a < 1e-9) return "0";
+  return (+v.toFixed(a >= 100 ? 0 : a >= 10 ? 1 : a >= 1 ? 2 : 3)) + "";
+}
+function nice(v){
+  var e = Math.pow(10, Math.floor(Math.log10(v))), m = v / e;
+  return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 2.5 ? 2.5 : m <= 5 ? 5 : 10) * e;
+}
+function iUnit(maxA){
+  var a = Math.abs(maxA);
+  return a >= 1e-3 ? {k:1e-3, u:"mA"} : a >= 1e-6 ? {k:1e-6, u:"µA"}
+       : a >= 1e-9 ? {k:1e-9, u:"nA"} : {k:1e-12, u:"pA"};
+}
+function supr(e){
+  var m = {"-":"⁻", "0":"⁰", "1":"¹", "2":"²", "3":"³", "4":"⁴",
+           "5":"⁵", "6":"⁶", "7":"⁷", "8":"⁸", "9":"⁹"};
+  return String(Math.round(e)).split("").map(function(c){ return m[c] || c; }).join("");
+}
+
+/* ---- a frame, and a decade frame for the log-log pictures -------------- */
+function fr(X0, X1, Y0, Y1, xlo, xhi, ylo, yhi){
+  return {X0:X0, X1:X1, Y0:Y0, Y1:Y1, xlo:xlo, xhi:xhi, ylo:ylo, yhi:yhi,
+    px:function(v){ return X0 + (v - xlo) / (xhi - xlo) * (X1 - X0); },
+    py:function(v){ return Y1 - (v - ylo) / (yhi - ylo) * (Y1 - Y0); }};
+}
+function axLin(f, xlab, ylab, fx, fy){
+  var s = rc(f.X0, f.Y0, f.X1 - f.X0, f.Y1 - f.Y0, "var(--surface-2)", 0.5, 4), g;
+  var xs = nice((f.xhi - f.xlo) / 5), ys = nice((f.yhi - f.ylo) / 5);
+  for(g = Math.ceil(f.xlo / xs) * xs; g <= f.xhi + 1e-12; g += xs){
+    s += ln(f.px(g), f.Y0, f.px(g), f.Y1, "var(--line)", 1, "2 3", 0.75);
+    /* the first one would sit in the corner the y labels already use */
+    if(f.px(g) > f.X0 + 10)
+      s += tx(f.px(g), f.Y1 + 14, fx ? fx(g) : tickNum(g), "var(--muted)", 9.5, "middle");
+  }
+  for(g = Math.ceil(f.ylo / ys) * ys; g <= f.yhi + 1e-12; g += ys){
+    s += ln(f.X0, f.py(g), f.X1, f.py(g), "var(--line)", 1, "2 3", 0.75);
+    s += tx(f.X0 - 6, f.py(g) + 3.4, fy ? fy(g) : tickNum(g), "var(--muted)", 9.5, "end");
+  }
+  s += xName(f.X0, f.X1, f.Y1 + 30, xlab);
+  s += yName(14, f.Y0, f.Y1, ylab);
+  return s;
+}
+/* both axes in decades: the only honest way to show a current that runs
+   from microamps to picoamps over six orders of magnitude of time      */
+/* a decade label is about 15 units wide and 13 tall; when there are more
+   decades than that leaves room for, label every second or fifth     */
+function thin(decades, room, each){
+  var want = Math.ceil(decades * each / room);
+  return want <= 1 ? 1 : want <= 2 ? 2 : want <= 5 ? 5 : 10;
+}
+function axLog(f, xlab, ylab){
+  var s = rc(f.X0, f.Y0, f.X1 - f.X0, f.Y1 - f.Y0, "var(--surface-2)", 0.5, 4), g;
+  var sx = thin(f.xhi - f.xlo, f.X1 - f.X0, 30), sy = thin(f.yhi - f.ylo, f.Y1 - f.Y0, 15);
+  for(g = Math.ceil(f.xlo); g <= f.xhi + 1e-9; g++){
+    s += ln(f.px(g), f.Y0, f.px(g), f.Y1, "var(--line)", 1, "2 3", 0.75);
+    /* the leftmost one shares its corner with the lowest y label */
+    if(g % sx === 0 && f.px(g) > f.X0 + 12)
+      s += tx(f.px(g), f.Y1 + 14, "10" + supr(g), "var(--muted)", 9.5, "middle");
+  }
+  for(g = Math.ceil(f.ylo); g <= f.yhi + 1e-9; g++){
+    s += ln(f.X0, f.py(g), f.X1, f.py(g), "var(--line)", 1, "2 3", 0.75);
+    if(g % sy === 0) s += tx(f.X0 - 6, f.py(g) + 3.4, "10" + supr(g), "var(--muted)", 9.5, "end");
+  }
+  s += xName(f.X0, f.X1, f.Y1 + 30, xlab);
+  s += yName(14, f.Y0, f.Y1, ylab);
+  return s;
+}
+function curve(f, fn, lo, hi, npt){
+  var d = "", pen = false, N = npt || 200;
+  for(var i = 0; i <= N; i++){
+    var x = lo + (hi - lo) * i / N, y = fn(x);
+    if(!isFinite(y) || y < f.ylo || y > f.yhi || x < f.xlo || x > f.xhi){ pen = false; continue; }
+    d += (pen ? "L" : "M") + f.px(x).toFixed(1) + " " + f.py(y).toFixed(1) + " ";
+    pen = true;
+  }
+  return d;
+}
+var PEND = {};
+function later(key, fn){
+  if(PEND[key]) return;
+  PEND[key] = true;
+  window.requestAnimationFrame(function(){ PEND[key] = false; fn(); });
+}
+
+/* ======================= THE Pt SURFACE MODEL =========================
+   Every trace on this page is this model evaluated, not a picture traced
+   from a paper. It is deliberately the simplest thing that is still
+   honest: each adsorption feature is one reversible surface wave.
+
+   For a surface-confined couple at coverage theta, sweeping at v,
+
+       i = w (F/RT) F A Gamma v theta (1 - theta),
+       theta = 1 / (1 + exp(w (F/RT) (E - E0)))
+
+   and the integral of that over all E is exactly F A Gamma v, so
+
+       Q = integral i dE / v = F A Gamma
+
+   whatever w and E0 are. w is an apparent ideality: w = 1 is the textbook
+   Langmuir wave, 90.6 mV wide at half height, and w < 1 broadens the peak
+   to the width Pt actually shows WITHOUT changing the charge under it.
+   That separation - shape free, charge fixed - is the whole reason this
+   page can show you a wrong baseline and still know the right answer.
+
+   What is deliberately left out: lateral interactions (a Frumkin term
+   would skew the peaks), anion adsorption, and any transport limit on
+   HER. The footer says so.                                              */
+
+/* the charge of one electron on every Pt surface atom. 210 is the
+   convention; 197 is the average of the three low-index faces, and the
+   page lets you switch because the choice moves every ECSA by 6.6 %.   */
+var Q_CONV = 210e-6, Q_AVG = 197e-6;       /* C per cm2 of real Pt       */
+var G_H = Q_CONV / FARADAY;                /* 2.176 nmol/cm2 of H sites  */
+var M_PT = 195.084;                        /* g/mol                      */
+
+var PT = {
+  E1: 0.130, w1: 0.75,                     /* weakly bound Hupd          */
+  E2: 0.265, w2: 0.85,                     /* strongly bound Hupd        */
+  Eoxa: 1.10, woxa: 0.25,                  /* oxide grows, broad         */
+  Eoxc: 0.78, woxc: 0.80,                  /* and comes off sharper      */
+  Eco: 0.76, wco: 2.2,                     /* CO stripping, very sharp   */
+  bH: 0.030                                /* HER Tafel slope, V/decade  */
+};
+var G_OX = 2 * Q_CONV / FARADAY;           /* PtO is two electrons/site  */
+var JH0 = 1.2e-4;                          /* A/cm2 of real Pt at 0 V    */
+
+function thS(E, E0, w){ return 1 / (1 + Math.exp(w * FRT * (E - E0))); }
+function iSurf(E, E0, w, G, A, v){
+  var t = thS(E, E0, w);
+  return w * FRT * FARADAY * A * G * v * t * (1 - t);
+}
+/* the charge a window [lo,hi] actually collects, as a fraction of the
+   monolayer: the coverage it sweeps through, nothing more             */
+function capt(lo, hi, E0, w){ return thS(lo, E0, w) - thS(hi, E0, w); }
+
+function iHupd(E, dir, A, v, split, block){
+  var b = 1 - (block || 0);
+  return dir * b * (iSurf(E, PT.E1, PT.w1, G_H * split, A, v)
+                  + iSurf(E, PT.E2, PT.w2, G_H * (1 - split), A, v));
+}
+/* how much oxide the anodic sweep managed to grow before it turned */
+function oxTheta(Elam){
+  return Math.max(0, (1 - thS(Elam, PT.Eoxa, PT.woxa)) - (1 - thS(0.40, PT.Eoxa, PT.woxa)));
+}
+function iOx(E, dir, A, v, Elam){
+  if(dir > 0) return E <= Elam ? iSurf(E, PT.Eoxa, PT.woxa, G_OX, A, v) : 0;
+  return -iSurf(E, PT.Eoxc, PT.woxc, G_OX * oxTheta(Elam), A, v);
+}
+/* HER only. Under Ar there is no dissolved H2, so there is no HOR branch
+   to balance it; this is a bare Tafel line anchored at 0 V vs RHE.     */
+function iHer(E, A){ return -JH0 * A * Math.pow(10, -E / PT.bH); }
+function iDl(dir, A, v, cdl){ return dir * v * cdl * A; }
+
+function iPt(E, dir, p){
+  return iDl(dir, p.A, p.v, p.cdl)
+       + iHupd(E, dir, p.A, p.v, p.split, p.block)
+       + iOx(E, dir, p.A, p.v, p.Elam)
+       + iHer(E, p.A)
+       + (p.co ? (dir > 0 && !p.coDone ? iSurf(E, PT.Eco, PT.wco, p.coG, p.A, p.v) : 0) : 0);
+}
+
+/* ---- integrate a sweep against a baseline, the way you would on paper */
+function qOf(p, dir, lo, hi, base, N){
+  var n = N || 1200, s = 0, i, E, y;
+  for(i = 0; i <= n; i++){
+    E = lo + (hi - lo) * i / n;
+    y = iPt(E, dir, p) - dir * base;
+    s += (i === 0 || i === n ? 0.5 : 1) * y;
+  }
+  return Math.abs(s * (hi - lo) / n / p.v);
+}
+
+/* the first cycle also grows oxide over the same window, so the strip is
+   referenced to the second (clean) cycle - which is what is done in the
+   laboratory, and it cancels the oxide and the double layer exactly.  */
+function qDiff(pa, pb, dir, lo, hi, N){
+  var n = N || 1200, s = 0, i, E;
+  for(i = 0; i <= n; i++){
+    E = lo + (hi - lo) * i / n;
+    s += (i === 0 || i === n ? 0.5 : 1) * (iPt(E, dir, pa) - iPt(E, dir, pb));
+  }
+  return Math.abs(s * (hi - lo) / n / pa.v);
+}
+
+/* ---- the monolayer charge the model really put there ---------------- */
+function qTrue(p){ return Q_CONV * p.A; }
+
+function ecsaOf(Q, qstar){ return Q / qstar; }
+function massArea(Q, qstar, load, Ageo){     /* m2 per g of Pt           */
+  var ecsa = Q / qstar;                      /* cm2 of Pt                */
+  return ecsa * 1e-4 / (load * 1e-3 * Ageo); /* cm2->m2, mg->g           */
+}
+
+function cvPath(f, p, dir, lo, hi, N){
+  var d = "", i, E, n = N || 420;
+  for(i = 0; i <= n; i++){
+    E = dir > 0 ? lo + (hi - lo) * i / n : hi - (hi - lo) * i / n;
+    d += (i ? "L" : "M") + f.px(E).toFixed(1) + " " + f.py(iPt(E, dir, p)).toFixed(1) + " ";
+  }
+  return d;
+}
+function iSpan(p, lo, hi){
+  var m = 0, i, E;
+  for(i = 0; i <= 400; i++){
+    E = lo + (hi - lo) * i / 400;
+    m = Math.max(m, Math.abs(iPt(E, 1, p)), Math.abs(iPt(E, -1, p)));
+  }
+  return m;
+}
+
+/* ======================= 1 - THE Pt VOLTAMMOGRAM ======================
+   The tab shows one thing happening in two places: the trace, and the
+   layer of atoms the trace is made of. Both are read off the same model,
+   so the picture cannot say one thing while the current says another. */
+var CV = {v:0.05, rf:1.8, Elam:1.20, Elo:0.05, cdl:40e-6, split:0.45, Ageo:0.196};
+var CV_U = 0, cvAnim = null;          /* u in [0,2): out and back again  */
+
+function cvP(){
+  return {A:CV.rf * CV.Ageo, v:CV.v, cdl:CV.cdl, split:CV.split, Elam:CV.Elam, block:0};
+}
+function cvEat(u){
+  return u < 1 ? CV.Elo + (CV.Elam - CV.Elo) * u
+               : CV.Elam - (CV.Elam - CV.Elo) * (u - 1);
+}
+function cvDirAt(u){ return u < 1 ? 1 : -1; }
+
+/* what is actually sitting on the metal at this potential. thS runs from
+   1 at low potential to 0 at high, which is exactly a coverage         */
+function cvCov(E, dir){
+  var h = CV.split * thS(E, PT.E1, PT.w1) + (1 - CV.split) * thS(E, PT.E2, PT.w2);
+  var ox = dir > 0
+    ? (1 - thS(E, PT.Eoxa, PT.woxa)) - (1 - thS(0.40, PT.Eoxa, PT.woxa))
+    : oxTheta(CV.Elam) * (1 - thS(E, PT.Eoxc, PT.woxc));
+  ox = Math.max(0, Math.min(1, ox));
+  /* the anions are spectators: they take what the two reactions leave */
+  return {h:h, ox:ox, an:0.38 * Math.max(0, 1 - h - ox)};
+}
+function cvRegionOf(E){
+  if(E < 0.40) return ["H-upd", "var(--ion-k)"];
+  if(E < 0.60) return ["double layer", "var(--go)"];
+  return ["oxide", "var(--ox)"];
+}
+
+/* ---- the trace, with the cursor on it ------------------------------- */
+function cvDraw(){
+  var p = cvP(), lo = CV.Elo, hi = CV.Elam;
+  var m = iSpan(p, lo, hi), un = iUnit(m), s = "";
+  var f = fr(62, 500, 22, 274, lo - 0.02, hi + 0.02, -m / un.k * 1.12, m / un.k * 1.12);
+  var g = fr(62, 500, 22, 274, lo - 0.02, hi + 0.02, -m * 1.12, m * 1.12);
+
+  s += axLin(f, "E / V vs RHE", "i / " + un.u);
+  s += ln(f.X0, f.py(0), f.X1, f.py(0), "var(--line-2)", 1.2);
+
+  var reg = [[lo, 0.40, "var(--ion-k)", "H-upd"],
+             [0.40, 0.60, "var(--go)", "double layer"],
+             [0.60, hi, "var(--ox)", "oxide"]];
+  reg.forEach(function(r){
+    if(r[1] <= r[0]) return;
+    s += rc(f.px(r[0]), f.Y0, f.px(r[1]) - f.px(r[0]), f.Y1 - f.Y0, r[2], 0.07);
+    s += tx((f.px(r[0]) + f.px(r[1])) / 2, f.Y0 + 13, r[3], "var(--muted)", 9.5, "middle", 600);
+  });
+
+  s += pth(cvPath(g, p, 1, lo, hi) + cvPath(g, p, -1, lo, hi).replace(/^M/, "L"),
+           "var(--red-)", 1.9);
+
+  /* where the scan has got to */
+  var E = cvEat(CV_U), dir = cvDirAt(CV_U), iNow = iPt(E, dir, p);
+  s += ln(f.px(E), f.Y0, f.px(E), f.Y1, "var(--ink-2)", 1, "3 3", 0.45);
+  s += cir(g.px(E), g.py(iNow), 9, "var(--ink)", 0.14);
+  s += cir(g.px(E), g.py(iNow), 4.6, "var(--ink)");
+  var rgt = f.px(E) < f.X1 - 90;
+  s += tx(f.px(E) + (rgt ? 9 : -9), f.Y1 - 8,
+          (dir > 0 ? "\u2192 anodic" : "\u2190 cathodic"),
+          "var(--ink-2)", 9.5, rgt ? null : "end", 700);
+  s += tx(f.px(lo) + 4, f.py(0) + 26, "HER", "var(--stop)", 10, null, 700);
+
+  document.getElementById("cvFig").innerHTML = s;
+  cvSurfDraw(E, dir, p, iNow);
+}
+
+/* ---- and the layer of atoms it is made of --------------------------- */
+var CV_NS = 14;
+/* a fixed order for the sites to fill and empty in, so that the picture
+   does not reshuffle itself between one frame and the next           */
+var CV_ORDER = [6, 1, 11, 3, 8, 13, 0, 9, 4, 12, 2, 7, 10, 5];
+
+function cvAdH(x, y){
+  return cir(x, y, 5.6, "var(--ion-k)");
+}
+function cvAdOH(x, y){
+  return cir(x, y, 6.2, "var(--ox)") + cir(x + 5, y - 5, 3.4, "var(--muted)");
+}
+function cvAdAn(x, y){
+  return cir(x, y, 6.6, "var(--go)")
+       + tx(x, y + 3.2, "\u2212", "var(--surface)", 9.5, "middle", 700);
+}
+function cvArrow(x, y0, y1, col){
+  var d = y1 > y0 ? 1 : -1;
+  return pth("M" + x + " " + y0 + " L" + x + " " + y1, col, 1.7)
+       + pth("M" + (x - 4) + " " + (y1 - d * 6) + " L" + x + " " + y1
+           + " L" + (x + 4) + " " + (y1 - d * 6), col, 1.7);
+}
+
+function cvSurfDraw(E, dir, p, iNow){
+  var c = cvCov(E, dir), i, r;
+  var du = 0.014, u0 = CV_U > du ? CV_U - du : CV_U + du;
+  var c0 = cvCov(cvEat(u0), cvDirAt(u0));
+  var sgn = CV_U > du ? 1 : -1;
+  var dH = (c.h - c0.h) * sgn, dOx = (c.ox - c0.ox) * sgn;
+  var reg = cvRegionOf(E), s = "";
+
+  s += tx(260, 17, reg[0] + "  \u00b7  " + E.toFixed(3) + " V vs RHE  \u00b7  "
+          + (dir > 0 ? "anodic" : "cathodic"), reg[1], 11, "middle", 700);
+
+  /* the metal: five rows, the top one the surface that gets counted */
+  var R = 17.4, X0 = 40, DX = 32, YT = 196, DY = 27.7, ROWS = 5;
+  for(r = ROWS - 1; r >= 0; r--){
+    var off = (r % 2) * (DX / 2);
+    for(i = -1; i <= CV_NS; i++){
+      var cx = X0 + i * DX - off, cy = YT + r * DY;
+      if(cx < 20 || cx > 500) continue;
+      s += cir(cx, cy, R, r === 0 ? "var(--line-2)" : "var(--line)", r === 0 ? 1 : 0.8);
+    }
+  }
+  s += tx(18, YT + 2 * DY, "Pt", "var(--muted)", 10.5, "middle", 700);
+
+  /* one adsorbate per site, as many as the coverage says */
+  var nH = Math.round(c.h * CV_NS), nOx = Math.round(c.ox * CV_NS);
+  var nAn = Math.round(c.an * CV_NS);
+  if(nH + nOx > CV_NS) nOx = CV_NS - nH;
+  if(nH + nOx + nAn > CV_NS) nAn = CV_NS - nH - nOx;
+  var kind = new Array(CV_NS), k = 0;
+  for(i = 0; i < nH; i++) kind[CV_ORDER[k++]] = "H";
+  for(i = 0; i < nOx; i++) kind[CV_ORDER[k++]] = "O";
+  for(i = 0; i < nAn; i++) kind[CV_ORDER[k++]] = "A";
+  for(i = 0; i < CV_NS; i++){
+    var x = X0 + i * DX, y = YT - R + 2;
+    if(kind[i] === "H") s += cvAdH(x, y);
+    else if(kind[i] === "O") s += cvAdOH(x, y);
+    else if(kind[i] === "A") s += cvAdAn(x, y);
+  }
+
+  /* what is crossing the gap, and which way */
+  var mov = Math.abs(dH) > Math.abs(dOx)
+    ? {t:Math.abs(dH) * 26, up:dH < 0, col:"var(--ion-k)", nm:"H\u207a + e\u207b", ad:cvAdH}
+    : {t:Math.abs(dOx) * 26, up:dOx > 0, col:"var(--ox)", nm:"H\u2082O", ad:cvAdOH};
+  var op = Math.max(0, Math.min(1, mov.t));
+  if(op > 0.05){
+    for(i = 0; i < 5; i++){
+      var ax = 76 + i * 86;
+      var y0 = mov.up ? 152 : 92, y1 = mov.up ? 92 : 152;
+      s += '<g opacity="' + op.toFixed(2) + '">';
+      s += cvArrow(ax, y0, y1, mov.col);
+      s += mov.ad(ax + 14, (y0 + y1) / 2);
+      s += "</g>";
+    }
+    s += tx(260, 44, (mov.up ? "leaving the surface \u2014 " : "arriving at the surface \u2014 ")
+            + mov.nm, mov.col, 10.5, "middle", 700);
+  }else{
+    s += tx(260, 44, "nothing is crossing \u2014 the current is the double layer alone",
+            "var(--muted)", 10.5, "middle", 600);
+  }
+
+  /* the key */
+  var keys = [[58, "var(--ion-k)", "H\u2090\u2094 \u2014 one per Pt site"],
+              [218, "var(--go)", "spectator anion"],
+              [356, "var(--ox)", "OH\u2090\u2094 from water"]];
+  keys.forEach(function(q){
+    s += cir(q[0], 322, 5.4, q[1]);
+    s += tx(q[0] + 11, 325.5, q[2], "var(--ink-2)", 9.5, null, 600);
+  });
+
+  document.getElementById("cvSurf").innerHTML = s;
+
+  /* ---- the readings ------------------------------------------------- */
+  var set = function(id, t){ document.getElementById(id).innerHTML = t; };
+  set("cvEnow", E.toFixed(3) + " V");
+  set("cvDirv", dir > 0 ? "anodic &rarr;" : "&larr; cathodic");
+  set("cvRegv", reg[0]);
+  set("cvInow", fmtI(iNow));
+  set("cvThH", (c.h * 100).toFixed(0) + " %");
+  set("cvThOx", (c.ox * 100).toFixed(0) + " %");
+  set("cvThAn", (c.an * 100).toFixed(0) + " %");
+  set("cvAreal", p.A.toPrecision(3) + " cm\u00b2");
+  set("cvNuv", (CV.v * 1000).toPrecision(3) + " mV/s");
+  set("cvRfv", CV.rf.toPrecision(3));
+  set("cvElamv", CV.Elam.toFixed(2) + " V");
+  set("cvElov", CV.Elo.toFixed(2) + " V");
+  set("cvCdlv", (CV.cdl * 1e6).toPrecision(3) + " \u00b5F/cm\u00b2");
+  set("cvSplitv", Math.round(CV.split * 100) + " % weak");
+  set("cvPosv", (dir > 0 ? "out, " : "back, ")
+      + Math.round((CV_U < 1 ? CV_U : CV_U - 1) * 100) + " %");
+
+  var msg;
+  if(E < 0.03){
+    msg = "<b>This is hydrogen evolution, not H<sub>upd</sub>.</b> The surface is already full "
+        + "and the extra current is making H<sub>2</sub> in the solution. No baseline separates "
+        + "the two, so anything integrated down here is partly a gas evolution rate.";
+  }else if(c.h > 0.9){
+    msg = "<b>Saturated.</b> Every Pt site carries one hydrogen atom, held at a potential above "
+        + "the one that would make H<sub>2</sub> &mdash; that is what <i>underpotential</i> means. "
+        + "The charge it takes to strip this layer is the atom count the whole lecture is after.";
+  }else if(c.h > 0.08){
+    msg = "<b>" + (dir > 0 ? "Coming off" : "Going back on") + ", " + (c.h * 100).toFixed(0)
+        + " % still there.</b> Two waves, not one: the weakly bound sites let go first and the "
+        + "strongly bound ones follow. The split slider moves charge between them without changing "
+        + "the total, which is why the area under the pair is the robust number.";
+  }else if(c.ox > 0.05){
+    msg = "<b>Oxide.</b> OH is sitting on " + (c.ox * 100).toFixed(0) + " % of the sites that used "
+        + "to carry hydrogen. The electrons per Pt here depend on how far you sweep and how long "
+        + "you wait, so this charge is not an area &mdash; and growing and stripping it is what "
+        + "roughens the electrode cycle after cycle.";
+  }else{
+    msg = "<b>Bare metal.</b> Nothing reacts between about 0.4 and 0.8 V; a few anions sit on the "
+        + "surface as spectators and the current is " + fmtI(CV.v * CV.cdl * p.A)
+        + " of double-layer charging, flat across the window. <b>That flat box is the baseline</b> "
+        + "every integration on the next tab is measured against.";
+  }
+  document.getElementById("cvNote").innerHTML = msg;
+}
+
+function cvSync(){ later("cv", cvDraw); }
+
+function cvRun(){
+  var btn = document.getElementById("cvRunBtn");
+  if(cvAnim){
+    window.clearInterval(cvAnim); cvAnim = null;
+    if(btn) btn.textContent = "Run the cycle \u2014 watch the surface fill and empty";
+    return;
+  }
+  if(btn) btn.textContent = "Pause";
+  cvAnim = window.setInterval(function(){
+    CV_U = (CV_U + 0.01) % 2;
+    setRange("cvPos", CV_U);
+    cvDraw();
+  }, 55);
+}
+
+
+/* ======================= 2 - Hupd INTO AN AREA ======================== */
+var HU = {v:0.05, rf:1.8, base:1.0, lo:0.05, hi:0.40, load:0.02,
+          q:"210", split:0.45, Ageo:0.196};
+
+function huP(){
+  return {A:HU.rf * HU.Ageo, v:HU.v, cdl:40e-6, split:0.45, Elam:1.20, block:0};
+}
+function huDraw(){
+  var p = huP(), lo = HU.lo, hi = HU.hi, s = "";
+  var idl = HU.v * p.cdl * p.A, base = idl * HU.base;
+  var m = iSpan(p, lo, hi), un = iUnit(m);
+  var f = fr(62, 500, 22, 236, lo - 0.01, hi + 0.01, -m / un.k * 1.2, m / un.k * 1.2);
+  var g = fr(62, 500, 22, 236, lo - 0.01, hi + 0.01, -m * 1.2, m * 1.2);
+
+  s += axLin(f, "E / V vs RHE", "i / " + un.u);
+  s += ln(f.X0, f.py(0), f.X1, f.py(0), "var(--line-2)", 1.2);
+
+  /* the area you are actually calling Hupd: trace out, baseline back */
+  var i, E, d = "";
+  for(i = 0; i <= 200; i++){ E = lo + (hi - lo) * i / 200;
+    d += (i ? "L" : "M") + g.px(E).toFixed(1) + " " + g.py(iPt(E, 1, p)).toFixed(1) + " "; }
+  d += "L" + g.px(hi).toFixed(1) + " " + g.py(base).toFixed(1) + " L"
+     + g.px(lo).toFixed(1) + " " + g.py(base).toFixed(1) + " Z";
+  s += pth(d, "none", 0, "var(--ion-k)", 0.17);
+
+  s += pth(cvPath(g, p, 1, lo, hi) + cvPath(g, p, -1, lo, hi).replace(/^M/, "L"),
+           "var(--red-)", 1.9);
+  s += ln(g.px(lo), g.py(base), g.px(hi), g.py(base), "var(--go)", 1.6, "5 4");
+  s += ln(g.px(lo), g.py(-base), g.px(hi), g.py(-base), "var(--go)", 1.6, "5 4");
+  s += tx(g.px(hi) - 4, g.py(base) - 6, "the baseline you chose", "var(--go)", 10, "end", 700);
+
+  document.getElementById("huFig").innerHTML = s;
+
+  /* ---- the second picture: charge does not care about the scan rate --- */
+  var nus = [], k, qq = [], pp = [], QT = qTrue(p);
+  for(k = 0; k <= 24; k++) nus.push(Math.pow(10, -2.3 + 2.3 * k / 24));
+  nus.forEach(function(nu){
+    var q = {A:p.A, v:nu, cdl:p.cdl, split:p.split, Elam:p.Elam, block:0};
+    qq.push(qOf(q, 1, lo, hi, nu * p.cdl * p.A * HU.base));
+    pp.push(iPt(PT.E2, 1, q));
+  });
+  var qmax = Math.max.apply(null, qq), pmax = Math.max.apply(null, pp);
+  var f2 = fr(62, 452, 22, 206, -2.3, 0, 0, Math.max(qmax * 1e6, QT * 1e6) * 1.25);
+  /* x is a decade axis but Q is not, so label the decades by hand rather
+     than hand both axes to axLog and get 10^90 on the ordinate      */
+  var s2 = axLin(f2, "scan rate / mV s⁻¹ (log)", "Q / µC",
+                 function(gv){ return Math.round(Math.pow(10, gv) * 1000) + ""; });
+  var d2 = "", d3 = "";
+  nus.forEach(function(nu, j){
+    d2 += (j ? "L" : "M") + f2.px(Math.log10(nu)).toFixed(1) + " " + f2.py(qq[j] * 1e6).toFixed(1) + " ";
+    d3 += (j ? "L" : "M") + f2.px(Math.log10(nu)).toFixed(1) + " "
+        + (206 - pp[j] / pmax * (206 - 22) * 0.92).toFixed(1) + " ";
+  });
+  s2 += ln(f2.X0, f2.py(QT * 1e6), f2.X1, f2.py(QT * 1e6), "var(--muted)", 1.4, "5 4");
+  s2 += tx(f2.X0 + 6, f2.py(QT * 1e6) - 6, "the monolayer, " + (QT * 1e6).toPrecision(3) + " µC",
+           "var(--muted)", 9.5, null, 600);
+  s2 += pth(d3, "var(--ox)", 1.6, null, 0.85);
+  s2 += pth(d2, "var(--ion-k)", 2.1);
+  s2 += tx(f2.X1 + 5, f2.py(qq[qq.length - 1] * 1e6) + 3, "Q", "var(--ion-k)", 11, null, 700);
+  s2 += tx(f2.X1 + 5, 206 - pp[pp.length - 1] / pmax * (206 - 22) * 0.92 + 3,
+           "iₚ, scaled", "var(--ox)", 10, null, 700);
+  document.getElementById("huFig2").innerHTML = s2;
+
+  /* ---- the numbers ---------------------------------------------------- */
+  var qa = qOf(p, 1, lo, hi, base), qc = qOf(p, -1, lo, hi, base);
+  var qav = (qa + qc) / 2;
+  var qstar = HU.q === "210" ? Q_CONV : Q_AVG;
+  var ecsa = ecsaOf(qav, qstar), rf = ecsa / HU.Ageo;
+  var fcap = HU.split * capt(lo, hi, PT.E1, PT.w1) + (1 - HU.split) * capt(lo, hi, PT.E2, PT.w2);
+  var set = function(id, t){ document.getElementById(id).innerHTML = t; };
+  set("huQdes", (qa * 1e6).toPrecision(3) + " µC");
+  set("huQads", (qc * 1e6).toPrecision(3) + " µC");
+  set("huQavg", (qav * 1e6).toPrecision(3) + " µC");
+  set("huEcsa", ecsa.toPrecision(3) + " cm²");
+  set("huRfOut", rf.toPrecision(3));
+  set("huMass", massArea(qav, qstar, HU.load, HU.Ageo).toPrecision(3) + " m²/g");
+  set("huTrue", (qTrue(p) * 1e6).toPrecision(3) + " µC");
+  set("huCapt", (fcap * 100).toFixed(1) + " %");
+  set("huErr", ((qav / qTrue(p) - 1) * 100).toFixed(1) + " %");
+  set("huNuv", (HU.v * 1000).toPrecision(3) + " mV/s");
+  set("huRfv", HU.rf.toPrecision(3));
+  set("huBasev", HU.base.toFixed(2) + " × i_dl");
+  set("huLov", HU.lo.toFixed(2) + " V");
+  set("huHiv", HU.hi.toFixed(2) + " V");
+  set("huLoadv", (HU.load * 1000).toPrecision(3) + " µg/cm²");
+
+  var msg, off = (qav / qTrue(p) - 1) * 100;
+  if(HU.lo < 0.035){
+    msg = "<b>The window reaches into HER.</b> Everything below about 0.05 V is hydrogen evolution, "
+        + "not adsorbed hydrogen, and integrating it adds charge that never sat on the surface: "
+        + off.toFixed(0) + " % high here. This is the commonest way an ECSA comes out too big.";
+  }else if(Math.abs(HU.base - 1) > 0.25){
+    msg = "<b>The baseline is doing the work.</b> At " + HU.base.toFixed(2) + " × the true double-layer "
+        + "current the answer is " + off.toFixed(1) + " % off, and nothing about the voltammogram tells "
+        + "you that. The double-layer line is an extrapolation from 0.4&ndash;0.6 V into a region where "
+        + "the surface is covered in hydrogen, so its capacitance is not the same &mdash; which is why "
+        + "ECSA is quoted to two significant figures and no more.";
+  }else if(fcap < 0.93){
+    msg = "<b>The window is clipping the wave.</b> It collects " + (fcap * 100).toFixed(1) + " % of the "
+        + "monolayer: the weakly bound peak runs under the lower limit and is simply lost. Widening the "
+        + "window recovers it, until the lower end reaches HER and starts adding charge instead.";
+  }else{
+    msg = "<b>About as well as this can be done.</b> The window collects " + (fcap * 100).toFixed(1)
+        + " % of the monolayer and the answer sits " + off.toFixed(1) + " % from the charge the model "
+        + "really put on the surface. Note which way the residual error runs: the clipped tail loses "
+        + "charge, so a careful H<sub>upd</sub> number is a slight <i>under</i>estimate.";
+  }
+  document.getElementById("huNote").innerHTML = msg;
+}
+function huSync(){ later("hu", huDraw); }
+
+/* ======================= 3 - CO STRIPPING ============================= */
+var CS = {v:0.02, rf:1.8, bridge:0.0, Ageo:0.196};
+
+function csDraw(){
+  var A = CS.rf * CS.Ageo, lo = 0.05, hi = 1.20, s = "";
+  /* CO molecules per Pt site: atop is one each, bridge is one per two */
+  var nco = (1 - CS.bridge) + CS.bridge / 2;
+  var coG = 2 * G_H * nco;                       /* two electrons per CO */
+  var p1 = {A:A, v:CS.v, cdl:40e-6, split:0.45, Elam:hi, block:1, co:1, coG:coG};
+  var p2 = {A:A, v:CS.v, cdl:40e-6, split:0.45, Elam:hi, block:0};
+  var m = Math.max(iSpan(p1, lo, hi), iSpan(p2, lo, hi)), un = iUnit(m);
+  var f = fr(62, 500, 22, 262, lo - 0.02, hi + 0.02, -m / un.k * 1.12, m / un.k * 1.12);
+  var g = fr(62, 500, 22, 262, lo - 0.02, hi + 0.02, -m * 1.12, m * 1.12);
+
+  s += axLin(f, "E / V vs RHE", "i / " + un.u);
+  s += ln(f.X0, f.py(0), f.X1, f.py(0), "var(--line-2)", 1.2);
+  s += pth(cvPath(g, p2, 1, lo, hi) + cvPath(g, p2, -1, lo, hi).replace(/^M/, "L"),
+           "var(--muted)", 1.5, null, 0.8);
+  s += pth(cvPath(g, p1, 1, lo, hi), "var(--red-)", 2.1);
+  var Ep = PT.Eco, ip = iPt(Ep, 1, p1);
+  s += cir(g.px(Ep), g.py(ip), 3.2, "var(--red-)");
+  s += tx(g.px(Ep) - 8, g.py(ip) - 6, "Q_CO", "var(--red-)", 10.5, "end", 700);
+  s += tx(g.px(0.17), g.py(0) - 10, "no H-upd — the CO is in the way",
+          "var(--muted)", 9.5, null, 600);
+  document.getElementById("csFig").innerHTML = s;
+
+  var idl = CS.v * 40e-6 * A;
+  var qco = qDiff(p1, p2, 1, 0.50, 1.05);
+  var qh = qOf(p2, 1, 0.05, 0.40, idl);
+  var eCO = qco / (2 * Q_CONV), eH = qh / Q_CONV;
+  var set = function(id, t){ document.getElementById(id).innerHTML = t; };
+  set("csQco", (qco * 1e6).toPrecision(3) + " µC");
+  set("csNco", nco.toFixed(3) + " CO / Pt");
+  set("csQspec", (qco / A * 1e6).toPrecision(3) + " µC/cm²");
+  set("csEcsaCO", eCO.toPrecision(3) + " cm²");
+  set("csEcsaH", eH.toPrecision(3) + " cm²");
+  set("csTrue", A.toPrecision(3) + " cm²");
+  set("csRatio", (eCO / A).toFixed(3) + " × true");
+  set("csNuv", (CS.v * 1000).toPrecision(3) + " mV/s");
+  set("csRfv", CS.rf.toPrecision(3));
+  set("csBridgev", Math.round(CS.bridge * 100) + " % bridged");
+
+  var msg;
+  if(CS.bridge < 0.05){
+    msg = "<b>All atop, and the assumption holds.</b> One CO on every Pt atom, two electrons each, "
+        + "so the monolayer is 2 × 210 = 420 µC/cm² and dividing by it returns the area you started "
+        + "with. This is the case every CO-stripping paper assumes.";
+  }else{
+    msg = "<b>" + Math.round(CS.bridge * 100) + " % of the sites carry bridged CO.</b> One molecule "
+        + "covers two Pt atoms, so there are only " + nco.toFixed(3) + " CO per site and the layer "
+        + "strips at " + (qco / A * 1e6).toPrecision(3) + " µC/cm², not 420. Divide by 420 anyway and "
+        + "you report " + (eCO / A).toFixed(3) + " of the real area &mdash; <b>an underestimate, and it "
+        + "bottoms out at exactly half</b> when every CO is bridged. The ratio is 1 &minus; x/2 and "
+        + "nothing in the voltammogram tells you x.";
+  }
+  document.getElementById("csNote").innerHTML = msg;
+}
+function csSync(){ later("cs", csDraw); }
+
+/* ======================= 4 - CAPACITANCE ============================== */
+var CP = {cdl:35e-6, cs:35e-6, rf:12, Ageo:0.196, E0:0.15};
+
+function cpDraw(){
+  var A = CP.rf * CP.Ageo, s = "";
+  var nus = [0.005, 0.01, 0.02, 0.05, 0.1, 0.2];
+  var m = nus[nus.length - 1] * CP.cdl * A, un = iUnit(m);
+  var f = fr(62, 500, 22, 214, -0.05, 0.35, -m / un.k * 1.3, m / un.k * 1.3);
+  s += axLin(f, "E / V vs reference", "i / " + un.u);
+  s += ln(f.X0, f.py(0), f.X1, f.py(0), "var(--line-2)", 1.2);
+  nus.forEach(function(nu, k){
+    var ic = nu * CP.cdl * A / un.k, o = 0.7 + 0.3 * k / (nus.length - 1);
+    s += pth("M" + f.px(-0.03) + " " + f.py(ic) + " L" + f.px(0.33) + " " + f.py(ic)
+           + " L" + f.px(0.33) + " " + f.py(-ic) + " L" + f.px(-0.03) + " " + f.py(-ic) + " Z",
+             "var(--red-)", 1.5, null, o);
+  });
+  s += ln(f.px(CP.E0), f.Y0, f.px(CP.E0), f.Y1, "var(--ion-k)", 1.4, "4 3");
+  s += tx(f.px(CP.E0) + 5, f.Y0 + 13, "read i here", "var(--ion-k)", 10, null, 700);
+  document.getElementById("cpFig").innerHTML = s;
+
+  /* i against v is a straight line through the origin: that slope is C */
+  var mx = 0.2, imax = mx * CP.cdl * A, u2 = iUnit(imax);
+  var f2 = fr(62, 452, 22, 206, 0, mx * 1000, 0, imax / u2.k * 1.12);
+  var s2 = axLin(f2, "scan rate / mV s⁻¹", "iᶜ / " + u2.u);
+  s2 += ln(f2.px(0), f2.py(0), f2.px(mx * 1000), f2.py(imax / u2.k), "var(--go)", 2);
+  nus.forEach(function(nu){
+    s2 += cir(f2.px(nu * 1000), f2.py(nu * CP.cdl * A / u2.k), 3.4, "var(--red-)");
+  });
+  s2 += tx(f2.X0 + 10, f2.Y0 + 16, "slope = Cᵈˡ = " + fmtF(CP.cdl * A),
+           "var(--go)", 10.5, null, 700);
+  document.getElementById("cpFig2").innerHTML = s2;
+
+  var Cmeas = CP.cdl * A, ecsa = Cmeas / CP.cs, rf = ecsa / CP.Ageo;
+  var set = function(id, t){ document.getElementById(id).innerHTML = t; };
+  set("cpC", fmtF(Cmeas));
+  set("cpEcsa", ecsa.toPrecision(3) + " cm²");
+  set("cpRfOut", rf.toPrecision(3));
+  set("cpTrue", A.toPrecision(3) + " cm²");
+  set("cpCdlv", (CP.cdl * 1e6).toPrecision(3) + " µF/cm²");
+  set("cpCsv", (CP.cs * 1e6).toPrecision(3) + " µF/cm²");
+  set("cpRfv", CP.rf.toPrecision(3));
+
+  var err = (ecsa / A - 1) * 100;
+  document.getElementById("cpNote").innerHTML = Math.abs(err) < 1
+    ? "<b>C<sub>s</sub> is right, so the area is right.</b> The whole method is one division, and it is "
+    + "exact the moment your specific capacitance matches the material. The trouble is that C<sub>s</sub> "
+    + "is the one thing you cannot measure on the sample you are measuring."
+    : "<b>C<sub>s</sub> is off by " + ((CP.cs / CP.cdl - 1) * 100).toFixed(0) + " %, so the area is off by "
+    + err.toFixed(0) + " %.</b> The error passes straight through: ECSA = C<sub>dl</sub>/C<sub>s</sub> is "
+    + "a division, not a fit. Reported C<sub>s</sub> for the same material span 20&ndash;60 µF/cm², which "
+    + "is a factor of three in every area that rests on them &mdash; and unlike H<sub>upd</sub>, nothing "
+    + "here is tied to a countable atom.";
+}
+function cpSync(){ later("cp", cpDraw); }
+
+/* ============== OTHER METALS, OTHER MONOLAYERS =======================
+   Four probes, one sample. Each is a single division, so each error is
+   a multiplier on the area and nothing averages it away:
+
+     H_upd        a mis-drawn baseline passes straight through
+     CO stripping bridged CO removes molecules  ->  1 - x/2, one sign
+     Cu UPD       an incomplete layer reports its own coverage
+     capacitance  ECSA = C_dl/C_s  ->  C_s(true)/C_s(looked up)
+
+   The four are independent of one another, which is the whole argument
+   for counting twice.                                                */
+var PB = {rf:12, hBase:0, xBr:0, cuT:1, csL:35};
+var PB_CS = 35;                            /* the real C_s, µF/cm2     */
+var PB_AGEO = 0.19635;                     /* the 5 mm disc of this page */
+var PB_SET = [
+  ["h",  "H upd",       "var(--go)"],
+  ["co", "CO stripping", "var(--ox)"],
+  ["cu", "Cu UPD",      "var(--ion-k)"],
+  ["cs", "capacitance", "var(--red-)"]
+];
+
+function pbRatio(k){
+  return k === "h"  ? 1 + PB.hBase / 100
+       : k === "co" ? 1 - PB.xBr / 2
+       : k === "cu" ? PB.cuT
+       :              PB_CS / PB.csL;
+}
+
+function pbDraw(){
+  var A = PB_AGEO * PB.rf, s = "";
+  var vals = PB_SET.map(function(p){ return PB.rf * pbRatio(p[0]); });
+  var xmax = Math.max.apply(null, vals.concat([PB.rf])) * 1.22;
+  var X0 = 150, X1 = 496, Y0 = 22, Y1 = 206, bh = 28;
+  var px = function(v){ return X0 + v / xmax * (X1 - X0); };
+  s += rc(X0, Y0, X1 - X0, Y1 - Y0, "var(--surface-2)", 0.5, 4);
+  /* a decimal grid, so the bars can be read off and not just compared */
+  var step = nice(xmax / 5), g;
+  for(g = step; g <= xmax; g += step){
+    s += ln(px(g), Y0, px(g), Y1, "var(--line)", 1, "2 3", 0.75);
+    s += tx(px(g), Y1 + 15, tickNum(g), "var(--muted)", 9.5, "middle");
+  }
+  s += xName(X0, X1, Y1 + 34, "roughness factor the probe reports");
+  PB_SET.forEach(function(p, i){
+    var y = Y0 + 14 + i * ((Y1 - Y0 - 28) / 3) - bh / 2;
+    var v = vals[i], e = (pbRatio(p[0]) - 1) * 100;
+    s += rc(X0, y, Math.max(1, px(v) - X0), bh, p[2], 0.82, 3);
+    s += tx(X0 - 8, y + bh / 2 + 4, p[1], "var(--ink-2)", 11, "end", 600);
+    var inside = px(v) - X0 > 92;
+    s += tx(px(v) + (inside ? -7 : 7), y + bh / 2 + 4,
+            v.toPrecision(3) + (Math.abs(e) < 0.05 ? "" :
+              "   (" + (e > 0 ? "+" : "") + e.toFixed(0) + " %)"),
+            inside ? "var(--surface)" : p[2], 10.5, inside ? "end" : null, 700);
+  });
+  s += ln(px(PB.rf), Y0 - 6, px(PB.rf), Y1 + 2, "var(--ink)", 1.8, "5 4");
+  s += tx(px(PB.rf), Y0 - 10, "the truth: " + PB.rf.toPrecision(3),
+          "var(--ink)", 10, "middle", 700);
+  document.getElementById("pbFig").innerHTML = s;
+
+  var set = function(id, t){ document.getElementById(id).innerHTML = t; };
+  set("pbTrue", A.toPrecision(3) + " cm\u00b2");
+  ["h", "co", "cu", "cs"].forEach(function(k, i){
+    set(["pbQh", "pbQco", "pbQcu", "pbQcs"][i],
+        (A * pbRatio(k)).toPrecision(3) + " cm\u00b2");
+  });
+  var hi = Math.max.apply(null, vals), lo = Math.min.apply(null, vals);
+  set("pbSpread", (hi / lo).toPrecision(3) + "\u00d7");
+  set("pbRfv", PB.rf.toPrecision(3));
+  set("pbHv", (PB.hBase > 0 ? "+" : "") + PB.hBase.toFixed(1) + " %");
+  set("pbXv", (PB.xBr * 100).toFixed(0) + " % bridged");
+  set("pbCuv", (PB.cuT * 100).toFixed(1) + " % of a layer");
+  set("pbCsv", PB.csL.toPrecision(3) + " \u00b5F/cm\u00b2");
+
+  var vd = document.getElementById("pbVerdict"), cls, msg;
+  var worst = 0, wname = "";
+  PB_SET.forEach(function(p, i){
+    var e = Math.abs(pbRatio(p[0]) - 1);
+    if(e > worst){ worst = e; wname = p[1]; }
+  });
+  if(hi / lo < 1.05){
+    cls = "go";
+    msg = "<b>All four land within " + ((hi / lo - 1) * 100).toFixed(0)
+        + " % of each other.</b> Four unrelated assumptions cannot fail the same way by accident, "
+        + "so this is the case where the area means something. Quote it with the probe that produced "
+        + "it &mdash; and quote the second probe too, because the agreement is the evidence, not the "
+        + "number.";
+  }else if(hi / lo < 1.5){
+    cls = "stop";
+    msg = "<b>They disagree by " + ((hi / lo - 1) * 100).toFixed(0) + " %, and "
+        + wname + " is the furthest out.</b> That is already larger than most of the activity "
+        + "differences people publish. Decide which assumption you trust before you divide a current "
+        + "by any of these, because the choice sets the answer.";
+  }else{
+    cls = "mixv";
+    msg = "<b>A factor of " + (hi / lo).toPrecision(2) + " between the highest and the lowest.</b> "
+        + "A specific activity is a current divided by one of these numbers, so the spread here is a "
+        + "spread of the same size in every turnover frequency computed from it &mdash; and nothing "
+        + "in the voltammogram itself tells you which of the four was right.";
+  }
+  vd.className = "verdict " + cls;
+  vd.innerHTML = msg;
+}
+function pbSync(){ later("pb", pbDraw); }
+
+/* ======================= CONTROLS ===================================== */
+function bind(id, fn){
+  var e = document.getElementById(id);
+  e.addEventListener("input", function(){ fn(+this.value); });
+}
+function setRange(id, v){ document.getElementById(id).value = v; }
+
+bind("pbRf", function(v){ PB.rf = Math.pow(10, v); pbSync(); });
+bind("pbH",  function(v){ PB.hBase = v; pbSync(); });
+bind("pbX",  function(v){ PB.xBr = v; pbSync(); });
+bind("pbCu", function(v){ PB.cuT = v; pbSync(); });
+bind("pbCs", function(v){ PB.csL = v; pbSync(); });
+[["pbP1", {hBase:0, xBr:0, cuT:1, csL:PB_CS}],
+ ["pbP2", {hBase:8, xBr:0.45, cuT:0.92, csL:60}]].forEach(function(p){
+  document.getElementById(p[0]).addEventListener("click", function(){
+    Object.keys(p[1]).forEach(function(k){ PB[k] = p[1][k]; });
+    setRange("pbH", PB.hBase); setRange("pbX", PB.xBr);
+    setRange("pbCu", PB.cuT);  setRange("pbCs", PB.csL);
+    pbSync();
+  });
+});
+
+bind("cvNu", function(v){ CV.v = Math.pow(10, v); cvSync(); });
+bind("cvRf", function(v){ CV.rf = Math.pow(10, v); cvSync(); });
+bind("cvElam", function(v){ CV.Elam = v; cvSync(); });
+bind("cvElo", function(v){ CV.Elo = v; cvSync(); });
+bind("cvCdl", function(v){ CV.cdl = v * 1e-6; cvSync(); });
+bind("cvSplit", function(v){ CV.split = v; cvSync(); });
+bind("cvPos", function(v){
+  /* dragging the scan by hand stops it running away under your finger */
+  if(cvAnim) cvRun();
+  CV_U = v; cvSync();
+});
+document.getElementById("cvRunBtn").addEventListener("click", cvRun);
+[["cvP1", {v:-1.301, rf:0.2553, Elam:1.20, Elo:0.05}],
+ ["cvP2", {v:-1.301, rf:0.2553, Elam:1.50, Elo:0.05}],
+ ["cvP3", {v:-1.301, rf:0.2553, Elam:1.20, Elo:0.00}]].forEach(function(p){
+  document.getElementById(p[0]).addEventListener("click", function(){
+    setRange("cvNu", p[1].v);   CV.v = Math.pow(10, p[1].v);
+    setRange("cvRf", p[1].rf);  CV.rf = Math.pow(10, p[1].rf);
+    setRange("cvElam", p[1].Elam); CV.Elam = p[1].Elam;
+    setRange("cvElo", p[1].Elo);   CV.Elo = p[1].Elo;
+    cvSync();
+  });
+});
+
+bind("huNu", function(v){ HU.v = Math.pow(10, v); huSync(); });
+bind("huRf", function(v){ HU.rf = Math.pow(10, v); huSync(); });
+bind("huBase", function(v){ HU.base = v; huSync(); });
+bind("huLo", function(v){ HU.lo = v; huSync(); });
+bind("huHi", function(v){ HU.hi = v; huSync(); });
+bind("huLoad", function(v){ HU.load = Math.pow(10, v); huSync(); });
+pillGroup("huQ", function(s){ HU.q = s; huSync(); });
+[["huP1", {base:1, lo:0.05, hi:0.40}],
+ ["huP2", {base:0.35, lo:0.05, hi:0.40}],
+ ["huP3", {base:1, lo:0.00, hi:0.40}]].forEach(function(p){
+  document.getElementById(p[0]).addEventListener("click", function(){
+    setRange("huBase", p[1].base); HU.base = p[1].base;
+    setRange("huLo", p[1].lo);     HU.lo = p[1].lo;
+    setRange("huHi", p[1].hi);     HU.hi = p[1].hi;
+    huSync();
+  });
+});
+
+bind("csNu", function(v){ CS.v = Math.pow(10, v); csSync(); });
+bind("csRf", function(v){ CS.rf = Math.pow(10, v); csSync(); });
+bind("csBridge", function(v){ CS.bridge = v; csSync(); });
+[["csP1", 0], ["csP2", 0.5], ["csP3", 1]].forEach(function(p){
+  document.getElementById(p[0]).addEventListener("click", function(){
+    setRange("csBridge", p[1]); CS.bridge = p[1]; csSync();
+  });
+});
+
+bind("cpCdl", function(v){ CP.cdl = v * 1e-6; cpSync(); });
+bind("cpCs", function(v){ CP.cs = v * 1e-6; cpSync(); });
+bind("cpRf", function(v){ CP.rf = Math.pow(10, v); cpSync(); });
+document.getElementById("cpP1").addEventListener("click", function(){
+  setRange("cpCs", Math.round(CP.cdl * 1e6)); CP.cs = CP.cdl; cpSync();
+});
+document.getElementById("cpP2").addEventListener("click", function(){
+  var w = Math.round(CP.cdl * 1e6) >= 45 ? 20 : 70;
+  setRange("cpCs", w); CP.cs = w * 1e-6; cpSync();
+});
+
+/* ======================= 5 - HER AND THE VOLCANO ======================
+   Three steps, one descriptor and one slope. Everything here is the same
+   two expressions evaluated: a Langmuir coverage that the potential
+   drives, and a Tafel slope that the coverage changes. The exchange
+   current comes off the volcano rather than a slider of its own, because
+   the point of the volcano is that it is not free to choose.         */
+var HE = {rds:"V", alpha:0.5, dG:-0.09, base:false};
+var KT_EV = 0.025693;                    /* kT at 25 C, in eV          */
+/* anchored so that Pt, at dG = -0.09 eV, comes out at its measured
+   1.2 mA per real cm2; the apex is then where the model says a perfect
+   catalyst would sit, which is a prediction rather than a datum      */
+var HE_J0 = 4.2e-2;
+/* a Langmuir isotherm of width kT fills from empty to full in about
+   100 mV, which no real surface does. This is the lumped width that
+   lateral repulsion and site heterogeneity actually give it        */
+var HE_W = 0.075;
+var HE_MET = [["W", -0.55], ["Mo", -0.48], ["Co", -0.31], ["Ni", -0.28],
+              ["Pd", -0.14], ["Rh", -0.11], ["Pt", -0.09], ["Ir", -0.05],
+              ["Cu", 0.10], ["Au", 0.33], ["Ag", 0.49]];
+
+function heJ0(dG){
+  /* the simplest expression that peaks at zero and falls on both sides */
+  var j = HE_J0 / (1 + Math.exp(Math.abs(dG) / KT_EV));
+  return HE.base ? j / 120 : j;          /* alkaline costs two decades */
+}
+/* a Langmuir coverage the overpotential drives: at eta = 0 it is set by
+   the binding energy alone, and cathodic overpotential fills it        */
+function heTheta(dG, h){ return 1 / (1 + Math.exp((dG - h) / HE_W)); }
+function heSlope(th){
+  var a = HE.alpha, d = 2.303 * RTF;
+  if(HE.rds === "V") return d / a;
+  if(HE.rds === "H") return d / (1 - th + a);
+  return d / (2 * Math.max(0.03, 1 - th));
+}
+/* log j is the integral of 1/b, because b itself moves with coverage  */
+function heCurve(dG, hmax, n){
+  var pts = [], h, i, L = Math.log(10) * 0, lg = Math.log10(heJ0(dG));
+  pts.push({h:0, lg:lg, b:heSlope(heTheta(dG, 0))});
+  for(i = 1; i <= n; i++){
+    h = hmax * i / n;
+    var hm = hmax * (i - 0.5) / n, b = heSlope(heTheta(dG, hm));
+    lg += (hmax / n) / b;
+    pts.push({h:h, lg:lg, b:heSlope(heTheta(dG, h))});
+  }
+  return pts;
+}
+function heAt(pts, target){
+  var i;
+  for(i = 1; i < pts.length; i++)
+    if(pts[i].lg >= target){
+      var f = (target - pts[i - 1].lg) / (pts[i].lg - pts[i - 1].lg);
+      return {h:pts[i - 1].h + f * (pts[i].h - pts[i - 1].h), b:pts[i].b};
+    }
+  return null;
+}
+
+/* Keep a label clear of the ones already placed in the same picture.
+   Only labels whose x ranges actually overlap can collide, so the test
+   is on the box, and a clash is resolved by moving up one line at a
+   time. Width is estimated from the string, which is accurate enough
+   for the 9-11 px annotations these figures use.                     */
+function laneY(used, x0, x1, y, h, top){
+  for(var k = 0; k < 14; k++){
+    var c = y - k * h, ok = true;
+    if(c < (top || 0) + h) break;
+    for(var i = 0; i < used.length; i++){
+      var u = used[i];
+      if(x1 > u[0] && x0 < u[1] && Math.abs(c - u[2]) < h){ ok = false; break; }
+    }
+    if(ok){ used.push([x0, x1, c]); return c; }
+  }
+  used.push([x0, x1, y]);
+  return y;
+}
+function laneW(text, size){ return 0.58 * (size || 10) * String(text).length; }
+
+function heDraw(){
+  var dG = HE.dG, pts = heCurve(dG, 0.8, 400), s = "";
+  var lgt = Math.log10(0.01);                       /* 10 mA / cm2     */
+  var hit = heAt(pts, lgt);
+  var lo = Math.floor(Math.log10(heJ0(dG))) - 0.3, hi = 0;
+
+  /* ---- the Tafel plot ---------------------------------------------- */
+  var f = fr(70, 500, 22, 246, lo, hi, 0, 0.8);
+  s += axLin(f, "log |j| / A cm\u207b\u00b2 of real area", "\u03b7 / V",
+             function(v){ return v.toFixed(0); }, function(v){ return v.toFixed(1); });
+  var d = "", i;
+  for(i = 0; i < pts.length; i++)
+    if(pts[i].lg >= lo && pts[i].lg <= hi)
+      d += (d ? "L" : "M") + f.px(pts[i].lg).toFixed(1) + " " + f.py(pts[i].h).toFixed(1) + " ";
+  s += pth(d, "var(--red-)", 2.3);
+  /* the three annotations of this plot all crowd the foot of it when j0
+     is large, and the j0 label used to sit in the tick row under the
+     axis. Put it above the axis and give the three of them lanes. */
+  var LANE = [], jx = f.px(Math.log10(heJ0(dG))), jr = jx < f.X1 - 36;
+  s += cir(jx, f.py(0), 4, "var(--go)");
+  var jw = laneW("j\u2080", 10);
+  s += tx(jx + (jr ? 7 : -7),
+          laneY(LANE, jr ? jx + 7 : jx - 7 - jw, jr ? jx + 7 + jw : jx - 7,
+                f.py(0) - 8, 14, f.Y0),
+          "j\u2080", "var(--go)", 10, jr ? null : "end", 700);
+  if(hit && hit.h < 0.8){
+    /* the tangent, drawn over one decade, is the slope you would report */
+    var x0 = lgt - 0.5, x1 = lgt + 0.5;
+    var y0 = hit.h - 0.5 * hit.b, y1 = hit.h + 0.5 * hit.b;
+    s += ln(f.px(x0), f.py(y0), f.px(x1), f.py(y1), "var(--ink)", 1.5, "5 3");
+    s += ln(f.X0, f.py(hit.h), f.px(lgt), f.py(hit.h), "var(--stop)", 1.2, "4 3");
+    s += ln(f.px(lgt), f.py(hit.h), f.px(lgt), f.Y1, "var(--stop)", 1.2, "4 3");
+    s += cir(f.px(lgt), f.py(hit.h), 4.4, "var(--stop)");
+    var rt = f.px(lgt) < f.X1 - 150;
+    var hy = clamp(f.py(hit.h), f.Y0 + 12, f.Y1);
+    var bt = "b = " + (hit.b * 1000).toFixed(0) + " mV/dec", bw = laneW(bt, 10.5);
+    s += tx(f.px(lgt) + (rt ? 8 : -8),
+            laneY(LANE, rt ? f.px(lgt) + 8 : f.px(lgt) - 8 - bw,
+                  rt ? f.px(lgt) + 8 + bw : f.px(lgt) - 8, hy - 8, 14, f.Y0),
+            bt, "var(--ink)", 10.5, rt ? null : "end", 700);
+    var et = "\u03b7\u2081\u2080 = " + (hit.h * 1000).toFixed(0) + " mV";
+    s += tx(f.X0 + 5,
+            laneY(LANE, f.X0 + 5, f.X0 + 5 + laneW(et, 10), hy - 6, 14, f.Y0),
+            et, "var(--stop)", 10, null, 700);
+  }else{
+    s += tx((f.X0 + f.X1) / 2, (f.Y0 + f.Y1) / 2,
+            "10 mA cm\u207b\u00b2 is out of reach below 800 mV", "var(--muted)", 11, "middle", 600);
+  }
+  document.getElementById("heTafel").innerHTML = s;
+
+  /* ---- the coverage that moved it ---------------------------------- */
+  var g = fr(70, 500, 22, 246, 0, 0.8, 0, 1.05), q = "";
+  q += axLin(g, "\u03b7 / V", "\u03b8 of H\u2090\u2094",
+             function(v){ return v.toFixed(1); }, function(v){ return v.toFixed(1); });
+  q += rc(g.X0, g.Y0, g.X1 - g.X0, g.py(0.8) - g.Y0, "var(--ox)", 0.08);
+  q += tx(g.X1 - 6, g.py(0.9) + 4, "no free sites left for the second step",
+          "var(--ox)", 9.5, "end", 700);
+  var dd = "";
+  for(i = 0; i <= 200; i++){
+    var h = 0.8 * i / 200;
+    dd += (i ? "L" : "M") + g.px(h).toFixed(1) + " " + g.py(heTheta(dG, h)).toFixed(1) + " ";
+  }
+  q += pth(dd, "var(--ion-k)", 2.3);
+  if(hit && hit.h < 0.8){
+    /* eta10 is negative on a catalyst whose j0 already passes 10 mA, so
+       the dashed line can leave the frame at either end; keep the mark
+       and its label inside it, and turn the label round near the right
+       edge rather than letting it run off. */
+    var cx = clamp(g.px(hit.h), g.X0 + 2, g.X1 - 2);
+    q += ln(cx, g.Y0, cx, g.Y1, "var(--stop)", 1.2, "4 3");
+    q += cir(cx, clamp(g.py(heTheta(dG, hit.h)), g.Y0 + 5, g.Y1 - 5), 4.4, "var(--stop)");
+    var cr = cx < g.X1 - 104;
+    q += tx(cx + (cr ? 6 : -6), g.Y0 + 14, "at 10 mA cm\u207b\u00b2",
+            "var(--stop)", 9.5, cr ? null : "end", 700);
+  }
+  /* what the slope would be at each end, written where it applies */
+  q += tx(g.X0 + 8, g.py(0.12), "b = " + (heSlope(0.02) * 1000).toFixed(0)
+          + " mV/dec while the surface is empty", "var(--ion-k)", 9.5, null, 700);
+  q += tx(g.X1 - 6, g.py(0.62), "b = " + (heSlope(0.97) * 1000).toFixed(0)
+          + " mV/dec once it is full", "var(--ion-k)", 9.5, "end", 700);
+  q += tx(g.X0 + 8, g.Y1 + 44, "this is the \u00ab reactive \u00bb H \u2014 not the strongly bound "
+          + "H\u1d64\u209a\u2094 the first tabs count", "var(--muted)", 9.5, null, 600);
+  document.getElementById("heCov").innerHTML = q;
+
+  /* ---- the volcano -------------------------------------------------- */
+  var v = fr(70, 1020, 22, 232, -0.7, 0.7, -11, -2), w = "";
+  w += axLin(v, "\u0394G\u029c / eV \u2014 binds more strongly \u2190   \u2192 binds more weakly",
+             "log j\u2080 / A cm\u207b\u00b2",
+             function(x){ return x.toFixed(1); }, function(y){ return y.toFixed(0); });
+  var vd = "";
+  for(i = 0; i <= 280; i++){
+    var x = -0.7 + 1.4 * i / 280;
+    var y = Math.log10(HE_J0 / (1 + Math.exp(Math.abs(x) / KT_EV)) / (HE.base ? 120 : 1));
+    if(y < v.ylo) { vd = vd; continue; }
+    vd += (vd ? "L" : "M") + v.px(x).toFixed(1) + " " + v.py(y).toFixed(1) + " ";
+  }
+  w += pth(vd, "var(--red-)", 2.3);
+  var MLANE = [];
+  HE_MET.forEach(function(m, idx){
+    var y = Math.log10(HE_J0 / (1 + Math.exp(Math.abs(m[1]) / KT_EV)) / (HE.base ? 120 : 1));
+    if(y < v.ylo) return;
+    w += cir(v.px(m[1]), v.py(y), 4, "var(--ink-2)");
+    /* near the apex there is no room above the point for the label */
+    var my = v.py(y) - 9 - (idx % 2) * 11;
+    if(my < 13) my = v.py(y) + 16 + (idx % 2) * 11;
+    var mw = laneW(m[0], 10);
+    w += tx(v.px(m[1]), laneY(MLANE, v.px(m[1]) - mw / 2, v.px(m[1]) + mw / 2,
+                              my, 12, 2), m[0], "var(--ink-2)", 10, "middle", 700);
+  });
+  var yv = Math.log10(heJ0(dG));
+  if(yv > v.ylo){
+    w += cir(v.px(dG), v.py(yv), 9, "var(--stop)", 0.25);
+    w += cir(v.px(dG), v.py(yv), 4.6, "var(--stop)");
+  }
+  w += ln(v.px(0), v.Y0, v.px(0), v.Y1, "var(--go)", 1.2, "4 3");
+  /* at the foot of its own line: the top of it is where the apex and the
+     metals nearest DG = 0 already are */
+  w += tx(v.px(0) + 6, v.Y1 - 8, "\u0394G\u029c = 0 \u2014 the top", "var(--go)", 10, null, 700);
+  w += tx(v.X0, v.Y1 + 44, "kT as the only width makes this volcano steeper than a measured one: "
+          + "read the ordering and the two legs, not the absolute j\u2080", "var(--muted)", 9.5, null, 600);
+  document.getElementById("heVolc").innerHTML = w;
+
+  /* ---- the numbers --------------------------------------------------- */
+  var near = HE_MET[0], k;
+  for(k = 0; k < HE_MET.length; k++)
+    if(Math.abs(HE_MET[k][1] - dG) < Math.abs(near[1] - dG)) near = HE_MET[k];
+  var set = function(id, t){ document.getElementById(id).innerHTML = t; };
+  set("heMetal", Math.abs(near[1] - dG) < 0.05 ? near[0] : "between " + near[0] + " and nothing named");
+  set("heJ0", heJ0(dG).toPrecision(2) + " A cm\u207b\u00b2");
+  set("heTh", hit ? (heTheta(dG, hit.h) * 100).toFixed(0) + " %" : "&mdash;");
+  set("heB", hit ? (hit.b * 1000).toFixed(0) + " mV/dec" : "&mdash;");
+  set("heEta", hit && hit.h < 0.8 ? (hit.h * 1000).toFixed(0) + " mV" : "&gt; 800 mV");
+  set("heB0", (heSlope(heTheta(dG, 0)) * 1000).toFixed(0) + " mV/dec");
+  set("heDGv", (dG >= 0 ? "+" : "") + dG.toFixed(2) + " eV");
+  set("heAlv", HE.alpha.toFixed(2));
+
+  var msg, th = hit ? heTheta(dG, hit.h) : heTheta(dG, 0.8);
+  if(HE.rds === "T" && th > 0.95){
+    msg = "<b>The surface is full and the step that empties it needs two free sites.</b> The slope "
+        + "runs away &mdash; the current has stopped caring about potential, which is a limiting "
+        + "current, not a Tafel region. This is the left leg of the volcano seen from underneath.";
+  }else if(th > 0.9){
+    msg = "<b>&theta;<sub>H</sub> is pinned at " + (th * 100).toFixed(0) + " %.</b> A coverage that "
+        + "cannot rise stops contributing to the potential dependence, so the Heyrovsky slope has "
+        + "climbed to the same 2.303RT/&alpha;F the Volmer step gives. <b>Two mechanisms, one "
+        + "number</b> &mdash; which is why a slope alone never names a step.";
+  }else if(th < 0.05){
+    msg = "<b>Almost nothing is adsorbed.</b> At &theta; = " + (th * 100).toFixed(1) + " % there is "
+        + "hardly any H<sub>ad</sub> for the second step to work on, so the discharge is what is slow "
+        + "whatever you selected. j<sub>0</sub> is down at " + heJ0(dG).toPrecision(2)
+        + " A cm<sup>&minus;2</sup>: this is the right-hand leg.";
+  }else{
+    msg = "<b>Near the top.</b> &theta; = " + (th * 100).toFixed(0) + " % at the benchmark current "
+        + "&mdash; enough intermediate to react and a weak enough bond to let it go. The slope reads "
+        + (hit ? (hit.b * 1000).toFixed(0) : "\u2014") + " mV/dec, which is the "
+        + (HE.rds === "V" ? "Volmer" : HE.rds === "H" ? "Heyrovsky" : "Tafel")
+        + " answer at &alpha; = " + HE.alpha.toFixed(2) + ".";
+  }
+  if(HE.base) msg += " <b>In alkali</b> the discharge is of water rather than H<sub>3</sub>O<sup>+</sup>, "
+      + "and the whole volcano drops about two decades &mdash; same shape, same ordering, less current.";
+  document.getElementById("heNote").innerHTML = msg;
+}
+function heSync(){ later("he", heDraw); }
+
+pillGroup("heRds", function(v){ HE.rds = v; heSync(); });
+pillGroup("hePh", function(v){ HE.base = (v === "base"); heSync(); });
+bind("heDG", function(v){ HE.dG = v; heSync(); });
+bind("heAl", function(v){ HE.alpha = v; heSync(); });
+[["heP1", {dG:-0.09, rds:"V", base:false}],
+ ["heP2", {dG:-0.28, rds:"H", base:true}],
+ ["heP3", {dG:0.33, rds:"V", base:false}]].forEach(function(p){
+  document.getElementById(p[0]).addEventListener("click", function(){
+    setRange("heDG", p[1].dG); HE.dG = p[1].dG;
+    HE.rds = p[1].rds; HE.base = p[1].base;
+    pillSet("heRds", p[1].rds); pillSet("hePh", p[1].base ? "base" : "acid");
+    heSync();
+  });
+});
+
+/* ---- panels drawn when first shown ------------------------------------ */
+var PANEL_SHOW = {}, SHOWN = {};
+[].slice.call(document.querySelectorAll(".tab")).forEach(function(t){
+  t.addEventListener("click", function(){
+    var id = t.getAttribute("aria-controls");
+    if(PANEL_SHOW[id] && !SHOWN[id]){ SHOWN[id] = 1; PANEL_SHOW[id](); }
+  });
+});
+PANEL_SHOW["p-hupd"] = function(){ huSync(); csSync(); };
+PANEL_SHOW["p-cap"] = cpSync;
+PANEL_SHOW["p-probe"] = pbSync;
+PANEL_SHOW["p-her"] = heSync;
+
+cvSync();
+
+
+/* ================= CONCEPT CHECK QUESTIONS ============================
+   One check, covering all three methods. Every answer is something the
+   page can be made to show, not something to remember.                 */
+
+var QZ1 = [
+ {q:"You double the scan rate on a clean Pt electrode. What happens to the H<sub>upd</sub> peak current and to the charge under the peak?",
+  o:["The current rises by &radic;2 and the charge is unchanged",
+     "The current doubles and the charge halves",
+     "Both double",
+     "The current doubles and the charge is unchanged"],
+  a:3,
+  w:"H<sub>upd</sub> is a <b>surface</b> wave: the hydrogen is already on the electrode when the sweep starts, so a fixed &Gamma; is stripped in half the time. i = w(F/RT)FA&Gamma;&upsilon;&middot;&theta;(1&minus;&theta;) is linear in &upsilon;, and Q = &int;i dE/&upsilon; = FA&Gamma; does not contain &upsilon; at all. The &radic;&upsilon; answer is Randles&ndash;Sev&ccaron;&iacute;k, which applies to a species diffusing in from solution &mdash; and for that case the charge would <i>fall</i> as 1/&radic;&upsilon;. The charge-against-scan-rate plot on the second tab is exactly this question."},
+
+ {q:"Two groups measure the same Pt electrode by H<sub>upd</sub> and report areas differing by 6.6 %, with identical voltammograms. What is the most likely cause?",
+  o:["One used a faster scan rate",
+     "One divided by 210 µC cm<sup>&minus;2</sup> and the other by 197",
+     "One electrode was rougher",
+     "One corrected for the double-layer charging and the other did not"],
+  a:1,
+  w:"210/197 = 1.066 exactly. 197 is the equal-weight average of the (100), (110) and (111) charge densities &mdash; 208, 147 and 240 µC cm<sup>&minus;2</sup>, each of which is just the surface atom density of that plane times e. 210 is a convention. Both are defensible and they differ by precisely the 6.6 % reported, with no measurement involved. A scan-rate difference would not change the charge at all, and a baseline difference would not land on such a round number."},
+
+ {q:"A CO-stripping measurement on a Pt catalyst gives an area 30 % below the H<sub>upd</sub> value. Which explanation fits?",
+  o:["Part of the CO layer is bridge-bonded, so there are fewer than one molecule per Pt",
+     "The CO layer was incomplete, leaving bare Pt that still gave H<sub>upd</sub>",
+     "The CO oxidation peak was integrated with too high a baseline",
+     "Any of these three would do it"],
+  a:3,
+  w:"All three remove charge from the CO peak, or add it to the H<sub>upd</sub> one, in the right direction. Bridging is the one the deck warns about &mdash; one CO on two Pt means 1 &minus; x/2 of the expected 420 µC cm<sup>&minus;2</sup>, bottoming out at half &mdash; but an incomplete layer and a baseline set too high do the same arithmetic to the integral. That is the real lesson: the two methods disagreeing tells you an assumption broke, not <i>which</i> one. The check is whether H<sub>upd</sub> was fully suppressed in the first cycle."},
+
+ {q:"Why is H<sub>upd</sub>, and not the Pt oxide peak, used to count surface atoms?",
+  o:["The number of electrons per Pt in the oxide depends on the upper limit and the hold time",
+     "The oxide peak overlaps with hydrogen evolution",
+     "The oxide peak is too small to integrate accurately",
+     "Oxide formation is not an electrochemical reaction"],
+  a:0,
+  w:"H<sub>upd</sub> is one hydrogen, one electron, one Pt atom, and it saturates &mdash; that is what makes the charge countable. Pt oxide grows as PtOH and on into PtO and deeper with potential and time, so the electrons per surface atom is not a constant you can divide by; the first tab shows the oxide charge climbing with the upper limit while the H<sub>upd</sub> charge does not move. The oxide peak is not small, and it sits near 0.78 V, nowhere near HER."},
+
+ {q:"On the H<sub>upd</sub> tab, dragging the double-layer baseline down (lower than the true charging current) does what to the reported ECSA, and why is that dangerous?",
+  o:["Leaves it unchanged, because the baseline cancels between Q<sub>ads</sub> and Q<sub>des</sub>",
+     "Raises it, but the error is caught by averaging Q<sub>ads</sub> and Q<sub>des</sub>",
+     "Raises it, and nothing in the voltammogram shows the baseline was wrong",
+     "Lowers it, but the trace visibly changes shape"],
+  a:2,
+  w:"A lower baseline leaves more area between it and the trace, so Q goes up and the area with it. The danger is that the baseline is an extrapolation, not a measurement: it is read where the Pt is bare and applied where it is covered in hydrogen, and the voltammogram looks identical whichever line you drew. Averaging Q<sub>ads</sub> and Q<sub>des</sub> does not help &mdash; the baseline shifts both the same way. This is why ECSA is reported to two significant figures."},
+
+ {q:"For a material with no adsorbate to count &mdash; a metal oxide, say &mdash; you measure C<sub>dl</sub> from the slope of i<sub>c</sub> against &upsilon; and divide by a C<sub>s</sub> from the literature. What is the status of the number you get?",
+  o:["A relative area: reliable for comparing samples you measured the same way, weak as an absolute",
+     "An absolute area as good as H<sub>upd</sub>, since the slope is measured precisely",
+     "Meaningless, because capacitance has nothing to do with area",
+     "An absolute area, provided the scan rates were low enough to stay capacitive"],
+  a:0,
+  w:"The slope is easy and precise; the divisor is the problem. C<sub>s</sub> is not measured on your sample &mdash; it is the capacitance somebody else reported for an atomically flat piece of nominally the same material, and published values for one material span 20&ndash;60 µF cm<sup>&minus;2</sup>. That factor of three passes straight into the area, because ECSA = C<sub>dl</sub>/C<sub>s</sub> is a division and not a fit. Between samples you measured identically, C<sub>s</sub> cancels and the comparison is sound, which is how the method should be used."}
+];
+
+
+
+/* ---- check 2: the step, the slope and the volcano -------------------- */
+var QZ2 = [
+ {q:"A catalyst gives a Tafel slope of 120 mV/dec for HER. Which conclusion is safe?",
+  o:["The Volmer discharge must be rate-determining",
+     "Either the Volmer step is rate-determining, or the Heyrovsky step is on a nearly saturated surface",
+     "The Tafel recombination must be rate-determining",
+     "&alpha; must be close to 1"],
+  a:1,
+  w:"2.303RT/&alpha;F is 118 mV/dec at &alpha; = 0.5, and that is the Volmer answer &mdash; but it is <i>also</i> the Heyrovsky answer once &theta;<sub>H</sub> has saturated, because a coverage that can no longer rise stops contributing to the potential dependence. Drive &Delta;G<sub>H</sub> strongly negative on the HER tab and switch between the two rds pills: the number does not move. <b>A slope has to be argued together with a coverage</b>, and the coverage is exactly what H<sub>upd</sub> measures."},
+
+ {q:"Your Tafel plot is straight up to 1 mA cm<sup>&minus;2</sup> and then bends upward, the apparent slope rising from 40 to 90 mV/dec. What is the first thing to suspect?",
+  o:["The mechanism changes from Heyrovsky to Volmer",
+     "The catalyst is deactivating during the measurement",
+     "Mass transport of H<sup>+</sup> is taking over",
+     "Uncompensated resistance &mdash; part of the applied potential is across the solution"],
+  a:3,
+  w:"&eta;<sub>true</sub> = &eta;<sub>applied</sub> &minus; iR<sub>u</sub>, so every decade of current adds its own error to the x axis and the line tips over. At 10 mA through 10 &Omega; that is 100 mV of overpotential that never reached the electrode &mdash; the same R<sub>u</sub> that set &tau; in Lecture 14. Measure it, subtract it, and say that you did. A real mechanism change is possible, but it is the last explanation to reach for, not the first."},
+
+ {q:"Two electrodes give the same current at the same potential per <b>geometric</b> cm&sup2;. One has a roughness factor of 1, the other 50. Which is the better catalyst?",
+  o:["The smooth one &mdash; it does the same job with one fiftieth of the surface",
+     "The rough one &mdash; more surface is always better",
+     "Neither; equal current means equal catalysis",
+     "There is not enough information"],
+  a:0,
+  w:"Catalysis is a rate per site. Per <i>real</i> area the rough electrode is running fifty times slower, and it only keeps up because it brought fifty times more platinum. This is the whole reason the first four tabs of this page exist: a j<sub>0</sub> or a volcano plotted on geometric current is partly a plot of surface areas. Quote current per real cm&sup2; or quote the roughness factor beside it."},
+
+ {q:"On the strong-binding leg of the volcano &mdash; W, Mo &mdash; what is actually slow?",
+  o:["The discharge of H<sup>+</sup>, because there is too little adsorbed hydrogen",
+     "Transport of H<sup>+</sup> to the surface",
+     "Getting the hydrogen off again: the surface is full, so the second step has no free sites to work with",
+     "The solution resistance, which is higher on these metals"],
+  a:2,
+  w:"&Delta;G<sub>H</sub> strongly negative means the surface saturates at tiny overpotential and stays saturated. A Tafel recombination needs two free neighbouring sites and a Heyrovsky step needs somewhere for the next proton to land, so whichever finishes the reaction becomes the bottleneck and the current stops responding to potential at all. Drag &Delta;G<sub>H</sub> left on the HER tab and watch &theta; pin at 100 % while the slope runs away. The right-hand leg is the opposite failure: not enough H<sub>ad</sub> to react, so the Volmer step limits."},
+
+ {q:"A CO<sub>2</sub> reduction paper reports 95 % Faradaic efficiency for CO. What does that number alone <i>not</i> tell you?",
+  o:["Which product took most of the charge",
+     "What fraction of the electrons ended up as CO",
+     "Whether hydrogen evolution was largely suppressed",
+     "How fast CO was being made"],
+  a:3,
+  w:"Faradaic efficiency is a share of charge, which makes it a <b>selectivity</b>, not an activity. The rate is the partial current density, j<sub>i</sub> = FE<sub>i</sub> &times; j<sub>total</sub>, per real area &mdash; 95 % at 1 mA cm<sup>&minus;2</sup> and 95 % at 300 mA cm<sup>&minus;2</sup> are the same selectivity and different results by two and a half orders of magnitude. Both numbers have to be quoted, and the second one is the one most often missing."},
+
+ {q:"Why does an H-type cell struggle to reach hundreds of mA cm<sup>&minus;2</sup> of CO<sub>2</sub> reduction, however good the catalyst is?",
+  o:["The counter-electrode reaction cannot keep up",
+     "The reactant is dissolved CO<sub>2</sub> &mdash; about 34 mM &mdash; so transport to the surface caps the current",
+     "The membrane resistance dominates at high current",
+     "Faradaic efficiency always collapses above 10 mA cm<sup>&minus;2</sup>"],
+  a:1,
+  w:"CO<sub>2</sub> is barely soluble in water, so the electrode is fed by diffusion from a reservoir of about 0.03 M and the limiting current lands in the tens of mA cm<sup>&minus;2</sup> whatever is on the surface. A gas-diffusion electrode removes the problem by delivering CO<sub>2</sub> as a <i>gas</i> to a three-phase boundary, which is why flow-cell numbers are an order of magnitude higher. <b>Comparing a catalyst measured in an H-cell with one measured on a GDE is not a comparison of catalysts.</b>"}
+];
+
+var LETTERS = "ABCD";
+var SUBMIT_URL = "https://script.google.com/macros/s/AKfycbxPm7WrbttFu6-gnTi__IcUPt-816GthK0eI8TPuwOZyYlcRW3RAWJlmsr791moxBc5GA/exec";
+
+function code(str){
+  var h=0x811c9dc5;
+  for(var i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=(h+((h<<1)+(h<<4)+(h<<7)+(h<<8)+(h<<24)))>>>0; }
+  return ("0000000"+h.toString(16).toUpperCase()).slice(-8);
+}
+
+/* n: 1 or 2, the suffix on every element id of that check's panel */
+function makeQuiz(n, QZ, label, STORE){
+  function E(id){ return document.getElementById(id + n); }
+  var picks=new Array(QZ.length).fill(-1);
+  var sId=E("sId"), elTally=E("tally"), elBar=E("scorebar"), elScore=E("scoreNum"),
+      elWho=E("whoLine"), elIdHint=E("idHint"), dlBtn=E("dlBtn"), dlHint=E("dlHint"),
+      sendBtn=E("sendBtn"), root=E("quiz");
+  var startedAt=null, finishedAt=null;
+
+  function save(){
+    try{ localStorage.setItem(STORE,JSON.stringify({i:sId.value,p:picks,s:startedAt,t:finishedAt})); }catch(e){}
+  }
+  function loadState(){
+    try{
+      var d=JSON.parse(localStorage.getItem(STORE)||"null");
+      if(d){ sId.value=d.i||""; if(Array.isArray(d.p)&&d.p.length===QZ.length) picks=d.p.slice();
+             startedAt=d.s||null; finishedAt=d.t||null; }
+    }catch(e){}
+  }
+  function started(){ return picks.some(function(p){return p>=0;}); }
+  function scoreOf(){ var s=0; for(var i=0;i<QZ.length;i++) if(picks[i]===QZ[i].a) s++; return s; }
+  function answered(){ return picks.filter(function(p){return p>=0;}).length; }
+
+  function receipt(){
+    var s=scoreOf(), pct=Math.round(s/QZ.length*100), id=(sId.value||"").trim();
+    var stamp=finishedAt||new Date().toISOString();
+    var vc=code(id+"|"+stamp+"|"+picks.join(""));
+    var head=["lecture","student_id","completed_utc","score","total","percent","verification"];
+    var row=[label,id,stamp,s,QZ.length,pct,vc];
+    for(var i=0;i<QZ.length;i++){ head.push("a"+(i+1)); row.push(picks[i]>=0?LETTERS[picks[i]]:"-"); }
+    for(var j=0;j<QZ.length;j++){ head.push("ok"+(j+1)); row.push(picks[j]===QZ[j].a?1:0); }
+    function cell(v){ v=String(v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
+    return {csv:head.join(",")+"\n"+row.map(cell).join(",")+"\n", vcode:vc, score:s, pct:pct, id:id};
+  }
+
+  function render(){
+    var done=answered(), all=(done===QZ.length);
+    elTally.textContent=done+" / "+QZ.length+" answered";
+    elBar.hidden=!all;
+    sId.readOnly=started();
+    elIdHint.innerHTML = all
+      ? "<strong>Attempt complete.</strong> Your answers are final. Every question now shows the correct answer and why — read them before you close this page."
+      : started() ? "<strong>Attempt in progress.</strong><span class=\"locked\">ID locked</span><br>Each answer is final."
+                  : "<strong>One attempt.</strong> Enter your student ID before you begin — it locks once you answer the first question.";
+    if(all){
+      if(!finishedAt){ finishedAt=new Date().toISOString(); save(); }
+      var r=receipt();
+      elScore.innerHTML=r.score+' <small>/ '+QZ.length+'  ·  '+r.pct+' %</small>';
+      elWho.innerHTML="Student ID <b>"+esc(r.id||"—")+"</b> &nbsp;·&nbsp; Verification <b>"+r.vcode+"</b>";
+    }
+    for(var i=0;i<QZ.length;i++){
+      var box=root.querySelector('.opts[data-q="'+i+'"]');
+      var kids=[].slice.call(box.children), why=box.parentNode.querySelector(".why");
+      if(picks[i]<0){ kids.forEach(function(o){o.disabled=false;o.className="opt";}); why.hidden=true; }
+      else{
+        (function(qi){ kids.forEach(function(o,j){
+          o.disabled=true;
+          o.className="opt"+(j===QZ[qi].a?" right":(j===picks[qi]?" wrong":""));
+        }); })(i);
+        var _note=(picks[i]!==QZ[i].a)
+          ? '<span class="misc">You chose <b>'+LETTERS[picks[i]]+'</b>. '
+            + 'The correct answer is <b>'+LETTERS[QZ[i].a]+'</b>.</span>'
+          : "";
+        why.innerHTML=_note+QZ[i].w; why.hidden=false;
+      }
+    }
+  }
+
+  root.innerHTML=QZ.map(function(item,i){
+    return '<div class="card q"><div class="card-b">'
+      +'<p class="stem"><b style="font-family:IBM Plex Mono,monospace;color:var(--muted);font-size:12px">Q'+(i+1)+'</b>  '+item.q+'</p>'
+      +'<div class="opts" data-q="'+i+'">'+item.o.map(function(o,j){
+          return '<button class="opt" data-i="'+j+'"><span class="ltr">'+LETTERS[j]+'</span><span>'+o+'</span></button>';
+        }).join("")+'</div><p class="why" hidden></p></div></div>';
+  }).join("");
+
+  [].slice.call(root.querySelectorAll(".opts")).forEach(function(box){
+    box.addEventListener("click",function(ev){
+      var b=ev.target.closest(".opt");
+      if(!b||b.disabled) return;
+      var qi=+box.getAttribute("data-q");
+      if(picks[qi]>=0) return;
+      if(!(sId.value||"").trim()){
+        elIdHint.innerHTML="<strong style=\"color:var(--stop)\">Enter your student ID first.</strong> It is written into the result file you submit.";
+        sId.focus(); return;
+      }
+      if(!startedAt) startedAt=new Date().toISOString();
+      picks[qi]=+b.getAttribute("data-i");
+      save(); render();
+    });
+  });
+  sId.addEventListener("input",save);
+
+  dlBtn.addEventListener("click",function(){
+    var id=(sId.value||"").trim();
+    if(!id){ dlHint.textContent="Enter your student ID first — it goes into the file."; return; }
+    var r=receipt();
+    try{
+      var blob=new Blob([r.csv],{type:"text/csv;charset=utf-8"});
+      var url=URL.createObjectURL(blob);
+      var a=document.createElement("a");
+      a.href=url; a.download="CH40051-"+label+"-check_"+id.replace(/[^A-Za-z0-9_-]/g,"")+".csv";
+      a.style.display="none";
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(function(){URL.revokeObjectURL(url);},1000);
+      dlHint.textContent="Saved. Hand it in as your instructor directs.";
+    }catch(e){
+      dlHint.textContent="Your browser blocked the download. Screenshot this panel and submit that instead.";
+    }
+  });
+
+  /* ---- submit straight to the course sheet -------------------------------- */
+  if(SUBMIT_URL){
+    sendBtn.hidden=false;
+    dlHint.textContent="Press Submit to send your result to the course. The download is a backup.";
+  }
+  sendBtn.addEventListener("click",function(){
+    var id=(sId.value||"").trim();
+    if(!id){ dlHint.textContent="Enter your student ID first."; return; }
+    var r=receipt();
+    var payload={
+      lecture:label, student_id:id, completed_utc:finishedAt||new Date().toISOString(),
+      score:r.score, total:QZ.length, percent:r.pct, verification:r.vcode,
+      answers:picks.map(function(p){ return p>=0?LETTERS[p]:"-"; }),
+      ok:picks.map(function(p,i){ return p===QZ[i].a?1:0; })
+    };
+    sendBtn.disabled=true;
+    dlHint.textContent="Sending...";
+    fetch(SUBMIT_URL,{
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(payload)
+    })
+    .then(function(res){ return res.json(); })
+    .then(function(j){
+      if(j && j.ok){
+        sendBtn.textContent="Submitted ✓";
+        dlHint.textContent="Recorded for student ID "+id+". You can close this page.";
+      }else{
+        sendBtn.disabled=false;
+        sendBtn.textContent="Submit to the course";
+        dlHint.textContent="Not recorded — "+((j && j.error) || "the course sheet refused it.")
+          + " Keep the downloaded file and tell your instructor if this looks wrong.";
+      }
+    })
+    .catch(function(){
+      fetch(SUBMIT_URL,{method:"POST",mode:"no-cors",
+        headers:{"Content-Type":"text/plain;charset=utf-8"},
+        body:JSON.stringify(payload)}).catch(function(){});
+      sendBtn.disabled=false;
+      sendBtn.textContent="Submit to the course";
+      dlHint.textContent="Sent, but the confirmation did not come back. "
+        + "Download the file as well and keep it - it is your proof of submission.";
+    });
+  });
+
+  loadState();
+  render();
+}makeQuiz(1, QZ1, "L15-ECSA", "ch40051-l15ecsa-check1-v1");
+makeQuiz(2, QZ2, "L15-HER", "ch40051-l15her-check2-v1");
+
+})();
+</script>
+</body>
+</html>

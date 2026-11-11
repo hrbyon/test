@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script src="exam-lock.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Problem Set 4</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+:root{
+  --ground:#F1F3F2; --surface:#FFFFFF; --surface-2:#E9EDEB;
+  --ink:#14191B; --ink-2:#3E4A4D; --muted:#68767A; --line:#D6DDDA; --line-2:#C3CCC8;
+  --ox:#A85B33; --ox-soft:#F3E4DA;
+  --red-:#15618E; --red-soft:#DDE9F2;
+  --go:#2C7355; --go-soft:#DCEBE3;
+  --stop:#8A5F0C; --stop-soft:#F3E9D3;
+  --shadow:0 1px 2px rgba(20,25,27,.05),0 8px 24px -12px rgba(20,25,27,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+    --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+    --ox:#D08551; --ox-soft:#33231A;
+    --red-:#5AA6D4; --red-soft:#152833;
+    --go:#5DBB8D; --go-soft:#152A21;
+    --stop:#D6A33F; --stop-soft:#2B2415;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+  --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+  --ox:#D08551; --ox-soft:#33231A;
+  --red-:#5AA6D4; --red-soft:#152833;
+  --go:#5DBB8D; --go-soft:#152A21;
+  --stop:#D6A33F; --stop-soft:#2B2415;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:880px;margin:0 auto;padding:32px 20px 80px}
+
+.masthead{padding-bottom:20px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.eyebrow a{color:inherit}
+h1{font-family:"IBM Plex Serif",Georgia,serif;font-weight:600;font-size:clamp(28px,4.2vw,40px);line-height:1.12;margin:0;letter-spacing:-.015em}
+.sub{margin:10px 0 0;color:var(--ink-2);font-size:15px;max-width:62ch}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);margin-top:16px}
+.card-h{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.card-h h2{font-size:15px;font-weight:600;margin:0}
+.card-h .note{font-size:12.5px;color:var(--muted)}
+.card-b{padding:18px}
+
+label.fld{display:block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+input[type=text]{width:100%;font-family:inherit;font-size:14px;color:var(--ink);background:var(--surface-2);
+  border:1px solid var(--line-2);border-radius:7px;padding:9px 10px}
+input:read-only{background:var(--surface);color:var(--muted);cursor:not-allowed}
+input:focus-visible,button:focus-visible{outline:2px solid var(--red-);outline-offset:1px}
+.startrow{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:end}
+@media(max-width:560px){.startrow{grid-template-columns:1fr}}
+
+.solid{appearance:none;background:var(--ox);border:1px solid var(--ox);color:#fff;font-family:inherit;
+  font-size:13.5px;font-weight:500;padding:10px 18px;border-radius:7px;cursor:pointer;white-space:nowrap}
+.solid:hover{filter:brightness(1.08)}
+.solid:disabled{background:var(--line-2);border-color:var(--line-2);color:var(--muted);cursor:not-allowed;filter:none}
+.ghost{appearance:none;background:var(--surface-2);border:1px solid var(--line-2);color:var(--ink-2);
+  font-family:inherit;font-size:12.5px;padding:8px 13px;border-radius:7px;cursor:pointer}
+.ghost:hover{border-color:var(--ox);color:var(--ox)}
+
+.pnum{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);letter-spacing:.1em}
+.ptopic{font-size:14px;font-weight:600;flex:1 1 auto}
+.stem{font-size:15px;line-height:1.7;margin:0 0 16px}
+.stem b{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--ox);font-size:14.5px}
+.answer{display:grid;grid-template-columns:minmax(120px,190px) auto auto;gap:10px;align-items:center}
+@media(max-width:560px){.answer{grid-template-columns:1fr}}
+.unit{font-family:"IBM Plex Mono",monospace;font-size:13.5px;color:var(--muted)}
+.verdict{margin:14px 0 0;padding:11px 14px;border-radius:8px;font-size:13.5px;line-height:1.6}
+.verdict[hidden]{display:none}
+.verdict.ok{background:var(--go-soft);color:var(--go)}
+.verdict.no{background:var(--stop-soft);color:var(--stop)}
+.sol{margin:14px 0 0;border-left:2px solid var(--line-2);padding-left:14px}
+.sol[hidden]{display:none}
+.sol h3{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 10px;font-weight:500}
+.sol ol{margin:0;padding-left:20px}
+.sol li{font-size:13.5px;line-height:1.8;color:var(--ink-2);margin-bottom:6px}
+.sol code{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--ink)}
+.sol .final{color:var(--ox);font-weight:600}
+.done .card-h{background:var(--go-soft)}
+
+.scorebar{display:flex;flex-wrap:wrap;align-items:center;gap:14px 22px;padding:16px 18px}
+.scorenum{font-family:"IBM Plex Mono",monospace;font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+.scorenum small{font-size:14px;font-weight:400;color:var(--muted)}
+.vcode{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted)}
+.vcode b{color:var(--ink);font-weight:600;letter-spacing:.08em}
+.hint{font-size:12.5px;color:var(--muted);line-height:1.65;margin:10px 0 0}
+footer{margin-top:44px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;line-height:1.8}
+
+/* --- section rules between Part A and Part B --- */
+.sect{margin:34px 0 0;padding:0 0 8px;border-bottom:1px solid var(--line-2);
+  display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.sect h2{font-family:"IBM Plex Serif",Georgia,serif;font-size:19px;font-weight:600;margin:0;letter-spacing:-.01em}
+.sect p{margin:0;font-size:12.5px;color:var(--muted)}
+
+/* --- multiple-choice items --- */
+.lect{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--muted);border:1px solid var(--line-2);border-radius:99px;padding:2px 8px}
+.opts{display:grid;gap:8px;margin:0}
+.opt{display:flex;gap:11px;align-items:flex-start;width:100%;text-align:left;
+  background:var(--surface-2);border:1px solid var(--line-2);border-radius:8px;
+  padding:11px 13px;font-family:inherit;font-size:13.5px;line-height:1.6;color:var(--ink);cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--ox)}
+.opt:disabled{cursor:default}
+.opt .k{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);flex:0 0 auto;padding-top:1px}
+.opt.picked{border-color:var(--ink-2)}
+.opt.right{background:var(--go-soft);border-color:var(--go);color:var(--go)}
+.opt.right .k{color:var(--go)}
+.opt.wrong{background:var(--stop-soft);border-color:var(--stop);color:var(--stop)}
+.opt.wrong .k{color:var(--stop)}
+.why{margin:14px 0 0;border-left:2px solid var(--line-2);padding-left:14px;
+  font-size:13.5px;line-height:1.75;color:var(--ink-2)}
+.why[hidden]{display:none}
+.why b{color:var(--ox)}
+
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow"><a href="index.html" style="color:inherit">CH40051 Electroanalytical Chemistry</a> · Problem Set 4</p>
+    <h1>Your own problem set</h1>
+    <p class="sub">Twelve problems on Lectures 13 and 14: cyclic voltammetry, the potential
+      step and the pulse methods. <b>Every one of them is a figure.</b> Part A asks you to read a number
+      off a plot &mdash; a peak separation, a peak ratio, the slope of a Randles&ndash;&Scaron;ev&ccaron;&iacute;k
+      line, the slope of a Cottrell line, an ohmic distortion, a half-width &mdash; and then use it.
+      Part B shows you a trace and asks what it is telling you. Every figure is generated from your
+      student ID, so no two sets are the same: a number copied from anyone else will simply be wrong.
+      This is what the final examination is going to ask you to do.</p>
+  </header>
+
+  <div class="card" id="startCard">
+    <div class="card-h"><h2>Generate your set</h2><span class="note">same ID always gives the same problems</span></div>
+    <div class="card-b">
+      <div class="startrow">
+        <div>
+          <label class="fld" for="sId">Student ID</label>
+          <input type="text" id="sId" inputmode="numeric" placeholder="e.g. 20261234" autocomplete="off">
+        </div>
+        <button class="solid" id="genBtn" type="button">Generate my problems</button>
+      </div>
+      <p class="hint" id="startHint">You can close this page and come back &mdash; your work is saved in this
+        browser, and the same ID regenerates the same set.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h2>How this is marked</h2><span class="note">read once before you start</span></div>
+    <div class="card-b">
+      <p class="hint" style="margin-top:0">
+        <b style="color:var(--ink)">Calculations</b> allow two attempts. A wrong first attempt earns one diagnostic
+        hint; the worked solution opens after the second. <b style="color:var(--ink)">Concept questions</b> allow
+        one attempt, then the reasoning is shown &mdash; guessing costs you the mark, so think before you click.
+        Give calculations to three significant figures in the unit printed beside the box; anything within 2 % counts.
+      </p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h2>What you may need</h2><span class="note">nothing else is required</span></div>
+    <div class="card-b">
+      <p class="hint" style="margin-top:0">
+        F = 96 485 C mol⁻¹ &nbsp;·&nbsp; R = 8.314 J mol⁻¹ K⁻¹ &nbsp;·&nbsp; RT/F = 25.69 mV at 25 °C &nbsp;·&nbsp; 2.303RT/F = 59.16 mV per decade<br>
+        at 60 °C: RT/F = 28.71 mV, 2.303RT/F = 66.12 mV &nbsp;·&nbsp; 1 year = 3.156 × 10⁷ s &nbsp;·&nbsp; 1 µA cm⁻² on steel ≈ 11.6 µm/year<br>
+        η<sub>conc</sub> = (RT/nF) ln(1 − j/j<sub>L</sub>) &nbsp;·&nbsp; j<sub>L</sub> = nFDc*/δ &nbsp;·&nbsp; R<sub>ct</sub> = RT/nFi<sub>0</sub> &nbsp;·&nbsp; b = 2.303RT/αF &nbsp;·&nbsp; i<sub>0</sub> = nFk°C<sub>O</sub>*<sup>1−α</sup>C<sub>R</sub>*<sup>α</sup><br>
+        E<sub>j</sub> = (t₊ − t₋)(RT/F) ln(c₁/c₂) &nbsp;·&nbsp; B = b<sub>a</sub>b<sub>c</sub>/2.303(b<sub>a</sub>+b<sub>c</sub>) &nbsp;·&nbsp; rate = i<sub>corr</sub>M/zFρ
+      </p>
+    </div>
+  </div>
+
+  <div id="sheet" hidden></div>
+
+  <div class="card" id="summary" hidden>
+    <div class="card-h"><h2>Submission</h2><span class="note">one button &mdash; the file is only a backup</span></div>
+    <div class="scorebar">
+      <div>
+        <div class="scorenum" id="scoreNum">&mdash;</div>
+        <div class="vcode" style="margin-top:5px" id="whoLine">&mdash;</div>
+      </div>
+      <div style="flex:1 1 300px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="solid" id="sendBtn" type="button" hidden>Submit to the course</button>
+          <button class="ghost" id="dlBtn" type="button">Download my result</button>
+        </div>
+        <p class="hint" id="dlHint" style="margin-top:8px">Answer every problem first &mdash; unanswered ones are recorded as incomplete.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Transport numbers from the Lecture 8 and 9 tables · diffusion coefficients and exchange currents from the
+    Lecture 10 and 11 tables · metal data from the Lecture 12 Evans presets · every constant above is the one the
+    lectures use<br>
+    CH40051 Electroanalytical Chemistry · Fall 2026
+  </footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+var F = 96485.33;             /* C/mol                                   */
+var RG = 8.314462;            /* J/(mol K)                               */
+var E0 = 8.8541878e-12;       /* F/m                                     */
+var QE = 1.602176634e-19;     /* C                                       */
+var KB = 1.380649e-23;        /* J/K                                     */
+var NA = 6.02214076e23;       /* /mol                                    */
+var T25 = 298.15;             /* K                                       */
+var RT_F = RG * T25 / F;      /* 0.025693 V                              */
+var DEC_V = RT_F * Math.LN10; /* 0.059159 V per decade                   */
+var ER_W = 78.39;             /* water at 25 C                           */
+var ETA_W = 0.890e-3;         /* Pa s                                    */
+
+/* ---------- deterministic RNG: same student ID -> same problem set ---------- */
+function hash32(s){
+  var h = 0x811c9dc5;
+  for (var i = 0; i < s.length; i++){
+    h ^= s.charCodeAt(i);
+    h = (h + ((h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24))) >>> 0;
+  }
+  return h >>> 0;
+}
+function mulberry32(a){
+  return function(){
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    var t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function ri(r, a, b){ return a + Math.floor(r() * (b - a + 1)); }
+function rf(r, a, b, d){ var v = a + r() * (b - a); return +v.toFixed(d); }
+function pick(r, arr){ return arr[Math.floor(r() * arr.length)]; }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function gcd(a,b){ while(b){ var t=b; b=a%b; a=t; } return a; }
+function lcm(a,b){ return a*b/gcd(a,b); }
+var SUPD = {"-":"⁻","0":"⁰","1":"¹","2":"²","3":"³","4":"⁴",
+            "5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹"};
+function supn(e){ return String(e).split("").map(function(c){ return SUPD[c]; }).join(""); }
+/* three figures, and a power of ten written the way it is read aloud */
+function sig(x, d){
+  if (x === 0) return "0";
+  var e = Math.floor(Math.log10(Math.abs(x)));
+  if (e >= 4 || e <= -3)
+    return (+(x / Math.pow(10, e)).toPrecision(d)) + " × 10" + supn(e);
+  return (+x.toPrecision(d)).toString();
+}
+/* Fisher-Yates on a copy, reporting where a tracked index landed. */
+function shuffle(r, arr, track){
+  var a = arr.slice(), pos = track;
+  for (var i = a.length - 1; i > 0; i--){
+    var j = Math.floor(r() * (i + 1));
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+    if (pos === i) pos = j; else if (pos === j) pos = i;
+  }
+  return { list: a, at: pos };
+}
+
+/* ---------- chemistry data, Lectures 9-12 ----------
+   Transference numbers from the Lecture 8/9 tables; diffusion coefficients
+   and exchange currents from the Lecture 10 and 11 tables; metal data from
+   the Lecture 12 Evans presets. Every number a problem uses is one the
+   lectures already put on screen.                                        */
+var SALT_T = [
+ {nm:"HCl",  tp:0.821, ions:"H⁺ and Cl⁻"},
+ {nm:"KCl",  tp:0.491, ions:"K⁺ and Cl⁻"},
+ {nm:"NaCl", tp:0.396, ions:"Na⁺ and Cl⁻"},
+ {nm:"LiCl", tp:0.336, ions:"Li⁺ and Cl⁻"}
+];
+var METALS = [
+ {nm:"Fe", E0:-0.440, i0:1e-7, ba:0.060, M:55.845, z:2, rho:7.87},
+ {nm:"Zn", E0:-0.762, i0:1e-7, ba:0.040, M:65.38,  z:2, rho:7.14},
+ {nm:"Ni", E0:-0.257, i0:1e-6, ba:0.060, M:58.693, z:2, rho:8.90},
+ {nm:"Cd", E0:-0.403, i0:1e-6, ba:0.060, M:112.41, z:2, rho:8.65}
+];
+var SEC_YR = 3.15576e7;
+
+var SUP = {"-":"⁻","0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹"};
+function p10(x){            /* 1.0e-5 -> 10⁻⁵, 2.5e-5 -> 2.5 × 10⁻⁵ */
+  var e = Math.floor(Math.log10(Math.abs(x))), m = x / Math.pow(10, e);
+  var ex = String(e).split("").map(function(ch){ return SUP[ch]; }).join("");
+  return (Math.abs(m - 1) < 1e-9 ? "" : (+m.toFixed(2)) + " × ") + "10" + ex;
+}
+function mM(c){             /* a concentration in mol/L, printed where it reads best */
+  return c >= 0.01 ? (+c.toFixed(4)) + " M" : sig(c * 1000, 3) + " mM";
+}
+
+/* =====================================================================
+   DRAWING - small and local. Every figure is a schematic: the shape is a
+   recognisable voltammogram or decay, and the peak positions, peak
+   heights and slopes are placed at exactly the values the question is
+   about, so what you read off the plot is what the arithmetic wants.
+   ================================================================== */
+function FR(X0, X1, Y0, Y1, xlo, xhi, ylo, yhi){
+  return {X0:X0, X1:X1, Y0:Y0, Y1:Y1, xlo:xlo, xhi:xhi, ylo:ylo, yhi:yhi,
+    px:function(v){ return X0 + (v - xlo) / (xhi - xlo) * (X1 - X0); },
+    py:function(v){ return Y1 - (v - ylo) / (yhi - ylo) * (Y1 - Y0); }};
+}
+function LN(x1, y1, x2, y2, c, w, d){
+  return '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + x2.toFixed(1)
+       + '" y2="' + y2.toFixed(1) + '" stroke="' + c + '" stroke-width="' + (w || 1) + '"'
+       + (d ? ' stroke-dasharray="' + d + '"' : "") + "/>";
+}
+function TX(x, y, t, c, sz, an, wt){
+  return '<text x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" fill="' + (c || "var(--ink-2)")
+       + '" font-size="' + (sz || 10) + '"'
+       + (an ? ' text-anchor="' + an + '"' : "")
+       + (wt ? ' font-weight="' + wt + '"' : "")
+       + ' font-family="IBM Plex Mono,monospace">' + t + "</text>";
+}
+function PA(d, c, w, dash){
+  return '<path d="' + d + '" fill="none" stroke="' + c + '" stroke-width="' + (w || 2) + '"'
+       + (dash ? ' stroke-dasharray="' + dash + '"' : "") + ' stroke-linejoin="round"/>';
+}
+function CIR(x, y, r, c){
+  return '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + r
+       + '" fill="' + c + '"/>';
+}
+function AX(f, xlab, ylab, nx, ny, fx, fy){
+  var s = '<rect x="' + f.X0 + '" y="' + f.Y0 + '" width="' + (f.X1 - f.X0) + '" height="'
+        + (f.Y1 - f.Y0) + '" fill="var(--surface-2)" opacity="0.5" rx="4"/>', i, v;
+  for(i = 0; i <= nx; i++){
+    v = f.xlo + (f.xhi - f.xlo) * i / nx;
+    s += LN(f.px(v), f.Y0, f.px(v), f.Y1, "var(--line)", 1, "2 3");
+    s += TX(f.px(v), f.Y1 + 14, fx(v), "var(--muted)", 9.5, "middle");
+  }
+  for(i = 0; i <= ny; i++){
+    v = f.ylo + (f.yhi - f.ylo) * i / ny;
+    s += LN(f.X0, f.py(v), f.X1, f.py(v), "var(--line)", 1, "2 3");
+    s += TX(f.X0 - 6, f.py(v) + 3.4, fy(v), "var(--muted)", 9.5, "end");
+  }
+  s += TX((f.X0 + f.X1) / 2, f.Y1 + 32, xlab, "var(--ink-2)", 11, "middle", 600);
+  s += '<text x="15" y="' + ((f.Y0 + f.Y1) / 2).toFixed(1) + '" fill="var(--ink-2)" font-size="11"'
+     + ' text-anchor="middle" font-weight="600" font-family="IBM Plex Mono,monospace"'
+     + ' transform="rotate(-90 15 ' + ((f.Y0 + f.Y1) / 2).toFixed(1) + ')">' + ylab + "</text>";
+  return s;
+}
+function SVG(w, h, inner, lab){
+  return '<svg viewBox="0 0 ' + w + " " + h + '" style="width:100%;height:auto;max-width:620px;'
+       + 'display:block;margin:10px 0 2px" role="img" aria-label="' + lab + '">' + inner + "</svg>";
+}
+/* a peak that rises like a wave and falls like a diffusion tail */
+function PKSHAPE(u, wid){
+  return u <= 0 ? Math.exp(-0.5 * (u / wid) * (u / wid))
+                : 1 / Math.sqrt(1 + u / (0.55 * wid));
+}
+/* one full cycle, cathodic first. E runs Ehi -> Elo -> Ehi */
+function CVPATH(f, Ehi, Elo, Epc, ipc, Epa, ipa, wid, base){
+  var d = "", i, E, y, N = 260;
+  for(i = 0; i <= N; i++){
+    E = Ehi - (Ehi - Elo) * i / N;
+    y = -ipc * PKSHAPE(Epc - E, wid) - base;
+    d += (i ? "L" : "M") + f.px(E).toFixed(1) + " " + f.py(y).toFixed(1) + " ";
+  }
+  for(i = 0; i <= N; i++){
+    E = Elo + (Ehi - Elo) * i / N;
+    y = ipa * PKSHAPE(E - Epa, wid) + base;
+    d += "L" + f.px(E).toFixed(1) + " " + f.py(y).toFixed(1) + " ";
+  }
+  return d;
+}
+
+/* ---- 1. Lecture 13: read the peak separation, and say how many electrons */
+function pPeakSep(r){
+  var n = pick(r, [1, 1, 2, 2]);
+  var E0 = pick(r, [-0.30, -0.15, 0.00, 0.15, 0.30]);
+  var dEp = 0.0590 / n;
+  var Epc = E0 - dEp / 2, Epa = E0 + dEp / 2;
+  var ip = pick(r, [12, 18, 25, 40]);
+  var f = FR(58, 500, 20, 232, E0 - 0.24, E0 + 0.24, -1.45 * ip, 1.45 * ip);
+  var g = AX(f, "E / V vs Ag/AgCl", "i / \u00b5A", 8, 4,
+             function(v){ return v.toFixed(2); }, function(v){ return v.toFixed(0); });
+  g += LN(f.X0, f.py(0), f.X1, f.py(0), "var(--line-2)", 1.2);
+  g += PA(CVPATH(f, E0 + 0.24, E0 - 0.24, Epc, ip, Epa, ip, 0.030, 0.06 * ip),
+          "var(--red-)", 2);
+  /* drop each peak onto the axis so it can be read against the grid */
+  g += LN(f.px(Epc), f.py(-ip - 0.06 * ip), f.px(Epc), f.Y1, "var(--ink-2)", 1.1, "4 3");
+  g += LN(f.px(Epa), f.py(ip + 0.06 * ip), f.px(Epa), f.Y1, "var(--ink-2)", 1.1, "4 3");
+  g += CIR(f.px(Epc), f.py(-ip - 0.06 * ip), 3.4, "var(--ink)");
+  g += CIR(f.px(Epa), f.py(ip + 0.06 * ip), 3.4, "var(--ink)");
+  return {
+    kind:"calc", lec:"Lecture 13", topic:"Peak separation \u2192 how many electrons", unit:"electrons",
+    answer:n, abstol:0.12,
+    stem:"A clean, diffusion-controlled voltammogram of a dissolved couple at 25 \u00b0C, recorded at "
+        + "100 mV s\u207b\u00b9 with full iR compensation. The two marked points are the peaks.<br>"
+        + SVG(520, 272, g, "A cyclic voltammogram with its anodic and cathodic peaks marked.")
+        + "<b>Read &Delta;E<sub>p</sub> off the figure</b> and report <b>n</b>, the number of electrons "
+        + "transferred.",
+    solution:[
+      "Read the two peak potentials from the grid: <code>E<sub>pc</sub> = " + Epc.toFixed(3)
+        + " V</code> and <code>E<sub>pa</sub> = " + Epa.toFixed(3) + " V</code>.",
+      "<code>&Delta;E<sub>p</sub> = E<sub>pa</sub> \u2212 E<sub>pc</sub> = " + (dEp * 1000).toFixed(0)
+        + " mV</code>",
+      "For a reversible couple at 25 \u00b0C, <code>&Delta;E<sub>p</sub> = 2.218 RT/nF = 57 mV / n</code>, "
+        + "usually quoted as 59/n mV.",
+      "<span class='final'>n = 59 / " + (dEp * 1000).toFixed(0) + " = " + n + "</span>",
+      "The midpoint is worth having too: <code>E\u00b0\u2032 \u2248 (E<sub>pa</sub> + E<sub>pc</sub>)/2 = "
+        + E0.toFixed(3) + " V</code>. <b>&Delta;E<sub>p</sub> larger than 59/n is not automatically slow "
+        + "kinetics</b> &mdash; uncompensated resistance does exactly the same thing, which is why the "
+        + "question had to tell you the iR was compensated."
+    ]
+  };
+}
+
+/* ---- 2. Lecture 13: the peak ratio, and the chemistry it exposes ---- */
+function pPeakRatio(r){
+  var ratio = pick(r, [0.42, 0.55, 0.68, 0.80]);
+  var E0 = pick(r, [-0.45, -0.25, 0.10, 0.25]);
+  var ipc = pick(r, [20, 30, 45]);
+  var ipa = ipc * ratio;
+  var dEp = 0.059, Epc = E0 - dEp / 2, Epa = E0 + dEp / 2;
+  var f = FR(58, 500, 20, 232, E0 - 0.30, E0 + 0.30, -1.45 * ipc, 1.45 * ipc);
+  var g = AX(f, "E / V vs Ag/AgCl", "i / \u00b5A", 6, 6,
+             function(v){ return v.toFixed(2); }, function(v){ return v.toFixed(0); });
+  g += LN(f.X0, f.py(0), f.X1, f.py(0), "var(--line-2)", 1.2);
+  g += PA(CVPATH(f, E0 + 0.30, E0 - 0.30, Epc, ipc, Epa, ipa, 0.030, 0.05 * ipc),
+          "var(--red-)", 2);
+  g += LN(f.px(Epc), f.py(0), f.px(Epc), f.py(-ipc - 0.05 * ipc), "var(--ink-2)", 1.2, "4 3");
+  g += LN(f.px(Epa), f.py(0), f.px(Epa), f.py(ipa + 0.05 * ipc), "var(--ink-2)", 1.2, "4 3");
+  return {
+    kind:"calc", lec:"Lecture 13", topic:"Peak ratio from the trace", unit:"i_pa / i_pc",
+    answer:ratio, abstol:0.07,
+    stem:"The same couple, now with something happening to the product. Both peak currents are measured "
+        + "from the zero line, which is drawn.<br>"
+        + SVG(520, 272, g, "A cyclic voltammogram whose return peak is visibly smaller than its forward peak.")
+        + "<b>Read both peak currents off the figure</b> and report the ratio "
+        + "<b>i<sub>pa</sub> / i<sub>pc</sub></b>.",
+    solution:[
+      "From the grid, <code>i<sub>pc</sub> \u2248 " + ipc.toFixed(0) + " \u00b5A</code> and "
+        + "<code>i<sub>pa</sub> \u2248 " + ipa.toFixed(1) + " \u00b5A</code>, both measured from zero.",
+      "<span class='final'>i<sub>pa</sub>/i<sub>pc</sub> = " + ipa.toFixed(1) + " / " + ipc.toFixed(0)
+        + " = " + ratio.toFixed(2) + "</span>",
+      "A reversible couple with a stable product gives <b>1.00</b>. Less than that means the product is "
+        + "being consumed before the sweep can come back for it \u2014 an <b>EC</b> mechanism.",
+      "The diagnostic is not the single number but how it <i>moves</i>: speed the scan up and the ratio "
+        + "climbs back towards 1, because you outrun the chemistry. If the ratio stayed at "
+        + ratio.toFixed(2) + " at every scan rate, you would be looking at something else \u2014 an "
+        + "unstable film, or a product that diffuses away."
+    ]
+  };
+}
+
+/* ---- 3. Lecture 13: a Randles-Sevcik slope, read off the line ---- */
+function pRandles(r){
+  var n = pick(r, [1, 2]);
+  var A = pick(r, [0.0314, 0.0707, 0.196]);            /* cm2: 2, 3, 5 mm discs */
+  var C = pick(r, [1.0, 2.0, 5.0]);                    /* mM                    */
+  var D = pick(r, [3.0e-6, 5.0e-6, 7.5e-6, 1.0e-5]);   /* cm2/s                 */
+  var k = 2.69e5 * Math.pow(n, 1.5) * A * C * 1e-6 * Math.sqrt(D);  /* A per (V/s)^1/2 */
+  var nus = [0.02, 0.05, 0.1, 0.2, 0.4], i;
+  var xs = nus.map(function(v){ return Math.sqrt(v); });
+  var xmax = 0.68, ymax = k * xmax * 1e6 * 1.15;
+  var f = FR(66, 500, 20, 222, 0, xmax, 0, ymax);
+  var g = AX(f, "\u221a\u03c5 / (V s\u207b\u00b9)\u00b9\u141f\u00b2", "i\u209a / \u00b5A", 4, 4,
+             function(v){ return v.toFixed(2); }, function(v){ return v.toFixed(0); });
+  g += PA("M" + f.px(0) + " " + f.py(0) + " L" + f.px(xmax) + " " + f.py(k * xmax * 1e6),
+          "var(--red-)", 1.8);
+  for(i = 0; i < xs.length; i++) g += CIR(f.px(xs[i]), f.py(k * xs[i] * 1e6), 4, "var(--ink)");
+  return {
+    kind:"calc", lec:"Lecture 13", topic:"Randles\u2013\u0160ev\u010d\u00edk slope \u2192 D",
+    unit:"\u00d710\u207b\u2076 cm\u00b2/s",
+    answer:D * 1e6, abstol:D * 1e6 * 0.09,
+    stem:"Peak current against the square root of scan rate for a <b>reversible, " + n
+        + "-electron</b> couple on a <b>" + A.toFixed(4) + " cm\u00b2</b> disc, in <b>" + C.toFixed(1)
+        + " mM</b> solution at 25 \u00b0C.<br>"
+        + SVG(520, 262, g, "Peak current plotted against the square root of scan rate: five points on a straight line through the origin.")
+        + "<b>Read the slope off the line</b> and report the diffusion coefficient <b>D</b>, in units of "
+        + "10\u207b\u2076 cm\u00b2 s\u207b\u00b9.",
+    solution:[
+      "The line passes through the origin, so take any point: at <code>\u221a\u03c5 = "
+        + xs[4].toFixed(3) + "</code>, <code>i\u209a = " + (k * xs[4] * 1e6).toPrecision(3)
+        + " \u00b5A</code>.",
+      "<code>slope = " + (k * 1e6).toPrecision(3) + " \u00b5A / (V s\u207b\u00b9)\u00b9\u141f\u00b2 = "
+        + sig(k, 3) + " A (V/s)^\u22121\u141f\u00b2</code>",
+      "Randles\u2013\u0160ev\u010d\u00edk at 25 \u00b0C: <code>i\u209a = 2.69\u00d710\u2075 n^(3/2) A D^(1/2) C* \u03c5^(1/2)</code>, "
+        + "so <code>slope = 2.69\u00d710\u2075 n^(3/2) A C* \u221aD</code> with C* in mol cm\u207b\u00b3.",
+      "<code>\u221aD = " + sig(k, 3) + " / (2.69\u00d710\u2075 \u00d7 " + Math.pow(n, 1.5).toFixed(3)
+        + " \u00d7 " + A.toFixed(4) + " \u00d7 " + sig(C * 1e-6, 3) + ") = " + sig(Math.sqrt(D), 4) + "</code>",
+      "<span class='final'>D = " + sig(D, 3) + " cm\u00b2 s\u207b\u00b9 = " + (D * 1e6).toPrecision(3)
+        + " \u00d7 10\u207b\u2076 cm\u00b2 s\u207b\u00b9</span>",
+      "<b>The line going through the origin is the measurement</b>, not a tidy detail: a straight line "
+        + "with an intercept means something is there that does not come from diffusion \u2014 adsorbed "
+        + "material, or a charging current that was never subtracted."
+    ]
+  };
+}
+
+/* ---- 4. Lecture 14: a Cottrell slope, read off the line ---- */
+function pCottrell(r){
+  var n = pick(r, [1, 2]);
+  var A = pick(r, [0.0314, 0.0707, 0.196]);
+  var C = pick(r, [1.0, 2.0, 5.0]);
+  var D = pick(r, [4.0e-6, 6.0e-6, 9.0e-6, 1.2e-5]);
+  var m = 96485 * n * A * Math.sqrt(D) * C * 1e-6 / Math.sqrt(Math.PI);  /* A s^1/2 */
+  var ts = [0.04, 0.0625, 0.111, 0.25, 1.0], i;      /* s  -> t^-1/2 = 5,4,3,2,1 */
+  var xs = ts.map(function(t){ return 1 / Math.sqrt(t); });
+  var xmax = 5.6, ymax = m * xmax * 1e6 * 1.15;
+  var f = FR(66, 500, 20, 222, 0, xmax, 0, ymax);
+  var g = AX(f, "t\u207b\u00b9\u141f\u00b2 / s\u207b\u00b9\u141f\u00b2", "i / \u00b5A", 4, 4,
+             function(v){ return v.toFixed(1); }, function(v){ return v.toFixed(0); });
+  g += PA("M" + f.px(0) + " " + f.py(0) + " L" + f.px(xmax) + " " + f.py(m * xmax * 1e6),
+          "var(--red-)", 1.8);
+  for(i = 0; i < xs.length; i++) g += CIR(f.px(xs[i]), f.py(m * xs[i] * 1e6), 4, "var(--ink)");
+  return {
+    kind:"calc", lec:"Lecture 14", topic:"Cottrell slope \u2192 D", unit:"\u00d710\u207b\u2076 cm\u00b2/s",
+    answer:D * 1e6, abstol:D * 1e6 * 0.09,
+    stem:"A potential step to the diffusion-limited plateau on a <b>" + A.toFixed(4) + " cm\u00b2</b> disc "
+        + "in <b>" + C.toFixed(1) + " mM</b> solution, <b>n = " + n + "</b>, 25 \u00b0C. The sampled current "
+        + "is plotted against t<sup>\u22121/2</sup>; every point shown was taken after 5&tau; and before "
+        + "convection set in.<br>"
+        + SVG(520, 262, g, "Current against the inverse square root of time: five points on a straight line through the origin.")
+        + "<b>Read the slope off the line</b> and report <b>D</b>, in units of 10\u207b\u2076 cm\u00b2 s\u207b\u00b9.",
+    solution:[
+      "At <code>t\u207b\u00b9\u141f\u00b2 = 5.0 s\u207b\u00b9\u141f\u00b2</code> (that is t = 40 ms) the current "
+        + "reads <code>" + (m * 5 * 1e6).toPrecision(3) + " \u00b5A</code>, and the line goes through the origin.",
+      "<code>slope m = " + (m * 1e6).toPrecision(3) + " \u00b5A s\u00b9\u141f\u00b2 = " + sig(m, 3)
+        + " A s\u00b9\u141f\u00b2</code>",
+      "Cottrell: <code>i = nFAD^(1/2)C* / \u221a(\u03c0t)</code>, so <code>m = nFA\u221aD C*/\u221a\u03c0</code> "
+        + "and <code>\u221aD = m\u221a\u03c0 / (nFAC*)</code>.",
+      "<code>\u221aD = " + sig(m, 3) + " \u00d7 1.7725 / (" + n + " \u00d7 96485 \u00d7 " + A.toFixed(4)
+        + " \u00d7 " + sig(C * 1e-6, 3) + ") = " + sig(Math.sqrt(D), 4) + "</code>",
+      "<span class='final'>D = " + sig(D, 3) + " cm\u00b2 s\u207b\u00b9 = " + (D * 1e6).toPrecision(3)
+        + " \u00d7 10\u207b\u2076 cm\u00b2 s\u207b\u00b9</span>",
+      "<b>The intercept is the real test.</b> Sample too early and the charging current lifts the "
+        + "short-time end; sample too late and convection drops the long-time end. Either way the line "
+        + "stops going through the origin \u2014 and a slope fitted through a non-zero intercept is a "
+        + "diffusion coefficient with something else mixed into it."
+    ]
+  };
+}
+
+/* ---- 5. Lecture 14: the ohmic drop, read as an extra peak separation ---- */
+function pOhmic(r){
+  var Ru = pick(r, [20, 50, 120, 250]);                /* ohm              */
+  var ipFast = pick(r, [40, 80, 150, 300]) * 1e-6;     /* A at the fast scan */
+  var dE0 = 0.059;
+  var extra = 2 * ipFast * Ru;
+  var dEfast = dE0 + extra;
+  var E0 = 0.0, ipSlow = ipFast / 10;
+  var f = FR(58, 500, 20, 232, -0.34, 0.34, -1.5, 1.5);
+  var g = AX(f, "E \u2212 E\u00b0\u2032 / V", "i / i\u209a (each trace to its own peak)", 6, 4,
+             function(v){ return v.toFixed(2); }, function(v){ return v.toFixed(1); });
+  g += LN(f.X0, f.py(0), f.X1, f.py(0), "var(--line-2)", 1.2);
+  g += PA(CVPATH(f, 0.34, -0.34, -dE0 / 2, 1, dE0 / 2, 1, 0.030, 0.04),
+          "var(--go)", 1.8);
+  g += PA(CVPATH(f, 0.34, -0.34, -dEfast / 2, 1, dEfast / 2, 1, 0.034, 0.04),
+          "var(--red-)", 2);
+  g += TX(f.X0 + 8, f.Y0 + 16, "\u03c5 = 0.01 V/s, i\u209a = " + (ipSlow * 1e6).toPrecision(2)
+          + " \u00b5A", "var(--go)", 10, null, 700);
+  g += TX(f.X0 + 8, f.Y0 + 31, "\u03c5 = 1.0 V/s, i\u209a = " + (ipFast * 1e6).toPrecision(3)
+          + " \u00b5A", "var(--red-)", 10, null, 700);
+  return {
+    kind:"calc", lec:"Lecture 14", topic:"Extra peak separation \u2192 R\u1d64", unit:"\u03a9",
+    answer:Ru, abstol:Ru * 0.12,
+    stem:"The same reversible couple at two scan rates, <b>no iR compensation</b>, each trace normalised "
+        + "to its own peak so the shapes can be compared. The peak currents are written on the figure.<br>"
+        + SVG(520, 272, g, "Two normalised cyclic voltammograms of the same couple, the faster one visibly wider between its peaks than the slower one.")
+        + "<b>Read both peak separations off the figure.</b> Taking the slow trace as the undistorted "
+        + "one, what is the <b>uncompensated resistance R<sub>u</sub></b>?",
+    solution:[
+      "From the grid: <code>&Delta;E<sub>p</sub>(slow) \u2248 " + (dE0 * 1000).toFixed(0)
+        + " mV</code> and <code>&Delta;E<sub>p</sub>(fast) \u2248 " + (dEfast * 1000).toFixed(0)
+        + " mV</code>.",
+      "<code>extra separation = " + (dEfast * 1000).toFixed(0) + " \u2212 " + (dE0 * 1000).toFixed(0)
+        + " = " + (extra * 1000).toPrecision(3) + " mV</code>",
+      "The ohmic error moves <b>both</b> peaks, each by i\u209aR\u1d64 and in opposite directions, so the "
+        + "separation grows by <code>2 i\u209a R\u1d64</code>.",
+      "<span class='final'>R\u1d64 = " + (extra * 1000).toPrecision(3) + " mV / (2 \u00d7 "
+        + (ipFast * 1e6).toPrecision(3) + " \u00b5A) = " + Ru + " \u03a9</span>",
+      "Notice what this does to a kinetic conclusion. The couple is <b>reversible</b>; it only looks "
+        + "quasi-reversible at 1 V s\u207b\u00b9 because the current is ten times larger and carries ten "
+        + "times the ohmic error with it. <b>A &Delta;E<sub>p</sub> that grows with scan rate is R\u1d64 "
+        + "until you have proved otherwise</b> \u2014 the test is whether it still grows after you "
+        + "compensate, or on a smaller electrode."
+    ]
+  };
+}
+
+/* ---- 6. Lecture 14: a DPV half-width, read off the peak ---- */
+function pDPV(r){
+  var n = pick(r, [1, 1, 2, 2]);
+  var E12 = pick(r, [-0.25, -0.10, 0.05, 0.20]);
+  var dE = pick(r, [-0.050, -0.025, -0.075]);
+  var Ep = E12 - dE / 2;
+  var W = 0.0904 / n;
+  var ip = pick(r, [8, 15, 28]);
+  var f = FR(58, 500, 20, 222, E12 - 0.22, E12 + 0.22, 0, ip * 1.3);
+  var g = AX(f, "E / V vs Ag/AgCl", "\u0394i / \u00b5A", 8, 4,
+             function(v){ return v.toFixed(2); }, function(v){ return v.toFixed(0); });
+  var d = "", i, E, u;
+  for(i = 0; i <= 300; i++){
+    E = f.xlo + (f.xhi - f.xlo) * i / 300;
+    u = (E - Ep) / (W / 1.665);                    /* W is the full width at half height */
+    d += (i ? "L" : "M") + f.px(E).toFixed(1) + " " + f.py(ip * Math.exp(-0.5 * u * u)).toFixed(1) + " ";
+  }
+  g += PA(d, "var(--ion-k)", 2.1);
+  g += LN(f.px(Ep - W / 2), f.py(ip / 2), f.px(Ep + W / 2), f.py(ip / 2), "var(--stop)", 1.8);
+  /* and drop both ends of the bar onto the axis to be read off the grid */
+  g += LN(f.px(Ep - W / 2), f.py(ip / 2), f.px(Ep - W / 2), f.Y1, "var(--stop)", 1.1, "4 3");
+  g += LN(f.px(Ep + W / 2), f.py(ip / 2), f.px(Ep + W / 2), f.Y1, "var(--stop)", 1.1, "4 3");
+  g += CIR(f.px(Ep), f.py(ip), 3.6, "var(--ink)");
+  g += TX(f.px(Ep), f.py(ip) - 9, "E\u209a", "var(--ink)", 10, "middle", 700);
+  g += TX(f.px(Ep), f.py(ip / 2) - 7, "half height", "var(--stop)", 9.5, "middle", 700);
+  return {
+    kind:"calc", lec:"Lecture 14", topic:"DPV half-width \u2192 n", unit:"electrons",
+    answer:n, abstol:0.12,
+    stem:"A differential pulse voltammogram of a reversible couple at 25 \u00b0C, pulse amplitude "
+        + "<b>&Delta;E = " + (dE * 1000).toFixed(0) + " mV</b>. The bar is drawn at half the peak height.<br>"
+        + SVG(520, 262, g, "A differential pulse voltammogram: one symmetric peak with a bar drawn across it at half its height.")
+        + "<b>Read the width at half height off the figure</b> and report <b>n</b>.",
+    solution:[
+      "From the grid the bar spans <code>W\u00bd \u2248 " + (W * 1000).toFixed(0) + " mV</code>.",
+      "For a reversible couple with a small pulse, <code>W\u00bd \u2192 3.52 RT/nF = 90.4/n mV</code> at "
+        + "25 \u00b0C.",
+      "<span class='final'>n = 90.4 / " + (W * 1000).toFixed(0) + " = " + n + "</span>",
+      "And the peak sits at <code>E\u209a = E\u00bd \u2212 &Delta;E/2</code>, so with &Delta;E = "
+        + (dE * 1000).toFixed(0) + " mV the half-wave potential is <code>" + Ep.toFixed(3) + " + "
+        + (-dE / 2).toFixed(3) + " = " + E12.toFixed(3) + " V</code> \u2014 <b>&Delta;E is signed</b>, and "
+        + "forgetting that puts E\u00bd on the wrong side of the peak by the full amplitude.",
+      "A width much larger than 90.4/n means the couple is not reversible on this timescale; a width "
+        + "<i>smaller</i> than it means the species is adsorbed, not diffusing."
+    ]
+  };
+}
+
+/* ---- the eight diagnosis figures ----------------------------------- */
+function FIGWRAP(g, lab){ return SVG(520, 240, g, lab); }
+function FIG_SQRT(){
+  var f = FR(58, 500, 16, 192, -0.30, 0.30, -11, 11);
+  var g = AX(f, "E − E°′ / V", "i / µA", 6, 4,
+             function(v){ return v.toFixed(2); }, function(v){ return v.toFixed(0); });
+  g += LN(f.X0, f.py(0), f.X1, f.py(0), "var(--line-2)", 1.2);
+  var cols = ["var(--go)", "var(--stop)", "var(--red-)"], ips = [1, 3.16, 10], i;
+  for(i = 0; i < 3; i++)
+    g += PA(CVPATH(f, 0.30, -0.30, -0.0295, ips[i], 0.0295, ips[i], 0.030, 0.03 * ips[i]),
+            cols[i], 1.8);
+  g += TX(f.X0 + 8, f.Y0 + 14, "0.1  ·  1  ·  10 V/s   —   iₚ = 1 : 3.16 : 10",
+          "var(--ink-2)", 10, null, 700);
+  return FIGWRAP(g, "Three cyclic voltammograms of one solution at three scan rates, the peaks growing but the peak positions unchanged.");
+}
+function FIG_EC(){
+  var f = FR(58, 500, 16, 192, -0.30, 0.30, -1.5, 1.5);
+  var g = AX(f, "E − E°′ / V", "i / iₚ (cathodic)", 6, 4,
+             function(v){ return v.toFixed(2); }, function(v){ return v.toFixed(1); });
+  g += LN(f.X0, f.py(0), f.X1, f.py(0), "var(--line-2)", 1.2);
+  g += PA(CVPATH(f, 0.30, -0.30, -0.0295, 1, 0.0295, 0.12, 0.030, 0.04), "var(--go)", 1.8);
+  g += PA(CVPATH(f, 0.30, -0.30, -0.0295, 1, 0.0295, 0.92, 0.030, 0.04), "var(--red-)", 2);
+  g += TX(f.X0 + 8, f.Y0 + 14, "0.05 V/s", "var(--go)", 10, null, 700);
+  g += TX(f.X0 + 8, f.Y0 + 29, "5 V/s", "var(--red-)", 10, null, 700);
+  return FIGWRAP(g, "Two cyclic voltammograms of one couple: at the slow scan rate the return peak is almost absent, at the fast one it is nearly full size.");
+}
+function FIG_CAT(){
+  var f = FR(58, 500, 16, 192, -0.35, 0.25, -1.25, 0.35);
+  var g = AX(f, "E − E°′ / V", "i / i_plateau", 6, 4,
+             function(v){ return v.toFixed(2); }, function(v){ return v.toFixed(1); });
+  g += LN(f.X0, f.py(0), f.X1, f.py(0), "var(--line-2)", 1.2);
+  var i, E, d1 = "", d2 = "", y;
+  for(i = 0; i <= 240; i++){
+    E = 0.25 - 0.60 * i / 240;
+    y = -1 / (1 + Math.exp((E + 0.02) / 0.022));
+    d1 += (i ? "L" : "M") + f.px(E).toFixed(1) + " " + f.py(y).toFixed(1) + " ";
+    d2 += (i ? "L" : "M") + f.px(E).toFixed(1) + " " + f.py(y * 0.985).toFixed(1) + " ";
+  }
+  for(i = 0; i <= 240; i++){
+    E = -0.35 + 0.60 * i / 240;
+    y = -1 / (1 + Math.exp((E + 0.02) / 0.022));
+    d1 += "L" + f.px(E).toFixed(1) + " " + f.py(y * 0.99).toFixed(1) + " ";
+  }
+  g += PA(d1, "var(--red-)", 2);
+  g += PA(d2, "var(--go)", 1.6, "5 3");
+  g += TX(f.X1 - 6, f.py(-1) - 8, "plateau, same height at both scan rates",
+          "var(--ink-2)", 10, "end", 700);
+  g += TX(f.X0 + 8, f.Y0 + 14, "0.02 V/s (dashed)  ·  0.2 V/s", "var(--ink-2)", 10, null, 700);
+  return FIGWRAP(g, "A voltammogram with one large cathodic wave rising to a flat plateau and no return peak, drawn at two scan rates that lie on top of each other.");
+}
+function FIG_ADS(){
+  var f = FR(66, 500, 16, 184, 0, 0.44, 0, 24);
+  var g = AX(f, "υ / V s⁻¹", "iₚ / µA", 4, 4,
+             function(v){ return v.toFixed(2); }, function(v){ return v.toFixed(0); });
+  g += PA("M" + f.px(0) + " " + f.py(0) + " L" + f.px(0.44) + " " + f.py(22), "var(--red-)", 1.9);
+  var nus = [0.05, 0.1, 0.2, 0.3, 0.4], i;
+  for(i = 0; i < nus.length; i++) g += CIR(f.px(nus[i]), f.py(50 * nus[i]), 4, "var(--ink)");
+  var d = "", v;
+  for(i = 0; i <= 120; i++){
+    v = 0.44 * i / 120;
+    d += (i ? "L" : "M") + f.px(v).toFixed(1) + " " + f.py(33 * Math.sqrt(v)).toFixed(1) + " ";
+  }
+  g += PA(d, "var(--muted)", 1.5, "5 3");
+  g += TX(f.X1 - 6, f.py(20) + 12, "the points", "var(--red-)", 10, "end", 700);
+  g += TX(f.X1 - 6, f.py(22.5) - 4, "what √υ would look like", "var(--muted)", 9.5, "end", 600);
+  return FIGWRAP(g, "Peak current against scan rate: the measured points lie on a straight line through the origin while a dashed square-root curve does not pass through them.");
+}
+function FIG_STEP(){
+  var f = FR(66, 500, 16, 184, -7, 1, -9, -2);
+  var g = AX(f, "log (t / s)", "log (i / A)", 4, 4,
+             function(v){ return v.toFixed(0); }, function(v){ return v.toFixed(0); });
+  var i, x, t, y, d1 = "", d2 = "", tau = 1e-5;
+  for(i = 0; i <= 300; i++){
+    x = -7 + 8 * i / 300;
+    t = Math.pow(10, x);
+    y = Math.log10(2e-3 * Math.exp(-t / tau));
+    if(y > f.ylo && y < f.yhi) d1 += (d1 ? "L" : "M") + f.px(x).toFixed(1) + " " + f.py(y).toFixed(1) + " ";
+    y = Math.log10(3e-5 / Math.sqrt(t));
+    if(y > f.ylo && y < f.yhi) d2 += (d2 ? "L" : "M") + f.px(x).toFixed(1) + " " + f.py(y).toFixed(1) + " ";
+  }
+  g += PA(d1, "var(--ion-k)", 2);
+  g += PA(d2, "var(--go)", 2);
+  g += TX(f.X0 + 8, f.Y0 + 14, "the cliff", "var(--ion-k)", 10, null, 700);
+  g += TX(f.X1 - 6, f.py(-5.4), "slope −½", "var(--go)", 10, "end", 700);
+  return FIGWRAP(g, "A log-log current-time trace: a steep exponential cliff at short times and a straight line of slope minus one half afterwards.");
+}
+function FIG_COTBEND(){
+  var f = FR(66, 500, 16, 184, 0, 6, 0, 26);
+  var g = AX(f, "t⁻¹ᐟ² / s⁻¹ᐟ²", "i / µA", 4, 4,
+             function(v){ return v.toFixed(0); }, function(v){ return v.toFixed(0); });
+  g += PA("M" + f.px(0) + " " + f.py(0) + " L" + f.px(6) + " " + f.py(24), "var(--muted)", 1.5, "5 3");
+  var xs = [0.5, 0.8, 1.2, 2, 3, 4, 4.8, 5.5], i, x, y, d = "";
+  for(i = 0; i < xs.length; i++){
+    x = xs[i]; y = 4 * x;
+    if(x < 1.3) y *= 0.80 + 0.15 * x;
+    if(x > 4.2) y *= 1 + 0.10 * (x - 4.2);
+    d += (i ? "L" : "M") + f.px(x).toFixed(1) + " " + f.py(y).toFixed(1) + " ";
+    g += CIR(f.px(x), f.py(y), 4, "var(--ink)");
+  }
+  g += PA(d, "var(--red-)", 1.8);
+  g += TX(f.X0 + 10, f.py(23), "long times ←", "var(--ink-2)", 9.5, null, 700);
+  g += TX(f.X1 - 6, f.py(3), "→ short times", "var(--ink-2)", 9.5, "end", 700);
+  return FIGWRAP(g, "A Cottrell plot that is straight in the middle, lifts above the dashed line at large inverse square root of time, and sags below it at small values.");
+}
+function FIG_UME(){
+  var f = FR(66, 500, 16, 184, -6, 2, -10, -3);
+  var g = AX(f, "log (t / s)", "log (i / A)", 4, 4,
+             function(v){ return v.toFixed(0); }, function(v){ return v.toFixed(0); });
+  var i, x, t, y, d1 = "", d2 = "";
+  for(i = 0; i <= 300; i++){
+    x = -6 + 8 * i / 300;
+    t = Math.pow(10, x);
+    y = Math.log10(1.2e-4 / Math.sqrt(t));
+    if(y > f.ylo && y < f.yhi) d1 += (d1 ? "L" : "M") + f.px(x).toFixed(1) + " " + f.py(y).toFixed(1) + " ";
+    y = Math.log10(4e-8 / Math.sqrt(t) + 2.4e-9);
+    if(y > f.ylo && y < f.yhi) d2 += (d2 ? "L" : "M") + f.px(x).toFixed(1) + " " + f.py(y).toFixed(1) + " ";
+  }
+  g += PA(d1, "var(--red-)", 2);
+  g += PA(d2, "var(--go)", 2);
+  g += TX(f.X1 - 6, f.py(-5.4), "3 mm disc", "var(--red-)", 10, "end", 700);
+  g += TX(f.X1 - 6, f.py(-8.1), "10 µm disc — steady state", "var(--go)", 10, "end", 700);
+  return FIGWRAP(g, "Two log-log chronoamperograms: the large electrode keeps falling with slope minus one half while the small one levels onto a constant current.");
+}
+function FIG_PULSE(){
+  var f = FR(58, 500, 16, 184, -0.26, 0.26, -0.1, 2.3);
+  var g = AX(f, "E − E½ / V", "response / i_d", 4, 4,
+             function(v){ return v.toFixed(2); }, function(v){ return v.toFixed(1); });
+  var i, E, u, sg, dn = "", dd = "", ds = "";
+  for(i = 0; i <= 260; i++){
+    E = -0.26 + 0.52 * i / 260;
+    sg = 1 / (1 + Math.exp(E / 0.0257));
+    dn += (i ? "L" : "M") + f.px(E).toFixed(1) + " " + f.py(sg).toFixed(1) + " ";
+    u = E / 0.0384;
+    dd += (i ? "L" : "M") + f.px(E).toFixed(1) + " " + f.py(0.97 * Math.exp(-0.5 * u * u)).toFixed(1) + " ";
+    ds += (i ? "L" : "M") + f.px(E).toFixed(1) + " " + f.py(1.94 * Math.exp(-0.5 * u * u)).toFixed(1) + " ";
+  }
+  g += PA(dn, "var(--muted)", 1.8);
+  g += PA(dd, "var(--ion-k)", 2);
+  g += PA(ds, "var(--red-)", 2);
+  g += TX(f.X0 + 8, f.py(1.08), "NPV", "var(--muted)", 10, null, 700);
+  g += TX(f.px(0.075), f.py(0.78), "DPV", "var(--ion-k)", 10, null, 700);
+  g += TX(f.px(0.075), f.py(1.75), "SWV", "var(--red-)", 10, null, 700);
+  return FIGWRAP(g, "Three pulse responses on one potential axis: a sigmoid for normal pulse, a peak for differential pulse and a peak about twice as tall for square wave.");
+}
+
+var CALC = [pPeakSep, pPeakRatio, pRandles, pCottrell, pOhmic, pDPV];
+
+
+/* ---------- state ---------- */
+var STORE = "ch40051-ps4-v1";
+var probs = [], state = [], sid = "";
+var sId       = document.getElementById("sId"),
+    genBtn    = document.getElementById("genBtn"),
+    sheet     = document.getElementById("sheet"),
+    summary   = document.getElementById("summary"),
+    startHint = document.getElementById("startHint");
+
+function save(){
+  try { localStorage.setItem(STORE, JSON.stringify({id:sid, st:state})); } catch(e){}
+}
+function load(){
+  try {
+    var d = JSON.parse(localStorage.getItem(STORE) || "null");
+    if (d && d.id){ sId.value = d.id; return d; }
+  } catch(e){}
+  return null;
+}
+
+/* ---------- Part B: concepts ----------
+   Four per lecture, written fresh but aimed at the same misconceptions the
+   concept checks probe, so revising the checks is the right preparation and
+   memorising their answers is not enough. One question is drawn from each of
+   Lectures 9-12, plus two more from lectures chosen by your ID, and the
+   options are shuffled per student.                                        */
+var CONCEPTS = {
+"Lecture 13": [
+ {q:"Three cyclic voltammograms of one solution at 0.1, 1 and 10 V s\u207b\u00b9. The peak currents are in the ratio 1 : 3.16 : 10, and \u0394E\u209a is 59 mV in all three.<br>" + FIG_SQRT() + "What does this trace set establish?",
+  o:["The couple is reversible and the species is <b>diffusing in from solution</b> \u2014 i\u209a \u221d \u221a\u03c5",
+     "The species is adsorbed on the electrode, because the peak current grows with scan rate",
+     "The couple is quasi-reversible, because the peaks move apart as the scan speeds up",
+     "The electrode area is changing between scans"],
+  a:0,
+  why:"1 : 3.16 : 10 is 1 : \u221a10 : \u221a100, so i\u209a \u221d \u221a\u03c5 \u2014 the Randles\u2013\u0160ev\u010d\u00edk signature of a species that has to diffuse to the electrode. An <b>adsorbed</b> layer is already there and gives i\u209a \u221d \u03c5, which over the same two decades would have been 1 : 10 : 100. And \u0394E\u209a staying at 59 mV through two decades of scan rate is exactly what reversibility means: the electron transfer is never the thing you are waiting for."},
+
+ {q:"One couple, two scan rates. At 0.05 V s\u207b\u00b9 the return peak is barely there; at 5 V s\u207b\u00b9 it is almost as big as the forward peak.<br>" + FIG_EC() + "What is happening?",
+  o:["The electron transfer is slow and only becomes reversible at high scan rate",
+     "The electrode is fouling at low scan rate",
+     "The product is being consumed by a following chemical reaction, and at 5 V s\u207b\u00b9 you outrun it",
+     "Uncompensated resistance suppresses the return peak at low scan rate"],
+  a:2,
+  why:"This is the <b>EC</b> diagnostic, and the direction is the whole of it: faster scanning gives you <i>less</i> time between making the product and looking for it, so a ratio that climbs towards 1 as \u03c5 rises means a chemical step is eating the product. Slow electron transfer does the opposite \u2014 it gets worse at high scan rate, and it widens \u0394E\u209a rather than removing the return peak. Ohmic drop also grows with current, so it too would be worse at 5 V s\u207b\u00b9, not better."},
+
+ {q:"A voltammogram with one large cathodic wave that reaches a plateau and no return peak at all; the plateau current is the same at 0.02 and 0.2 V s\u207b\u00b9.<br>" + FIG_CAT() + "Which mechanism fits?",
+  o:["A simple irreversible one-electron reduction",
+     "A catalytic (EC\u2032) regeneration: the product is reoxidised by a substrate in solution and goes round again",
+     "Adsorption of the reactant on the electrode",
+     "An uncompensated-resistance artefact"],
+  a:1,
+  why:"Two things name it. A <b>plateau instead of a peak</b> means the surface concentration is being held up rather than depleted, and a plateau height that <b>does not move with scan rate</b> means the current is set by a chemical turnover rate, not by diffusion \u2014 a diffusion peak would have grown by \u221a10 between those two scan rates. That is EC\u2032: the electrode makes a reductant, the substrate regenerates the oxidant, and the same molecule is used over and over. An irreversible reduction still gives a peak that grows as \u221a\u03c5."},
+
+ {q:"Peak current against scan rate for a modified electrode: the points fall on a straight line through the origin against \u03c5, and on a curve against \u221a\u03c5.<br>" + FIG_ADS() + "What does that say about the redox species?",
+  o:["It is diffusing in from the bulk solution",
+     "It is attached to the electrode surface \u2014 a fixed amount, stripped faster as you sweep faster",
+     "The measurement has an uncorrected charging current",
+     "The couple is irreversible"],
+  a:1,
+  why:"A fixed surface coverage \u0393 is stripped in a time inversely proportional to \u03c5, so the current is proportional to \u03c5 and the <b>charge under the peak is independent of it</b>. That is the test, and it is the same one the ECSA lecture uses on H<sub>upd</sub>. A diffusing species obeys Randles\u2013\u0160ev\u010d\u00edk and gives \u221a\u03c5. Worth remembering: the charging current <i>also</i> grows as \u03c5, which is exactly why a surface wave has to be integrated against a proper baseline."}
+],
+"Lecture 14": [
+ {q:"A current\u2013time trace after a potential step, on log\u2013log axes. For the first few hundred microseconds it falls off a cliff; after that it settles onto a straight line of slope \u2212\u00bd.<br>" + FIG_STEP() + "What are the two parts?",
+  o:["Charging the double layer, then the faradaic Cottrell decay",
+     "The faradaic current, then convection taking over",
+     "Uncompensated resistance, then the double layer",
+     "An instrument artefact, then the true current"],
+  a:0,
+  why:"The cliff is <code>i\u1d04 = (\u0394E/R\u1d64) e^(\u2212t/\u03c4)</code> with \u03c4 = R\u1d64C\u1d48\u02e1 \u2014 an exponential, which on log\u2013log falls vertically once it starts. The straight line of slope \u2212\u00bd is Cottrell, <code>i \u221d t^(\u22121\u141f\u00b2)</code>. <b>An exponential always beats a power law eventually</b>, so there is always a time after which only the faradaic current is left, and it arrives at about 5\u03c4. Everything sampled before that is mostly the cell charging itself."},
+
+ {q:"A Cottrell plot \u2014 i against t<sup>\u22121/2</sup> \u2014 that is straight in the middle, bends <b>above</b> the line at the right-hand end (short times) and falls <b>below</b> it at the left-hand end (long times).<br>" + FIG_COTBEND() + "What are the two ends telling you?",
+  o:["Both ends are noise; fit the whole range anyway",
+     "Short times: the electrode area is wrong. Long times: the concentration is wrong",
+     "Short times: charging current not yet dead. Long times: convection, or the diffusion layer reaching the edge of the electrode",
+     "Short times: convection. Long times: charging current"],
+  a:2,
+  why:"Short time is the left end of the <i>clock</i> but the right end of a t<sup>\u22121/2</sup> axis, and that is where the charging current still has not died \u2014 it adds to i, so the points sit above the line. At long times the diffusion layer has grown to tens of microns and two things undo the assumption behind Cottrell: the room stirs the solution, and on a finite electrode the layer reaches the edge and gets fed from the side. Both <i>add</i> transport, which holds the current up relative to a pure t<sup>\u22121/2</sup> \u2014 so plotted this way the long-time points fall below the extrapolated line. <b>The usable window is between 5\u03c4 and about twenty seconds</b>, and a Cottrell slope fitted outside it is not a diffusion coefficient."},
+
+ {q:"Two chronoamperograms of the same solution, one on a 3 mm disc and one on a 10 \u00b5m disc, on the same log time axis. The large one keeps falling; the small one flattens onto a constant current after about a millisecond.<br>" + FIG_UME() + "Why?",
+  o:["The small electrode has a smaller R\u1d64, so its charging current dies sooner",
+     "Radial diffusion to the small electrode reaches a steady state the planar one never reaches",
+     "The small electrode is passivating",
+     "The small electrode has a higher current density, so it depletes the solution"],
+  a:1,
+  why:"When the diffusion layer grows larger than the electrode itself, material arrives from the <i>sides</i> as well as from in front, and the supply stops falling: <code>i<sub>ss</sub> = 4nFDC*r\u2080</code> for a disc. The crossover is at about <code>t \u2248 r\u2080\u00b2/D</code>, which is milliseconds for a 10 \u00b5m disc and hours for a 3 mm one. The small electrode does also have a much smaller R\u1d64C\u1d48\u02e1, which is a real and useful second advantage \u2014 but it is not what makes the current flat; it is what lets you look early."},
+
+ {q:"The same solution measured by normal pulse (a sigmoid), differential pulse and square wave (both peaks). The square-wave peak is about twice the differential-pulse peak at the same amplitude.<br>" + FIG_PULSE() + "Why is the square-wave response the biggest?",
+  o:["It samples twice as often, so it averages less noise",
+     "Its pulses are twice as tall",
+     "It subtracts a reverse-scan sample that is anodic, so the two currents add rather than cancel",
+     "It runs at a higher frequency, and current rises with frequency"],
+  a:2,
+  why:"Square wave takes one sample at the end of the forward half-cycle and one at the end of the reverse half-cycle, and at the foot of the wave the reverse sample is <b>anodic</b> \u2014 opposite in sign. Subtracting it therefore <i>adds</i> its magnitude, which is where the factor of about two comes from. The second thing it buys you is free: the forward and reverse currents kept apart are a reversibility test, because an irreversible couple gives no reverse current to speak of. Differential pulse subtracts a sample taken just before the pulse, which is a small current of the <i>same</i> sign, so it only removes a background."}
+]
+};
+
+function build(id){
+  sid = id;
+  var r = mulberry32(hash32("CH40051-PS4-" + id));
+  probs = CALC.map(function(fn){ return fn(r); });
+
+  /* one concept question from each lecture, and a second from one of them */
+  var LECS = ["Lecture 13", "Lecture 14"];
+  var want = {};
+  LECS.forEach(function(L){ want[L] = 1; });
+  /* four each: both lectures carry three diagnoses and one more drawn by
+     the seed, so a set is always three from each plus two */
+  want["Lecture 13"] = 3; want["Lecture 14"] = 3;
+  LECS.forEach(function(L){
+    var pool = CONCEPTS[L].map(function(c, i){ return {c:c, i:i}; });
+    for (var k = 0; k < want[L]; k++){
+      var take = pool.splice(Math.floor(r() * pool.length), 1)[0];
+      var sh = shuffle(r, take.c.o, take.c.a);
+      probs.push({
+        kind:"mcq", lec:L, topic:"Diagnose — " + L + " #" + (take.i + 1),
+        stem:take.c.q, opts:sh.list, answer:sh.at, why:take.c.why
+      });
+    }
+  });
+}
+
+
+/* ---------- rendering ---------- */
+var LETTER = ["A", "B", "C", "D", "E"];
+
+function section(title, note){
+  return '<div class="sect"><h2>' + title + '</h2><p>' + note + '</p></div>';
+}
+
+function render(){
+  sheet.hidden = false;
+  summary.hidden = false;
+  sId.readOnly = true;
+
+  var h = "";
+  probs.forEach(function(p, i){
+    if (i === 0) h += section("Part A &mdash; read it off the plot", "six figures to read and use &middot; Lectures 13&ndash;14 &middot; two attempts each &middot; the tolerance is as wide as reading a line off a grid, about 10 %");
+    if (i === 6) h += section("Part B &mdash; what is this trace telling you?", "six traces to diagnose &middot; one attempt each &middot; the answer is in the shape");
+
+    var st = state[i];
+    h += '<div class="card' + (st.solved ? " done" : "") + '">'
+       +   '<div class="card-h">'
+       +     '<span class="pnum">' + (i < 9 ? "0" : "") + (i + 1) + '</span>'
+       +     '<span class="ptopic">' + esc(p.topic) + '</span>'
+       +     '<span class="lect">' + esc(p.lec) + '</span>'
+       +   '</div>'
+       +   '<div class="card-b">'
+       +     '<p class="stem">' + p.stem + '</p>';
+
+    if (p.kind === "calc"){
+      h += '<div class="answer">'
+         +   '<input type="text" id="in' + i + '" inputmode="decimal" autocomplete="off"'
+         +     ' placeholder="your answer" value="' + esc(st.given) + '"'
+         +     (st.solved ? " readonly" : "") + '>'
+         +   '<span class="unit">' + esc(p.unit) + '</span>'
+         +   '<button class="ghost" type="button" data-check="' + i + '"'
+         +     (st.solved ? " disabled" : "") + '>Check</button>'
+         + '</div>';
+      if (st.msg) h += '<p class="verdict ' + st.msgKind + '">' + st.msg + '</p>';
+      if (st.showSol){
+        h += '<div class="sol"><h3>Worked solution</h3><ol>';
+        p.solution.forEach(function(s){ h += "<li>" + s + "</li>"; });
+        h += '</ol></div>';
+      }
+    } else {
+      h += '<div class="opts">';
+      p.opts.forEach(function(o, j){
+        var cls = "opt";
+        if (st.showSol){
+          if (j === p.answer) cls += " right";
+          else if (String(j) === String(st.given)) cls += " wrong";
+        }
+        h += '<button type="button" class="' + cls + '" data-mcq="' + i + '" data-opt="' + j + '"'
+           +   (st.showSol ? " disabled" : "") + '>'
+           +   '<span class="k">' + LETTER[j] + '</span><span>' + o + '</span></button>';
+      });
+      h += '</div>';
+      if (st.msg) h += '<p class="verdict ' + st.msgKind + '">' + st.msg + '</p>';
+      if (st.showSol) h += '<div class="why"><b>Why.</b> ' + p.why + '</div>';
+    }
+    h += '</div></div>';
+  });
+  sheet.innerHTML = h;
+
+  var solved = state.filter(function(s){ return s.solved; }).length;
+  document.getElementById("scoreNum").innerHTML = solved + ' <small>/ ' + probs.length + ' correct</small>';
+  document.getElementById("whoLine").innerHTML = esc(sid) + " &middot; verification <b>" + vcode() + "</b>";
+}
+
+/* A short code over the student ID and the exact answers this set expects, so a
+   marker can confirm a submitted file was produced by this page and not edited. */
+function vcode(){
+  var s = sid + "|";
+  probs.forEach(function(p){ s += sig(p.answer, 6) + "|"; });
+  var v = hash32(s).toString(36).toUpperCase();
+  while (v.length < 7) v = "0" + v;
+  return v.slice(0, 4) + "-" + v.slice(4);
+}
+
+/* ---------- checking ---------- */
+function check(i){
+  var el = document.getElementById("in" + i);
+  var raw = (el.value || "").trim().replace(/,/g, "").replace(/\s+/g, "");
+  var v = parseFloat(raw);
+  var st = state[i], p = probs[i];
+  if (!raw || !isFinite(v)){
+    st.msg = "Type a number. Use a decimal point, and scientific notation like <code>1.7e-2</code> if you need it.";
+    st.msgKind = "no";
+    render(); return;
+  }
+  st.tries++;
+  st.given = raw;
+  var tol = Math.max(Math.abs(p.answer) * 0.02, p.abstol || 1e-9);
+  if (Math.abs(v - p.answer) <= tol){
+    st.solved = true; st.showSol = true;
+    st.msg = "Correct. The exact value is <b>" + sig(p.answer, 4) + " " + esc(p.unit) + "</b>.";
+    st.msgKind = "ok";
+  } else if (st.tries >= 2){
+    st.showSol = true;
+    st.msg = "Not correct, and that was your second attempt &mdash; the worked solution is below. "
+           + "Read it, then try the number again.";
+    st.msgKind = "no";
+  } else {
+    var ratio = v / p.answer, nudge = "";
+    function near(x, f){ return Math.abs(ratio - x) < x * f; }
+    if (ratio < 0)
+      nudge = " Check the sign &mdash; every answer here is a positive magnitude.";
+    else if (ratio > 0.9 && ratio < 1.1)
+      nudge = " You are very close &mdash; check your rounding or significant figures.";
+    else if (near(1000, 0.08) || near(0.001, 0.08))
+      nudge = " Out by a factor of 1000 &mdash; look for a milli- prefix: mM against M, mS against S, or mol/L against mol/cm\u00b3.";
+    else if (near(1e4, 0.08) || near(1e-4, 0.08))
+      nudge = " Out by 10\u2074 &mdash; that is cm\u00b2 against m\u00b2. Decide once whether you are working in centimetres or in metres, and convert everything.";
+    else if (near(100, 0.08) || near(0.01, 0.08))
+      nudge = " Out by 100 &mdash; check a cm-to-m conversion, or F/m\u00b2 against \u00b5F/cm\u00b2 (1 F/m\u00b2 = 100 \u00b5F/cm\u00b2).";
+    else if (near(10, 0.08) || near(0.1, 0.08))
+      nudge = " Out by 10 &mdash; check nm against \u00c5, or mm against cm.";
+    else if (p.unit === "nm" && (near(2, 0.06) || near(0.5, 0.06) || near(3, 0.06) || near(1/3, 0.06)
+          || near(4, 0.06) || near(0.25, 0.06) || near(6, 0.06)))
+      nudge = " Out by a small whole-number factor &mdash; that is the charge. Ionic strength weights every ion by z\u00b2, and the pairing distance carries |z\u2081z\u2082|.";
+    else if (near(Math.PI, 0.05) || near(1 / Math.PI, 0.05) || near(Math.sqrt(Math.PI), 0.04))
+      nudge = " Out by \u03c0 or \u221a\u03c0 &mdash; check whether a \u221a(\u03c0t) or a 4\u03c0\u03b5\u2080 has gone missing.";
+    else if (near(2, 0.06) || near(0.5, 0.06))
+      nudge = " Out by a factor of 2 &mdash; look for n, for the 2 in the ionic-strength \u00bd, or for the 2k_BT in the pairing criterion.";
+    st.msg = "Not correct." + nudge + " One more attempt before the solution appears.";
+    st.msgKind = "no";
+  }
+  save(); render();
+}
+
+function choose(i, j){
+  var st = state[i], p = probs[i];
+  if (st.showSol) return;
+  st.tries = 1;
+  st.given = String(j);
+  st.showSol = true;
+  st.solved = (j === p.answer);
+  st.msg = st.solved
+    ? "Correct."
+    : "Not correct &mdash; the right option is <b>" + LETTER[p.answer] + "</b>. Concept questions get one attempt.";
+  st.msgKind = st.solved ? "ok" : "no";
+  save(); render();
+}
+
+sheet.addEventListener("click", function(ev){
+  var b = ev.target.closest("[data-check]");
+  if (b){ check(+b.getAttribute("data-check")); return; }
+  var m = ev.target.closest("[data-mcq]");
+  if (m) choose(+m.getAttribute("data-mcq"), +m.getAttribute("data-opt"));
+});
+sheet.addEventListener("keydown", function(ev){
+  if (ev.key !== "Enter") return;
+  var m = (ev.target.id || "").match(/^in(\d+)$/);
+  if (m){ ev.preventDefault(); check(+m[1]); }
+});
+
+function start(id){
+  build(id);
+  if (!state.length || state.length !== probs.length){
+    state = probs.map(function(){
+      return {solved:false, tries:0, given:"", msg:"", msgKind:"", showSol:false};
+    });
+  }
+  save(); render();
+}
+
+genBtn.addEventListener("click", function(){
+  var id = (sId.value || "").trim();
+  if (!id){
+    startHint.innerHTML = "<b style='color:var(--stop)'>Enter your student ID first.</b> "
+                        + "It is what generates your particular problems.";
+    sId.focus(); return;
+  }
+  state = []; start(id);
+});
+sId.addEventListener("keydown", function(e){ if (e.key === "Enter") genBtn.click(); });
+
+/* ---------- the result, in one shape ----------
+   The download and the course submission carry exactly the same columns, so a
+   sheet export and a handed-in file can be marked by the same tool. */
+function result(){
+  var solved = state.filter(function(s){ return s.solved; }).length;
+  var r = {
+    assignment:"PS3", student_id:sid, completed_utc:new Date().toISOString(),
+    solved:solved, total:probs.length, verification:vcode(),
+    kinds:[], topics:[], expected:[], given:[], tries:[], ok:[]
+  };
+  probs.forEach(function(p, i){
+    var g = state[i].given;
+    r.kinds.push(p.kind);
+    r.topics.push(p.topic);
+    r.expected.push(p.kind === "calc" ? sig(p.answer, 5) : LETTER[p.answer]);
+    r.given.push(p.kind === "calc" ? g : (g === "" ? "" : LETTER[+g]));
+    r.tries.push(state[i].tries);
+    r.ok.push(state[i].solved ? 1 : 0);
+  });
+  return r;
+}
+
+/* ---------- submission file ---------- */
+document.getElementById("dlBtn").addEventListener("click", function(){
+  var res = result();
+  var head = ["assignment", "student_id", "completed_utc", "solved", "total", "verification"];
+  var row  = [res.assignment, res.student_id, res.completed_utc, res.solved, res.total, res.verification];
+  probs.forEach(function(p, i){
+    head.push("q" + (i+1) + "_kind");     row.push(res.kinds[i]);
+    head.push("q" + (i+1) + "_topic");    row.push(res.topics[i]);
+    head.push("q" + (i+1) + "_expected"); row.push(res.expected[i]);
+    head.push("q" + (i+1) + "_given");    row.push(res.given[i]);
+    head.push("q" + (i+1) + "_tries");    row.push(res.tries[i]);
+    head.push("q" + (i+1) + "_solved");   row.push(res.ok[i]);
+  });
+  function cell(v){ v = String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+  var csv = head.join(",") + "\n" + row.map(cell).join(",") + "\n";
+  try {
+    var blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = "CH40051-PS3_" + sid.replace(/[^A-Za-z0-9_-]/g, "") + ".csv";
+    a.style.display = "none";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+    document.getElementById("dlHint").textContent =
+      "Saved. Keep it as your backup — the submission itself is the button beside this one.";
+  } catch(e){
+    document.getElementById("dlHint").textContent =
+      "Your browser blocked the download. Screenshot this page and submit that instead.";
+  }
+});
+
+/* ---- submit straight to the course sheet ----------------------------------
+   The same endpoint the concept checks use; the assignment field is what
+   routes this row to the "Problem set" tab of the submissions sheet. Left
+   empty, the button stays hidden and only the download exists.             */
+var SUBMIT_URL = "https://script.google.com/macros/s/AKfycbxPm7WrbttFu6-gnTi__IcUPt-816GthK0eI8TPuwOZyYlcRW3RAWJlmsr791moxBc5GA/exec";
+
+var sendBtn = document.getElementById("sendBtn"),
+    dlHint  = document.getElementById("dlHint");
+if (SUBMIT_URL){
+  sendBtn.hidden = false;
+  dlHint.textContent = "Press Submit to send your result to the course. The download is a backup.";
+}
+
+sendBtn.addEventListener("click", function(){
+  if (!sid){ dlHint.textContent = "Generate your set first."; return; }
+  var payload = result();
+  sendBtn.disabled = true;
+  dlHint.textContent = "Sending\u2026";
+
+  /* text/plain keeps this a simple request, so the browser sends it without
+     a preflight the Apps Script endpoint cannot answer */
+  fetch(SUBMIT_URL, {
+    method:"POST",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify(payload)
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(j){
+    if (j && j.ok){
+      sendBtn.textContent = "Submitted \u2713";
+      dlHint.textContent = "Recorded for student ID " + payload.student_id + " \u2014 "
+        + payload.solved + " of " + payload.total + " correct. You can close this page.";
+    } else {
+      var e = new Error((j && j.error) || "rejected"); e.fromServer = !!(j && j.error); throw e;
+    }
+  })
+  .catch(function(err){
+    /* a refusal the endpoint gave us is the student's to act on and resending
+       would not help; a reply we could not read is ours, so resend blind and
+       let the downloaded file stand as proof */
+    if (err && err.fromServer){
+      sendBtn.disabled = false;
+      sendBtn.textContent = "Submit to the course";
+      dlHint.textContent = err.message;
+      return;
+    }
+    fetch(SUBMIT_URL, {method:"POST", mode:"no-cors",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(payload)}).catch(function(){});
+    sendBtn.disabled = false;
+    sendBtn.textContent = "Submit to the course";
+    dlHint.textContent = "Sent, but the confirmation did not come back. "
+      + "Download the file as well and keep it \u2014 it is your proof of submission.";
+  });
+});
+
+/* resume a set from a previous visit */
+var prev = load();
+if (prev){ state = prev.st || []; start(prev.id); }
+
+})();
+</script>
+</body>
+</html>
