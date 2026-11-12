@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>CH40051 Electroanalytical Chemistry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Serif:wght@500;600&display=swap">
+
+<style>
+:root{
+  --ground:#F1F3F2; --surface:#FFFFFF; --surface-2:#E9EDEB;
+  --ink:#14191B; --ink-2:#3E4A4D; --muted:#68767A; --line:#D6DDDA; --line-2:#C3CCC8;
+  --ox:#A85B33; --ox-soft:#F3E4DA;
+  --red-:#15618E; --red-soft:#DDE9F2;
+  --go:#2C7355; --go-soft:#DCEBE3;
+  --shadow:0 1px 2px rgba(20,25,27,.05),0 8px 24px -12px rgba(20,25,27,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+    --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+    --ox:#D08551; --ox-soft:#33231A;
+    --red-:#5AA6D4; --red-soft:#152833;
+    --go:#5DBB8D; --go-soft:#152A21;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+  --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+  --ox:#D08551; --ox-soft:#33231A;
+  --red-:#5AA6D4; --red-soft:#152833;
+  --go:#5DBB8D; --go-soft:#152A21;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:960px;margin:0 auto;padding:44px 20px 80px}
+
+.masthead{padding-bottom:26px;border-bottom:2px solid var(--ink)}
+.code{font-family:"IBM Plex Mono",monospace;font-size:13px;letter-spacing:.22em;color:var(--ox);font-weight:600;margin:0 0 10px}
+h1{font-family:"IBM Plex Serif",Georgia,serif;font-weight:600;font-size:clamp(30px,5.4vw,50px);
+  line-height:1.08;margin:0;letter-spacing:-.02em;text-wrap:balance}
+.term{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted);margin:14px 0 0;letter-spacing:.06em}
+.sub{margin:18px 0 0;color:var(--ink-2);font-size:16px;max-width:60ch}
+
+h2.sec{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--muted);font-weight:500;margin:48px 0 16px}
+
+/* lecture list */
+.lect{display:block;text-decoration:none;color:inherit;background:var(--surface);
+  border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);
+  padding:20px 22px;margin-bottom:12px;transition:border-color .15s,transform .15s}
+a.lect:hover{border-color:var(--ox);transform:translateY(-1px)}
+a.lect:focus-visible{outline:2px solid var(--red-);outline-offset:2px}
+.lect.soon{opacity:.72;box-shadow:none;border-style:dashed}
+.lhead{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.lnum{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);flex:0 0 auto;letter-spacing:.1em}
+.ltitle{font-size:18px;font-weight:600;letter-spacing:-.01em;flex:1 1 240px}
+.state{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  padding:3px 9px;border-radius:20px;font-weight:500;white-space:nowrap}
+.state.live{background:var(--go-soft);color:var(--go)}
+.state.soon{background:var(--surface-2);color:var(--muted)}
+.ldesc{margin:10px 0 0;font-size:14px;color:var(--ink-2);max-width:64ch}
+.parts{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}
+.part{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink-2);
+  background:var(--surface-2);padding:4px 10px;border-radius:6px}
+
+/* how-it-works */
+.steps{counter-reset:s;display:grid;gap:2px}
+.stp{display:grid;grid-template-columns:32px 1fr;gap:14px;padding:14px 0;border-bottom:1px dotted var(--line)}
+.stp:last-child{border-bottom:0}
+.stp .n{counter-increment:s;font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ox);
+  border:1px solid var(--line-2);border-radius:50%;width:28px;height:28px;display:grid;place-items:center}
+.stp .n::before{content:counter(s)}
+.stp .t{font-size:14.5px;color:var(--ink-2)}
+.stp .t b{color:var(--ink);font-weight:600}
+
+.callout{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--ox);
+  border-radius:8px;padding:16px 20px;margin-top:18px;font-size:14px;color:var(--ink-2);line-height:1.7}
+.callout b{color:var(--ink)}
+
+footer{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;line-height:1.8}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="code">CH40051</p>
+    <h1>Electroanalytical Chemistry</h1>
+    <p class="term">Fall 2026 · interactive companion materials</p>
+    <p class="sub">Each lecture has a page you can operate rather than only read: build the cell, move the sliders, and check whether you actually have the concept. Everything here works in a browser — no install, no lab time.</p>
+  </header>
+
+  <h2 class="sec">Lectures</h2>
+
+  <a class="lect" href="lecture01.html">
+    <div class="lhead">
+      <span class="lnum">LECTURE 1</span>
+      <span class="ltitle">Electrochemistry Bench</span>
+      <span class="state live">Open</span>
+    </div>
+    <p class="ldesc">Basic terminology and thermodynamics. Run a virtual electrolysis that reproduces the worked example from class, then assemble a cell from any two half-reactions and read the E diagram.</p>
+    <div class="parts">
+      <span class="part">Faraday Bench</span>
+      <span class="part">Cell Builder</span>
+      <span class="part">Concept Check · graded</span>
+    </div>
+  </a>
+
+  <a class="lect" href="lecture02.html">
+    <div class="lhead">
+      <span class="lnum">LECTURE 2</span>
+      <span class="ltitle">Potential Explorer</span>
+      <span class="state live">Open</span>
+    </div>
+    <p class="ldesc">Leaving standard state. Move the concentrations and watch E follow the Nernst equation — in a single couple, in a cell whose two halves differ only in concentration, and in the Daniell cell as it runs itself flat — then switch to the electron's point of view: what applying a potential does to the Fermi level, and why a potential step gives two currents rather than one.</p>
+    <div class="parts">
+      <span class="part">Nernst Explorer</span>
+      <span class="part">Concentration Cell</span>
+      <span class="part">Daniell Cell &middot; E vs discharge</span>
+      <span class="part">Fermi Level &amp; Sweep</span>
+      <span class="part">Concept Check · graded</span>
+    </div>
+  </a>
+
+  <a class="lect" href="lecture03.html">
+    <div class="lhead">
+      <span class="lnum">LECTURE 3</span>
+      <span class="ltitle">Reference Bench</span>
+      <span class="state live">Open</span>
+    </div>
+    <p class="ldesc">Electrochemical cells. Convert a potential between SHE, Ag/AgCl, calomel and the non-aqueous references without losing a sign, then put both cell designs side by side: what the third electrode buys you, and how much ohmic error survives it once current flows.</p>
+    <div class="parts">
+      <span class="part">Reference Converter</span>
+      <span class="part">Ferrocene Referencing</span>
+      <span class="part">Ohmic Error</span>
+      <span class="part">Concept Check · graded</span>
+    </div>
+  </a>
+
+  <a class="lect" href="lecture04.html">
+    <div class="lhead">
+      <span class="lnum">LECTURE 4</span>
+      <span class="ltitle">Double Layer Bench</span>
+      <span class="state live">Open</span>
+    </div>
+    <p class="ldesc">Ion distribution at the interface. Build the double layer one model at a time — Helmholtz, Gouy-Chapman, Stern, Grahame — and watch where the potential actually drops, then see what that structure does to a voltammogram when nothing reacts at all.</p>
+    <div class="parts">
+      <span class="part">CV</span>
+      <span class="part">Double Layer Models</span>
+      <span class="part">Grahame 1947</span>
+      <span class="part">Concept Check · graded</span>
+    </div>
+  </a>
+
+  <a class="lect" href="lecture05.html">
+    <div class="lhead">
+      <span class="lnum">LECTURE 5</span>
+      <span class="ltitle">Mass Transport Bench</span>
+      <span class="state live">Open</span>
+    </div>
+    <p class="ldesc">Ion flux. Take the total flux apart term by term on one moving concentration profile — switch diffusion, migration and convection on and off and watch which one decides the answer — then see Fick's second law fall out of his first, one slab at a time.</p>
+    <div class="parts">
+      <span class="part">Total Flux, J</span>
+      <span class="part">Fick&rsquo;s Laws</span>
+      <span class="part">Concept Check · graded</span>
+    </div>
+  </a>
+
+  <a class="lect" href="lecture06.html">
+    <div class="lhead">
+      <span class="lnum">LECTURE 6</span>
+      <span class="ltitle">Ion Interactions Bench</span>
+      <span class="state live">Open</span>
+    </div>
+    <p class="ldesc">Ion interactions. Tell potential from field around one ion and between two electrodes, follow where the voltage goes in an electrochemical cell and why migration needs a field, then watch the atmosphere of counter-charge every ion carries thin out as you dilute and count what a Gaussian sphere around it encloses.</p>
+    <div class="parts">
+      <span class="part">Field &amp; Potential</span>
+      <span class="part">Ion Atmosphere</span>
+      <span class="part">Concept Check &middot; graded</span>
+    </div>
+  </a>
+
+  <a class="lect" href="lecture07.html">
+    <div class="lhead">
+      <span class="lnum">LECTURE 7</span>
+      <span class="ltitle">Solvent Bench</span>
+      <span class="state live">Open</span>
+    </div>
+    <p class="ldesc">Solvents. Every number so far has had a solvent hidden inside it. Put the solvents on three plots &mdash; permittivity against dipole, viscosity against boiling point, acceptor against donor number &mdash; and see why a big dipole usually but not always means a big &epsilon;<sub>r</sub>, why the liquids that dissociate a salt are the ones that slow its ions down, and why neither DN nor AN can be read off &epsilon;<sub>r</sub>.</p>
+    <div class="parts">
+      <span class="part">Solvent Properties</span>
+      <span class="part">Concept Check &middot; graded</span>
+    </div>
+  </a>
+
+  <a class="lect" href="lecture08.html">
+    <div class="lhead">
+      <span class="lnum">LECTURE 8</span>
+      <span class="ltitle">Ionic Conductivity Bench</span>
+      <span class="state live">Open</span>
+    </div>
+    <p class="ldesc">Ionic conductivity. Watch a drifting ion drag a lopsided atmosphere behind it and see where Kohlrausch&rsquo;s &radic;c comes from, how one friction fixes an ion&rsquo;s diffusion coefficient, its mobility and its size at once, and which ions actually carry the current once a supporting electrolyte is added &mdash; with every equation of the lecture, from a potential gradient to a transference number, collected on one page.</p>
+    <div class="parts">
+      <span class="part">Drift &amp; relaxation</span>
+      <span class="part">Stokes&ndash;Einstein</span>
+      <span class="part">Transference</span>
+      <span class="part">Summary</span>
+      <span class="part">Concept Check &middot; graded</span>
+    </div>
+  </a>
+
+  <a class="lect" href="lecture09.html">
+    <div class="lhead">
+      <span class="lnum">LECTURE 9</span>
+      <span class="ltitle">Junction &amp; Membrane Bench</span>
+      <span class="state live">Open</span>
+    </div>
+    <p class="ldesc">Liquid junction and Donnan potentials. Two voltages that appear with no reaction anywhere: build a junction and watch the faster ion run ahead until the field it leaves behind holds it back, put a fixed charge inside a membrane and let the salt find equilibrium around it, then stack the two into a pH electrode and find the pH at which it stops telling the truth.</p>
+    <div class="parts">
+      <span class="part">Liquid junction</span>
+      <span class="part">Donnan</span>
+      <span class="part">Glass electrode</span>
+      <span class="part">Summary</span>
+      <span class="part">Concept Check &middot; graded</span>
+    </div>
+  </a>
+
+  <a class="lect" href="lecture10.html">
+    <div class="lhead">
+      <span class="lnum">LECTURE 10</span>
+      <span class="ltitle">Overpotential Bench</span>
+      <span class="state live">Open</span>
+    </div>
+    <p class="ldesc">Various potentials. Thermodynamics says what a cell is worth; the moment current flows you get less, by an activation barrier and by a layer the reactant has run out of. Take them apart one at a time &mdash; Butler&ndash;Volmer and Tafel metal by metal, on a frame that never moves, then the depletion layer in a still cell and on a rotating disc, each drawn in the cell the experiment is actually done in &mdash; then put them back together, with the ohmic drop, in a fuel cell and an electrolyser and watch which loss arrives first and which one costs the most.</p>
+    <div class="parts">
+      <span class="part">Activation &eta;</span>
+      <span class="part">Concentration &eta;</span>
+      <span class="part">All three</span>
+      <span class="part">Concept Check &middot; graded</span>
+    </div>
+  </a>
+
+  <a class="lect" href="lecture11.html">
+    <div class="lhead">
+      <span class="lnum">LECTURE 11</span>
+      <span class="ltitle">Electrochemical Kinetics Bench</span>
+      <span class="state live">Open</span>
+    </div>
+    <p class="ldesc">Electrochemical kinetics. A current is a rate: each direction has its own rate constant, set by a barrier the electrode potential tilts &mdash; and only a fraction &alpha; of the tilt reaches the top. Watch the barrier move and &alpha; change it, set k&deg; against k and see Nernst and the exchange current fall out of two rates, take Butler&ndash;Volmer apart into its ohmic and Tafel regions and the point where mass transport takes over, then fit a Tafel line to Pt(110) or a couple of your own &alpha; and see how far the wrong window moves i<sub>0</sub>.</p>
+    <div class="parts">
+      <span class="part">The barrier</span>
+      <span class="part">k&deg;, k and i<sub>0</sub></span>
+      <span class="part">Butler&ndash;Volmer</span>
+      <span class="part">Tafel analysis</span>
+      <span class="part">Concept Checks 1 &amp; 2 &middot; graded</span>
+    </div>
+  </a>
+
+  <a class="lect" href="lecture12.html">
+    <div class="lhead">
+      <span class="lnum">LECTURE 12</span>
+      <span class="ltitle">Mixed Potential Bench</span>
+      <span class="state live">Open</span>
+    </div>
+    <p class="ldesc">Two reactions on one piece of metal, and a potential that belongs to neither. Build the Evans diagram from two Tafel branches and watch E<sub>corr</sub> and i<sub>corr</sub> slide with the area ratio, the exchange currents and the oxidant&rsquo;s transport limit; read the corrosion rate off Faraday&rsquo;s law and recover i<sub>corr</sub> by Stern&ndash;Geary without removing the sample; and step through the eight moves of the deck&rsquo;s table, from iron in acid to the alkaline zinc cell.</p>
+    <div class="parts">
+      <span class="part">Mixed potential</span>
+      <span class="part">Concept Check &middot; graded</span>
+    </div>
+  </a>
+
+  <a class="lect" href="lecture13.html">
+    <div class="lhead">
+      <span class="lnum">LECTURE 13</span>
+      <span class="ltitle">Cyclic Voltammetry Bench</span>
+      <span class="state live">Open</span>
+    </div>
+    <p class="ldesc">One triangular sweep, and the current that comes back carries the thermodynamics, the electron-transfer rate, the diffusion coefficient and whatever chemistry the product goes on to do &mdash; all in one trace. Watch the peak build as the surface is stripped and the diffusion layer thickens; move a couple between reversible, quasi-reversible and irreversible with nothing but the scan rate; test i<sub>p</sub> against &radic;&upsilon; and see where it bends; and run the seven coupled mechanisms of the Lecture 14 deck, EC through EC&prime;, at three scan rates at once. The last tab hands you unlabelled voltammograms from hidden conditions and asks you to diagnose them. Every trace is computed from the diffusion equation, not drawn.</p>
+    <div class="parts">
+      <span class="part">The sweep</span>
+      <span class="part">Reversible?</span>
+      <span class="part">Randles&ndash;Sevcik</span>
+      <span class="part">Coupled chemistry</span>
+      <span class="part">Read the voltammogram</span>
+      <span class="part">Concept Checks 1 &amp; 2 &middot; graded</span>
+    </div>
+  </a>
+
+  <a class="lect" href="lecture14.html">
+    <div class="lhead">
+      <span class="lnum">LECTURE 14</span>
+      <span class="ltitle">Potential Step Bench</span>
+      <span class="state live">Open</span>
+    </div>
+    <p class="ldesc">Hold the potential still and watch the clock instead. Start with the term that spoils everything else &mdash; the potential you set is not the one the electrode gets, because the current has to cross the solution to reach it, and nothing you measure is clean until the cell has charged for five time constants. Then two currents come back at once, one charging the double layer and dying exponentially, one carrying the reaction and dying as 1/&radic;t, and almost everything here is the window between them: 5&tau; closes it at the near end, the room&rsquo;s own convection at the far one. Test the Cottrell line, drag the sampling window along it, and get a number for D &mdash; then meet the five ways that number comes out wrong. Shrink the electrode below its own diffusion layer until the window never closes, with the field animated beside a millimetre disc; then pulse the potential so the charging current never appears at all, and watch one scan lay its voltammogram down a cycle at a time.</p>
+    <div class="parts">
+      <span class="part">Ohmic error</span>
+      <span class="part">Cottrell</span>
+      <span class="part">Ultramicroelectrode</span>
+      <span class="part">Pulse methods</span>
+      <span class="part">Concept Check &middot; graded</span>
+    </div>
+  </a>
+
+  <a class="lect" href="lecture15.html">
+    <div class="lhead">
+      <span class="lnum">LECTURE 15</span>
+      <span class="ltitle">Electrocatalysis Bench</span>
+      <span class="state live">Open</span>
+    </div>
+    <p class="ldesc">A catalyst&rsquo;s activity is a current divided by an area, and the area is the hard part: the geometric area is not it, the BET area is not it, and what you want is the number of atoms the electrolyte can actually reach. On platinum you can count them one at a time &mdash; one hydrogen adsorbs on each, one electron each, so a charge becomes an atom count and an atom count becomes square centimetres. Build that voltammogram from the surface waves rather than tracing it and walk the scan through them, with the layer of atoms drawn beside the trace at every instant; then the two things the picture rests on &mdash; the potential at which the metal itself carries no charge, and the difference between the hydrogen you count and the hydrogen that reacts. Then press Play, and each of the three measurements runs step by step in the order you would do it at the bench: hydrogen stripped off and integrated against a baseline you have to choose, carbon monoxide laid on and burnt off against a second cycle, and the double layer of a material with nothing to adsorb at all, where the specific capacitance you looked up is a factor of three wide. <b>Three answers from one electrode</b>, with the arithmetic written out beside each of them and the truth to measure them against. Finish where the area was going all along: a current per site, a Tafel slope that names the rate-determining step, and the volcano that says why platinum sits on top.</p>
+    <div class="parts">
+      <span class="part">The Pt voltammogram</span>
+      <span class="part">pzc &middot; H<sub>upd</sub> &amp; H<sub>opd</sub></span>
+      <span class="part">ECSA measurements &middot; animated</span>
+      <span class="part">HER &amp; the volcano</span>
+      <span class="part">2 Concept Checks &middot; graded</span>
+    </div>
+  </a>
+
+  <div class="lect soon">
+    <div class="lhead">
+      <span class="lnum">LECTURE 16+</span>
+      <span class="ltitle">Further topics</span>
+      <span class="state soon">Coming</span>
+    </div>
+    <p class="ldesc">Pages are added here as the semester goes on. Bookmark this page rather than the individual lecture links — it always points to the current set.</p>
+  </div>
+
+  <h2 class="sec">Problem sets</h2>
+
+  <a class="lect" href="problemset04.html">
+    <div class="lhead">
+      <span class="lnum">PROBLEM SET 4</span>
+      <span class="ltitle">Lectures 13&ndash;14</span>
+      <span class="state live">Open</span>
+    </div>
+    <p class="ldesc">Twelve problems on cyclic voltammetry, the potential step and the pulse methods: the Randles&ndash;&Scaron;ev&ccaron;&iacute;k equation and what a peak separation means, the Cottrell line and the window it has to be fitted inside, the ultramicroelectrode steady state, and what NPV, DPV and square wave each do with the charging current. Every number is generated from your student ID, so no two sets are the same: an answer copied from anyone else will simply be wrong.</p>
+    <div class="parts">
+      <span class="part">6 calculations &middot; two attempts</span>
+      <span class="part">6 concept questions &middot; one attempt</span>
+      <span class="part">worked solutions</span>
+      <span class="part">graded &middot; submitted from the page</span>
+    </div>
+  </a>
+
+  <a class="lect" href="problemset03.html">
+    <div class="lhead">
+      <span class="lnum">PROBLEM SET 3</span>
+      <span class="ltitle">Lectures 9&ndash;12</span>
+      <span class="state live">Open</span>
+    </div>
+    <p class="ldesc">Twelve problems on junction and membrane potentials, the three overpotentials, electrode kinetics and the mixed potential. Six are calculations &mdash; one from each lecture, with Lectures 10 and 11 asked twice &mdash; and six are concept questions. Every number is generated from your student ID, so no two sets are the same: an answer copied from anyone else will simply be wrong.</p>
+    <div class="parts">
+      <span class="part">6 calculations &middot; two attempts</span>
+      <span class="part">6 concept questions &middot; one attempt</span>
+      <span class="part">worked solutions</span>
+      <span class="part">graded &middot; submitted from the page</span>
+    </div>
+  </a>
+
+  <h2 class="sec">How the concept checks work</h2>
+
+  <div class="card" style="background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:8px 22px">
+    <div class="steps">
+      <div class="stp"><span class="n"></span><span class="t">Enter your <b>student ID</b> before you begin. That is how your submission is identified — there is no separate account or password.</span></div>
+      <div class="stp"><span class="n"></span><span class="t"><b>You get one attempt.</b> Your student ID locks as soon as you answer the first question, and each answer is final.</span></div>
+      <div class="stp"><span class="n"></span><span class="t">Every question shows <b>the correct answer and why it is correct</b> the moment you choose — including when you get it wrong. Read those explanations; they are the point of the exercise.</span></div>
+      <div class="stp"><span class="n"></span><span class="t">At the end, click <b>Submit to the course</b> to send your result. The download button beside it is a backup, not a second step.</span></div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <b>These checks are for learning, not for ranking.</b> They are graded on completion, and the results tell the teaching team which ideas the class has not landed yet — those become the opening of the next lecture. Answer honestly; a wrong answer you understand afterwards is worth more here than a right one you guessed.
+  </div>
+
+  <h2 class="sec">Using AI in this course</h2>
+
+  <div class="callout" style="border-left-color:var(--red-)">
+    Use AI to <b>explain a concept, check your reasoning, or generate extra practice</b>. Do not submit AI-written text as your own, and do not use it during closed-book examinations.<br><br>
+    The test is simple: <b>you must be able to reproduce and defend every answer you submit, with the AI closed.</b>
+  </div>
+
+  <footer>
+    CH40051 Electroanalytical Chemistry · Fall 2026<br>
+    Standard potentials are quoted at 25 °C and unit activity · F = 96 485 C mol⁻¹
+  </footer>
+</div>
+</body>
+</html>
