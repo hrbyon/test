@@ -548,8 +548,14 @@ function pCottrell(r){
 
 /* ---- 5. Lecture 14: the ohmic drop, read as an extra peak separation ---- */
 function pOhmic(r){
-  var Ru = pick(r, [20, 50, 120, 250]);                /* ohm              */
-  var ipFast = pick(r, [40, 80, 150, 300]) * 1e-6;     /* A at the fast scan */
+  /* R_u and the peak current are picked as a pair. Independently they
+     could land on 20 ohm and 40 uA, which widens the peaks by 1.6 mV -
+     a third of a pixel on this axis, and nothing anyone can read. The
+     smallest pair here is worth 30 mV.                               */
+  var pr = pick(r, [[50, 300], [120, 150], [250, 80],
+                    [120, 300], [250, 150], [90, 250]]);
+  var Ru = pr[0];                                      /* ohm              */
+  var ipFast = pr[1] * 1e-6;                           /* A at the fast scan */
   var dE0 = 0.059;
   var extra = 2 * ipFast * Ru;
   var dEfast = dE0 + extra;
@@ -558,26 +564,37 @@ function pOhmic(r){
   var g = AX(f, "E \u2212 E\u00b0\u2032 / V", "i / i\u209a (each trace to its own peak)", 6, 4,
              function(v){ return v.toFixed(2); }, function(v){ return v.toFixed(1); });
   g += LN(f.X0, f.py(0), f.X1, f.py(0), "var(--line-2)", 1.2);
+  /* every peak dropped onto the axis, so the printed potentials below
+     can be tied to the trace they came from                          */
+  [[dE0, "var(--go)"], [dEfast, "var(--red-)"]].forEach(function(q){
+    g += LN(f.px(q[0] / 2), f.Y0, f.px(q[0] / 2), f.Y1, q[1], 1, "4 3", 0.55);
+    g += LN(f.px(-q[0] / 2), f.Y0, f.px(-q[0] / 2), f.Y1, q[1], 1, "4 3", 0.55);
+  });
   g += PA(CVPATH(f, 0.34, -0.34, -dE0 / 2, 1, dE0 / 2, 1, 0.030, 0.04),
           "var(--go)", 1.8);
   g += PA(CVPATH(f, 0.34, -0.34, -dEfast / 2, 1, dEfast / 2, 1, 0.034, 0.04),
           "var(--red-)", 2);
   g += TX(f.X0 + 8, f.Y0 + 16, "\u03c5 = 0.01 V/s, i\u209a = " + (ipSlow * 1e6).toPrecision(2)
-          + " \u00b5A", "var(--go)", 10, null, 700);
+          + " \u00b5A, E\u209a = \u00b1" + (dE0 * 500).toFixed(1) + " mV",
+          "var(--go)", 10, null, 700);
   g += TX(f.X0 + 8, f.Y0 + 31, "\u03c5 = 1.0 V/s, i\u209a = " + (ipFast * 1e6).toPrecision(3)
-          + " \u00b5A", "var(--red-)", 10, null, 700);
+          + " \u00b5A, E\u209a = \u00b1" + (dEfast * 500).toFixed(1) + " mV",
+          "var(--red-)", 10, null, 700);
   return {
     kind:"calc", lec:"Lecture 14", topic:"Extra peak separation \u2192 R\u1d64", unit:"\u03a9",
     answer:Ru, abstol:Ru * 0.12,
     stem:"The same reversible couple at two scan rates, <b>no iR compensation</b>, each trace normalised "
-        + "to its own peak so the shapes can be compared. The peak currents are written on the figure.<br>"
+        + "to its own peak so the shapes can be compared. <b>The peak current and both peak potentials "
+        + "are printed for each trace</b>, since the difference between them is tens of millivolts on an "
+        + "axis that spans two thirds of a volt.<br>"
         + SVG(520, 272, g, "Two normalised cyclic voltammograms of the same couple, the faster one visibly wider between its peaks than the slower one.")
-        + "<b>Read both peak separations off the figure.</b> Taking the slow trace as the undistorted "
+        + "<b>Take both peak separations from the potentials on the figure.</b> Taking the slow trace as the undistorted "
         + "one, what is the <b>uncompensated resistance R<sub>u</sub></b>?",
     solution:[
-      "From the grid: <code>&Delta;E<sub>p</sub>(slow) \u2248 " + (dE0 * 1000).toFixed(0)
-        + " mV</code> and <code>&Delta;E<sub>p</sub>(fast) \u2248 " + (dEfast * 1000).toFixed(0)
-        + " mV</code>.",
+      "Each trace is symmetric about E\u00b0\u2032, so the separation is twice the printed peak "
+        + "potential: <code>&Delta;E<sub>p</sub>(slow) = 2 \u00d7 " + (dE0 * 500).toFixed(1)
+        + " = " + (dE0 * 1000).toFixed(0) + " mV</code> and <code>&Delta;E<sub>p</sub>(fast) = 2 \u00d7 "
+        + (dEfast * 500).toFixed(1) + " = " + (dEfast * 1000).toFixed(0) + " mV</code>.",
       "<code>extra separation = " + (dEfast * 1000).toFixed(0) + " \u2212 " + (dE0 * 1000).toFixed(0)
         + " = " + (extra * 1000).toPrecision(3) + " mV</code>",
       "The ohmic error moves <b>both</b> peaks, each by i\u209aR\u1d64 and in opposite directions, so the "
@@ -597,7 +614,10 @@ function pOhmic(r){
 function pDPV(r){
   var n = pick(r, [1, 1, 2, 2]);
   var E12 = pick(r, [-0.25, -0.10, 0.05, 0.20]);
-  var dE = pick(r, [-0.050, -0.025, -0.075]);
+  /* W(1/2) -> 90.4/n mV is the limit as the pulse amplitude goes to
+     zero, so the problem has to be set where that limit holds: these
+     are all small against RT/F = 25.7 mV and against 90.4/n.        */
+  var dE = pick(r, [-0.010, -0.015, -0.020]);
   var Ep = E12 - dE / 2;
   var W = 0.0904 / n;
   var ip = pick(r, [8, 15, 28]);
@@ -621,21 +641,30 @@ function pDPV(r){
   return {
     kind:"calc", lec:"Lecture 14", topic:"DPV half-width \u2192 n", unit:"electrons",
     answer:n, abstol:0.12,
-    stem:"A differential pulse voltammogram of a reversible couple at 25 \u00b0C, pulse amplitude "
-        + "<b>&Delta;E = " + (dE * 1000).toFixed(0) + " mV</b>. The bar is drawn at half the peak height.<br>"
+    stem:"A differential pulse voltammogram of a reversible couple at 25 \u00b0C, recorded with a "
+        + "<b>small pulse amplitude, &Delta;E = " + (dE * 1000).toFixed(0) + " mV</b> \u2014 small enough "
+        + "against RT/F = 25.7 mV that the limiting half-width applies. The bar is drawn at half the peak "
+        + "height.<br>"
         + SVG(520, 262, g, "A differential pulse voltammogram: one symmetric peak with a bar drawn across it at half its height.")
         + "<b>Read the width at half height off the figure</b> and report <b>n</b>.",
     solution:[
       "From the grid the bar spans <code>W\u00bd \u2248 " + (W * 1000).toFixed(0) + " mV</code>.",
-      "For a reversible couple with a small pulse, <code>W\u00bd \u2192 3.52 RT/nF = 90.4/n mV</code> at "
-        + "25 \u00b0C.",
+      "For a reversible couple, <code>W\u00bd \u2192 3.52 RT/nF = 90.4/n mV</code> at 25 \u00b0C "
+        + "<b>as the pulse amplitude goes to zero</b>, which is the condition this measurement was set up "
+        + "to meet.",
       "<span class='final'>n = 90.4 / " + (W * 1000).toFixed(0) + " = " + n + "</span>",
       "And the peak sits at <code>E\u209a = E\u00bd \u2212 &Delta;E/2</code>, so with &Delta;E = "
         + (dE * 1000).toFixed(0) + " mV the half-wave potential is <code>" + Ep.toFixed(3) + " + "
         + (-dE / 2).toFixed(3) + " = " + E12.toFixed(3) + " V</code> \u2014 <b>&Delta;E is signed</b>, and "
         + "forgetting that puts E\u00bd on the wrong side of the peak by the full amplitude.",
-      "A width much larger than 90.4/n means the couple is not reversible on this timescale; a width "
-        + "<i>smaller</i> than it means the species is adsorbed, not diffusing."
+      "<b>The amplitude is part of the measurement, not a setting you can ignore.</b> A larger pulse "
+        + "makes the peak taller \u2014 the height goes as tanh(nF&Delta;E/4RT) and saturates \u2014 but it "
+        + "also makes it <i>wider</i>, because the response is a difference between two points "
+        + "&Delta;E apart on the wave. At the 50\u201375 mV amplitudes used for sensitivity the peak is "
+        + "visibly broader than 90.4/n, and reading n from this formula would return a number that is "
+        + "<b>too small</b>. Quote the amplitude with the width, or do not quote n.",
+      "A width much larger than that limit at small amplitude means the couple is not reversible on this "
+        + "timescale; a width <i>smaller</i> than it means the species is adsorbed, not diffusing."
     ]
   };
 }
