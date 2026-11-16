@@ -247,6 +247,12 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
 .steps button:hover{color:var(--ink-2);background:var(--surface-2)}
 .steps button[aria-current="true"]{color:var(--ink);font-weight:600;
   background:var(--surface-2);border-left-color:var(--ox)}
+/* a link inside a paragraph of prose: visible as a link, quiet enough
+   to read past                                                       */
+.hint a{color:var(--red-);font-weight:600;text-decoration:none;
+  border-bottom:1px solid var(--red-soft)}
+.hint a:hover{border-bottom-color:var(--red-)}
+
 .steps .n{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted);
   margin-right:7px}
 .steps button[aria-current="true"] .n{color:var(--ox)}
@@ -268,6 +274,20 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
 @media(max-width:1200px){.bench{grid-template-columns:minmax(236px,282px) minmax(0,1fr)}}
 @media(max-width:980px){.bench{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:700px){.bench>.figs{grid-template-columns:minmax(0,1fr)}}
+
+/* the mechanism tab: the line of slide 5 that holds at this eta */
+.eqbig .lit{background:var(--stop-soft);border-radius:5px;padding:1px 5px}
+.eqbig .dim{opacity:.55}
+/* a line of the derivation whose step has not run yet */
+.eqbig .soon{opacity:.17}
+/* a reading list: four groups, two to a row */
+.reflist{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:7px;
+  font-size:12.5px;line-height:1.55;color:var(--ink-2)}
+.reflist li::marker{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted)}
+.reflist a{color:var(--red-);font-family:"IBM Plex Mono",monospace;font-size:11.5px;font-weight:600;
+  text-decoration:none;border-bottom:1px solid var(--red-soft)}
+.reflist a:hover{border-bottom-color:var(--red-)}
+.refs>div>.fld{margin-bottom:8px}
 </style>
 
 </head>
@@ -277,14 +297,15 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
     <div style="flex:1 1 380px">
       <p class="eyebrow"><a href="index.html">CH40051 Electroanalytical Chemistry</a> &middot; Lecture 15 &middot; Pt catalysis and electrochemically active surface area</p>
       <h1>Electrocatalysis Bench</h1>
-      <p class="sub">A catalyst&rsquo;s activity is a current divided by an area &mdash; and the area is the hard part. The geometric area is not it, the BET area is not it, and what you want is the number of atoms the electrolyte can actually reach. On platinum you can count them: one hydrogen adsorbs on each, one electron each, so a charge becomes an atom count and an atom count becomes square centimetres. Here is that voltammogram, built from the surface waves rather than traced &mdash; and then the three measurements that turn it into an area, each played out in the order you would do it: hydrogen stripped off and integrated, carbon monoxide laid on and burnt off against a second cycle, and the double layer of a material with nothing to adsorb at all. And at the end, what the whole count was for: a current per site, a Tafel slope that names the slow step, and the volcano that says why platinum sits on top.</p>
+      <p class="sub">A catalyst&rsquo;s activity is a current divided by an area &mdash; and the area is the hard part. The geometric area is not it, the BET area is not it, and what you want is the number of atoms the electrolyte can actually reach. On platinum you can count them: one hydrogen adsorbs on each, one electron each, so a charge becomes an atom count and an atom count becomes square centimetres. Here is that voltammogram, built from the surface waves rather than traced &mdash; and then the three measurements that turn it into an area, each played out in the order you would do it: hydrogen stripped off and integrated, carbon monoxide laid on and burnt off against a second cycle, and the double layer of a material with nothing to adsorb at all. And at the end, what the whole count was for: the Volmer, Heyrovsky and Tafel steps played out on the surface with the slope each one gives, the d band that decides how hard a metal holds H, the volcano that says why platinum sits on top and the scaling relations that make one number enough &mdash; and what all of it costs in overpotential at 10 mA cm<sup>&minus;2</sup>.</p>
     </div>
   </header>
 
   <div class="tabs" role="tablist">
     <button class="tab" role="tab" aria-selected="true"  aria-controls="p-cv"    id="t-cv">The Pt voltammogram</button>
     <button class="tab" role="tab" aria-selected="false" aria-controls="p-probe" id="t-probe">ECSA measurements</button>
-    <button class="tab" role="tab" aria-selected="false" aria-controls="p-her"   id="t-her">HER &amp; the volcano</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-mech"  id="t-mech">Volmer &middot; Heyrovsky &middot; Tafel</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-desc"  id="t-desc">d band &amp; scaling</button>
     <button class="tab" role="tab" aria-selected="false" aria-controls="p-quiz1" id="t-quiz1">Concept Check 1</button>
     <button class="tab" role="tab" aria-selected="false" aria-controls="p-quiz2" id="t-quiz2">Concept Check 2</button>
   </div>
@@ -387,6 +408,17 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
           lecture is read between 0.4 and 0.6 V: a window <i>positive</i> of the pzc, where the
           metal is charged, nothing reacts, and the capacitance is as near constant as platinum
           ever gets.</p>
+        <p class="hint" style="margin:0"><b>Where this was actually measured &mdash; go and read it.</b>
+          Everything above is the mercury experiment, and it is taken apart with real curves on
+          <a href="lecture04.html#p-gh">Lecture 4 &middot; Double Layer Bench, the
+          <i>Grahame 1947</i> tab</a>: the capacitance minimum that stays at the same potential
+          however much salt you add &mdash; which is what fixes E<sub>pzc</sub> at &minus;0.472 V
+          vs NCE for mercury &mdash; the series pair that fills the dip in as the concentration
+          rises, the specific adsorption that would drag the pzc along with it (which is why the
+          experiment had to be done in NaF), and the hump near &minus;0.3 V that
+          Gouy&ndash;Chapman&ndash;Stern cannot produce at all. <b>That tab is the evidence for the
+          curve above</b>; this one is the same arithmetic applied to a surface that will not hold
+          still for it.</p>
         <p class="hint" style="margin:0"><b>And it is why C<sub>s</sub> is not one number.</b> A
           capacitance divided into an area is read at some potential, and it is the distance from
           <i>that material&rsquo;s own</i> pzc that sets what the diffuse layer contributes.
@@ -434,7 +466,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
           hydrogens.</b> The area comes from H<sub>upd</sub>, which is bound too strongly to be the
           intermediate &mdash; it is still sitting there at potentials where nothing evolves. The
           activity comes from H<sub>opd</sub>, and it is <i>its</i> &Delta;G<sub>H</sub> that the
-          volcano on the last tab is drawn against. What H<sub>upd</sub> contributes to the HER is the
+          volcano on the d band &amp; scaling tab is drawn against. What H<sub>upd</sub> contributes to the HER is the
           denominator: it counts the sites the reaction has to work with.</p>
       </div>
     </div>
@@ -578,23 +610,117 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
 
   </section>
 
-  <!-- ====================== 3 - HER AND THE VOLCANO ==================== -->
-  <section class="panel" id="p-her" role="tabpanel" aria-labelledby="t-her" hidden>
+  <!-- ========= 3 · VOLMER, HEYROVSKY, TAFEL — THE STEPS, ANIMATED ========= -->
+  <section class="panel" id="p-mech" role="tabpanel" aria-labelledby="t-mech" hidden>
 
     <div class="card" style="margin-bottom:16px">
-      <div class="card-h"><h2>What the area was for: a current per site, and the step that sets it</h2>
-        <span class="note">looking ahead to Lecture 16 &middot; HER on a metal surface</span></div>
+      <div class="card-h"><h2>Two electrons, one H<sub>2</sub> &mdash; and the step that keeps everything waiting</h2>
+        <span class="note">Lecture 16, slides 5&ndash;6 &middot; Pletcher, <i>A First Course in Electrode Processes</i>, Tables 5.2 and 5.3</span></div>
       <div class="card-b stack" style="gap:12px">
         <div class="eqbig" style="white-space:normal">
-          <span class="cnc">Volmer: H<sup>+</sup> + e<sup>&minus;</sup> &rarr; H<sub>ad</sub></span>
-          &nbsp;(alkaline: H<sub>2</sub>O + e<sup>&minus;</sup> &rarr; H<sub>ad</sub> + OH<sup>&minus;</sup>)
-          <small>the discharge every route has to go through first &mdash; and the atom the earlier tabs counted</small><br>
-          <span class="act">Heyrovsky: H<sub>ad</sub> + H<sup>+</sup> + e<sup>&minus;</sup> &rarr; H<sub>2</sub></span>&nbsp;&nbsp;&middot;&nbsp;&nbsp;
-          <span class="mix">Tafel: H<sub>ad</sub> + H<sub>ad</sub> &rarr; H<sub>2</sub></span>
-          <small>two ways to finish: one more electron on an occupied site, or two occupied sites meeting</small><br>
-          <span class="pot">b = &part;&eta; / &part;log|j|</span>
-          <small>and the slope of the Tafel line names which of the three is holding everything up &mdash; if you read it honestly</small>
+          <span class="cnc">A &middot; Volmer: &nbsp;&#9633;* + H<sup>+</sup> + e<sup>&minus;</sup> &rarr; H<sub>ad</sub></span>
+          <small>electrochemical &mdash; the first step of both routes</small><br>
+          <span class="mix">B &middot; Tafel: &nbsp;2H<sub>ad</sub> &rarr; H<sub>2</sub> + 2&#9633;*</span>
+          <small>chemical &mdash; no electron crosses, so the potential only reaches it through &theta;</small><br>
+          <span class="act">C &middot; Heyrovsky: &nbsp;H<sub>ad</sub> + H<sup>+</sup> + e<sup>&minus;</sup> &rarr; H<sub>2</sub> + &#9633;*</span>
+          <small>electrochemical &mdash; the second electron lands on an occupied site</small><br>
+          <span class="pot">Mechanism I = A then B &nbsp;&middot;&nbsp; Mechanism II = A then C</span>
+          <small>and whichever step is slow sets the Tafel slope: 120, 30 or 40 mV/dec</small>
         </div>
+        <p class="hint" style="margin:0">Pick a route and the slow step, then press <b>Play</b>. The
+          cycle runs one H<sub>2</sub> at a time, and the slow step is played three times slower than the
+          others. Watch the <b>other</b> sites while it runs: their coverage is the steady-state
+          &theta;<sub>H</sub> the kinetics give at the overpotential you set, so the surface stays bare
+          when Volmer is slow and fills up when the second step is &mdash; which is the whole of slide 5:
+          <b>the slope you measure is the rate law of the slow step, with &theta; worked out from the fast
+          ones.</b></p>
+      </div>
+    </div>
+
+    <div class="bench level">
+      <div class="ctl">
+        <div class="card">
+          <div class="card-h"><h2>Pick the route and the slow step</h2></div>
+          <div class="card-b stack" style="gap:13px">
+            <div>
+              <span class="fld">route</span>
+              <div class="pill-row pw" id="mkRoute">
+                <button class="pill" type="button" data-s="I" aria-pressed="false">I &middot; Volmer&ndash;Tafel</button>
+                <button class="pill" type="button" data-s="II" aria-pressed="true">II &middot; Volmer&ndash;Heyrovsky</button>
+              </div>
+            </div>
+            <div>
+              <span class="fld">rate-determining step</span>
+              <div class="pill-row pw" id="mkRds">
+                <button class="pill" type="button" data-s="A" aria-pressed="true">A &middot; Volmer</button>
+                <button class="pill" type="button" data-s="2" aria-pressed="false" id="mkRds2">C &middot; Heyrovsky</button>
+              </div>
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">cathodic overpotential |&eta;|</span><span class="val" id="mkEtav"></span></div>
+              <input type="range" id="mkEta" min="0" max="0.35" step="0.005" value="0.10">
+            </div>
+            <div class="btnrow">
+              <button class="ghost" id="mkPlay" type="button">Play</button>
+              <button class="ghost" id="mkBack" type="button">&larr; back</button>
+              <button class="ghost" id="mkNext" type="button">next &rarr;</button>
+            </div>
+            <div class="steps" id="mkSteps"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="figs">
+        <div class="card">
+          <div class="card-h"><h2>On the surface</h2>
+            <span class="note" id="mkFigN">&mdash;</span></div>
+          <div class="card-b stack" style="gap:12px">
+            <svg id="mkFig" viewBox="0 0 520 300" style="width:100%;height:auto" role="img"
+                 aria-label="A row of platinum atoms under an electrolyte. Protons come down from the solution, electrons come up from the metal, and they meet to make adsorbed hydrogen; a second proton and electron, or a second adsorbed hydrogen, turns it into an H2 molecule that rises away. The slow step is labelled and played more slowly, and the other sites are covered to the steady-state coverage."></svg>
+            <p class="hint" style="margin:0"><b>Slide 5, line by line.</b> Each line arrives as
+              its own step runs &mdash; the equilibrium that the fast step sets, then the rate law
+              of the slow one, then what it becomes at the two ends of the coverage range.
+              <span class="mono" style="font-size:11.5px">&eta; &lt; 0 for a cathodic reaction, as
+              on the slide &middot; f = F/RT, f&prime; = F/2.3RT, (f&prime;)<sup>&minus;1</sup>
+              &asymp; 59 mV</span></p>
+            <div class="eqbig" id="mkDer" style="white-space:normal;font-size:12.5px"></div>
+            <p class="hint" style="margin:0" id="mkDerNote">&mdash;</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h2>The Tafel plot it makes</h2>
+            <span class="note">all four rows of Table 5.2, the one you picked in colour</span></div>
+          <div class="card-b stack" style="gap:12px">
+            <svg id="mkTafel" viewBox="0 0 520 300" style="width:100%;height:auto" role="img"
+                 aria-label="Overpotential against the logarithm of current for the four cases of Table 5.2. Volmer rate-determining gives a straight 120 millivolt per decade line; Tafel rate-determining gives 30 millivolts per decade and then a limiting current; Heyrovsky rate-determining gives 40 and then 120. A tangent at the chosen overpotential shows the slope there."></svg>
+            <div class="readouts">
+              <div class="readout"><span class="k">row of Table 5.2</span><span class="v" id="mkCase">&mdash;</span></div>
+              <div class="readout"><span class="k">&theta;<sub>H</sub>, steady state</span><span class="v" id="mkTh">&mdash;</span></div>
+              <div class="readout"><span class="k">Tafel slope here</span><span class="v" id="mkB">&mdash;</span></div>
+              <div class="readout"><span class="k">reaction order in H<sup>+</sup></span><span class="v" id="mkOrd">&mdash;</span></div>
+              <div class="readout"><span class="k">regime</span><span class="v" id="mkReg">&mdash;</span></div>
+            </div>
+            <p class="hint" style="margin:0" id="mkNote">&mdash;</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ---- HER on one surface: from dG_H to the overpotential (was its own tab) ---- -->
+    <div class="card" style="margin:16px 0">
+      <div class="card-h"><h2>What the area was for: from &Delta;G<sub>H</sub> to the overpotential you pay at 10 mA cm<sup>&minus;2</sup></h2>
+        <span class="note">looking ahead to Lecture 16 &middot; HER on a metal surface, per <b>real</b> cm&sup2;</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <p class="hint" style="margin:0">The bench above runs the three steps with rate constants
+          chosen so each row of Table 5.2 shows cleanly. Here the same kinetics are put on one real surface:
+          pick &Delta;G<sub>H</sub> &mdash; where it comes from is the <b>d band &amp; scaling</b> tab &mdash;
+          and the slow step, and the bench works out the exchange current per real cm&sup2; (the
+          <b>ECSA measurements</b> tab&rsquo;s area), the coverage the potential drives, the Tafel slope that
+          coverage gives, and <b>the overpotential it costs to draw 10 mA cm<sup>&minus;2</sup></b> &mdash; in
+          acid or in alkali.</p>
       </div>
     </div>
 
@@ -670,66 +796,278 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
         </div>
 
         <div class="card wideF">
-          <div class="card-h"><h2>The volcano &mdash; Sabatier with a number on it</h2>
-            <span class="note">j<sub>0</sub> against the one descriptor, after Trasatti 1972 and N&oslash;rskov 2005</span></div>
-          <div class="card-b stack" style="gap:12px">
-            <svg id="heVolc" viewBox="0 0 1040 290" style="width:100%;height:auto" role="img"
-                 aria-label="The exchange current density for hydrogen evolution plotted against the free energy of hydrogen adsorption, forming a volcano with its maximum at zero. Metals are marked along it, with the strong binding ones on the left leg, the weak binding ones on the right, and platinum at the top."></svg>
-            <div class="notes2">
-              <p class="hint"><b class="cnc">The left leg binds too strongly.</b> The surface fills with
-                H and stays full. There is no free site for a Tafel recombination and no empty neighbour
-                for a Heyrovsky step, so whichever finishes the reaction becomes the bottleneck and the
-                current stops responding to potential. Watch &theta;<sub>H</sub> pin at 100 % as you drag
-                &Delta;G<sub>H</sub> left, and watch the slope run away with it.</p>
-              <p class="hint"><b class="act">The right leg binds too weakly.</b> There is almost no
-                adsorbed H to react, so the discharge itself &mdash; the Volmer step &mdash; is what is
-                slow, and j<sub>0</sub> falls off a cliff. Gold and silver sit here; they are not bad
-                metals, they are metals that will not hold the intermediate.</p>
-              <p class="hint"><b>The top is &Delta;G<sub>H</sub> &asymp; 0.</b> Enough coverage to react
-                and a weak enough bond to let go. Pt, Ir and Rh sit within 0.1 eV of it, and that is the
-                whole of why Pt is the catalyst this lecture has been measuring the area of.</p>
-              <p class="hint"><b>Where the descriptor comes from.</b> H(1s) mixes with the metal d band
-                into a bonding and an antibonding level; the more of the antibonding level that sits
-                below E<sub>F</sub> and is filled, the weaker the bond. One number, computed, predicting
-                an electrochemical rate &mdash; which is why the plot is drawn this way round at all.</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="card wideF">
           <div class="card-h"><h2>Reading a Tafel slope without fooling yourself</h2>
-            <span class="note">three corrections, and one ambiguity that no correction removes</span></div>
+            <span class="note">two habits that keep the slope and &eta;<sub>10</sub> honest</span></div>
           <div class="card-b stack" style="gap:14px">
             <div class="notes2">
-              <p class="hint"><b>120 mV/dec does not name one step.</b> 2.303RT/&alpha;F is the Volmer
-                answer at &alpha; = 0.5 &mdash; and it is also the Heyrovsky answer once
-                &theta;<sub>H</sub> has saturated, because a coverage that can no longer rise stops
-                contributing to the potential dependence. Switch the rds pills with &Delta;G<sub>H</sub>
-                held strongly negative and watch two different mechanisms give the same number. <b>The
-                slope has to be argued together with a coverage</b>, and the coverage is what the
-                H<sub>upd</sub> measurement counts.</p>
               <p class="hint"><b class="ohm">Subtract iR<sub>u</sub> first.</b> A Tafel plot that curves
                 upward at high current is uncompensated resistance far more often than it is a change of
                 mechanism &mdash; the same R<sub>u</sub> that set &tau; in Lecture 14. At 10 mA over
                 1 cm&sup2; and 10 &Omega;, 100 mV of your overpotential is not on the electrode at all.</p>
-              <p class="hint"><b>Divide by the real area, not the disc.</b> j<sub>0</sub> per geometric
-                area rewards a rough electrode for being rough. Everything on this page &mdash;
-                H<sub>upd</sub>, CO stripping, C<sub>dl</sub>/C<sub>s</sub> &mdash; exists so that this
-                division can be done, and a volcano plotted on geometric current is a plot of surface
-                areas wearing a catalysis label.</p>
-              <p class="hint"><b class="cnc">The hydrogen that evolves is not the hydrogen you
-                counted.</b> H<sub>upd</sub> is bound too strongly to be the intermediate &mdash; it is
-                still there at potentials where no H<sub>2</sub> forms at all. The reactive species is
-                the weakly bound, overpotential-deposited H that only exists below 0 V vs RHE, and it is
-                its &Delta;G that the volcano is drawn against. H<sub>upd</sub> still earns its place:
-                it counts the sites that species has to work with, which is the denominator of every
-                current on this tab.</p>
               <p class="hint"><b>And fit over a decade.</b> A slope read across half a decade of current,
                 near equilibrium where the back reaction still matters, or up where transport is taking
                 over, is a number with no mechanism attached. Fit in the straight part, say where it was,
                 and quote &eta; at 10 mA cm<sup>&minus;2</sup> beside it &mdash; that one is hard to
                 misreport.</p>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4 · THE d BAND, THE DESCRIPTOR AND SCALING ============== -->
+  <section class="panel" id="p-desc" role="tabpanel" aria-labelledby="t-desc" hidden>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>From the d band to a number that predicts a current</h2>
+        <span class="note">Lecture 16, slides 7&ndash;9 &middot; Hammer &amp; N&oslash;rskov, <i>Adv. Catal.</i> 45 (2000); N&oslash;rskov <i>et al.</i>, <i>J. Electrochem. Soc.</i> 152, J23 (2005)</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig" style="white-space:normal">
+          <span class="cnc">&epsilon;<sub>d</sub>, V<sub>sd</sub><sup>2</sup>, f</span> &nbsp;&rarr;&nbsp;
+          <span class="mix">&Delta;E<sub>H</sub> (DFT)</span> &nbsp;&rarr;&nbsp;
+          <span class="pot">&Delta;G<sub>H*</sub> = &Delta;E<sub>H</sub> + 0.24 eV</span> &nbsp;&rarr;&nbsp;
+          <span class="act">j<sub>0</sub> (volcano)</span>
+          <small>the electronic structure of the surface, the energy it binds H with, that energy as a free energy, and the current it predicts</small><br>
+          <span class="mix">&Delta;E<sub>AH<sub>x</sub></sub> = &gamma;(x)&thinsp;&Delta;E<sub>A</sub> + &xi;, &nbsp;&gamma; = (x<sub>max</sub> &minus; x)/x<sub>max</sub></span>
+          <small>and the scaling relation that makes one descriptor enough &mdash; and, for any reaction with two intermediates, too much</small>
+        </div>
+        <p class="hint" style="margin:0">Slide 8 says the H&ndash;metal bond is decided by two things: <b>how
+          strongly H 1s couples to the metal d states</b> (V<sub>sd</sub><sup>2</sup>) and <b>how much of the
+          antibonding state that coupling makes ends up filled</b>. Slide 9 turns that into a periodic table
+          and a free-energy diagram. Here the same data are put through the arithmetic: the DFT binding
+          energies of Table I (slide 7) are fitted against the d-band centre, the fit is turned into
+          &Delta;G<sub>H*</sub>, and the free-energy diagram is given a potential so you can find where each
+          metal starts to work.</p>
+      </div>
+    </div>
+
+    <div class="bench level">
+      <div class="ctl">
+        <div class="card">
+          <div class="card-h"><h2>Pick a metal &mdash; or move its d band</h2></div>
+          <div class="card-b stack" style="gap:13px">
+            <div>
+              <span class="fld">slide 9&rsquo;s nine metals</span>
+              <div class="stack" style="gap:4px" id="dsMet">
+                <div class="pill-row pw"><button class="pill" type="button" data-s="Co" aria-pressed="false">Co</button><button class="pill" type="button" data-s="Ni" aria-pressed="false">Ni</button><button class="pill" type="button" data-s="Cu" aria-pressed="false">Cu</button></div>
+                <div class="pill-row pw"><button class="pill" type="button" data-s="Rh" aria-pressed="false">Rh</button><button class="pill" type="button" data-s="Pd" aria-pressed="false">Pd</button><button class="pill" type="button" data-s="Ag" aria-pressed="false">Ag</button></div>
+                <div class="pill-row pw"><button class="pill" type="button" data-s="Ir" aria-pressed="false">Ir</button><button class="pill" type="button" data-s="Pt" aria-pressed="true">Pt</button><button class="pill" type="button" data-s="Au" aria-pressed="false">Au</button></div>
+              </div>
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">d-band centre &epsilon;<sub>d</sub> &minus; E<sub>F</sub></span><span class="val" id="dsEdv"></span></div>
+              <input type="range" id="dsEd" min="-4.6" max="-0.8" step="0.01" value="-2.25">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">coupling V<sub>sd</sub><sup>2</sup> (Cu = 1)</span><span class="val" id="dsV2v"></span></div>
+              <input type="range" id="dsV2" min="0.8" max="4.6" step="0.01" value="3.9">
+            </div>
+            <div>
+              <span class="fld">Pt over a subsurface 3d metal (Kitchin 2004)</span>
+              <div class="btnrow">
+                <button class="ghost" type="button" id="dsK1">Pt/Ni/Pt</button>
+                <button class="ghost" type="button" id="dsK2">Pt/Fe/Pt</button>
+                <button class="ghost" type="button" id="dsK3">Pt/V/Pt</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h2>What that predicts</h2></div>
+          <div class="card-b stack" style="gap:12px">
+            <div class="readouts">
+              <div class="readout"><span class="k">surface</span><span class="v" id="dsName">&mdash;</span></div>
+              <div class="readout"><span class="k">&Delta;E<sub>H</sub> from the &epsilon;<sub>d</sub> fit</span><span class="v" id="dsEfit">&mdash;</span></div>
+              <div class="readout"><span class="k">&Delta;E<sub>H</sub> by DFT (Table I)</span><span class="v" id="dsEdft">&mdash;</span></div>
+              <div class="readout"><span class="k">&Delta;G<sub>H*</sub> = &Delta;E<sub>H</sub> + 0.24</span><span class="v" id="dsG">&mdash;</span></div>
+              <div class="readout"><span class="k">limiting potential U<sub>L</sub></span><span class="v" id="dsUL">&mdash;</span></div>
+              <div class="readout"><span class="k">antibonding level filled</span><span class="v" id="dsF">&mdash;</span></div>
+            </div>
+            <p class="hint" style="margin:0" id="dsNote">&mdash;</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="figs">
+        <div class="card">
+          <div class="card-h"><h2>H 1s meets the d band</h2>
+            <span class="note">slide 8&rsquo;s two-level picture, drawn to scale of &epsilon;<sub>d</sub> and V</span></div>
+          <div class="card-b">
+            <svg id="dsLev" viewBox="0 0 520 300" style="width:100%;height:auto" role="img"
+                 aria-label="An energy-level diagram. On the left the hydrogen 1s level, on the right the metal d band with the Fermi level, and between them the bonding and antibonding levels their coupling makes. The antibonding level is shaded in proportion to how much of it is filled."></svg>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h2>One number from the d band: &Delta;E<sub>H</sub> against &epsilon;<sub>d</sub></h2>
+            <span class="note">DFT &Delta;E<sub>H</sub> at &frac14; ML (Table I) &middot; &epsilon;<sub>d</sub> of the close-packed surface</span></div>
+          <div class="card-b">
+            <svg id="dsFit" viewBox="0 0 520 300" style="width:100%;height:auto" role="img"
+                 aria-label="The calculated hydrogen adsorption energy of nine metals plotted against their d-band centre, with the least-squares line through them, the line where the free energy of adsorption is zero, and the current surface marked on the line."></svg>
+          </div>
+        </div>
+
+        <div class="card wideF">
+          <div class="card-h"><h2>The free-energy diagram of slide 9 &mdash; with a potential on it</h2>
+            <span class="note">computational hydrogen electrode: H<sup>+</sup> + e<sup>&minus;</sup> costs &minus;eU relative to &frac12;H<sub>2</sub></span></div>
+          <div class="card-b stack" style="gap:12px">
+            <div style="max-width:420px">
+              <div class="slider-row"><span class="fld" style="margin:0">electrode potential U vs RHE</span><span class="val" id="dsUv"></span></div>
+              <input type="range" id="dsU" min="-0.6" max="0.2" step="0.01" value="0">
+            </div>
+            <svg id="dsFed" viewBox="0 0 1040 260" style="width:100%;height:auto" role="img"
+                 aria-label="The free-energy diagram for hydrogen evolution through the Volmer and Heyrovsky steps: two protons and electrons, then one adsorbed hydrogen plus a proton and electron, then H2. Lines are drawn for gold, platinum, nickel, molybdenum and the chosen surface; as the potential is made more negative the first state rises and the steps become downhill."></svg>
+            <p class="hint" style="margin:0" id="dsFedN">&mdash;</p>
+          </div>
+        </div>
+
+        <div class="card wideF">
+          <div class="card-h"><h2>Computation against experiment: Table I as a volcano</h2>
+            <span class="note">measured log i<sub>0</sub> against computed &Delta;G<sub>H*</sub> &middot; every measurement in the table, not one per metal</span></div>
+          <div class="card-b stack" style="gap:12px">
+            <svg id="dsVolc" viewBox="0 0 1040 280" style="width:100%;height:auto" role="img"
+                 aria-label="Measured exchange current densities of thirteen metals plotted against the computed free energy of hydrogen adsorption, with the kinetic model of Norskov 2005 drawn through them. The points form a volcano with platinum-group metals at the top, but the measured legs fall off more slowly than the model."></svg>
+            <div class="notes2">
+              <p class="hint"><b>The ordering survives; the slopes do not.</b> Pt, Pd, Rh, Ir and Re sit within
+                0.25 eV of the top and within a decade of each other; Au, Ag and Cu on the right leg and Ni, Co,
+                W, Mo, Nb on the left all fall away, which is what a one-descriptor theory has to get right. But
+                the model&rsquo;s legs fall by 1/(kT ln 10) &asymp; 17 decades per eV and the data by three or
+                four. That gap is real, and it is where the critiques start (Quaino <i>et al.</i> 2014 and a
+                2021 re-analysis of this very table, both in the reading list below).</p>
+              <p class="hint"><b>Two measurements of the same metal can be two decades apart</b> (Ag: &minus;5.0
+                and &minus;7.85). Polycrystalline against single-crystal, clean against not, geometric area
+                against real &mdash; the ECSA tab is why the second half of that list matters. A volcano is
+                only as good as the denominators of its y-axis.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bench level" style="margin-top:16px">
+      <div class="ctl">
+        <div class="card">
+          <div class="card-h"><h2>One intermediate, or several</h2></div>
+          <div class="card-b stack" style="gap:13px">
+            <div>
+              <span class="fld">reaction</span>
+              <div class="pill-row pw" id="dsRx">
+                <button class="pill" type="button" data-s="her" aria-pressed="true">HER &middot; 1 intermediate</button>
+                <button class="pill" type="button" data-s="oer" aria-pressed="false">OER &middot; 3 intermediates</button>
+              </div>
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0" id="dsDlab">descriptor</span><span class="val" id="dsDv"></span></div>
+              <input type="range" id="dsD" min="-0.6" max="0.6" step="0.01" value="-0.09">
+            </div>
+            <div class="readouts">
+              <div class="readout"><span class="k">largest step</span><span class="v" id="dsSt">&mdash;</span></div>
+              <div class="readout"><span class="k">theoretical &eta;</span><span class="v" id="dsEta">&mdash;</span></div>
+              <div class="readout"><span class="k">best possible &eta;</span><span class="v" id="dsEtaMin">&mdash;</span></div>
+            </div>
+            <p class="hint" style="margin:0" id="dsRxN">&mdash;</p>
+          </div>
+        </div>
+      </div>
+      <div class="figs">
+        <div class="card">
+          <div class="card-h"><h2>The staircase at the equilibrium potential</h2>
+            <span class="note" id="dsStairN">&mdash;</span></div>
+          <div class="card-b">
+            <svg id="dsStair" viewBox="0 0 520 300" style="width:100%;height:auto" role="img"
+                 aria-label="The free-energy staircase of the chosen reaction at its equilibrium potential, with the ideal staircase of equal steps dashed behind it and the largest step marked."></svg>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>&hellip; and the volcano it implies</h2>
+            <span class="note">theoretical overpotential against the descriptor</span></div>
+          <div class="card-b">
+            <svg id="dsScV" viewBox="0 0 520 300" style="width:100%;height:auto" role="img"
+                 aria-label="The theoretical overpotential against the descriptor. For hydrogen evolution it is a V that reaches zero; for oxygen evolution it is a V whose bottom stops at 0.37 volts, because the two intermediates that set the two legs are tied together by a scaling relation."></svg>
+          </div>
+        </div>
+        <div class="card wideF">
+          <div class="card-h"><h2>Why one descriptor is enough: counting bonds</h2>
+            <span class="note">Abild-Pedersen <i>et al.</i>, <i>Phys. Rev. Lett.</i> 99, 016105 (2007)</span></div>
+          <div class="card-b stack" style="gap:12px">
+            <div class="sumwrap">
+              <table class="sumtbl">
+                <tr><th>central atom A</th><th>bonds it wants, x<sub>max</sub></th><th>AH<sub>x</sub></th><th>&gamma; = (x<sub>max</sub> &minus; x)/x<sub>max</sub></th><th>so &Delta;E<sub>AH<sub>x</sub></sub> moves by</th></tr>
+                <tr><td class="nm">C</td><td class="eq">4</td><td class="sy">CH<sub>3</sub> &middot; CH<sub>2</sub> &middot; CH</td><td class="eq">0.25 &middot; 0.50 &middot; 0.75</td><td class="sy">a quarter, a half, three quarters of what C* moves by</td></tr>
+                <tr><td class="nm">N</td><td class="eq">3</td><td class="sy">NH<sub>2</sub> &middot; NH</td><td class="eq">0.33 &middot; 0.67</td><td class="sy">a third, two thirds of N*</td></tr>
+                <tr><td class="nm">O</td><td class="eq">2</td><td class="sy">OH</td><td class="eq">0.50</td><td class="sy">half of O* &mdash; and HOO* tracks HO* with slope &asymp; 1</td></tr>
+                <tr><td class="nm">S</td><td class="eq">2</td><td class="sy">SH</td><td class="eq">0.50</td><td class="sy">half of S*</td></tr>
+              </table>
+            </div>
+            <div class="notes2">
+              <p class="hint"><b>The rule is the d-band model again.</b> An adsorbate that has used x of its
+                x<sub>max</sub> bonds on hydrogen has (x<sub>max</sub> &minus; x) left for the metal, and the
+                metal-dependent part of its binding scales with that number. So across metals, everything that
+                binds through O moves together, everything that binds through C moves together &mdash; and one
+                computed energy per metal predicts the rest. That is what makes a single-descriptor volcano
+                possible at all.</p>
+              <p class="hint"><b>And why it is a ceiling, not just a convenience.</b> HER has one intermediate,
+                so the descriptor can be tuned to &Delta;G<sub>H*</sub> = 0 and the theoretical overpotential
+                to zero &mdash; Pt nearly does it. OER has three, and HOO* sits 3.2 &plusmn; 0.2 eV above HO* on
+                every oxide anyone has computed (Man <i>et al.</i> 2011), where the ideal is 2 &times; 1.23 =
+                2.46 eV. No surface that obeys the relation can do better than (3.2 &minus; 2.46)/2 =
+                0.37 V. CO<sub>2</sub> reduction has the same problem with CO* and CHO* (Peterson &amp;
+                N&oslash;rskov 2012) &mdash; which is why Cu, the best metal on slide 12, still needs a large
+                overpotential, and why &ldquo;breaking the scaling relation&rdquo; is a research programme
+                rather than a phrase.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="card-h"><h2>Reading list: the calculations behind slides 7&ndash;9</h2>
+        <span class="note">grouped by what each paper adds &middot; DOIs given where checked</span></div>
+      <div class="card-b stack" style="gap:14px">
+        <div class="notes2 refs" id="dsRefs">
+          <div>
+            <p class="fld">1 &middot; the d-band model (slides 8&ndash;9)</p>
+            <ol class="reflist">
+              <li>B. Hammer, J. K. N&oslash;rskov, &ldquo;Why gold is the noblest of all the metals&rdquo;, <i>Nature</i> <b>376</b>, 238 (1995). <a href="https://doi.org/10.1038/376238a0">doi</a> &mdash; nobleness = filled antibonding states + large orbital overlap (Pauli repulsion); the origin of slide 9&rsquo;s V<sub>sd</sub><sup>2</sup>/filling table.</li>
+              <li>B. Hammer, J. K. N&oslash;rskov, &ldquo;Electronic factors determining the reactivity of metal surfaces&rdquo;, <i>Surf. Sci.</i> <b>343</b>, 211 (1995) &mdash; trends in reactivity from the hybridization of adsorbate states with the d band.</li>
+              <li>A. Ruban, B. Hammer, P. Stoltze, H. L. Skriver, J. K. N&oslash;rskov, <i>J. Mol. Catal. A</i> <b>115</b>, 421 (1997) &mdash; the table of surface d-band centres used on this tab.</li>
+              <li>B. Hammer, J. K. N&oslash;rskov, &ldquo;Theoretical surface science and catalysis &mdash; calculations and concepts&rdquo;, <i>Adv. Catal.</i> <b>45</b>, 71&ndash;129 (2000) &mdash; the review slides 8&ndash;9 are drawn from (Figs. 3 and 8).</li>
+              <li>M. Mavrikakis, B. Hammer, J. K. N&oslash;rskov, &ldquo;Effect of strain on the reactivity of metal surfaces&rdquo;, <i>Phys. Rev. Lett.</i> <b>81</b>, 2819 (1998) &mdash; tensile strain narrows the d band and pushes &epsilon;<sub>d</sub> up.</li>
+              <li>J. R. Kitchin, J. K. N&oslash;rskov, M. A. Barteau, J. G. Chen, &ldquo;Modification of the surface electronic and chemical properties of Pt(111) by subsurface 3d transition metals&rdquo;, <i>J. Chem. Phys.</i> <b>120</b>, 10240 (2004). <a href="https://doi.org/10.1063/1.1737365">doi</a> &mdash; the ligand effect: &epsilon;<sub>d</sub> of surface Pt falls by 0.16&ndash;0.74 eV and H binding weakens almost linearly with it (the three alloy buttons).</li>
+            </ol>
+          </div>
+          <div>
+            <p class="fld">2 &middot; &Delta;G<sub>H*</sub> as the HER descriptor (slide 7)</p>
+            <ol class="reflist" start="7">
+              <li>S. Trasatti, &ldquo;Work function, electronegativity, and electrochemical behaviour of metals III&rdquo;, <i>J. Electroanal. Chem.</i> <b>39</b>, 163 (1972) &mdash; the first HER volcano, against experimental M&ndash;H bond strengths.</li>
+              <li>J. K. N&oslash;rskov <i>et al.</i>, &ldquo;Origin of the overpotential for oxygen reduction at a fuel-cell cathode&rdquo;, <i>J. Phys. Chem. B</i> <b>108</b>, 17886 (2004) &mdash; the computational hydrogen electrode used in the free-energy diagram.</li>
+              <li>J. K. N&oslash;rskov, T. Bligaard, A. Logadottir, J. R. Kitchin, J. G. Chen, S. Pandelov, U. Stimming, &ldquo;Trends in the exchange current for hydrogen evolution&rdquo;, <i>J. Electrochem. Soc.</i> <b>152</b>, J23 (2005). <a href="https://doi.org/10.1149/1.1856988">doi</a> &mdash; Table I (slide 7), &Delta;G<sub>H*</sub> = &Delta;E<sub>H</sub> + 0.24 eV, and the kinetic model drawn on this tab.</li>
+              <li>B. Hinnemann <i>et al.</i>, &ldquo;Biomimetic hydrogen evolution: MoS<sub>2</sub> nanoparticles as catalyst for hydrogen evolution&rdquo;, <i>J. Am. Chem. Soc.</i> <b>127</b>, 5308 (2005). <a href="https://doi.org/10.1021/ja0504690">doi</a> &mdash; the descriptor used to <i>predict</i> a non-metal catalyst: the MoS<sub>2</sub> edge, &Delta;G<sub>H*</sub> close to zero.</li>
+              <li>T. F. Jaramillo <i>et al.</i>, &ldquo;Identification of active edge sites for electrochemical H<sub>2</sub> evolution from MoS<sub>2</sub> nanocatalysts&rdquo;, <i>Science</i> <b>317</b>, 100 (2007) &mdash; the prediction checked: activity scales with edge length, not area.</li>
+              <li>J. Greeley, T. F. Jaramillo, J. Bonde, I. Chorkendorff, J. K. N&oslash;rskov, &ldquo;Computational high-throughput screening of electrocatalytic materials for hydrogen evolution&rdquo;, <i>Nat. Mater.</i> <b>5</b>, 909 (2006). <a href="https://doi.org/10.1038/nmat1752">doi</a> &mdash; &Delta;G<sub>H*</sub> and a stability filter over ~700 surface alloys; BiPt predicted and confirmed.</li>
+              <li>E. Sk&uacute;lason <i>et al.</i>, &ldquo;Modeling the electrochemical hydrogen oxidation and evolution reactions on the basis of density functional theory calculations&rdquo;, <i>J. Phys. Chem. C</i> <b>114</b>, 18182 (2010). <a href="https://doi.org/10.1021/jp1048887">doi</a> &mdash; barriers, not just &Delta;G: Volmer&ndash;Tafel is the HER route on Pt(111), as Pt&rsquo;s 30 mV/dec in Table 5.3 says.</li>
+            </ol>
+          </div>
+          <div>
+            <p class="fld">3 &middot; scaling relations</p>
+            <ol class="reflist" start="14">
+              <li>F. Abild-Pedersen <i>et al.</i>, &ldquo;Scaling properties of adsorption energies for hydrogen-containing molecules on transition-metal surfaces&rdquo;, <i>Phys. Rev. Lett.</i> <b>99</b>, 016105 (2007). <a href="https://doi.org/10.1103/PhysRevLett.99.016105">doi</a> &mdash; CH<sub>x</sub>, NH<sub>x</sub>, OH<sub>x</sub>, SH<sub>x</sub> scale with their central atom, slope set by x alone.</li>
+              <li>I. C. Man <i>et al.</i>, &ldquo;Universality in oxygen evolution electrocatalysis on oxide surfaces&rdquo;, <i>ChemCatChem</i> <b>3</b>, 1159 (2011). <a href="https://doi.org/10.1002/cctc.201000397">doi</a> &mdash; HOO*/HO* scaling on rutiles, perovskites, spinels &hellip;; one universal OER volcano.</li>
+              <li>A. A. Peterson, J. K. N&oslash;rskov, &ldquo;Activity descriptors for CO<sub>2</sub> electroreduction to methane on transition-metal catalysts&rdquo;, <i>J. Phys. Chem. Lett.</i> <b>3</b>, 251 (2012). <a href="https://doi.org/10.1021/jz201461p">doi</a> &mdash; CO* binding as the descriptor; CO* &rarr; CHO* sets the overpotential; why Cu.</li>
+              <li>H. A. Hansen, J. B. Varley, A. A. Peterson, J. K. N&oslash;rskov, <i>J. Phys. Chem. Lett.</i> <b>4</b>, 388 (2013) &mdash; CO<sub>2</sub> &rarr; CO: COOH*/CO* scaling and the overpotential it leaves.</li>
+            </ol>
+          </div>
+          <div>
+            <p class="fld">4 &middot; what the descriptor leaves out</p>
+            <ol class="reflist" start="18">
+              <li>W. Sheng, H. A. Gasteiger, Y. Shao-Horn, &ldquo;Hydrogen oxidation and evolution reaction kinetics on platinum: acid vs alkaline electrolytes&rdquo;, <i>J. Electrochem. Soc.</i> <b>157</b>, B1529 (2010) &mdash; the same Pt, two orders slower in base: the descriptor is not the whole story.</li>
+              <li>P. Quaino, F. Juarez, E. Santos, W. Schmickler, &ldquo;Volcano plots in hydrogen electrocatalysis &mdash; uses and abuses&rdquo;, <i>Beilstein J. Nanotechnol.</i> <b>5</b>, 846 (2014). <a href="https://doi.org/10.3762/bjnano.5.96">doi</a> &mdash; take out the oxide-covered metals and the left leg goes; Sabatier is one factor of several.</li>
+              <li>&ldquo;Revisiting trends in the exchange current for hydrogen evolution&rdquo;, arXiv:2109.04219 (2021) &mdash; a revised kinetic model that narrows the computed/measured j<sub>0</sub> gap by up to four orders of magnitude.</li>
+              <li>Z. W. Seh <i>et al.</i>, &ldquo;Combining theory and experiment in electrocatalysis: insights into materials design&rdquo;, <i>Science</i> <b>355</b>, eaad4998 (2017) &mdash; the review that puts HER, OER, ORR and CO<sub>2</sub>R on one set of descriptors.</li>
+            </ol>
           </div>
         </div>
       </div>
@@ -772,7 +1110,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
   <section class="panel" id="p-quiz2" role="tabpanel" aria-labelledby="t-quiz2" hidden>
     <div class="card" style="margin-bottom:16px">
       <div class="card-h">
-        <h2>Concept check 2 &middot; the step, the slope and the volcano</h2>
+        <h2>Concept check 2 &middot; the step, the descriptor and the scaling</h2>
         <span class="note">six questions &mdash; answer once per question; the reasoning appears immediately</span>
         <span class="tally" style="margin-left:auto" id="tally2"></span>
       </div>
@@ -812,7 +1150,15 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
     dissolved H<sub>2</sub> under Ar &middot;
     210 µC cm<sup>&minus;2</sup> is the convention and 197 the equal-weight average of 208, 147 and 240 for Pt(100),
     (110) and (111), each of which is that plane&rsquo;s atom density from a = 3.9242 &Aring; times e &middot;
-    CO stripping is taken as two electrons per molecule, 420 µC cm<sup>&minus;2</sup> for an all-atop layer<br>
+    CO stripping is taken as two electrons per molecule, 420 µC cm<sup>&minus;2</sup> for an all-atop layer &middot;
+    the Volmer&middot;Heyrovsky&middot;Tafel tab solves the mean-field steady state of the three steps at &alpha; = 0.5, with the
+    fast step 10<sup>3</sup>&ndash;10<sup>6</sup> times faster than the slow one and K = 10<sup>&minus;3</sup> for the Volmer equilibrium;
+    the back reactions of B and C are left out, and the animation&rsquo;s clock is not the reaction&rsquo;s &middot;
+    the d band tab takes &Delta;E<sub>H</sub> (&frac14; ML) and log i<sub>0</sub> from Table I of N&oslash;rskov <i>et al.</i> 2005,
+    V<sub>sd</sub><sup>2</sup> and f from Hammer &amp; N&oslash;rskov 2000, &epsilon;<sub>d</sub> from Ruban <i>et al.</i> 1997 and the alloy
+    shifts from Kitchin <i>et al.</i> 2004; the level diagram is a two-level cartoon (band width 1 + 2.2&radic;V<sub>sd</sub><sup>2</sup> eV,
+    antibonding level V<sub>sd</sub><sup>2</sup>/gap above the band top), not a Newns&ndash;Anderson calculation; the OER staircase holds
+    HO* at 0.86 eV and HOO* 3.2 eV above it<br>
     CH40051 Electroanalytical Chemistry &middot; Fall 2026 &mdash; companion to Lecture 15
   </footer>
 </div>
@@ -2220,9 +2566,12 @@ var HE_J0 = 4.2e-2;
    100 mV, which no real surface does. This is the lumped width that
    lateral repulsion and site heterogeneity actually give it        */
 var HE_W = 0.075;
-var HE_MET = [["W", -0.55], ["Mo", -0.48], ["Co", -0.31], ["Ni", -0.28],
-              ["Pd", -0.14], ["Rh", -0.11], ["Pt", -0.09], ["Ir", -0.05],
-              ["Cu", 0.10], ["Au", 0.33], ["Ag", 0.49]];
+/* dG_H* = dE_H(1/4 ML) + 0.24 eV from Table I of Norskov et al. 2005 -
+   the same numbers the d band tab and Concept Check 2 use. Ni is listed
+   before Co, which has the same value, so the Ni preset is named Ni.   */
+var HE_MET = [["W", -0.43], ["Mo", -0.37], ["Ni", -0.27], ["Co", -0.27],
+              ["Pd", -0.14], ["Rh", -0.10], ["Pt", -0.09], ["Ir", 0.03],
+              ["Cu", 0.19], ["Au", 0.45], ["Ag", 0.51]];
 
 function heJ0(dG){
   /* the simplest expression that peaks at zero and falls on both sides */
@@ -2364,44 +2713,6 @@ function heDraw(){
           + "H\u1d64\u209a\u2094 the first tabs count", "var(--muted)", 9.5, null, 600);
   document.getElementById("heCov").innerHTML = q;
 
-  /* ---- the volcano -------------------------------------------------- */
-  var v = fr(70, 1020, 22, 232, -0.7, 0.7, -11, -2), w = "";
-  w += axLin(v, "\u0394G\u029c / eV \u2014 binds more strongly \u2190   \u2192 binds more weakly",
-             "log j\u2080 / A cm\u207b\u00b2",
-             function(x){ return x.toFixed(1); }, function(y){ return y.toFixed(0); });
-  var vd = "";
-  for(i = 0; i <= 280; i++){
-    var x = -0.7 + 1.4 * i / 280;
-    var y = Math.log10(HE_J0 / (1 + Math.exp(Math.abs(x) / KT_EV)) / (HE.base ? 120 : 1));
-    if(y < v.ylo) { vd = vd; continue; }
-    vd += (vd ? "L" : "M") + v.px(x).toFixed(1) + " " + v.py(y).toFixed(1) + " ";
-  }
-  w += pth(vd, "var(--red-)", 2.3);
-  var MLANE = [];
-  HE_MET.forEach(function(m, idx){
-    var y = Math.log10(HE_J0 / (1 + Math.exp(Math.abs(m[1]) / KT_EV)) / (HE.base ? 120 : 1));
-    if(y < v.ylo) return;
-    w += cir(v.px(m[1]), v.py(y), 4, "var(--ink-2)");
-    /* near the apex there is no room above the point for the label */
-    var my = v.py(y) - 9 - (idx % 2) * 11;
-    if(my < 13) my = v.py(y) + 16 + (idx % 2) * 11;
-    var mw = laneW(m[0], 10);
-    w += tx(v.px(m[1]), laneY(MLANE, v.px(m[1]) - mw / 2, v.px(m[1]) + mw / 2,
-                              my, 12, 2), m[0], "var(--ink-2)", 10, "middle", 700);
-  });
-  var yv = Math.log10(heJ0(dG));
-  if(yv > v.ylo){
-    w += cir(v.px(dG), v.py(yv), 9, "var(--stop)", 0.25);
-    w += cir(v.px(dG), v.py(yv), 4.6, "var(--stop)");
-  }
-  w += ln(v.px(0), v.Y0, v.px(0), v.Y1, "var(--go)", 1.2, "4 3");
-  /* at the foot of its own line: the top of it is where the apex and the
-     metals nearest DG = 0 already are */
-  w += tx(v.px(0) + 6, v.Y1 - 8, "\u0394G\u029c = 0 \u2014 the top", "var(--go)", 10, null, 700);
-  w += tx(v.X0, v.Y1 + 44, "kT as the only width makes this volcano steeper than a measured one: "
-          + "read the ordering and the two legs, not the absolute j\u2080", "var(--muted)", 9.5, null, 600);
-  document.getElementById("heVolc").innerHTML = w;
-
   /* ---- the numbers --------------------------------------------------- */
   var near = HE_MET[0], k;
   for(k = 0; k < HE_MET.length; k++)
@@ -2420,12 +2731,12 @@ function heDraw(){
   if(HE.rds === "T" && th > 0.95){
     msg = "<b>The surface is full and the step that empties it needs two free sites.</b> The slope "
         + "runs away &mdash; the current has stopped caring about potential, which is a limiting "
-        + "current, not a Tafel region. This is the left leg of the volcano seen from underneath.";
+        + "current, not a Tafel region: the far end of the left leg.";
   }else if(th > 0.9){
     msg = "<b>&theta;<sub>H</sub> is pinned at " + (th * 100).toFixed(0) + " %.</b> A coverage that "
         + "cannot rise stops contributing to the potential dependence, so the Heyrovsky slope has "
-        + "climbed to the same 2.303RT/&alpha;F the Volmer step gives. <b>Two mechanisms, one "
-        + "number</b> &mdash; which is why a slope alone never names a step.";
+        + "climbed to the 2.303RT/&alpha;F a slow Volmer step would give &mdash; the same number "
+        + "from a different step. This is the left leg of the volcano.";
   }else if(th < 0.05){
     msg = "<b>Almost nothing is adsorbed.</b> At &theta; = " + (th * 100).toFixed(1) + " % there is "
         + "hardly any H<sub>ad</sub> for the second step to work on, so the discharge is what is slow "
@@ -2449,8 +2760,8 @@ pillGroup("hePh", function(v){ HE.base = (v === "base"); heSync(); });
 bind("heDG", function(v){ HE.dG = v; heSync(); });
 bind("heAl", function(v){ HE.alpha = v; heSync(); });
 [["heP1", {dG:-0.09, rds:"V", base:false}],
- ["heP2", {dG:-0.28, rds:"H", base:true}],
- ["heP3", {dG:0.33, rds:"V", base:false}]].forEach(function(p){
+ ["heP2", {dG:-0.27, rds:"H", base:true}],
+ ["heP3", {dG:0.45, rds:"V", base:false}]].forEach(function(p){
   document.getElementById(p[0]).addEventListener("click", function(){
     setRange("heDG", p[1].dG); HE.dG = p[1].dG;
     HE.rds = p[1].rds; HE.base = p[1].base;
@@ -2458,6 +2769,743 @@ bind("heAl", function(v){ HE.alpha = v; heSync(); });
     heSync();
   });
 });
+
+/* ============ 3 - VOLMER, HEYROVSKY, TAFEL: THE STEPS, ANIMATED ==========
+   Slide 5 of Lecture 16 put in motion, with the kinetics underneath it
+   solved rather than quoted. Mean-field steady state on one kind of site,
+   |eta| the cathodic overpotential:
+     A  Volmer     r1 = k1 C (1-th) e^(a f|eta|),  r-1 = k-1 th e^(-(1-a) f|eta|)
+     B  Tafel      r3 = k3 th^2                       (no electron, no eta)
+     C  Heyrovsky  r2 = k2 C th e^(a f|eta|)
+   The fast step is made 10^3 - 10^6 times faster than the slow one, so the
+   limits slide 5 takes (th -> 0, th -> 1, th = K C e^(f|eta|)) are what the
+   solution actually does, and the slopes and orders on the page come out
+   of differentiating it rather than being written in. The back reactions
+   of B and C are left out, so the curves are read away from eta = 0.  */
+var MK_AL = 0.5;
+var MK_K = {
+  IIA:{r:2, k1:1e-6, km1:0,   k2:1e-3, k3:0},
+  IA: {r:1, k1:1e-6, km1:0,   k2:0,    k3:1},
+  IB: {r:1, k1:1,    km1:1e3, k2:0,    k3:1e-5},
+  IIC:{r:2, k1:1,    km1:1e3, k2:1e-5, k3:0}
+};
+var MK_NAME = {IIA:"II · A", IA:"I · A", IB:"I · B", IIC:"II · C"};
+var MK_COL = {IIA:"var(--red-)", IA:"var(--red-)", IB:"var(--ion-k)", IIC:"var(--ox)"};
+function mkTheta(c, eta, C){
+  var p = MK_K[c], a = Math.exp(MK_AL * eta / RTF), b = Math.exp(-(1 - MK_AL) * eta / RTF);
+  var fw = p.k1 * C * a, bk = p.km1 * b;
+  if(p.r === 2) return fw / (fw + bk + p.k2 * C * a);
+  /* 2 k3 th^2 + (fw + bk) th - fw = 0, in the form that does not cancel */
+  var s = fw + bk;
+  return 2 * fw / (s + Math.sqrt(s * s + 8 * p.k3 * fw));
+}
+/* electrons per unit time: two per H2, whichever route */
+function mkJ(c, eta, C){
+  var p = MK_K[c], th = mkTheta(c, eta, C);
+  if(p.r === 2) return 2 * p.k2 * C * Math.exp(MK_AL * eta / RTF) * th;
+  return 2 * p.k3 * th * th;
+}
+function mkLg(c, eta, C){ return Math.log10(mkJ(c, eta, C === undefined ? 1 : C)); }
+/* the slope you would report, d|eta|/dlog j, and the order in H+ */
+function mkSlope(c, eta){
+  var lo = Math.max(0, eta - 1e-4), hi = eta + 1e-4, d = mkLg(c, hi) - mkLg(c, lo);
+  return d > 1e-7 ? (hi - lo) / d : Infinity;
+}
+function mkOrder(c, eta){
+  var q = 1.01;
+  return (mkLg(c, eta, q) - mkLg(c, eta, 1 / q)) / (2 * Math.log10(q));
+}
+function mkSlopeTxt(b){ return isFinite(b) && b < 2 ? (b * 1000).toFixed(0) + " mV/dec" : "∞ — flat"; }
+function mkPct(th){
+  var p = th * 100;
+  return p >= 99.95 ? "100 %" : p >= 10 ? p.toFixed(0) + " %" : p >= 0.1 ? p.toFixed(1) + " %"
+       : p.toPrecision(2) + " %";
+}
+
+/* the cycle, phase by phase; s is the letter of the step a phase is */
+var MK_PH = {
+  II:[{h:"H<sup>+</sup> comes to the surface", s:null, w:1, k:"arr", site:0},
+      {h:"Volmer: an electron, and it sticks", s:"A", w:1, k:"vol", site:0},
+      {h:"a second H<sup>+</sup> comes to the same site", s:null, w:0.8, k:"arr2", site:0},
+      {h:"Heyrovsky: a second electron, and H<sub>2</sub>", s:"C", w:1, k:"hey", site:0},
+      {h:"H<sub>2</sub> leaves; the site is free again", s:null, w:0.8, k:"off"}],
+  I: [{h:"H<sup>+</sup> comes to the surface", s:null, w:1, k:"arr", site:0},
+      {h:"Volmer: the first H<sub>ad</sub>", s:"A", w:1, k:"vol", site:0},
+      {h:"another H<sup>+</sup>, at the next site", s:null, w:0.8, k:"arr", site:1},
+      {h:"Volmer again: a neighbouring H<sub>ad</sub>", s:"A", w:1, k:"vol", site:1},
+      {h:"Tafel: two neighbours combine &mdash; no electron", s:"B", w:1, k:"taf"},
+      {h:"H<sub>2</sub> leaves; two sites are free", s:null, w:0.8, k:"off"}]
+};
+var MK = {route:"II", rds:"A", eta:0.10, k:0, u:1, play:false, last:0, iv:null,
+          seen:99, derAt:-1};   /* seen: the furthest phase reached; 99 = show it all */
+function mkCase(){ return MK.route === "I" ? (MK.rds === "A" ? "IA" : "IB") : (MK.rds === "A" ? "IIA" : "IIC"); }
+function mkSlow(){ return MK.rds === "A" ? "A" : (MK.route === "I" ? "B" : "C"); }
+function mkPh(){ return MK_PH[MK.route]; }
+/* seconds per phase: 1.15 s at first, played 1.5x faster since */
+var MK_SPEED = 1.5;
+function mkDur(ph){ return 1.15 / MK_SPEED * ph.w * (ph.s === mkSlow() ? 3 : 1); }
+
+/* ---- the picture ----------------------------------------------------- */
+var MK_NS = 8, MK_X0 = 70, MK_DX = 54, MK_YT = 216, MK_R = 18, MK_YA = MK_YT - 26;
+function mkX(i){ return MK_X0 + i * MK_DX; }
+function mkHp(x, y, op){
+  return '<g opacity="' + (op === undefined ? 1 : op).toFixed(2) + '">' + cir(x, y, 8.5, "var(--red-)")
+       + tx(x, y + 3.6, "+", "#fff", 11, "middle", 700) + '</g>';
+}
+function mkEl(x, y){
+  return '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="5.6" fill="var(--surface)" stroke="var(--red-)" stroke-width="1.6"/>'
+       + tx(x, y + 3.2, "−", "var(--red-)", 9.5, "middle", 700);
+}
+function mkHad(x, y, op){ return cir(x, y === undefined ? MK_YA : y, 6.6, "var(--ion-k)", op); }
+function mkH2(x, y, op){ return mkHad(x - 5.5, y, op) + mkHad(x + 5.5, y, op); }
+/* a label drawn over the metal: a halo in the card colour keeps it legible */
+function txh(x, y, s, col, size, anchor, weight){
+  return tx(x, y, s, col, size, anchor, weight)
+    .replace("<text", '<text stroke="var(--surface)" stroke-width="3.2" paint-order="stroke" stroke-linejoin="round"');
+}
+function mkEase(u){ u = clamp(u, 0, 1); return u < 0.5 ? 2 * u * u : 1 - 2 * (1 - u) * (1 - u); }
+function mkLerp(a, b, u){ return a + (b - a) * u; }
+
+function mkFigDraw(now){
+  var c = mkCase(), ph = mkPh(), P = ph[MK.k], u = MK.u, e = mkEase(u), s = "", i, j, x;
+  var act = MK.route === "I" ? [3, 4] : [3], th = mkTheta(c, MK.eta, 1);
+  /* the electrolyte, the legend, and three rows of metal */
+  s += rc(26, 34, 468, MK_YA - 22, "var(--ion-k)", 0.05, 8);
+  for(j = 2; j >= 0; j--)
+    for(i = 0; i < MK_NS; i++){
+      x = mkX(i) + (j % 2 ? MK_DX / 2 : 0);
+      if(x > 494) continue;
+      s += cir(x, MK_YT + j * 26, MK_R, "var(--ink-2)", j === 0 ? 0.5 : 0.26);
+    }
+  s += txh(36, 294, "Pt — the electrons come from here", "var(--ink)", 9.5, null, 700);
+  var kx = 40;
+  s += mkHp(kx, 20) + tx(kx + 13, 23.5, "H⁺ (as H₃O⁺)", "var(--ink-2)", 9.5, null, 600);
+  kx += 118; s += mkEl(kx, 20) + tx(kx + 11, 23.5, "e⁻", "var(--ink-2)", 9.5, null, 600);
+  kx += 40; s += mkHad(kx, 20) + tx(kx + 11, 23.5, 'H<tspan baseline-shift="sub" font-size="7.5">ad</tspan>', "var(--ink-2)", 9.5, null, 600);
+  kx += 46; s += mkH2(kx + 5, 20) + tx(kx + 19, 23.5, "H₂", "var(--ink-2)", 9.5, null, 600);
+
+  /* the spectators: the other sites, covered to the steady state */
+  var ord = [6, 1, 0, 7, 5, 2, 4, 3].filter(function(k){ return act.indexOf(k) < 0; });
+  var nOcc = Math.round(th * ord.length), empty = [];
+  ord.forEach(function(k, n){ if(n < nOcc) s += mkHad(mkX(k)); else empty.push(k); });
+  s += tx(490, 54, "other sites: θ = " + mkPct(th), "var(--ion-k)", 10, "end", 700);
+
+  /* the slow step labelled as it plays */
+  var slow = P.s && P.s === mkSlow();
+  if(P.s)
+    s += tx(40, 54, slow ? "rate-determining — slow" : "fast step", slow ? "var(--ox)" : "var(--go)", 10.5, null, 700);
+  /* while the slow second step waits, the first one runs both ways */
+  if(slow && MK.rds !== "A"){
+    if(empty.length){
+      var t = (now || 0) / 1000, xb = mkX(empty[0]);
+      var yb = MK_YA - 38 + 38 * (0.5 - 0.5 * Math.cos(2 * Math.PI * t * MK_SPEED / 0.9));
+      s += mkHp(xb, yb, 0.75);
+      s += tx(xb, MK_YA - 52, "Volmer ⇄", "var(--red-)", 9.5, "middle", 700);
+    }else{
+      s += tx(260, 76, "every site full — the Volmer step has nowhere left to put H",
+              "var(--red-)", 10, "middle", 700);
+    }
+  }
+
+  /* the active site(s), phase by phase: what is done stays drawn */
+  var x0 = mkX(act[0]), x1 = act.length > 1 ? mkX(act[1]) : x0, xm = (x0 + x1) / 2;
+  var yTop = 70, yDl = MK_YA - 40, yMet = MK_YT + 30;
+  var k = P.k, done = function(n){ return MK.k > n || (MK.k === n && u >= 0.92); };
+  if(MK.route === "II"){
+    if(MK.k === 0) s += mkHp(x0, mkLerp(yTop, yDl, e));
+    if(MK.k === 1){
+      if(u < 0.92) s += mkHp(x0, mkLerp(yDl, MK_YA, e)) + mkEl(x0, mkLerp(yMet, MK_YA + 4, e));
+      else s += mkHad(x0) + '<circle cx="' + x0 + '" cy="' + MK_YA + '" r="13" fill="none" stroke="var(--red-)" stroke-width="1.4" opacity=".6"/>';
+    }
+    if(MK.k === 2) s += mkHad(x0) + mkHp(x0, mkLerp(yTop, yDl, e));
+    if(MK.k === 3){
+      if(u < 0.9) s += mkHad(x0) + mkHp(x0, mkLerp(yDl, MK_YA - 14, e)) + mkEl(x0 + 10, mkLerp(yMet, MK_YA, e));
+      else s += mkH2(x0, MK_YA - 10);
+    }
+    if(MK.k === 4) s += mkH2(x0, mkLerp(MK_YA - 10, yTop - 20, e), 1 - 0.85 * e);
+  }else{
+    if(MK.k === 0) s += mkHp(x0, mkLerp(yTop, yDl, e));
+    if(MK.k === 1){
+      if(u < 0.92) s += mkHp(x0, mkLerp(yDl, MK_YA, e)) + mkEl(x0, mkLerp(yMet, MK_YA + 4, e));
+      else s += mkHad(x0);
+    }
+    if(MK.k === 2) s += mkHad(x0) + mkHp(x1, mkLerp(yTop, yDl, e));
+    if(MK.k === 3){
+      s += mkHad(x0);
+      if(u < 0.92) s += mkHp(x1, mkLerp(yDl, MK_YA, e)) + mkEl(x1, mkLerp(yMet, MK_YA + 4, e));
+      else s += mkHad(x1);
+    }
+    if(MK.k === 4){
+      if(u < 0.9) s += mkHad(mkLerp(x0, xm - 5.5, e), mkLerp(MK_YA, MK_YA - 10, e))
+                     + mkHad(mkLerp(x1, xm + 5.5, e), mkLerp(MK_YA, MK_YA - 10, e));
+      else s += mkH2(xm, MK_YA - 10);
+      s += tx(xm, MK_YA - 30, "no electron crosses", "var(--ion-k)", 9.5, "middle", 700);
+    }
+    if(MK.k === 5) s += mkH2(xm, mkLerp(MK_YA - 10, yTop - 20, e), 1 - 0.85 * e);
+  }
+  /* an electron on its way out of the metal gets an arrow in the metal */
+  if(k === "vol" || k === "hey"){
+    var xe = k === "hey" ? x0 + 10 : (P.site ? x1 : x0);
+    s += txh(xe + 14, MK_YT + 40, "e⁻ from the electrode", "var(--red-)", 9.5, null, 700);
+  }
+  document.getElementById("mkFig").innerHTML = s;
+}
+
+/* ---- the Tafel plot: all four cases, the chosen one in colour --------- */
+function mkTafelDraw(){
+  var c = mkCase(), f = fr(70, 500, 22, 246, -0.4, 7, 0, 0.35), s = "", order = ["IA", "IIA", "IB", "IIC"];
+  s += axLin(f, "log ( j / j at η → 0 )", "|η| / V",
+             function(v){ return v.toFixed(0); }, function(v){ return v.toFixed(2); });
+  order.forEach(function(q){
+    if(q === c || (c === "IA" && q === "IIA") || (c === "IIA" && q === "IA")) return;
+    var d = "", l0 = mkLg(q, 0), h;
+    for(h = 0; h <= 0.3501; h += 0.0025)
+      d += (d ? "L" : "M") + f.px(mkLg(q, h) - l0).toFixed(1) + " " + f.py(h).toFixed(1) + " ";
+    s += pth(d, "var(--muted)", 1.3, null, 0.5);
+  });
+  var dd = "", L0 = mkLg(c, 0), h2;
+  for(h2 = 0; h2 <= 0.3501; h2 += 0.0025)
+    dd += (dd ? "L" : "M") + f.px(mkLg(c, h2) - L0).toFixed(1) + " " + f.py(h2).toFixed(1) + " ";
+  s += pth(dd, MK_COL[c], 2.6);
+  /* one label per curve, each at a height where the curves are apart */
+  [["IIA", 0.28, "A · Volmer (I or II)"], ["IB", 0.10, "B · Tafel"], ["IIC", 0.30, "C · Heyrovsky"]].forEach(function(t){
+    var q = t[0], on = q === c || (q === "IIA" && c === "IA");
+    var xl = f.px(mkLg(q, t[1]) - mkLg(q, 0)) + 7;
+    var rt = xl < f.X1 - 6 * t[2].length;
+    s += tx(rt ? xl : xl - 14, f.py(t[1]) + 4, t[2], on ? MK_COL[c] : "var(--muted)", 10, rt ? null : "end", 700);
+  });
+  /* where you are, and the tangent over one decade */
+  var xn = mkLg(c, MK.eta) - L0, b = mkSlope(c, MK.eta), xp = f.px(xn), yp = f.py(MK.eta);
+  if(isFinite(b) && b < 2){
+    s += ln(f.px(xn - 0.6), f.py(MK.eta - 0.6 * b), f.px(xn + 0.6), f.py(MK.eta + 0.6 * b), "var(--ink)", 1.4, "5 3");
+  }else{
+    s += ln(xp, f.Y0, xp, f.Y1, "var(--ink)", 1.4, "5 3");
+  }
+  s += ln(f.X0, yp, xp, yp, "var(--stop)", 1.1, "4 3");
+  s += cir(xp, yp, 4.6, "var(--stop)");
+  var bt = "b = " + mkSlopeTxt(b), rt = xp < f.X1 - 140;
+  s += tx(xp + (rt ? 9 : -9), clamp(yp + 16, f.Y0 + 12, f.Y1 - 6), bt, "var(--ink)", 10.5, rt ? null : "end", 700);
+  s += tx(f.X1 - 6, f.Y1 - 8, "118 · 39 · 30 mV/dec at α = 0.5", "var(--muted)", 9.5, "end", 600);
+  document.getElementById("mkTafel").innerHTML = s;
+}
+
+/* ---- slide 5, written out for the case, with the live line lit ------- */
+/* The algebra of slide 5, as a list of lines with the phase each one
+   belongs to: a line is written out when its own step has run. `seen` is
+   the furthest phase the animation has reached, or a large number when
+   nothing is playing, in which case the whole derivation is there.    */
+function mkDerLines(c, th){
+  var lo = th < 0.15, hi = th > 0.85;
+  var k0 = function(n){ return "k<sup>o</sup><sub>" + n + "</sub>"; };
+  var eq = '&theta;/(1 &minus; &theta;) = K C<sub>H+</sub> e<sup>&minus;f&eta;</sup>';
+  if(c === "IA" || c === "IIA"){
+    var last = c === "IA" ? 5 : 4;
+    return [
+      {at:1, lit:null, h:'<span class="cnc">Volmer is rds:</span> &minus;i&prime; = F k<sub>V</sub> '
+        + 'C<sub>H+</sub>(1 &minus; &theta;) = F[' + k0("V") + ' e<sup>&minus;&alpha;f&eta;</sup>] '
+        + 'C<sub>H+</sub> &nbsp;<small>at &theta;<sub>H</sub> &rarr; 0 &mdash; whatever lands is '
+        + 'taken away at once</small>'},
+      {at:last, lit:null, h:'&rArr; log|&minus;i&prime;| = const + log C<sub>H+</sub> &minus; '
+        + '&alpha;f&prime;&eta; &nbsp;&rArr;&nbsp; b = (&alpha;f&prime;)<sup>&minus;1</sup> = '
+        + '(120 mV)<sup>&minus;1</sup>, order 1'},
+      {at:last, lit:null, h:'<small>the same in both routes: the step after it never gets the '
+        + 'chance to matter</small>'}];
+  }
+  if(c === "IB")
+    return [
+      {at:1, lit:null, h:'<span class="pot">Volmer is fast, so it sits at equilibrium:</span> '
+        + eq + ' &nbsp;<small>the fast step does not set the rate &mdash; it sets the '
+        + 'coverage</small>'},
+      {at:4, lit:null, h:'<span class="mix">Tafel is rds:</span> &minus;i&prime; = 2F k<sub>T</sub> '
+        + '&theta;<sup>2</sup> &nbsp;<small>a chemical step: &eta; enters only through '
+        + '&theta;</small>'},
+      {at:5, lit:lo, h:'low &eta; (&theta; &laquo; 1): &minus;i&prime; = 2F k<sub>T</sub>(K '
+        + 'C<sub>H+</sub> e<sup>&minus;f&eta;</sup>)<sup>2</sup> &rArr; log|&minus;i&prime;| = const '
+        + '+ 2 log C<sub>H+</sub> &minus; 2f&prime;&eta; &rArr; (30 mV)<sup>&minus;1</sup>, order 2'},
+      {at:5, lit:hi, h:'high &eta; (&theta; &rarr; 1): &minus;i&prime; = 2F k<sub>T</sub> &mdash; '
+        + 'independent of potential: a limiting current, not a Tafel line'}];
+  return [
+    {at:1, lit:null, h:'<span class="pot">Volmer is fast, so it sits at equilibrium:</span> ' + eq
+      + ' &nbsp;<small>the fast step does not set the rate &mdash; it sets the coverage</small>'},
+    {at:3, lit:null, h:'<span class="act">Heyrovsky is rds:</span> &minus;i&prime; = F k<sub>H</sub> '
+      + 'C<sub>H+</sub> &theta; = F[' + k0("H") + ' e<sup>&minus;&alpha;f&eta;</sup>] '
+      + 'C<sub>H+</sub> &theta; &nbsp;<small>an electron onto an occupied site</small>'},
+    {at:4, lit:lo, h:'low &eta;: &theta; = K C<sub>H+</sub> e<sup>&minus;f&eta;</sup> &rArr; '
+      + 'log|&minus;i&prime;| = const + 2 log C<sub>H+</sub> &minus; (1 + &alpha;)f&prime;&eta; '
+      + '&rArr; (40 mV)<sup>&minus;1</sup>, order 2'},
+    {at:4, lit:hi, h:'high &eta;: &theta; &rarr; 1 &rArr; log|&minus;i&prime;| = const + log '
+      + 'C<sub>H+</sub> &minus; &alpha;f&prime;&eta; &rArr; (120 mV)<sup>&minus;1</sup>, order 1'}];
+}
+function mkDerHtml(c, th, seen){
+  return mkDerLines(c, th).map(function(L){
+    var cls = L.at > seen ? "soon" : L.lit === true ? "lit" : L.lit === false ? "dim" : "";
+    return cls ? '<span class="' + cls + '">' + L.h + "</span>" : L.h;
+  }).join("<br>");
+}
+/* the two lines under the picture, redrawn whenever the step changes */
+function mkDerRender(){
+  var c = mkCase(), th = mkTheta(c, MK.eta, 1), ph = mkPh();
+  var set = function(id, t){ document.getElementById(id).innerHTML = t; };
+  MK.derAt = MK.seen;
+  set("mkDer", mkDerHtml(c, th, MK.seen));
+  if(MK.seen < ph.length - 1)
+    set("mkDerNote", "Building: step " + (MK.k + 1) + " of " + ph.length
+        + " &mdash; the next line arrives when its own step does.");
+  else if(MK.rds === "A")
+    set("mkDerNote", "The lit line is the one that holds at every &eta; you can set: with Volmer "
+        + "slow, &theta; never grows enough for a second regime to appear.");
+  else
+    set("mkDerNote", "The lit line is the one that holds at |&eta;| = "
+        + (MK.eta * 1000).toFixed(0) + " mV, where the kinetics give &theta; = " + mkPct(th)
+        + "; drag &eta; and watch the light move from one line to the other at &theta; &asymp; 0.5 "
+        + "(|&eta;| &asymp; 178 mV here, set by K = 10<sup>&minus;3</sup>).");
+}
+
+function mkList(){
+  var box = document.getElementById("mkSteps");
+  box.innerHTML = mkPh().map(function(P, i){
+    return '<button type="button" data-k="' + i + '"><span class="n">' + (i + 1) + '</span>' + P.h
+         + (P.s === mkSlow() ? ' <span class="act" style="font-size:11px">&middot; slow</span>' : "") + '</button>';
+  }).join("");
+  [].slice.call(box.querySelectorAll("button")).forEach(function(b){
+    b.addEventListener("click", function(){ mkStop(); MK.k = +b.getAttribute("data-k"); MK.u = 1; mkDraw(); });
+  });
+}
+function mkDraw(now){
+  var c = mkCase(), ph = mkPh(), P = ph[MK.k], th = mkTheta(c, MK.eta, 1), b = mkSlope(c, MK.eta);
+  mkFigDraw(now);
+  var set = function(id, t){ document.getElementById(id).innerHTML = t; };
+  set("mkFigN", MK_NAME[c] + " · |η| = " + (MK.eta * 1000).toFixed(0) + " mV · step " + (MK.k + 1) + " of " + ph.length);
+  var bs = document.getElementById("mkSteps").querySelectorAll("button"), i;
+  for(i = 0; i < bs.length; i++){
+    if(i === MK.k) bs[i].setAttribute("aria-current", "true"); else bs[i].removeAttribute("aria-current");
+  }
+  document.getElementById("mkPlay").textContent = MK.play ? "Pause" : "Play";
+  if(MK.seen < MK.k) MK.seen = MK.k;
+  if(MK.derAt !== MK.seen) mkDerRender();
+}
+/* everything that does not move with the animation */
+function mkStatic(){
+  var c = mkCase(), th = mkTheta(c, MK.eta, 1), b = mkSlope(c, MK.eta), o = mkOrder(c, MK.eta);
+  var set = function(id, t){ document.getElementById(id).innerHTML = t; };
+  document.getElementById("mkRds2").innerHTML = MK.route === "I" ? "B &middot; Tafel" : "C &middot; Heyrovsky";
+  set("mkEtav", (MK.eta * 1000).toFixed(0) + " mV");
+  set("mkCase", MK_NAME[c]);
+  set("mkTh", mkPct(th));
+  set("mkB", mkSlopeTxt(b));
+  set("mkOrd", Math.abs(o) < 0.005 ? "0" : o.toFixed(2));
+  var reg = MK.rds === "A" ? "θ → 0" : th < 0.15 ? "low η: θ = KCe⁻ᶠη" : th > 0.85 ? "high η: θ → 1" : "in between";
+  set("mkReg", reg);
+  var n;
+  if(MK.rds === "A")
+    n = "<b>Volmer is slow, so the surface stays almost bare</b> and the current is the discharge rate itself: 2.303RT/&alpha;F = 118 mV/dec at every &eta;, first order in H<sup>+</sup>. Which step follows makes no difference &mdash; switch the route and the line does not move. This is the row most metals in Table 5.3 sit in.";
+  else if(c === "IB")
+    n = th > 0.85 ? "<b>&theta; = " + mkPct(th) + ": the surface is full.</b> Tafel needs two <i>occupied</i> neighbours and now has them everywhere; it simply cannot go faster, and the potential has no way left to push it. The slope runs off to infinity &mdash; a limiting current that is chemical, not diffusional."
+      : "<b>Two H<sub>ad</sub> per H<sub>2</sub>, and each one costs a factor e<sup>&minus;f&eta;</sup> of coverage</b>, so the rate goes as e<sup>&minus;2f&eta;</sup>: 2.303RT/2F = 30 mV/dec, second order in H<sup>+</sup>. This is Pt in acid &mdash; and why its Tafel slope is the smallest in Table 5.3.";
+  else
+    n = th > 0.85 ? "<b>&theta; = " + mkPct(th) + ", pinned.</b> The coverage has stopped helping, so only the electron transfer is left in the potential dependence: back to 118 mV/dec and first order &mdash; <b>the same number as a slow Volmer step</b>, from a different mechanism. A slope alone never names a step."
+      : th < 0.15 ? "<b>One factor e<sup>&minus;f&eta;</sup> from the coverage and one e<sup>&minus;&alpha;f&eta;</sup> from the electron</b>: (1 + &alpha;)f = 1.5f, so 2.303RT/1.5F = 39 mV/dec, second order in H<sup>+</sup>. Pd in Table 5.3."
+      : "<b>On the way from 40 to 120.</b> &theta; = " + mkPct(th) + " is neither small nor saturated, so neither limit of slide 5 applies and the slope is whatever lies between &mdash; " + mkSlopeTxt(b) + " here. A measured 60 mV/dec (Rh, W) can be exactly this.";
+  set("mkNote", n);
+  mkDerRender();
+  mkTafelDraw();
+}
+
+/* ---- the clock ------------------------------------------------------- */
+function mkFrame(ts){
+  if(!MK.play) return;
+  if(document.getElementById("p-mech").hidden){ MK.last = 0; window.requestAnimationFrame(mkFrame); return; }
+  var dt = MK.last ? Math.min(0.1, (ts - MK.last) / 1000) : 0;
+  MK.last = ts;
+  var ph = mkPh();
+  MK.u += dt / mkDur(ph[MK.k]);
+  if(MK.u >= 1){ MK.k = (MK.k + 1) % ph.length; MK.u = 0; }
+  mkDraw(ts);
+  window.requestAnimationFrame(mkFrame);
+}
+function mkStop(){
+  MK.play = false;
+  if(MK.iv){ window.clearInterval(MK.iv); MK.iv = null; }
+}
+function mkToggle(){
+  if(MK.play){ mkStop(); mkDraw(); return; }
+  MK.play = true;
+  /* a fresh cycle empties the derivation so that it is built rather than
+     displayed; resuming a paused one keeps the lines already earned  */
+  if(MK.seen > 90 || MK.seen >= mkPh().length - 1){ MK.k = 0; MK.u = 0; MK.seen = -1; }
+  if(REDUCED){
+    /* no motion: a step at a time, with the end state of each shown */
+    MK.u = 1;
+    MK.iv = window.setInterval(function(){
+      if(document.getElementById("p-mech").hidden) return;
+      MK.k = (MK.k + 1) % mkPh().length; mkDraw();
+    }, 2400 / MK_SPEED);
+    mkDraw();
+  }else{
+    if(MK.u >= 1){ MK.k = (MK.k + 1) % mkPh().length; MK.u = 0; }
+    MK.last = 0;
+    mkDraw();
+    window.requestAnimationFrame(mkFrame);
+  }
+}
+function mkSync(){ mkList(); mkStatic(); mkDraw(); }
+
+pillGroup("mkRoute", function(v){ MK.route = v; MK.k = 0; MK.u = 1; MK.seen = 99; mkStop(); mkList(); mkStatic(); mkDraw(); });
+pillGroup("mkRds", function(v){ MK.rds = v; MK.k = 0; MK.u = 1; MK.seen = 99; mkStop(); mkList(); mkStatic(); mkDraw(); });
+bind("mkEta", function(v){ MK.eta = v; mkStatic(); if(!MK.play) mkDraw(); });
+document.getElementById("mkPlay").addEventListener("click", mkToggle);
+document.getElementById("mkBack").addEventListener("click", function(){
+  mkStop(); MK.k = (MK.k - 1 + mkPh().length) % mkPh().length; MK.u = 1; mkDraw();
+});
+document.getElementById("mkNext").addEventListener("click", function(){
+  mkStop(); MK.k = (MK.k + 1) % mkPh().length; MK.u = 1; mkDraw();
+});
+
+/* ============ 4 - THE d BAND, THE DESCRIPTOR AND SCALING ================
+   The numbers behind slides 7-9. dE is the DFT hydrogen adsorption energy
+   at 1/4 monolayer from Table I of Norskov et al. 2005 (the table on
+   slide 7), lg the measured log(i0 / A cm-2) beside it; v2 and f are
+   slide 9's coupling (Cu = 1) and d filling from Hammer & Norskov; ed is
+   the surface d-band centre of Ruban et al. 1997. The page fits dE
+   against ed itself, so the line on the plot is a result, not an input. */
+var DS_MET = {
+  Co:{ed:-1.17, v2:1.47, f:0.8, dE:-0.51, lg:[-5.32]},
+  Ni:{ed:-1.29, v2:1.34, f:0.9, dE:-0.51, lg:[-5.2, -5.21]},
+  Cu:{ed:-2.67, v2:1.00, f:1.0, dE:-0.05, lg:[-5.37]},
+  Rh:{ed:-1.73, v2:3.32, f:0.8, dE:-0.34, lg:[-3.6, -3.22]},
+  Pd:{ed:-1.83, v2:2.78, f:0.9, dE:-0.38, lg:[-3, -3]},
+  Ag:{ed:-4.30, v2:2.26, f:1.0, dE:0.27, lg:[-5.0, -7.85]},
+  Ir:{ed:-2.11, v2:4.45, f:0.8, dE:-0.21, lg:[-3.7, -3.46]},
+  Pt:{ed:-2.25, v2:3.90, f:0.9, dE:-0.33, lg:[-3.1, -2.63, -3.34]},
+  Au:{ed:-3.56, v2:3.35, f:1.0, dE:0.21, lg:[-6.6, -6.8, -5.4]}
+};
+var DS_OTHER = {W:{dE:-0.67, lg:[-5.9, -5.9]}, Mo:{dE:-0.61, lg:[-7.07]},
+                Re:{dE:-0.56, lg:[-2.87]}, Nb:{dE:-0.80, lg:[-6.8]}};
+var DS_ZPE_TS = 0.24;               /* dG = dE + dZPE - T dS = dE + 0.24 eV */
+/* Kitchin et al. 2004, Table I: surface d-band centre of Pt(111) with a
+   subsurface 3d layer, minus that of the pure Pt slab in the same
+   calculation. Only the shift is used: it is added to Pt's ed here.   */
+var DS_KIT = {dsK1:["Pt/Ni/Pt", -0.16], dsK2:["Pt/Fe/Pt", -0.40], dsK3:["Pt/V/Pt", -0.74]};
+
+/* least squares of dE on ed over the nine metals */
+var DS_FIT = (function(){
+  var k, n = 0, sx = 0, sy = 0, sxx = 0, sxy = 0, syy = 0;
+  for(k in DS_MET){ var p = DS_MET[k]; n++; sx += p.ed; sy += p.dE; sxx += p.ed * p.ed; sxy += p.ed * p.dE; syy += p.dE * p.dE; }
+  var b = (n * sxy - sx * sy) / (n * sxx - sx * sx), a = (sy - b * sx) / n, ss = 0, st = 0;
+  for(k in DS_MET){ var q = DS_MET[k], r = q.dE - (a + b * q.ed); ss += r * r; st += Math.pow(q.dE - sy / n, 2); }
+  return {a:a, b:b, r2:1 - ss / st, rms:Math.sqrt(ss / n)};
+})();
+function dsFitE(ed){ return DS_FIT.a + DS_FIT.b * ed; }
+
+var DS = {m:"Pt", alloy:null, ed:-2.25, v2:3.90, U:0, rx:"her", Dher:-0.09, Doer:1.60};
+function dsMetal(){ return DS.m ? DS_MET[DS.m] : null; }
+/* the energy the rest of the tab uses: the DFT value when the surface is
+   one of the nine untouched, Pt's DFT value moved along the fitted slope
+   for an alloy, and the fit itself for a d band you have moved by hand */
+function dsE(){
+  var m = dsMetal();
+  if(m) return {E:m.dE, src:"DFT"};
+  if(DS.alloy) return {E:DS_MET.Pt.dE + DS_FIT.b * (DS.ed - DS_MET.Pt.ed), src:"Pt + slope"};
+  return {E:dsFitE(DS.ed), src:"fit"};
+}
+function dsName(){
+  return DS.m ? DS.m + "(111)" : DS.alloy ? DS.alloy + " (estimate)" : "your surface";
+}
+/* the d band and its antibonding level, as slide 8 draws them. Not a
+   Newns-Anderson calculation: the band width is made to grow with V^2
+   and the antibonding level sits above the band top by V^2/(gap), with
+   V^2 in eV^2 taken equal to slide 9's relative value. It reproduces the
+   slide's point - filled for Cu, Ag, Au, empty for the rest - and no more. */
+var DS_EA = -6.0, DS_SIG = 0.3;
+function dsBand(ed, v2){
+  var W = 1 + 2.2 * Math.sqrt(v2), top = ed + W / 2;
+  var up = top + v2 / (top - DS_EA), dn = DS_EA - v2 / (ed - DS_EA);
+  return {W:W, top:top, up:up, dn:dn, fill:dsPhi(-up / DS_SIG)};
+}
+function dsPhi(z){            /* the standard normal CDF, A&S 7.1.26 */
+  var t = 1 / (1 + 0.3275911 * Math.abs(z) / Math.SQRT2);
+  var y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-z * z / 2);
+  return z >= 0 ? (1 + y) / 2 : (1 - y) / 2;
+}
+
+function dsLevDraw(){
+  var B = dsBand(DS.ed, DS.v2), s = "";
+  var py = function(E){ return 34 + (2.5 - E) / 11 * 236; };
+  s += ln(40, py(0), 500, py(0), "var(--go)", 1.2, "4 3");
+  s += tx(498, py(0) - 5, "E<tspan baseline-shift='sub' font-size='8'>F</tspan>", "var(--go)", 10, "end", 700);
+  s += tx(24, 22, "E − E<tspan baseline-shift='sub' font-size='8'>F</tspan> / eV", "var(--muted)", 9.5, null, 600);
+  for(var g = 2; g >= -8; g -= 2){
+    s += ln(36, py(g), 40, py(g), "var(--muted)", 1);
+    s += tx(33, py(g) + 3.4, String(g).replace("-", "−"), "var(--muted)", 9, "end");
+  }
+  /* H 1s */
+  s += ln(62, py(DS_EA), 140, py(DS_EA), "var(--ion-k)", 3.2);
+  s += tx(101, py(DS_EA) + 16, "H 1s", "var(--ion-k)", 10.5, "middle", 700);
+  s += tx(101, py(DS_EA) + 28, "(after the sp band)", "var(--muted)", 8.5, "middle", 600);
+  /* the d band as a half-ellipse, filled below E_F */
+  var x0 = 390, d1 = "", d2 = "", E, i, N = 60;
+  for(i = 0; i <= N; i++){
+    E = DS.ed - B.W / 2 + B.W * i / N;
+    var w = 92 * Math.sqrt(Math.max(0, 1 - Math.pow((E - DS.ed) / (B.W / 2), 2)));
+    d1 += (i ? "L" : "M") + (x0 + w).toFixed(1) + " " + py(E).toFixed(1) + " ";
+    if(E <= 0) d2 += (d2 ? "L" : "M") + (x0 + w).toFixed(1) + " " + py(E).toFixed(1) + " ";
+  }
+  var eTop = Math.min(0, B.top);
+  s += '<path d="M' + x0 + ' ' + py(DS.ed - B.W / 2).toFixed(1) + ' ' + d2.slice(1) + 'L' + x0 + ' ' + py(eTop).toFixed(1) + ' Z" fill="var(--red-)" opacity=".28"/>';
+  s += pth(d1 + "L" + x0 + " " + py(DS.ed - B.W / 2).toFixed(1), "var(--red-)", 1.8);
+  s += ln(x0, py(DS.ed - B.W / 2), x0, py(DS.ed + B.W / 2), "var(--red-)", 1.2);
+  s += ln(x0 - 6, py(DS.ed), x0 + 100, py(DS.ed), "var(--red-)", 1, "3 3");
+  s += tx(x0 + 100, py(DS.ed) - 4, "ε<tspan baseline-shift='sub' font-size='8'>d</tspan> = " + DS.ed.toFixed(2), "var(--red-)", 9.5, "end", 700);
+  s += tx(x0 + 46, 22, "metal d band", "var(--red-)", 10.5, "middle", 700);
+  /* the two levels the coupling makes */
+  var xm0 = 210, xm1 = 300;
+  var dnY = py(Math.max(B.dn, -8.4)), upY = py(B.up);
+  s += ln(xm0, dnY, xm1, dnY, "var(--ink)", 3);
+  s += tx((xm0 + xm1) / 2, dnY + 14, "bonding" + (B.dn < -8.4 ? " (lower)" : ""), "var(--ink-2)", 9.5, "middle", 700);
+  s += rc(xm0, upY - 5, xm1 - xm0, 10, "var(--ox)", 0.18, 2);
+  s += rc(xm0, upY - 5, (xm1 - xm0) * B.fill, 10, "var(--ox)", 0.9, 2);
+  s += tx((xm0 + xm1) / 2, upY - 10, "antibonding — " + (B.fill * 100).toFixed(0) + " % filled", "var(--ox)", 9.5, "middle", 700);
+  s += ln(140, py(DS_EA), xm0, dnY, "var(--muted)", 1, "3 3");
+  s += ln(140, py(DS_EA), xm0, upY, "var(--muted)", 1, "3 3");
+  s += ln(xm1, dnY, x0, py(DS.ed), "var(--muted)", 1, "3 3");
+  s += ln(xm1, upY, x0, py(B.top), "var(--muted)", 1, "3 3");
+  s += tx(255, 22, "H on the surface", "var(--ink-2)", 10.5, "middle", 700);
+  s += tx(255, 290, B.fill > 0.5 ? "filled antibonding: the bond is paid back — repulsion"
+                                 : "antibonding empty: the bond is kept", B.fill > 0.5 ? "var(--ox)" : "var(--go)", 10, "middle", 700);
+  document.getElementById("dsLev").innerHTML = s;
+}
+
+function dsFitDraw(){
+  var f = fr(70, 500, 22, 236, -4.6, -0.8, -0.7, 0.45), s = "";
+  s += axLin(f, "ε<tspan baseline-shift='sub' font-size='8'>d</tspan> − E<tspan baseline-shift='sub' font-size='8'>F</tspan> / eV", "ΔEʜ / eV",
+             function(v){ return v.toFixed(1); }, function(v){ return v.toFixed(1); });
+  var eStar = (-DS_ZPE_TS - DS_FIT.a) / DS_FIT.b;
+  s += ln(f.X0, f.py(-DS_ZPE_TS), f.X1, f.py(-DS_ZPE_TS), "var(--go)", 1.2, "4 3");
+  s += tx(f.X0 + 6, f.py(-DS_ZPE_TS) + 13, "ΔGʜ* = 0  (ΔEʜ = −0.24)", "var(--go)", 9.5, null, 700);
+  s += ln(f.px(eStar), f.Y0, f.px(eStar), f.Y1, "var(--go)", 1, "2 3", 0.7);
+  s += pth("M" + f.px(-4.6).toFixed(1) + " " + f.py(dsFitE(-4.6)).toFixed(1) + " L" + f.px(-0.8).toFixed(1) + " " + f.py(dsFitE(-0.8)).toFixed(1), "var(--ox)", 1.8);
+  var used = [], k;
+  for(k in DS_MET){
+    var p = DS_MET[k], on = DS.m === k, x = f.px(p.ed), y = f.py(p.dE);
+    if(on) s += cir(x, y, 9, "var(--stop)", 0.25);
+    s += cir(x, y, 4.4, p.f === 1 ? "var(--ox)" : "var(--red-)");
+    s += tx(x + 7, laneY(used, x + 7, x + 7 + laneW(k, 10), y - 6, 12, f.Y0), k, "var(--ink-2)", 10, null, 700);
+  }
+  var E = dsE().E;
+  if(!DS.m){
+    var xs = f.px(DS.ed), ys = f.py(E);
+    s += cir(xs, ys, 9, "var(--stop)", 0.25) + cir(xs, ys, 4.6, "var(--stop)");
+    s += tx(xs, ys + 20, DS.alloy || "you", "var(--stop)", 10, "middle", 700);
+  }
+  s += tx(f.X1 - 6, f.Y0 + 16, "ΔEʜ = " + DS_FIT.a.toFixed(2).replace("-", "−") + " − " + Math.abs(DS_FIT.b).toFixed(3) + " ε<tspan baseline-shift='sub' font-size='8'>d</tspan>",
+          "var(--ox)", 10.5, "end", 700);
+  s += tx(f.X1 - 6, f.Y0 + 30, "R² = " + DS_FIT.r2.toFixed(2) + " · rms " + (DS_FIT.rms * 1000).toFixed(0) + " meV",
+          "var(--muted)", 9.5, "end", 600);
+  s += tx(f.X1 - 6, f.Y0 + 43, "ΔGʜ* = 0 at ε<tspan baseline-shift='sub' font-size='8'>d</tspan> = " + eStar.toFixed(2).replace("-", "−") + " eV",
+          "var(--go)", 9.5, "end", 700);
+  s += tx(f.X0 + 6, f.Y1 - 22, "● f = 1 (Cu, Ag, Au)", "var(--ox)", 9.5, null, 700);
+  s += tx(f.X0 + 6, f.Y1 - 9, "● f < 1", "var(--red-)", 9.5, null, 700);
+  document.getElementById("dsFit").innerHTML = s;
+}
+
+/* G of 2(H+ + e-), H* + (H+ + e-) and H2 at potential U, relative to H2 */
+function dsLevels(dG, U){ return [-2 * U, dG - U, 0]; }
+function dsFedDraw(){
+  var s = "", X = [[80, 250], [440, 610], [800, 970]], ylo = -1.25, yhi = 1.45;
+  var py = function(G){ return 20 + (yhi - G) / (yhi - ylo) * 200; };
+  s += rc(60, 20, 930, 200, "var(--surface-2)", 0.5, 4);
+  for(var g = -1; g <= 1.01; g += 0.5){
+    s += ln(60, py(g), 990, py(g), "var(--line)", 1, "2 3", 0.75);
+    s += tx(54, py(g) + 3.4, g.toFixed(1).replace("-", "−"), "var(--muted)", 9.5, "end");
+  }
+  s += yName(16, 20, 220, "G / eV");
+  var names = ["2(H⁺ + e⁻)", "H* + (H⁺ + e⁻)", "H₂"];
+  X.forEach(function(c, i){ s += tx((c[0] + c[1]) / 2, 246, names[i], "var(--ink-2)", 11, "middle", 700); });
+  s += tx(345, 246, "Volmer", "var(--red-)", 10, "middle", 700);
+  s += tx(705, 246, "Heyrovsky", "var(--ox)", 10, "middle", 700);
+  var lines = [["Au", DS_MET.Au.dE + DS_ZPE_TS], ["Pt", DS_MET.Pt.dE + DS_ZPE_TS],
+               ["Ni", DS_MET.Ni.dE + DS_ZPE_TS], ["Mo", DS_OTHER.Mo.dE + DS_ZPE_TS]];
+  var me = dsE().E + DS_ZPE_TS;
+  var draw = function(dG, col, w, op, lab){
+    var L = dsLevels(dG, DS.U), q = "";
+    L.forEach(function(G, i){
+      q += ln(X[i][0], py(G), X[i][1], py(G), col, w, null, op);
+      if(i) q += ln(X[i - 1][1], py(L[i - 1]), X[i][0], py(G), col, w * 0.5, "3 3", op);
+    });
+    if(lab) q += tx(X[1][1] + 6, py(L[1]) + 3.5, lab, col, 10, null, 700);
+    return q;
+  };
+  /* the comparison metals in grey, each named at the right end of its
+     middle level; the chosen surface on top in colour, named first so
+     the others make way for it                                        */
+  var L = dsLevels(me, DS.U), up1 = L[1] - L[0], up2 = L[2] - L[1];
+  var yMe = py(L[1]) + 3.5, grey = [];
+  lines.forEach(function(l){
+    if(DS.m === l[0]) return;
+    s += draw(l[1], "var(--muted)", 1.6, 0.6, null);
+    grey.push([l[0], py(l[1] - DS.U) + 3.5]);
+  });
+  /* the grey names go at the left end of the middle level, top to
+     bottom in the order of their levels, pushed apart where they crowd */
+  grey.sort(function(a, b){ return a[1] - b[1]; });
+  for(var gi = 1; gi < grey.length; gi++) if(grey[gi][1] - grey[gi - 1][1] < 12) grey[gi][1] = grey[gi - 1][1] + 12;
+  grey.forEach(function(q){ s += tx(X[1][0] - 8, q[1], q[0], "var(--muted)", 10, "end", 700); });
+  s += draw(me, "var(--stop)", 3.2, 1, null);
+  s += tx(X[1][1] + 6, yMe, dsName(), "var(--stop)", 10.5, null, 700);
+  /* each step's free energy, written over the middle of its connector */
+  [[0, up1], [1, up2]].forEach(function(t){
+    var i = t[0], xm = (X[i][1] + X[i + 1][0]) / 2, y0 = py(L[i]), y1 = py(L[i + 1]);
+    s += txh(xm, Math.min(y0, y1) - 8, (t[1] >= 0 ? "+" : "−") + Math.abs(t[1]).toFixed(2) + " eV",
+             t[1] > 1e-4 ? "var(--ox)" : "var(--go)", 10.5, "middle", 700);
+  });
+  document.getElementById("dsFed").innerHTML = s;
+  var UL = -Math.abs(me);
+  var msg = "At U = " + DS.U.toFixed(2) + " V the two steps on " + dsName() + " are " + (up1 >= 0 ? "+" : "") + up1.toFixed(2)
+          + " and " + (up2 >= 0 ? "+" : "") + up2.toFixed(2) + " eV. ";
+  msg += (up1 <= 0.0001 && up2 <= 0.0001)
+    ? "<b>Both are downhill</b> &mdash; with no thermodynamic barrier left, this is the potential window in which HER can run at a useful rate on this surface."
+    : "<b>One is still uphill</b>; both turn downhill only below U<sub>L</sub> = &minus;|&Delta;G<sub>H*</sub>|/e = " + UL.toFixed(2) + " V. ";
+  msg += " The descriptor is the size of that first uphill step: <b>a binding energy is turned into a potential</b> with nothing more than the &minus;eU the computational hydrogen electrode assigns to each H<sup>+</sup> + e<sup>&minus;</sup>. (Through the Tafel step instead, 2H* &rarr; H<sub>2</sub> costs &minus;2&Delta;G<sub>H*</sub> whatever U is &mdash; on a strong binder no potential can help it, which is why strong binders are expected to finish by Heyrovsky, while Pt, at &minus;0.09 eV, can afford Tafel.)";
+  document.getElementById("dsFedN").innerHTML = msg;
+}
+
+function dsVolcDraw(){
+  var f = fr(80, 1020, 20, 222, -0.7, 0.7, -9, -1.5), s = "", k, i;
+  s += axLin(f, "ΔGʜ* = ΔEʜ(¼ ML) + 0.24 / eV — binds more strongly ←   → binds more weakly",
+             "log ( i₀ / A cm⁻² )", function(v){ return v.toFixed(1); }, function(v){ return v.toFixed(0); });
+  s += pth(curve(f, function(x){ return Math.log10(HE_J0 / (1 + Math.exp(Math.abs(x) / KT_EV))); }, -0.7, 0.7, 400), "var(--red-)", 2);
+  s += ln(f.px(0), f.Y0, f.px(0), f.Y1, "var(--go)", 1.1, "4 3");
+  var all = [];
+  for(k in DS_MET) all.push([k, DS_MET[k]]);
+  for(k in DS_OTHER) all.push([k, DS_OTHER[k]]);
+  var used = [];
+  all.sort(function(a, b){ return Math.max.apply(null, b[1].lg) - Math.max.apply(null, a[1].lg); });
+  all.forEach(function(m){
+    var x = f.px(m[1].dE + DS_ZPE_TS), on = DS.m === m[0];
+    m[1].lg.forEach(function(lg){ s += cir(x, f.py(lg), on ? 5.4 : 4.2, on ? "var(--stop)" : "var(--ink-2)", on ? 1 : 0.85); });
+    var ytop = f.py(Math.max.apply(null, m[1].lg)) - 9, w = laneW(m[0], 10);
+    s += tx(x, laneY(used, x - w / 2 - 2, x + w / 2 + 2, ytop, 12, f.Y0), m[0], on ? "var(--stop)" : "var(--ink-2)", 10, "middle", 700);
+  });
+  var me = dsE().E + DS_ZPE_TS;
+  if(!DS.m) s += ln(f.px(me), f.Y0, f.px(me), f.Y1, "var(--stop)", 1.4, "5 3") + tx(f.px(me) + 5, f.Y1 - 8, dsName(), "var(--stop)", 10, null, 700);
+  s += tx(f.X1 - 6, f.Y0 + 14, "model: i₀ = e k₀ / (1 + e^(|ΔGʜ*|/kT)), k₀ set so Pt gives 1.2 mA cm⁻²", "var(--red-)", 9.5, "end", 700);
+  document.getElementById("dsVolc").innerHTML = s;
+}
+
+/* ---- one intermediate against several -------------------------------- */
+var DS_GOH = 0.86;            /* HO* held where steps 1 and 4 never limit */
+var DS_OOH = 3.2;             /* G(HOO*) - G(HO*), Man et al. 2011        */
+function dsSteps(){
+  if(DS.rx === "her"){ var x = DS.Dher; return {G:[0, x, 0], st:[x, -x], ideal:[0, 0, 0], eq:0,
+    names:["H⁺ + e⁻", "H*", "1/2 H₂"], sn:["Volmer", "2nd step"]}; }
+  var D = DS.Doer, G = [0, DS_GOH, DS_GOH + D, DS_GOH + DS_OOH, 4.92];
+  return {G:G, st:[G[1] - G[0], G[2] - G[1], G[3] - G[2], G[4] - G[3]], ideal:[0, 1.23, 2.46, 3.69, 4.92], eq:1.23,
+          names:["H₂O", "HO*", "O*", "HOO*", "O₂"], sn:["H₂O → HO*", "HO* → O*", "O* → HOO*", "HOO* → O₂"]};
+}
+function dsEtaOf(x){
+  if(DS.rx === "her") return Math.abs(x);
+  return Math.max(DS_GOH, x, DS_OOH - x, 4.92 - DS_GOH - DS_OOH) - 1.23;
+}
+function dsRxDraw(){
+  var S = dsSteps(), n = S.G.length, s = "", i, her = DS.rx === "her";
+  var ylo = her ? -0.7 : -0.3, yhi = her ? 0.7 : 5.3;
+  var f = fr(70, 500, 22, 236, 0, n, ylo, yhi);
+  s += axLin(f, "reaction coordinate", "G / eV  (at U = " + S.eq.toFixed(2) + " V)",
+             function(){ return ""; }, function(v){ return v.toFixed(1); });
+  var imax = 0;
+  for(i = 1; i < S.st.length; i++) if(S.st[i] > S.st[imax]) imax = i;
+  for(i = 0; i < n; i++){
+    var xa = f.px(i + 0.15), xb = f.px(i + 0.85);
+    s += ln(xa, f.py(S.ideal[i]), xb, f.py(S.ideal[i]), "var(--go)", 1.4, "4 3");
+    s += ln(xa, f.py(S.G[i]), xb, f.py(S.G[i]), "var(--ink)", 3);
+    s += tx((xa + xb) / 2, f.Y1 + 14, S.names[i], "var(--ink-2)", 9.5, "middle", 700);
+    if(i){
+      var hot = (i - 1) === imax && S.st[imax] > S.eq * 0 + 1e-9;
+      s += ln(f.px(i - 0.15), f.py(S.G[i - 1]), xa, f.py(S.G[i]), hot ? "var(--ox)" : "var(--muted)", hot ? 2.2 : 1, hot ? null : "3 3");
+    }
+  }
+  /* the largest step, measured against the ideal one */
+  var xs = f.px(imax + 1);
+  s += arrowV(xs, f.py(S.G[imax]), f.py(S.G[imax + 1]), "var(--ox)", S.st[imax].toFixed(2) + " eV", "l");
+  s += tx(f.X1 - 6, f.Y0 + 14, her ? "ideal: every step 0 eV" : "ideal: every step 1.23 eV", "var(--go)", 9.5, "end", 700);
+  document.getElementById("dsStair").innerHTML = s;
+  document.getElementById("dsStairN").innerHTML = her ? "H<sup>+</sup> + e<sup>&minus;</sup> &rarr; H* &rarr; &frac12;H<sub>2</sub>, at 0 V vs RHE"
+    : "four proton-electron steps at 1.23 V; HO* held at 0.86 eV";
+
+  /* the volcano of the theoretical overpotential */
+  var lo = her ? -0.6 : 0.6, hi = her ? 0.6 : 2.6, g = fr(70, 500, 22, 236, lo, hi, 0, her ? 0.7 : 1.4), q = "";
+  q += axLin(g, her ? "ΔGʜ* / eV" : "ΔG(O*) − ΔG(HO*) / eV", "η theory / V",
+             function(v){ return v.toFixed(1); }, function(v){ return v.toFixed(1); });
+  q += pth(curve(g, dsEtaOf, lo, hi, 400), "var(--red-)", 2.4);
+  if(!her){
+    q += ln(g.X0, g.py(0.37), g.X1, g.py(0.37), "var(--ox)", 1.2, "4 3");
+    q += tx(g.X1 - 6, g.py(0.37) - 6, "0.37 V — the floor the scaling relation sets", "var(--ox)", 9.5, "end", 700);
+  }
+  q += tx(g.X1 - 6, g.py(0) - 6, "η = 0 — only with one intermediate", "var(--go)", 9.5, "end", 700);
+  var D = her ? DS.Dher : DS.Doer;
+  q += cir(g.px(D), g.py(dsEtaOf(D)), 9, "var(--stop)", 0.25) + cir(g.px(D), g.py(dsEtaOf(D)), 4.6, "var(--stop)");
+  document.getElementById("dsScV").innerHTML = q;
+
+  var set = function(id, t){ document.getElementById(id).innerHTML = t; };
+  set("dsSt", S.sn[imax] + ", " + S.st[imax].toFixed(2) + " eV");
+  set("dsEta", (dsEtaOf(D) * 1000).toFixed(0) + " mV");
+  set("dsEtaMin", her ? "0 at ΔGʜ* = 0" : "370 mV at 1.60 eV");
+  set("dsDv", (D >= 0 && her ? "+" : "") + D.toFixed(2) + " eV");
+  set("dsRxN", her
+    ? "<b>One intermediate, one knob.</b> Make &Delta;G<sub>H*</sub> zero and both steps are flat at 0 V: nothing in the thermodynamics stops a perfect HER catalyst from existing, and Pt is within 0.1 eV of being one. What is left is kinetics &mdash; the barriers, and the Tafel slope of the Volmer &middot; Heyrovsky &middot; Tafel tab."
+    : "<b>Three intermediates, and they move together.</b> The descriptor sets steps 2 and 3, but their sum is pinned at G(HOO*) &minus; G(HO*) = 3.2 eV instead of the 2.46 eV a perfect catalyst needs. Push one step down and the other comes up; the best you can do is split 3.2 eV evenly, 1.6 + 1.6, and that is still 0.37 V above 1.23. <b>The scaling relation is the reason, not any particular oxide.</b>");
+}
+
+function dsDraw(){
+  var m = dsMetal(), E = dsE(), set = function(id, t){ document.getElementById(id).innerHTML = t; };
+  var B = dsBand(DS.ed, DS.v2), dG = E.E + DS_ZPE_TS;
+  set("dsEdv", DS.ed.toFixed(2) + " eV");
+  set("dsV2v", DS.v2.toFixed(2));
+  set("dsUv", (DS.U > 0 ? "+" : "") + DS.U.toFixed(2) + " V");
+  set("dsName", dsName());
+  set("dsEfit", (dsFitE(DS.ed) >= 0 ? "+" : "") + dsFitE(DS.ed).toFixed(2) + " eV");
+  set("dsEdft", m ? (m.dE >= 0 ? "+" : "") + m.dE.toFixed(2) + " eV" : DS.alloy ? (E.E >= 0 ? "+" : "") + E.E.toFixed(2) + " eV (est.)" : "&mdash;");
+  set("dsG", (dG >= 0 ? "+" : "") + dG.toFixed(2) + " eV");
+  set("dsUL", (-Math.abs(dG)).toFixed(2) + " V");
+  set("dsF", (B.fill * 100).toFixed(0) + " %");
+  var n;
+  if(m && m.f === 1)
+    n = "<b>" + DS.m + ": the d band is full (f = 1)</b>, so the antibonding level the coupling makes lands below E<sub>F</sub> and is filled too &mdash; the bond is paid back, and the bigger V<sub>sd</sub><sup>2</sup> the bigger the Pauli cost. " + (DS.m === "Au" ? "That is why Au is nobler than Ag although its d band sits higher: V<sub>sd</sub><sup>2</sup> = 3.35 against 2.26 (slide 9)." : "H binds weakly or not at all.");
+  else if(m)
+    n = "<b>" + DS.m + ": the d band is not full (f = " + m.f + ")</b>, so the antibonding level sits above E<sub>F</sub> and stays empty: the bond is kept. How strong it is then follows the d-band centre &mdash; the higher &epsilon;<sub>d</sub>, the closer the antibonding level to E<sub>F</sub> and the stronger the bond. " + (DS.m === "Pt" ? "Pt lands " + Math.abs(DS.ed - (-DS_ZPE_TS - DS_FIT.a) / DS_FIT.b).toFixed(2) + " eV from the &epsilon;<sub>d</sub> that the fit puts at &Delta;G<sub>H*</sub> = 0." : "");
+  else if(DS.alloy)
+    n = "<b>" + DS.alloy + "</b>: a 3d layer under the surface pulls the Pt d band down by " + Math.abs(DS.ed - DS_MET.Pt.ed).toFixed(2) + " eV (Kitchin 2004, the ligand effect). Moved along the fitted slope, Pt&rsquo;s &Delta;E<sub>H</sub> weakens to " + E.E.toFixed(2) + " eV. <b>This is how the descriptor is used to design</b>: compute the shift, not the whole reaction.";
+  else
+    n = "You have moved the d band by hand, so &Delta;E<sub>H</sub> comes from the fit alone (rms " + (DS_FIT.rms * 1000).toFixed(0) + " meV over the nine metals). Downward &epsilon;<sub>d</sub> &rarr; antibonding level nearer E<sub>F</sub> and filling &rarr; weaker H binding.";
+  set("dsNote", n);
+  dsLevDraw(); dsFitDraw(); dsFedDraw(); dsVolcDraw(); dsRxDraw();
+}
+function dsSync(){ later("ds", dsDraw); }
+
+pillGroup("dsMet", function(v){
+  var m = DS_MET[v]; DS.m = v; DS.alloy = null; DS.ed = m.ed; DS.v2 = m.v2;
+  setRange("dsEd", m.ed); setRange("dsV2", m.v2); dsSync();
+});
+function dsLoose(){ DS.m = null; pillSet("dsMet", ""); }
+bind("dsEd", function(v){ DS.ed = v; dsLoose(); DS.alloy = null; dsSync(); });
+bind("dsV2", function(v){ DS.v2 = v; dsLoose(); DS.alloy = null; dsSync(); });
+bind("dsU", function(v){ DS.U = v; dsSync(); });
+Object.keys(DS_KIT).forEach(function(id){
+  document.getElementById(id).addEventListener("click", function(){
+    dsLoose(); DS.alloy = DS_KIT[id][0];
+    DS.ed = DS_MET.Pt.ed + DS_KIT[id][1]; DS.v2 = DS_MET.Pt.v2;
+    setRange("dsEd", DS.ed); setRange("dsV2", DS.v2); dsSync();
+  });
+});
+pillGroup("dsRx", function(v){
+  DS.rx = v; var r = document.getElementById("dsD");
+  if(v === "her"){ r.min = -0.6; r.max = 0.6; r.value = DS.Dher; }
+  else { r.min = 0.6; r.max = 2.6; r.value = DS.Doer; }
+  document.getElementById("dsDlab").innerHTML = v === "her" ? "&Delta;G<sub>H*</sub>" : "&Delta;G(O*) &minus; &Delta;G(HO*)";
+  dsSync();
+});
+bind("dsD", function(v){ if(DS.rx === "her") DS.Dher = v; else DS.Doer = v; dsSync(); });
+document.getElementById("dsDlab").innerHTML = "&Delta;G<sub>H*</sub>";
 
 /* ---- panels drawn when first shown ------------------------------------ */
 var PANEL_SHOW = {}, SHOWN = {};
@@ -2468,7 +3516,8 @@ var PANEL_SHOW = {}, SHOWN = {};
   });
 });
 PANEL_SHOW["p-probe"] = anSync;
-PANEL_SHOW["p-her"] = heSync;
+PANEL_SHOW["p-mech"] = function(){ mkSync(); heSync(); };
+PANEL_SHOW["p-desc"] = dsSync;
 
 cvSync();
 pzcDraw();
@@ -2531,55 +3580,55 @@ var QZ1 = [
 
 
 
-/* ---- check 2: the step, the slope and the volcano -------------------- */
+/* ---- check 2: the step, the descriptor and the scaling -------------------- */
 var QZ2 = [
- {q:"A catalyst gives a Tafel slope of 120 mV/dec for HER. Which conclusion is safe?",
-  o:["The Volmer discharge must be rate-determining",
-     "Either the Volmer step is rate-determining, or the Heyrovsky step is on a nearly saturated surface",
-     "The Tafel recombination must be rate-determining",
-     "&alpha; must be close to 1"],
+ {q:"An HER Tafel plot in acid gives 40 mV/dec at low overpotential, and at fixed &eta; doubling C<sub>H+</sub> makes the current four times larger. Which row of Table 5.2 is this?",
+  o:["Mechanism I or II, step A: the Volmer discharge is rate-determining",
+     "Mechanism I, step B: the Tafel recombination is rate-determining",
+     "Mechanism II, step C: the Heyrovsky step is rate-determining, with the Volmer step fast and in equilibrium",
+     "None &mdash; a current that rises faster than C<sub>H+</sub> means H<sup>+</sup> transport is limiting"],
+  a:2,
+  w:"Second order and 40 mV/dec go together in only one row. With the Volmer step in equilibrium, &theta; = K C<sub>H+</sub>e<sup>&minus;f&eta;</sup>, and the Heyrovsky rate &minus;i&prime; = F k<sub>H</sub> C<sub>H+</sub> &theta; e<sup>&minus;&alpha;f&eta;</sup> then carries C<sub>H+</sub><sup>2</sup> and e<sup>&minus;(1+&alpha;)f&eta;</sup>: 2.303RT/1.5F = 39 mV/dec. A slow Volmer step gives 120 mV/dec and first order; a slow Tafel step is also second order but gives 30 mV/dec, because &theta;<sup>2</sup> brings e<sup>&minus;2f&eta;</sup> and no electron transfer adds to it; and a transport limit would make the current <i>stop</i> responding to &eta;, not respond faster. Set route II, Heyrovsky, |&eta;| &lt; 100 mV on the <b>Volmer &middot; Heyrovsky &middot; Tafel</b> tab and read the slope and the order off the panel &mdash; this is Pd in Table 5.3."},
+
+ {q:"The same electrode, driven harder: above about 200 mV the slope becomes 120 mV/dec and the order in H<sup>+</sup> falls to 1, both measured after iR correction. What happened?",
+  o:["The mechanism switched over to a slow Volmer step",
+     "&theta;<sub>H</sub> saturated: a coverage that can no longer rise drops out of the potential dependence, leaving only the Heyrovsky electron transfer",
+     "The Tafel recombination took over from the Heyrovsky step",
+     "&alpha; fell from 0.5 to 0.17 at high overpotential"],
   a:1,
-  w:"2.303RT/&alpha;F is 118 mV/dec at &alpha; = 0.5, and that is the Volmer answer &mdash; but it is <i>also</i> the Heyrovsky answer once &theta;<sub>H</sub> has saturated, because a coverage that can no longer rise stops contributing to the potential dependence. Drive &Delta;G<sub>H</sub> strongly negative on the HER tab and switch between the two rds pills: the number does not move. <b>A slope has to be argued together with a coverage</b>, and the coverage is exactly what H<sub>upd</sub> measures."},
+  w:"Slide 5, high-&eta; line: once &theta;<sub>H</sub> &rarr; 1, &minus;i&prime; = F k<sub>H</sub> C<sub>H+</sub> e<sup>&minus;&alpha;f&eta;</sup> &mdash; one C<sub>H+</sub> and one &alpha;f&eta;, so 120 mV/dec and first order. Nothing about the mechanism changed; the coverage stopped helping. That is the same number a slow Volmer step gives, which is why <b>a slope alone never names a step</b>: here it takes the slope <i>and</i> the coverage <i>and</i> the order. A Tafel step taking over would flatten the current altogether (&theta; = 1 makes 2Fk<sub>T</sub>&theta;<sup>2</sup> a constant), and an &alpha; of 0.17 is not something an electron transfer does. Drag &eta; through 178 mV in case II &middot; C and watch the lit line of slide 5 move."},
 
- {q:"Your Tafel plot is straight up to 1 mA cm<sup>&minus;2</sup> and then bends upward, the apparent slope rising from 40 to 90 mV/dec. What is the first thing to suspect?",
-  o:["The mechanism changes from Heyrovsky to Volmer",
-     "The catalyst is deactivating during the measurement",
-     "Mass transport of H<sup>+</sup> is taking over",
-     "Uncompensated resistance &mdash; part of the applied potential is across the solution"],
+ {q:"In slide 9&rsquo;s density of states, the H 1s&ndash;metal d <i>antibonding</i> state lies below E<sub>F</sub> on Cu and Au and above it on Ni and Pt. What does that do to the H&ndash;metal bond?",
+  o:["It makes Cu and Au bind H more strongly, because more electrons take part in the bond",
+     "Nothing &mdash; only the bonding state below the d band contributes to the bond",
+     "It shifts the d-band filling f of Cu and Au from 1.0 to 0.9",
+     "On Cu and Au the antibonding state is filled, which pays back part of the bond: H binds weakly, and the bigger V<sub>sd</sub><sup>2</sup> the bigger that cost"],
   a:3,
-  w:"&eta;<sub>true</sub> = &eta;<sub>applied</sub> &minus; iR<sub>u</sub>, so every decade of current adds its own error to the x axis and the line tips over. At 10 mA through 10 &Omega; that is 100 mV of overpotential that never reached the electrode &mdash; the same R<sub>u</sub> that set &tau; in Lecture 14. Measure it, subtract it, and say that you did. A real mechanism change is possible, but it is the last explanation to reach for, not the first."},
+  w:"Coupling H 1s to the d band makes a bonding level below and an antibonding level above. Electrons in the first make the bond; electrons in the second undo it. On metals whose d band is full (f = 1: Cu, Ag, Au) the antibonding level lands under the Fermi level and is filled, so the bond is partly cancelled and the orbital overlap V<sub>sd</sub><sup>2</sup> turns into Pauli repulsion &mdash; Hammer and N&oslash;rskov&rsquo;s reason gold is the noblest metal. Where f &lt; 1 the antibonding level stays empty and the bond strength follows the d-band centre: on the <b>d band &amp; scaling</b> tab the nine metals give &Delta;E<sub>H</sub> = &minus;0.84 &minus; 0.273&thinsp;&epsilon;<sub>d</sub> with R<sup>2</sup> = 0.95. f is a property of the clean metal; adsorbing H does not change it."},
 
- {q:"Two electrodes give the same current at the same potential per <b>geometric</b> cm&sup2;. One has a roughness factor of 1, the other 50. Which is the better catalyst?",
-  o:["The smooth one &mdash; it does the same job with one fiftieth of the surface",
-     "The rough one &mdash; more surface is always better",
-     "Neither; equal current means equal catalysis",
-     "There is not enough information"],
+ {q:"A layer of Fe under a Pt(111) surface pulls the surface d-band centre down by 0.40 eV (Kitchin <i>et al.</i> 2004). Using the slope of the &Delta;E<sub>H</sub>&ndash;&epsilon;<sub>d</sub> fit, &minus;0.273, and &Delta;G<sub>H*</sub>(Pt) = &minus;0.09 eV, where does Pt/Fe/Pt land?",
+  o:["&Delta;G<sub>H*</sub> &asymp; +0.02 eV &mdash; H binds more weakly than on Pt, and the surface sits nearer the top of the volcano",
+     "&Delta;G<sub>H*</sub> &asymp; &minus;0.20 eV &mdash; a lower d band binds H more strongly",
+     "&Delta;G<sub>H*</sub> = &minus;0.09 eV &mdash; a layer below the surface cannot change what the surface binds",
+     "&Delta;G<sub>H*</sub> &asymp; +0.31 eV &mdash; the whole 0.40 eV shift goes into the binding energy"],
   a:0,
-  w:"Catalysis is a rate per site. Per <i>real</i> area the rough electrode is running fifty times slower, and it only keeps up because it brought fifty times more platinum. This is the whole reason the first four tabs of this page exist: a j<sub>0</sub> or a volcano plotted on geometric current is partly a plot of surface areas. Quote current per real cm&sup2; or quote the roughness factor beside it."},
+  w:"&Delta;(&Delta;E<sub>H</sub>) = &minus;0.273 &times; (&minus;0.40 eV) = +0.11 eV, so &Delta;G<sub>H*</sub> goes from &minus;0.09 to about +0.02 eV. A lower d band brings the antibonding level down towards E<sub>F</sub>, so it fills and the bond weakens &mdash; the opposite of the second option. The layer underneath changes the surface through the ligand effect: Pt&ndash;Fe bonding broadens the Pt d band, and a broader band holding the same number of electrons has to sit lower. Only part of the shift reaches the binding energy, because the fitted slope is 0.27, not 1. <b>This is how the descriptor is used to design</b>: compute a shift in &epsilon;<sub>d</sub> and read the change in activity off a correlation, instead of computing the whole reaction. It is an estimate from a fit, not a DFT result &mdash; press Pt/Fe/Pt on the <b>d band &amp; scaling</b> tab."},
 
- {q:"On the strong-binding leg of the <b>HER volcano plot</b> &mdash; W, Mo &mdash; what is actually slow?",
-  o:["The discharge of H<sup>+</sup>, because there is too little adsorbed hydrogen",
-     "Transport of H<sup>+</sup> to the surface",
-     "Getting the hydrogen off again: the surface is full, so the second step has no free sites to work with",
-     "The solution resistance, which is higher on these metals"],
+ {q:"DFT gives &Delta;G<sub>H*</sub> = &minus;0.27 eV for Ni. In the free-energy diagram 2(H<sup>+</sup> + e<sup>&minus;</sup>) &rarr; H* + (H<sup>+</sup> + e<sup>&minus;</sup>) &rarr; H<sub>2</sub>, which step is uphill at 0 V vs RHE, and below what potential are both steps downhill?",
+  o:["The Volmer step, by 0.27 eV; both are downhill below &minus;0.27 V",
+     "Neither &mdash; a negative &Delta;G<sub>H*</sub> means Ni is downhill all the way at 0 V",
+     "The Heyrovsky step, which has to take H back off, by 0.27 eV; both are downhill only below U<sub>L</sub> = &minus;0.27 V",
+     "Both, by 0.135 eV each; both are downhill below &minus;0.135 V"],
   a:2,
-  w:"&Delta;G<sub>H</sub> strongly negative means the surface saturates at tiny overpotential and stays saturated. A Tafel recombination needs two free neighbouring sites and a Heyrovsky step needs somewhere for the next proton to land, so whichever finishes the reaction becomes the bottleneck and the current stops responding to potential at all. Drag &Delta;G<sub>H</sub> left on the HER tab and watch &theta; pin at 100 % while the slope runs away. The right-hand leg is the opposite failure: not enough H<sub>ad</sub> to react, so the Volmer step limits."},
+  w:"With the computational hydrogen electrode each H<sup>+</sup> + e<sup>&minus;</sup> costs &minus;eU, so the two steps are &Delta;G<sub>1</sub> = &Delta;G<sub>H*</sub> + eU and &Delta;G<sub>2</sub> = &minus;&Delta;G<sub>H*</sub> + eU. At U = 0 on Ni that is &minus;0.27 eV (Volmer, downhill) and +0.27 eV (Heyrovsky, uphill): a strong binder has no trouble putting H on and trouble getting it off. Both steps turn downhill only once eU &le; &minus;|&Delta;G<sub>H*</sub>|, so U<sub>L</sub> = &minus;0.27 V. That is the left leg of the volcano in one picture, and it is why the descriptor is |&Delta;G<sub>H*</sub>| rather than &Delta;G<sub>H*</sub>. Choose Ni on the <b>d band &amp; scaling</b> tab and drag U: the second step turns over at &minus;0.27 V."},
 
- {q:"A CO<sub>2</sub> reduction paper reports 95 % Faradaic efficiency for CO. What does that number alone <i>not</i> tell you?",
-  o:["Which product took most of the charge",
-     "What fraction of the electrons ended up as CO",
-     "Whether hydrogen evolution was largely suppressed",
-     "How fast CO was being made"],
-  a:3,
-  w:"Faradaic efficiency is a share of charge, which makes it a <b>selectivity</b>, not an activity. The rate is the partial current density, j<sub>i</sub> = FE<sub>i</sub> &times; j<sub>total</sub>, per real area &mdash; 95 % at 1 mA cm<sup>&minus;2</sup> and 95 % at 300 mA cm<sup>&minus;2</sup> are the same selectivity and different results by two and a half orders of magnitude. Both numbers have to be quoted, and the second one is the one most often missing."},
-
- {q:"H<sub>upd</sub> is stripped off platinum <i>above</i> 0 V vs RHE, where no H<sub>2</sub> forms at all, so it cannot be the intermediate the HER goes through. What is it doing in an HER paper, then?",
-  o:["Measuring &Delta;G<sub>H</sub> itself &mdash; the potential it strips at is the binding energy the volcano is drawn against",
-     "Giving the number of electrons transferred in the Volmer step",
-     "Counting the sites the reaction has to run on, so that j<sub>0</sub> and &eta;<sub>10</sub> can be quoted per real cm&sup2;",
-     "Nothing that matters &mdash; it is reported out of habit"],
-  a:2,
-  w:"Two different hydrogens. H<sub>upd</sub> is the strongly bound one, still sitting there at potentials where no H<sub>2</sub> can form; the species the reaction goes through is the weakly bound, <i>over</i>potential-deposited H that only exists below 0 V vs RHE, and it is that one&rsquo;s &Delta;G the volcano is drawn against. So H<sub>upd</sub> is not the intermediate and its stripping potential is not the descriptor &mdash; what it gives you is the <b>denominator</b>: the number of sites the reaction has to work with, and therefore the real area that turns a measured current into j<sub>0</sub> and an &eta;<sub>10</sub> you can compare with somebody else&rsquo;s. That is why a lecture on counting atoms ends on a volcano: the counting is what makes the comparison mean anything. One electron per site is what makes the count possible, not what the Volmer step transfers."}
+ {q:"In theory a catalyst with &Delta;G<sub>H*</sub> = 0 runs HER with zero overpotential, but no OER catalyst is predicted to do better than about 0.37 V. Why?",
+  o:["O<sub>2</sub> is a less stable molecule than H<sub>2</sub>, so its equilibrium potential is harder to reach",
+     "The OER intermediates are tied by a scaling relation: HOO* sits &asymp; 3.2 eV above HO* on every surface, where two ideal steps need only 2.46 eV, so the best possible split still leaves (3.2 &minus; 2.46)/2 &asymp; 0.37 V",
+     "OER moves four electrons and each one costs about 0.09 V",
+     "Oxide catalysts conduct poorly, so 0.37 V is always lost as iR"],
+  a:1,
+  w:"HER has one intermediate, so one descriptor can be tuned until every step is flat at 0 V. OER goes through HO*, O* and HOO*, and these are not independent: everything bound through O scales with O (Abild-Pedersen 2007, &gamma; = (x<sub>max</sub> &minus; x)/x<sub>max</sub>), and HOO* sits 3.2 &plusmn; 0.2 eV above HO* on rutiles, perovskites and spinels alike (Man <i>et al.</i> 2011). The two middle steps must add up to that 3.2 eV, where a perfect catalyst needs 2 &times; 1.23 = 2.46 eV. Split it evenly, 1.6 + 1.6 eV, and the largest step is still 0.37 eV more than 1.23. That is a property of the scaling relation, not of any oxide, and it is why &ldquo;breaking the scaling relation&rdquo; is a research programme. Switch the bench on the <b>d band &amp; scaling</b> tab to OER and try to get under 0.37 V."}
 ];
 
 var LETTERS = "ABCD";
@@ -2750,7 +3799,7 @@ function makeQuiz(n, QZ, label, STORE){
   loadState();
   render();
 }makeQuiz(1, QZ1, "L15-ECSA", "ch40051-l15ecsa-check1-v1");
-makeQuiz(2, QZ2, "L15-HER", "ch40051-l15her-check2-v1");
+makeQuiz(2, QZ2, "L15-HER2", "ch40051-l15her-check2-v2");
 
 })();
 </script>
