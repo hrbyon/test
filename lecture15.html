@@ -2568,6 +2568,12 @@ var HE_J0 = 4.2e-2;
 var HE_W = 0.075;
 /* the fixed left end of the Tafel plot's log|j| axis */
 var HE_LGLO = -15;
+/* the fixed top of the eta axis, in both plots. At alpha = 0.5 the worst
+   eta10 on the dG slider (|dG| = 0.65 eV, slow Volmer, alkali) is 1.47 V,
+   so 1.5 V keeps every dG reachable. Below alpha = 0.5, or with a slow
+   Tafel step on a full surface (a limiting current, eta10 unbounded),
+   10 mA can still lie off the top, and the plot says so.              */
+var HE_HMAX = 1.5;
 /* dG_H* = dE_H(1/4 ML) + 0.24 eV from Table I of Norskov et al. 2005 -
    the same numbers the d band tab and Concept Check 2 use. Ni is listed
    before Co, which has the same value, so the Ni preset is named Ni.   */
@@ -2632,7 +2638,7 @@ function laneY(used, x0, x1, y, h, top){
 function laneW(text, size){ return 0.58 * (size || 10) * String(text).length; }
 
 function heDraw(){
-  var dG = HE.dG, pts = heCurve(dG, 0.8, 400), s = "";
+  var dG = HE.dG, pts = heCurve(dG, HE_HMAX, 600), s = "";
   var lgt = Math.log10(0.01);                       /* 10 mA / cm2     */
   var hit = heAt(pts, lgt);
   /* the frame does not move with the sliders: only the curve, j0 and the
@@ -2641,7 +2647,7 @@ function heDraw(){
   var lo = HE_LGLO, hi = 0;
 
   /* ---- the Tafel plot ---------------------------------------------- */
-  var f = fr(70, 500, 22, 246, lo, hi, 0, 0.8);
+  var f = fr(70, 500, 22, 246, lo, hi, 0, HE_HMAX);
   s += axLin(f, "log |j| / A cm\u207b\u00b2 of real area", "\u03b7 / V",
              function(v){ return v.toFixed(0); }, function(v){ return v.toFixed(1); });
   var d = "", i;
@@ -2659,7 +2665,7 @@ function heDraw(){
           laneY(LANE, jr ? jx + 7 : jx - 7 - jw, jr ? jx + 7 + jw : jx - 7,
                 f.py(0) - 8, 14, f.Y0),
           "j\u2080", "var(--go)", 10, jr ? null : "end", 700);
-  if(hit && hit.h < 0.8){
+  if(hit && hit.h < HE_HMAX){
     /* the tangent, drawn over one decade, is the slope you would report */
     var x0 = lgt - 0.5, x1 = lgt + 0.5;
     var y0 = hit.h - 0.5 * hit.b, y1 = hit.h + 0.5 * hit.b;
@@ -2680,24 +2686,25 @@ function heDraw(){
             et, "var(--stop)", 10, null, 700);
   }else{
     s += tx((f.X0 + f.X1) / 2, (f.Y0 + f.Y1) / 2,
-            "10 mA cm\u207b\u00b2 is out of reach below 800 mV", "var(--muted)", 11, "middle", 600);
+            "10 mA cm\u207b\u00b2 is out of reach below " + (HE_HMAX * 1000).toFixed(0) + " mV", "var(--muted)", 11, "middle", 600);
   }
   document.getElementById("heTafel").innerHTML = s;
 
   /* ---- the coverage that moved it ---------------------------------- */
-  var g = fr(70, 500, 22, 246, 0, 0.8, 0, 1.05), q = "";
+  var g = fr(70, 500, 22, 246, 0, HE_HMAX, 0, 1.05), q = "";
+  /* theta ticks fall every 0.25: two decimals, or 0.25 would read 0.3 */
   q += axLin(g, "\u03b7 / V", "\u03b8 of H\u2090\u2094",
-             function(v){ return v.toFixed(1); }, function(v){ return v.toFixed(1); });
+             function(v){ return v.toFixed(1); }, function(v){ return String(+v.toFixed(2)); });
   q += rc(g.X0, g.Y0, g.X1 - g.X0, g.py(0.8) - g.Y0, "var(--ox)", 0.08);
   q += tx(g.X1 - 6, g.py(0.9) + 4, "few empty sites left for the Volmer step",
           "var(--ox)", 9.5, "end", 700);
   var dd = "";
   for(i = 0; i <= 200; i++){
-    var h = 0.8 * i / 200;
+    var h = HE_HMAX * i / 200;
     dd += (i ? "L" : "M") + g.px(h).toFixed(1) + " " + g.py(heTheta(dG, h)).toFixed(1) + " ";
   }
   q += pth(dd, "var(--ion-k)", 2.3);
-  if(hit && hit.h < 0.8){
+  if(hit && hit.h < HE_HMAX){
     /* eta10 is negative on a catalyst whose j0 already passes 10 mA, so
        the dashed line can leave the frame at either end; keep the mark
        and its label inside it, and turn the label round near the right
@@ -2727,12 +2734,12 @@ function heDraw(){
   set("heJ0", heJ0(dG).toPrecision(2) + " A cm\u207b\u00b2");
   set("heTh", hit ? (heTheta(dG, hit.h) * 100).toFixed(0) + " %" : "&mdash;");
   set("heB", hit ? (hit.b * 1000).toFixed(0) + " mV/dec" : "&mdash;");
-  set("heEta", hit && hit.h < 0.8 ? (hit.h * 1000).toFixed(0) + " mV" : "&gt; 800 mV");
+  set("heEta", hit && hit.h < HE_HMAX ? (hit.h * 1000).toFixed(0) + " mV" : "&gt; " + (HE_HMAX * 1000).toFixed(0) + " mV");
   set("heB0", (heSlope(heTheta(dG, 0)) * 1000).toFixed(0) + " mV/dec");
   set("heDGv", (dG >= 0 ? "+" : "") + dG.toFixed(2) + " eV");
   set("heAlv", HE.alpha.toFixed(2));
 
-  var msg, th = hit ? heTheta(dG, hit.h) : heTheta(dG, 0.8);
+  var msg, th = hit ? heTheta(dG, hit.h) : heTheta(dG, HE_HMAX);
   if(HE.rds === "T" && th > 0.95){
     msg = "<b>The surface is full.</b> The Tafel step needs two <i>occupied</i> neighbours and now "
         + "has them everywhere, so it is already running as fast as it can, at 2k<sub>T</sub>. More "
