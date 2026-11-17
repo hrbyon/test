@@ -691,12 +691,12 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
 
         <div class="card">
           <div class="card-h"><h2>The Tafel plot it makes</h2>
-            <span class="note">all four rows of Table 5.2, the one you picked in colour</span></div>
+            <span class="note">all four cases, route &middot; slow step, the one you picked in colour</span></div>
           <div class="card-b stack" style="gap:12px">
             <svg id="mkTafel" viewBox="0 0 520 300" style="width:100%;height:auto" role="img"
-                 aria-label="Overpotential against the logarithm of current for the four cases of Table 5.2. Volmer rate-determining gives a straight 120 millivolt per decade line; Tafel rate-determining gives 30 millivolts per decade and then a limiting current; Heyrovsky rate-determining gives 40 and then 120. A tangent at the chosen overpotential shows the slope there."></svg>
+                 aria-label="Overpotential against the logarithm of current for the four cases, route and slow step. Volmer rate-determining gives a straight 120 millivolt per decade line; Tafel rate-determining gives 30 millivolts per decade and then a limiting current; Heyrovsky rate-determining gives 40 and then 120. A tangent at the chosen overpotential shows the slope there."></svg>
             <div class="readouts">
-              <div class="readout"><span class="k">row of Table 5.2</span><span class="v" id="mkCase">&mdash;</span></div>
+              <div class="readout"><span class="k">route &middot; slow step</span><span class="v" id="mkCase">&mdash;</span></div>
               <div class="readout"><span class="k">&theta;<sub>H</sub>, steady state</span><span class="v" id="mkTh">&mdash;</span></div>
               <div class="readout"><span class="k">Tafel slope here</span><span class="v" id="mkB">&mdash;</span></div>
               <div class="readout"><span class="k">reaction order in H<sup>+</sup></span><span class="v" id="mkOrd">&mdash;</span></div>
@@ -715,7 +715,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
         <span class="note">looking ahead to Lecture 16 &middot; HER on a metal surface, per <b>real</b> cm&sup2;</span></div>
       <div class="card-b stack" style="gap:12px">
         <p class="hint" style="margin:0">The bench above runs the three steps with rate constants
-          chosen so each row of Table 5.2 shows cleanly. Here the same kinetics are put on one real surface:
+          chosen so each case shows cleanly. Here the same kinetics are put on one real surface:
           pick &Delta;G<sub>H</sub> &mdash; where it comes from is the <b>d band &amp; scaling</b> tab &mdash;
           and the slow step, and the bench works out the exchange current per real cm&sup2; (the
           <b>ECSA measurements</b> tab&rsquo;s area), the coverage the potential drives, the Tafel slope that
@@ -1048,7 +1048,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
               <li>B. Hinnemann <i>et al.</i>, &ldquo;Biomimetic hydrogen evolution: MoS<sub>2</sub> nanoparticles as catalyst for hydrogen evolution&rdquo;, <i>J. Am. Chem. Soc.</i> <b>127</b>, 5308 (2005). <a href="https://doi.org/10.1021/ja0504690">doi</a> &mdash; the descriptor used to <i>predict</i> a non-metal catalyst: the MoS<sub>2</sub> edge, &Delta;G<sub>H*</sub> close to zero.</li>
               <li>T. F. Jaramillo <i>et al.</i>, &ldquo;Identification of active edge sites for electrochemical H<sub>2</sub> evolution from MoS<sub>2</sub> nanocatalysts&rdquo;, <i>Science</i> <b>317</b>, 100 (2007) &mdash; the prediction checked: activity scales with edge length, not area.</li>
               <li>J. Greeley, T. F. Jaramillo, J. Bonde, I. Chorkendorff, J. K. N&oslash;rskov, &ldquo;Computational high-throughput screening of electrocatalytic materials for hydrogen evolution&rdquo;, <i>Nat. Mater.</i> <b>5</b>, 909 (2006). <a href="https://doi.org/10.1038/nmat1752">doi</a> &mdash; &Delta;G<sub>H*</sub> and a stability filter over ~700 surface alloys; BiPt predicted and confirmed.</li>
-              <li>E. Sk&uacute;lason <i>et al.</i>, &ldquo;Modeling the electrochemical hydrogen oxidation and evolution reactions on the basis of density functional theory calculations&rdquo;, <i>J. Phys. Chem. C</i> <b>114</b>, 18182 (2010). <a href="https://doi.org/10.1021/jp1048887">doi</a> &mdash; barriers, not just &Delta;G: Volmer&ndash;Tafel is the HER route on Pt(111), as Pt&rsquo;s 30 mV/dec in Table 5.3 says.</li>
+              <li>E. Sk&uacute;lason <i>et al.</i>, &ldquo;Modeling the electrochemical hydrogen oxidation and evolution reactions on the basis of density functional theory calculations&rdquo;, <i>J. Phys. Chem. C</i> <b>114</b>, 18182 (2010). <a href="https://doi.org/10.1021/jp1048887">doi</a> &mdash; barriers, not just &Delta;G: Volmer&ndash;Tafel is the HER route on Pt(111), as Pt&rsquo;s 30 mV/dec on slide 6 says.</li>
             </ol>
           </div>
           <div>
@@ -2684,7 +2684,7 @@ function heDraw(){
   q += axLin(g, "\u03b7 / V", "\u03b8 of H\u2090\u2094",
              function(v){ return v.toFixed(1); }, function(v){ return v.toFixed(1); });
   q += rc(g.X0, g.Y0, g.X1 - g.X0, g.py(0.8) - g.Y0, "var(--ox)", 0.08);
-  q += tx(g.X1 - 6, g.py(0.9) + 4, "no free sites left for the second step",
+  q += tx(g.X1 - 6, g.py(0.9) + 4, "few empty sites left for the Volmer step",
           "var(--ox)", 9.5, "end", 700);
   var dd = "";
   for(i = 0; i <= 200; i++){
@@ -2729,9 +2729,11 @@ function heDraw(){
 
   var msg, th = hit ? heTheta(dG, hit.h) : heTheta(dG, 0.8);
   if(HE.rds === "T" && th > 0.95){
-    msg = "<b>The surface is full and the step that empties it needs two free sites.</b> The slope "
-        + "runs away &mdash; the current has stopped caring about potential, which is a limiting "
-        + "current, not a Tafel region: the far end of the left leg.";
+    msg = "<b>The surface is full.</b> The Tafel step needs two <i>occupied</i> neighbours and now "
+        + "has them everywhere, so it is already running as fast as it can, at 2k<sub>T</sub>. More "
+        + "&eta; can only push the Volmer step, and that needs an <i>empty</i> site, which a full surface "
+        + "no longer has. The slope runs away &mdash; the current has stopped caring about potential, "
+        + "which is a limiting current, not a Tafel region: the far end of the left leg.";
   }else if(th > 0.9){
     msg = "<b>&theta;<sub>H</sub> is pinned at " + (th * 100).toFixed(0) + " %.</b> A coverage that "
         + "cannot rise stops contributing to the potential dependence, so the Heyrovsky slope has "
@@ -3098,13 +3100,13 @@ function mkStatic(){
   set("mkReg", reg);
   var n;
   if(MK.rds === "A")
-    n = "<b>Volmer is slow, so the surface stays almost bare</b> and the current is the discharge rate itself: 2.303RT/&alpha;F = 118 mV/dec at every &eta;, first order in H<sup>+</sup>. Which step follows makes no difference &mdash; switch the route and the line does not move. This is the row most metals in Table 5.3 sit in.";
+    n = "<b>Volmer is slow, so the surface stays almost bare</b> and the current is the discharge rate itself: 2.303RT/&alpha;F = 118 mV/dec at every &eta;, first order in H<sup>+</sup>. Which step follows makes no difference &mdash; switch the route and the line does not move. Most metals on slide 6 show this 120 mV/dec.";
   else if(c === "IB")
     n = th > 0.85 ? "<b>&theta; = " + mkPct(th) + ": the surface is full.</b> Tafel needs two <i>occupied</i> neighbours and now has them everywhere; it simply cannot go faster, and the potential has no way left to push it. The slope runs off to infinity &mdash; a limiting current that is chemical, not diffusional."
-      : "<b>Two H<sub>ad</sub> per H<sub>2</sub>, and each one costs a factor e<sup>&minus;f&eta;</sup> of coverage</b>, so the rate goes as e<sup>&minus;2f&eta;</sup>: 2.303RT/2F = 30 mV/dec, second order in H<sup>+</sup>. This is Pt in acid &mdash; and why its Tafel slope is the smallest in Table 5.3.";
+      : "<b>Two H<sub>ad</sub> per H<sub>2</sub>, and each one costs a factor e<sup>&minus;f&eta;</sup> of coverage</b>, so the rate goes as e<sup>&minus;2f&eta;</sup>: 2.303RT/2F = 30 mV/dec, second order in H<sup>+</sup>. This is Pt in acid &mdash; and why its 30 mV/dec is the smallest slope on slide 6.";
   else
     n = th > 0.85 ? "<b>&theta; = " + mkPct(th) + ", pinned.</b> The coverage has stopped helping, so only the electron transfer is left in the potential dependence: back to 118 mV/dec and first order &mdash; <b>the same number as a slow Volmer step</b>, from a different mechanism. A slope alone never names a step."
-      : th < 0.15 ? "<b>One factor e<sup>&minus;f&eta;</sup> from the coverage and one e<sup>&minus;&alpha;f&eta;</sup> from the electron</b>: (1 + &alpha;)f = 1.5f, so 2.303RT/1.5F = 39 mV/dec, second order in H<sup>+</sup>. Pd in Table 5.3."
+      : th < 0.15 ? "<b>One factor e<sup>&minus;f&eta;</sup> from the coverage and one e<sup>&minus;&alpha;f&eta;</sup> from the electron</b>: (1 + &alpha;)f = 1.5f, so 2.303RT/1.5F = 39 mV/dec, second order in H<sup>+</sup>. Pd&rsquo;s 40 mV/dec on slide 6."
       : "<b>On the way from 40 to 120.</b> &theta; = " + mkPct(th) + " is neither small nor saturated, so neither limit of slide 5 applies and the slope is whatever lies between &mdash; " + mkSlopeTxt(b) + " here. A measured 60 mV/dec (Rh, W) can be exactly this.";
   set("mkNote", n);
   mkDerRender();
@@ -3582,13 +3584,13 @@ var QZ1 = [
 
 /* ---- check 2: the step, the descriptor and the scaling -------------------- */
 var QZ2 = [
- {q:"An HER Tafel plot in acid gives 40 mV/dec at low overpotential, and at fixed &eta; doubling C<sub>H+</sub> makes the current four times larger. Which row of Table 5.2 is this?",
+ {q:"An HER Tafel plot in acid gives 40 mV/dec at low overpotential, and at fixed &eta; doubling C<sub>H+</sub> makes the current four times larger. Which HER mechanism is consistent with these observations?",
   o:["Mechanism I or II, step A: the Volmer discharge is rate-determining",
      "Mechanism I, step B: the Tafel recombination is rate-determining",
      "Mechanism II, step C: the Heyrovsky step is rate-determining, with the Volmer step fast and in equilibrium",
      "None &mdash; a current that rises faster than C<sub>H+</sub> means H<sup>+</sup> transport is limiting"],
   a:2,
-  w:"Second order and 40 mV/dec go together in only one row. With the Volmer step in equilibrium, &theta; = K C<sub>H+</sub>e<sup>&minus;f&eta;</sup>, and the Heyrovsky rate &minus;i&prime; = F k<sub>H</sub> C<sub>H+</sub> &theta; e<sup>&minus;&alpha;f&eta;</sup> then carries C<sub>H+</sub><sup>2</sup> and e<sup>&minus;(1+&alpha;)f&eta;</sup>: 2.303RT/1.5F = 39 mV/dec. A slow Volmer step gives 120 mV/dec and first order; a slow Tafel step is also second order but gives 30 mV/dec, because &theta;<sup>2</sup> brings e<sup>&minus;2f&eta;</sup> and no electron transfer adds to it; and a transport limit would make the current <i>stop</i> responding to &eta;, not respond faster. Set route II, Heyrovsky, |&eta;| &lt; 100 mV on the <b>Volmer &middot; Heyrovsky &middot; Tafel</b> tab and read the slope and the order off the panel &mdash; this is Pd in Table 5.3."},
+  w:"Second order and 40 mV/dec go together in only one mechanism. With the Volmer step in equilibrium, &theta; = K C<sub>H+</sub>e<sup>&minus;f&eta;</sup>, and the Heyrovsky rate &minus;i&prime; = F k<sub>H</sub> C<sub>H+</sub> &theta; e<sup>&minus;&alpha;f&eta;</sup> then carries C<sub>H+</sub><sup>2</sup> and e<sup>&minus;(1+&alpha;)f&eta;</sup>: 2.303RT/1.5F = 39 mV/dec. A slow Volmer step gives 120 mV/dec and first order; a slow Tafel step is also second order but gives 30 mV/dec, because &theta;<sup>2</sup> brings e<sup>&minus;2f&eta;</sup> and no electron transfer adds to it; and a transport limit would make the current <i>stop</i> responding to &eta;, not respond faster. Set route II, Heyrovsky, |&eta;| &lt; 100 mV on the <b>Volmer &middot; Heyrovsky &middot; Tafel</b> tab and read the slope and the order off the panel &mdash; this is how Pd behaves, at 40 mV/dec."},
 
  {q:"The same electrode, driven harder: above about 200 mV the slope becomes 120 mV/dec and the order in H<sup>+</sup> falls to 1, both measured after iR correction. What happened?",
   o:["The mechanism switched over to a slow Volmer step",
@@ -3596,9 +3598,9 @@ var QZ2 = [
      "The Tafel recombination took over from the Heyrovsky step",
      "&alpha; fell from 0.5 to 0.17 at high overpotential"],
   a:1,
-  w:"Slide 5, high-&eta; line: once &theta;<sub>H</sub> &rarr; 1, &minus;i&prime; = F k<sub>H</sub> C<sub>H+</sub> e<sup>&minus;&alpha;f&eta;</sup> &mdash; one C<sub>H+</sub> and one &alpha;f&eta;, so 120 mV/dec and first order. Nothing about the mechanism changed; the coverage stopped helping. That is the same number a slow Volmer step gives, which is why <b>a slope alone never names a step</b>: here it takes the slope <i>and</i> the coverage <i>and</i> the order. A Tafel step taking over would flatten the current altogether (&theta; = 1 makes 2Fk<sub>T</sub>&theta;<sup>2</sup> a constant), and an &alpha; of 0.17 is not something an electron transfer does. Drag &eta; through 178 mV in case II &middot; C and watch the lit line of slide 5 move."},
+  w:"At high &eta;, once &theta;<sub>H</sub> &rarr; 1, &minus;i&prime; = F k<sub>H</sub> C<sub>H+</sub> e<sup>&minus;&alpha;f&eta;</sup> &mdash; one C<sub>H+</sub> and one &alpha;f&eta;, so 120 mV/dec and first order. Nothing about the mechanism changed; the coverage stopped helping. That is the same number a slow Volmer step gives, which is why <b>a slope alone never names a step</b>: here it takes the slope <i>and</i> the coverage <i>and</i> the order. A Tafel step taking over would flatten the current altogether (&theta; = 1 makes 2Fk<sub>T</sub>&theta;<sup>2</sup> a constant), and an &alpha; of 0.17 is not something an electron transfer does. Drag &eta; through 178 mV in case II &middot; C and watch the lit line of the derivation move from the low-&eta; to the high-&eta; form."},
 
- {q:"In slide 9&rsquo;s density of states, the H 1s&ndash;metal d <i>antibonding</i> state lies below E<sub>F</sub> on Cu and Au and above it on Ni and Pt. What does that do to the H&ndash;metal bond?",
+ {q:"In the calculated density of states of H adsorbed on Ni, Cu, Pt and Au (Hammer &amp; N&oslash;rskov), the H 1s&ndash;metal d <i>antibonding</i> state lies below E<sub>F</sub> on Cu and Au and above it on Ni and Pt. What does that do to the H&ndash;metal bond?",
   o:["It makes Cu and Au bind H more strongly, because more electrons take part in the bond",
      "Nothing &mdash; only the bonding state below the d band contributes to the bond",
      "It shifts the d-band filling f of Cu and Au from 1.0 to 0.9",
