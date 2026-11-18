@@ -1,0 +1,1779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script src="exam-lock.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>RDE and RRDE Bench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+:root{
+  --ground:#F1F3F2; --surface:#FFFFFF; --surface-2:#E9EDEB;
+  --ink:#14191B; --ink-2:#3E4A4D; --muted:#68767A; --line:#D6DDDA; --line-2:#C3CCC8;
+  --ox:#A85B33; --ox-soft:#F3E4DA;
+  --red-:#15618E; --red-soft:#DDE9F2;
+  --go:#2C7355; --go-soft:#DCEBE3;
+  --stop:#8A5F0C; --stop-soft:#F3E9D3;
+  --elec:#3E4A4D; --ion-k:#6E4C9B; --ion-k-soft:#EBE3F5;
+  --shadow:0 1px 2px rgba(20,25,27,.05),0 8px 24px -12px rgba(20,25,27,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+    --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+    --ox:#D08551; --ox-soft:#33231A;
+    --red-:#5AA6D4; --red-soft:#152833;
+    --go:#5DBB8D; --go-soft:#152A21;
+    --stop:#D6A33F; --stop-soft:#2B2415;
+    --elec:#AEBBBE; --ion-k:#B99BE0; --ion-k-soft:#241C33;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+  --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+  --ox:#D08551; --ox-soft:#33231A;
+  --red-:#5AA6D4; --red-soft:#152833;
+  --go:#5DBB8D; --go-soft:#152A21;
+  --stop:#D6A33F; --stop-soft:#2B2415;
+  --elec:#AEBBBE; --ion-k:#B99BE0; --ion-k-soft:#241C33;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:32px 20px 72px}
+.masthead{display:flex;flex-wrap:wrap;align-items:flex-end;gap:20px 32px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.eyebrow a{color:inherit}
+h1{font-family:"IBM Plex Serif",Georgia,serif;font-weight:600;font-size:clamp(28px,4.2vw,42px);line-height:1.12;margin:0;text-wrap:balance;letter-spacing:-.015em}
+.sub{margin:8px 0 0;color:var(--ink-2);font-size:15px;max-width:62ch}
+.tabs{display:flex;gap:2px;margin:24px 0 22px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{appearance:none;background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);
+  font-family:inherit;font-size:14.5px;font-weight:500;padding:11px 16px;cursor:pointer;white-space:nowrap;margin-bottom:-1px}
+.tab:hover{color:var(--ink-2)}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ox)}
+.tab:focus-visible{outline:2px solid var(--red-);outline-offset:-2px;border-radius:4px 4px 0 0}
+.panel[hidden]{display:none}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow)}
+.card-h{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.card-h h2{font-size:15px;font-weight:600;margin:0;letter-spacing:-.01em}
+.card-h .note{font-size:12.5px;color:var(--muted)}
+.card-b{padding:18px}
+.stack{display:flex;flex-direction:column;gap:16px}
+.two{display:grid;grid-template-columns:minmax(270px,1fr) minmax(330px,1.45fr);gap:16px;align-items:start}
+@media(max-width:900px){.two{grid-template-columns:1fr}}
+label.fld,span.fld{display:block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+select,input[type=text],input[type=number]{width:100%;font-family:inherit;font-size:14px;color:var(--ink);
+  background:var(--surface-2);border:1px solid var(--line-2);border-radius:7px;padding:9px 10px}
+input:read-only{background:var(--surface);color:var(--muted);cursor:not-allowed}
+select:focus-visible,input:focus-visible{outline:2px solid var(--red-);outline-offset:1px}
+input[type=range]{width:100%;accent-color:var(--ox)}
+input[type=range]:focus-visible{outline:2px solid var(--red-);outline-offset:3px}
+.slider-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;gap:10px}
+.slider-row .val{font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+.readout{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px dotted var(--line)}
+.readout:last-child{border-bottom:0}
+.readout .k{font-size:13px;color:var(--muted)}
+.rgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 32px}
+.rgrid .readout:last-child{border-bottom:1px dotted var(--line)}
+@media(max-width:620px){.rgrid{grid-template-columns:minmax(0,1fr)}}
+.readout .v{font-family:"IBM Plex Mono",monospace;font-size:16px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--ink)}
+.verdict{padding:12px 14px;border-radius:8px;font-size:13.5px;line-height:1.55}
+.verdict.go{background:var(--go-soft);color:var(--go)}
+.verdict.stop{background:var(--stop-soft);color:var(--stop)}
+.verdict.flat{background:var(--surface-2);color:var(--ink-2)}
+.verdict.mixv{background:var(--ion-k-soft);color:var(--ion-k)}
+.eqline{font-family:"IBM Plex Mono",monospace;font-size:13px;line-height:1.9;color:var(--ink-2);
+  background:var(--surface-2);border-radius:7px;padding:11px 13px}
+.eqline b{color:var(--ox);font-weight:600}
+svg{display:block;max-width:100%}
+.scrollx{overflow-x:auto}
+.solid{appearance:none;background:var(--ox);border:1px solid var(--ox);color:#fff;font-family:inherit;
+  font-size:13.5px;font-weight:500;padding:10px 16px;border-radius:7px;cursor:pointer}
+.solid:hover{filter:brightness(1.08)}
+.solid:disabled{background:var(--line-2);border-color:var(--line-2);color:var(--muted);cursor:not-allowed}
+.ghost{appearance:none;background:var(--surface-2);border:1px solid var(--line-2);color:var(--ink-2);
+  font-family:inherit;font-size:12.5px;padding:8px 12px;border-radius:7px;cursor:pointer;text-align:left}
+.ghost:hover{border-color:var(--ox);color:var(--ox)}
+table.ions{border-collapse:collapse;width:100%;font-size:13px}
+table.ions th,table.ions td{text-align:left;padding:8px 9px;border-bottom:1px solid var(--line);white-space:nowrap}
+table.ions th{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500}
+table.ions td.num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;text-align:right}
+table.ions tr.hi td{color:var(--ox);font-weight:500}
+table.ions tr.lo td{color:var(--red-)}
+.idgrid{display:grid;grid-template-columns:1fr;gap:14px;max-width:340px}
+.scorebar{display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;padding:14px 18px;border-top:1px solid var(--line)}
+.scorenum{font-family:"IBM Plex Mono",monospace;font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+.scorenum small{font-size:14px;font-weight:400;color:var(--muted)}
+.vcode{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted)}
+.vcode b{color:var(--ink);font-weight:600;letter-spacing:.08em}
+/* six questions as three files of two: the grid is filled down each
+   column, so 1 and 2 stand in the first, 3 and 4 in the second, 5 and 6
+   in the third. Narrower, it falls to two files of three and then one  */
+.quiz{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  grid-template-rows:repeat(2,auto);grid-auto-flow:column;gap:16px}
+@media(max-width:1180px){.quiz{grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-template-rows:repeat(3,auto)}}
+@media(max-width:760px){.quiz{grid-template-columns:minmax(0,1fr);
+  grid-template-rows:none;grid-auto-flow:row}}
+.q .stem{font-size:14.5px;line-height:1.6;margin:0 0 12px}
+.q .stem code{font-family:"IBM Plex Mono",monospace;font-size:13px;background:var(--surface-2);padding:1px 5px;border-radius:4px}
+.opts{display:flex;flex-direction:column;gap:7px}
+.opt{appearance:none;text-align:left;font-family:inherit;font-size:13.5px;line-height:1.45;color:var(--ink);
+  background:var(--surface-2);border:1px solid transparent;border-radius:7px;padding:9px 12px;cursor:pointer;display:flex;gap:9px}
+.opt .ltr{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);flex:0 0 auto;padding-top:1px}
+.opt:hover:not(:disabled){border-color:var(--line-2)}
+.opt.right{background:var(--go-soft);color:var(--go);border-color:var(--go);font-weight:500}
+.opt.right .ltr{color:var(--go)}
+.opt.wrong{background:var(--stop-soft);color:var(--stop);border-color:var(--stop)}
+.opt.wrong .ltr{color:var(--stop)}
+.opt:disabled{cursor:default}
+.why{margin:12px 0 0;font-size:13px;line-height:1.65;color:var(--ink-2);border-left:2px solid var(--line-2);padding-left:12px}
+.misc{display:block;margin-top:10px;padding:9px 12px;border-radius:7px;background:var(--stop-soft);color:var(--stop);font-size:12.5px;line-height:1.6}
+.misc a{color:inherit;font-weight:600;white-space:nowrap}
+.why[hidden]{display:none}
+.tally{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.hint{font-size:12.5px;color:var(--muted);line-height:1.65;margin:10px 0 0}
+.locked{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;background:var(--go-soft);color:var(--go);padding:2px 7px;border-radius:4px;margin-left:8px}
+.pill-row{display:flex;gap:3px;background:var(--surface-2);border-radius:8px;padding:3px}
+.pill{flex:1;appearance:none;border:0;background:none;font-family:"IBM Plex Mono",monospace;font-size:12.5px;
+  font-weight:500;color:var(--muted);padding:7px 2px;border-radius:6px;cursor:pointer}
+.pill[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.pill:focus-visible{outline:2px solid var(--red-);outline-offset:1px}
+.pill-row.pw .pill{font-size:11.5px}
+/* nowrap + scroll: a formula broken across lines mid-term is harder to read
+   than one the reader has to nudge sideways.  Explicit <br> still breaks. */
+.eqbig{font-family:"IBM Plex Mono",monospace;font-size:13.5px;line-height:2.05;color:var(--ink);
+  background:var(--surface-2);border-radius:8px;padding:14px 15px;overflow-x:auto;white-space:nowrap}
+.eqbig small{color:var(--muted);font-size:11.5px;letter-spacing:.04em}
+/* one colour per loss term, used in prose, in the equations and in every picture */
+.act{color:var(--ox);font-weight:600}
+.cnc{color:var(--red-);font-weight:600}
+.ohm{color:var(--stop);font-weight:600}
+.pot{color:var(--go);font-weight:600}
+.mix{color:var(--ion-k);font-weight:600}
+.termtbl{border-collapse:collapse;width:100%;font-size:13px}
+.termtbl td,.termtbl th{padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+.termtbl th{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);font-weight:500;text-align:left}
+.termtbl td.num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;text-align:right}
+.termtbl tr.tot td{border-bottom:0;border-top:2px solid var(--line-2);font-weight:600}
+.sumwrap{overflow-x:auto}
+.sumtbl{border-collapse:collapse;width:100%;font-size:13px}
+.sumtbl td,.sumtbl th{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}
+.sumtbl th{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.sumtbl tr:last-child td{border-bottom:0}
+.sumtbl td.eq{font-family:"IBM Plex Mono",monospace;font-size:13.5px;color:var(--ink);white-space:nowrap}
+.sumtbl td.nm{color:var(--ink-2);white-space:nowrap;font-size:12.5px}
+.sumtbl td.sy{color:var(--muted);font-size:12.5px;line-height:1.5;white-space:normal}
+.symgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:4px 20px;font-size:12.5px;color:var(--ink-2);line-height:1.6}
+.symgrid b{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--ink)}
+.swatch{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px}
+.trio3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:stretch}
+.trio3>.card{display:flex;flex-direction:column}
+.trio3>.card>.card-b:last-child{flex:1 1 auto}
+@media(max-width:1000px){.trio3{grid-template-columns:1fr 1fr}}
+@media(max-width:720px){.trio3{grid-template-columns:1fr}}
+.two.eq{align-items:stretch}
+.two.wideL{grid-template-columns:minmax(330px,1.5fr) minmax(240px,1fr)}
+.two.eq>.card{display:flex;flex-direction:column}
+.two.eq>.card>.card-b:last-child{flex:1 1 auto}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap}
+.btnrow .ghost{flex:1 1 auto;text-align:center}
+.dfctl{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:14px 16px;align-items:end}
+.trio3 .dfctl{grid-template-columns:1fr}
+.dfctl-2{grid-template-columns:repeat(2,minmax(150px,1fr))}
+.dfctl-3{grid-template-columns:repeat(3,minmax(150px,1fr))}
+.dfctl-wide{grid-column:1 / -1}
+@media(max-width:820px){.dfctl{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.dfctl{grid-template-columns:1fr}}
+footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;line-height:1.8}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+.glegend{display:flex;flex-direction:column;gap:5px;font-size:12.5px;line-height:1.45;color:var(--ink-2)}
+.glegend.big{font-size:14.5px;line-height:1.5;gap:7px}
+.glegend.big > span > svg{flex:0 0 32px}
+.glegend > span{display:flex;align-items:flex-start;gap:8px}
+.glegend > span > svg{flex:0 0 26px;margin-top:3px}
+/* the loss waterfall: one row per term, number on the left of the bar */
+.wide1{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+.pairfig{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+.pairfig.eq{align-items:stretch}
+.pairfig.eq>.card{display:flex;flex-direction:column}
+.pairfig.eq>.card>.card-b:last-child{flex:1 1 auto}
+@media(max-width:880px){.pairfig{grid-template-columns:1fr}}
+/* terse notes, two to a row */
+.notes2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 22px}
+.notes2>p{margin:0}
+@media(max-width:760px){.notes2{grid-template-columns:1fr}}
+</style><style>
+.wrap{max-width:1480px}
+.trio3{grid-template-columns:minmax(230px,0.92fr) minmax(300px,1.34fr) minmax(300px,1.34fr)}
+@media(max-width:1180px){.trio3{grid-template-columns:minmax(230px,1fr) minmax(300px,1.4fr)}}
+@media(max-width:760px){.trio3{grid-template-columns:1fr}}
+/* two cards in one grid column, the lower one taking up the slack so
+   that the column ends level with the figure beside it */
+.colpair{display:flex;flex-direction:column;gap:16px}
+.colpair>.card{display:flex;flex-direction:column}
+.colpair>.card:last-child{flex:1 1 auto}
+.colpair>.card:last-child>.card-b:last-child{flex:1 1 auto}
+/* two concept panels side by side, each a column of its own and both
+   as tall as the taller one                                         */
+.pair2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;
+  align-items:stretch;margin-bottom:16px}
+.pair2>.card{display:flex;flex-direction:column}
+.pair2>.card>.card-b:last-child{flex:1 1 auto}
+@media(max-width:980px){.pair2{grid-template-columns:minmax(0,1fr)}}
+
+/* a bench whose figure column ends in a wide card: the two columns are
+   made the same height and the last card of the control column grows to
+   meet it, so they finish on the same line instead of one trailing  */
+.bench.level{align-items:stretch}
+.bench.level>.ctl>.card:last-child{display:flex;flex-direction:column;flex:1 1 auto}
+.bench.level>.ctl>.card:last-child>.card-b:last-child{flex:1 1 auto}
+.bench.level>.figs{align-content:stretch}
+
+/* the list of steps down the side of the animation: a table of contents
+   you can also drive the thing from                                   */
+.steps{display:flex;flex-direction:column;gap:3px}
+.steps button{appearance:none;background:none;border:0;border-left:2px solid transparent;
+  text-align:left;cursor:pointer;font:inherit;font-size:12.5px;line-height:1.35;
+  color:var(--muted);padding:5px 8px 5px 9px;border-radius:0 6px 6px 0}
+.steps button:hover{color:var(--ink-2);background:var(--surface-2)}
+.steps button[aria-current="true"]{color:var(--ink);font-weight:600;
+  background:var(--surface-2);border-left-color:var(--ox)}
+/* a link inside a paragraph of prose: visible as a link, quiet enough
+   to read past                                                       */
+.hint a{color:var(--red-);font-weight:600;text-decoration:none;
+  border-bottom:1px solid var(--red-soft)}
+.hint a:hover{border-bottom-color:var(--red-)}
+
+.steps .n{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted);
+  margin-right:7px}
+.steps button[aria-current="true"] .n{color:var(--ox)}
+
+/* a bench row: one narrow column of controls down the left, and the
+   pictures beside it, two across. The widest thing on the screen is
+   always a picture rather than a row of sliders.                     */
+.bench{display:grid;grid-template-columns:minmax(252px,316px) minmax(0,1fr);gap:16px;align-items:start}
+.bench>.figs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:stretch}
+.bench>.figs>.card{display:flex;flex-direction:column}
+.bench>.figs>.card>.card-b:last-child{flex:1 1 auto}
+.bench>.ctl{display:flex;flex-direction:column;gap:16px}
+/* a narrow column: let the name of a reading wrap, never its value */
+.bench>.ctl .readout{gap:10px;padding:8px 0}
+.bench>.ctl .readout .k{font-size:12px;line-height:1.4}
+.bench>.ctl .readout .v{font-size:15px;text-align:right;min-width:0;overflow-wrap:anywhere}
+.bench>.ctl .slider-row .fld{line-height:1.4}
+.bench .wideF{grid-column:1 / -1}
+@media(max-width:1200px){.bench{grid-template-columns:minmax(236px,282px) minmax(0,1fr)}}
+@media(max-width:980px){.bench{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:700px){.bench>.figs{grid-template-columns:minmax(0,1fr)}}
+
+/* the mechanism tab: the line of slide 5 that holds at this eta */
+.eqbig .lit{background:var(--stop-soft);border-radius:5px;padding:1px 5px}
+.eqbig .dim{opacity:.55}
+/* a reading list: four groups, two to a row */
+.reflist{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:7px;
+  font-size:12.5px;line-height:1.55;color:var(--ink-2)}
+.reflist li::marker{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted)}
+.reflist a{color:var(--red-);font-family:"IBM Plex Mono",monospace;font-size:11.5px;font-weight:600;
+  text-decoration:none;border-bottom:1px solid var(--red-soft)}
+.reflist a:hover{border-bottom-color:var(--red-)}
+.refs>div>.fld{margin-bottom:8px}
+/* the live table quotes Greek symbols: no upper-casing */
+#dlTab th{text-transform:none;letter-spacing:.02em;font-size:11px}
+</style>
+
+</head>
+<body>
+  <div class="wrap">
+  <header class="masthead">
+    <div style="flex:1 1 380px">
+      <p class="eyebrow"><a href="index.html">CH40051 Electroanalytical Chemistry</a> &middot; Lecture 16 &middot; Hydrodynamic methods: the rotating disk electrode</p>
+      <h1>RDE and RRDE Bench</h1>
+      <p class="sub">Spin the electrode and the current stops decaying. The flow under a rotating disk brings fresh solution up from below and throws it out sideways, and what is left at the surface is a layer of stagnant liquid whose thickness the rotation rate sets &mdash; 12 µm at 1600 rpm for a typical ion in water, and the same 12 µm for as long as you keep spinning. Every number here follows from that one layer: the Levich current, which grows as &radic;&omega; and gives you D from its slope; the profile under the disk, with the Nernst tangent that defines &delta; and the hydrodynamic layer twenty times thicker around it; and the Koutecky&ndash;Levich plot, which separates a slow electrode reaction from the transport that feeds it &mdash; and which turns into noise if you read it too close to the plateau.</p>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true"  aria-controls="p-lev"   id="t-lev">Rotation &amp; Levich</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-kl"    id="t-kl">Koutecky&ndash;Levich</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-ring"  id="t-ring">The ring: N and %H<sub>2</sub>O<sub>2</sub></button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-quiz1" id="t-quiz1">Concept Check 1</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-quiz2" id="t-quiz2">Concept Check 2</button>
+  </div>
+
+  <!-- ====================== 1 · ROTATION AND THE LEVICH PLOT ====================== -->
+  <section class="panel" id="p-lev" role="tabpanel" aria-labelledby="t-lev">
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>Slide 7 in two lines</h2>
+        <span class="note">a reversible reduction O + ne<sup>&minus;</sup> &rarr; R, only O in the bulk, 25 &deg;C</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig" style="white-space:normal">
+          <span class="cnc">&delta; = 1.61 D<sup>1/3</sup> &nu;<sup>1/6</sup> &omega;<sup>&minus;1/2</sup></span>
+          <small>the Nernst diffusion layer: thinner as the disk spins faster, and fixed in time</small><br>
+          <span class="act">i<sub>L</sub> = nFAD C*/&delta; = 0.620 nFA D<sup>2/3</sup> &nu;<sup>&minus;1/6</sup> &omega;<sup>1/2</sup> C* = B &omega;<sup>1/2</sup></span>
+          <small>B is the Levich constant (slide 7&rsquo;s &Gamma;n): the slope of the Levich plot</small><br>
+          <span class="pot">&omega; = 2&pi; &times; rpm / 60</span>
+          <small>in rad s<sup>&minus;1</sup> &mdash; the only unit the 0.620 is right for</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="bench level">
+      <div class="ctl">
+        <div class="card">
+          <div class="card-h"><h2>The solution and the disk</h2></div>
+          <div class="card-b stack" style="gap:13px">
+            <div>
+              <span class="fld">electrons, n</span>
+              <div class="pill-row" id="lvN">
+                <button class="pill" type="button" data-s="1" aria-pressed="true">1</button>
+                <button class="pill" type="button" data-s="2" aria-pressed="false">2</button>
+                <button class="pill" type="button" data-s="3" aria-pressed="false">3</button>
+                <button class="pill" type="button" data-s="4" aria-pressed="false">4</button>
+              </div>
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">bulk concentration C*</span><span class="val" id="lvCv"></span></div>
+              <input type="range" id="lvC" min="0.1" max="10" step="0.1" value="1.0">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">diffusion coefficient D</span><span class="val" id="lvDv"></span></div>
+              <input type="range" id="lvD" min="-6" max="-4.3" step="0.01" value="-5">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">kinematic viscosity &nu;</span><span class="val" id="lvNuv"></span></div>
+              <input type="range" id="lvNu" min="0.005" max="0.020" step="0.0005" value="0.010">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">disk diameter</span><span class="val" id="lvDiav"></span></div>
+              <input type="range" id="lvDia" min="2" max="6" step="0.5" value="5">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">rotation rate</span><span class="val" id="lvRpmv"></span></div>
+              <input type="range" id="lvRpm" min="100" max="4000" step="50" value="1600">
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+
+      <div class="figs">
+        <div class="card">
+          <div class="card-h"><h2>Voltammograms: four rotation rates, and yours</h2>
+            <span class="note" id="lvFigN">&mdash;</span></div>
+          <div class="card-b">
+            <svg id="lvLsv" viewBox="0 0 520 300" style="width:100%;height:auto" role="img"
+                 aria-label="Current against potential for a reversible reduction at four standard rotation rates and the one chosen. Each is a sigmoidal wave that levels off at a limiting current; the plateau is deeper the faster the disk spins."></svg>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h2>The Levich plot they make</h2>
+            <span class="note">plateau current against &radic;&omega;, with slide 7 evaluated underneath</span></div>
+          <div class="card-b stack" style="gap:12px">
+            <svg id="lvPlot" viewBox="0 0 520 300" style="width:100%;height:auto" role="img"
+                 aria-label="Limiting current against the square root of the rotation rate. The points lie on a straight line through the origin whose slope is the Levich constant; the chosen rotation rate is highlighted."></svg>
+
+            <div class="eqbig" id="lvDer" style="white-space:normal"></div>
+            <p class="hint" style="margin:0">Two routes to the same current differ in the third figure: nFADC*/&delta; uses 1/1.61 = 0.621 where Levich&rsquo;s equation has 0.620. Both are the rounded form of one constant, 1/1.612 = 0.6205, from the derivation in the supplementary slides (S2); the page uses 1.61 for &delta; and 0.620 for i<sub>L</sub>, as slide 7 does.</p>
+          </div>
+        </div>
+
+
+        <div class="card wideF">
+          <div class="card-h"><h2>At this rotation rate</h2>
+            <span class="note">everything the two figures above are drawn from</span></div>
+          <div class="card-b stack" style="gap:12px">
+            <div class="readouts">
+              <div class="readout"><span class="k">&omega;</span><span class="v" id="lvW">&mdash;</span></div>
+              <div class="readout"><span class="k">&delta;, Nernst layer</span><span class="v" id="lvDel">&mdash;</span></div>
+              <div class="readout"><span class="k">m<sub>T</sub> = D/&delta;</span><span class="v" id="lvMt">&mdash;</span></div>
+              <div class="readout"><span class="k">i<sub>L</sub></span><span class="v" id="lvIL">&mdash;</span></div>
+              <div class="readout"><span class="k">j<sub>L</sub> = i<sub>L</sub>/A</span><span class="v" id="lvJL">&mdash;</span></div>
+              <div class="readout"><span class="k">Levich slope</span><span class="v" id="lvB">&mdash;</span></div>
+              <div class="readout"><span class="k">D read back from it</span><span class="v" id="lvDb">&mdash;</span></div>
+            </div>
+            <div class="verdict flat" id="lvVerd">&mdash;</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-kl" role="tabpanel" aria-labelledby="t-kl" hidden>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>Two resistances in series</h2>
+        <span class="note">slides 10&ndash;13 &middot; an ORR-like reduction on a 5.0 mm disk</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <p class="hint" style="margin:0">The transport numbers are fixed at C* = 1.2 mM, D = 1.9 &times; 10<sup>&minus;5</sup> cm<sup>2</sup> s<sup>&minus;1</sup> and &nu; = 0.010 cm<sup>2</sup> s<sup>&minus;1</sup> &mdash; round versions of values often quoted for O<sub>2</sub> in 0.1 M HClO<sub>4</sub> at 25 &deg;C, used here as an illustration rather than as data. The kinetics are yours to set.</p>
+      </div>
+    </div>
+
+    <div class="bench level">
+      <div class="ctl">
+        <div class="card">
+          <div class="card-h"><h2>The electrode and the measurement</h2></div>
+          <div class="card-b stack" style="gap:13px">
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">potential E (vs RHE)</span><span class="val" id="klEv"></span></div>
+              <input type="range" id="klE" min="0.60" max="1.00" step="0.005" value="0.85">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">j<sub>k</sub> at 0.90 V</span><span class="val" id="klJv"></span></div>
+              <input type="range" id="klJ" min="-2" max="1.5" step="0.05" value="0">
+            </div>
+            <div>
+              <span class="fld">Tafel slope b</span>
+              <div class="pill-row" id="klB">
+                <button class="pill" type="button" data-s="0.060" aria-pressed="true">60 mV/dec</button>
+                <button class="pill" type="button" data-s="0.120" aria-pressed="false">120 mV/dec</button>
+              </div>
+            </div>
+            <div>
+              <span class="fld">electrons per O<sub>2</sub>, n</span>
+              <div class="pill-row pw" id="klN">
+                <button class="pill" type="button" data-s="4" aria-pressed="true">4</button>
+                <button class="pill" type="button" data-s="2" aria-pressed="false">2</button>
+                <button class="pill" type="button" data-s="d" aria-pressed="false">drifts with E</button>
+              </div>
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">noise on each current</span><span class="val" id="klNzv"></span></div>
+              <input type="range" id="klNz" min="0" max="3" step="0.1" value="0">
+            </div>
+            <div class="btnrow">
+              <button class="ghost" id="klReroll" type="button">new noise</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h2>What the K-L line returns</h2></div>
+          <div class="card-b stack" style="gap:12px">
+            <div class="readouts">
+              <div class="readout"><span class="k">i/i<sub>L</sub> at 1600 rpm</span><span class="v" id="klFr">&mdash;</span></div>
+              <div class="readout"><span class="k">i<sub>k</sub>, true</span><span class="v" id="klIkT">&mdash;</span></div>
+              <div class="readout"><span class="k">i<sub>k</sub>, from the intercept</span><span class="v" id="klIkF">&mdash;</span></div>
+              <div class="readout"><span class="k">i<sub>k,corr</sub> at 1600 rpm alone</span><span class="v" id="klIkC">&mdash;</span></div>
+              <div class="readout"><span class="k">n, true</span><span class="v" id="klNT">&mdash;</span></div>
+              <div class="readout"><span class="k">n, from the slope</span><span class="v" id="klNF">&mdash;</span></div>
+            </div>
+            <div class="verdict flat" id="klVerd">&mdash;</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="figs">
+        <div class="card">
+          <div class="card-h"><h2>Linear sweeps at four rotation rates</h2>
+            <span class="note">the band is 10&ndash;80 % of i<sub>L</sub> at 1600 rpm (slide 13)</span></div>
+          <div class="card-b">
+            <svg id="klLsv" viewBox="0 0 520 300" style="width:100%;height:auto" role="img"
+                 aria-label="Cathodic current density against potential at 400, 900, 1600 and 2500 rpm. At high potential the current is kinetic and the same at every rotation rate; at low potential it levels off at a plateau that deepens with rotation. A shaded band marks where the current is between ten and eighty per cent of the plateau at 1600 rpm, and a vertical line marks the chosen potential."></svg>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h2>The Koutecky&ndash;Levich plot</h2>
+            <span class="note">your E in colour, 30 mV either side in grey &mdash; and the two lines it is read with</span></div>
+          <div class="card-b stack" style="gap:12px">
+            <svg id="klPlot" viewBox="0 0 520 300" style="width:100%;height:auto" role="img"
+                 aria-label="Inverse current against the inverse square root of the rotation rate, at the chosen potential and fifty millivolts either side. Each set of four points is fitted with a straight line extended to the vertical axis, where the intercept is the inverse kinetic current. A dotted line through the origin is pure transport."></svg>
+        <div class="eqbig" style="white-space:normal">
+          <span class="act">1/i = 1/i<sub>k</sub> + 1/i<sub>L</sub> = 1/i<sub>k</sub> + 1/(B&omega;<sup>1/2</sup>)</span>
+          <small>from i = nFAk<sub>f</sub>C(0) and C(0)/C* = 1 &minus; i/i<sub>L</sub>: an irreversible reduction, first order in O</small><br>
+          <span class="cnc">i<sub>k</sub>(E) = i<sub>k</sub>(0.90 V) &times; 10<sup>(0.90 V &minus; E)/b</sup></span>
+          <small>the current the electrode could pass with unlimited supply; b is the Tafel slope</small><br>
+          <span class="pot">intercept of 1/i against &omega;<sup>&minus;1/2</sup> = 1/i<sub>k</sub> &nbsp;&middot;&nbsp; slope = 1/B</span>
+          <small>B = 0.620 nFAD<sup>2/3</sup>&nu;<sup>&minus;1/6</sup>C*, so the slope gives n if D, &nu; and C* are known</small>
+        </div>
+          </div>
+        </div>
+
+        <div class="card wideF">
+          <div class="card-h"><h2>Slide 12&rsquo;s Tafel plot, made from the intercepts</h2>
+            <span class="note">i<sub>k</sub> extracted by K-L at every 20 mV, with the noise you set &middot; open circles are outside the 10&ndash;80 % window</span></div>
+          <div class="card-b stack" style="gap:12px">
+            <svg id="klTafel" viewBox="0 0 1040 300" style="width:100%;height:auto" role="img"
+                 aria-label="Logarithm of the kinetic current density against potential. The true Tafel line is straight; the points extracted from Koutecky-Levich fits follow it inside the ten-to-eighty per cent window and scatter widely near the plateau at low potential."></svg>
+            <p class="hint" style="margin:0" id="klTafNote">&mdash;</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ====================== 3 · THE RING ====================== -->
+  <section class="panel" id="p-ring" role="tabpanel" aria-labelledby="t-ring" hidden>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>The disk makes it; the ring counts what escapes</h2>
+        <span class="note">RRDE slides 6&ndash;8 &middot; an ORR-like reduction, ring held where H<sub>2</sub>O<sub>2</sub> is oxidised</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig" style="white-space:normal">
+          <span class="cnc">N = |i<sub>R</sub>| / |i<sub>D</sub>|</span>
+          <small>for a product that cannot decompose on the way &mdash; three radii and nothing else: not &omega;, not D, not C*</small><br>
+          <span class="act">n = 4 i<sub>D</sub> / (i<sub>D</sub> + i<sub>R</sub>/N)</span>&nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="pot">% H<sub>2</sub>O<sub>2</sub> = 200 (i<sub>R</sub>/N) / (i<sub>D</sub> + i<sub>R</sub>/N)</span>
+          <small>i<sub>R</sub>/N is the peroxide current <i>as it left the disk</i>, before the flow took its share away</small>
+        </div>
+        <p class="hint" style="margin:0">Set what the catalyst really does with the slider, and the bench
+          reports what the two currents would tell you. With nothing lost on the way and a clean ring, the
+          two agree exactly: <b>i<sub>D</sub> + i<sub>R</sub>/N is the four-electron current of the same
+          oxygen flux</b>, so n comes back as 4 &minus; 2x and %H<sub>2</sub>O<sub>2</sub> as 100x. Then
+          add the two things that go wrong.</p>
+      </div>
+    </div>
+
+    <div class="bench level">
+      <div class="ctl">
+        <div class="card">
+          <div class="card-h"><h2>The electrode, and the truth</h2></div>
+          <div class="card-b stack" style="gap:13px">
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">peroxide the catalyst really makes</span><span class="val" id="rgXv"></span></div>
+              <input type="range" id="rgX" min="0" max="1" step="0.01" value="0.30">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">collection efficiency N</span><span class="val" id="rgNv"></span></div>
+              <input type="range" id="rgN" min="0.15" max="0.45" step="0.01" value="0.25">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">rotation rate</span><span class="val" id="rgRpmv"></span></div>
+              <input type="range" id="rgRpm" min="400" max="2500" step="100" value="1600">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">peroxide lost before the ring</span><span class="val" id="rgLv"></span></div>
+              <input type="range" id="rgL" min="0" max="0.5" step="0.01" value="0">
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">ring current that is not peroxide</span><span class="val" id="rgBv"></span></div>
+              <input type="range" id="rgB" min="0" max="20" step="0.5" value="0">
+            </div>
+            <div class="btnrow">
+              <button class="ghost" id="rgP1" type="button">clean 4e&minus;</button>
+              <button class="ghost" id="rgP2" type="button">a real catalyst</button>
+              <button class="ghost" id="rgP3" type="button">peroxide decomposing</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h2>What the two currents say</h2>
+            <span class="note">read at the plateau</span></div>
+          <div class="card-b stack" style="gap:12px">
+            <div class="readouts">
+              <div class="readout"><span class="k">i<sub>D</sub>, disk</span><span class="v" id="rgID">&mdash;</span></div>
+              <div class="readout"><span class="k">i<sub>R</sub>, ring</span><span class="v" id="rgIR">&mdash;</span></div>
+              <div class="readout"><span class="k">i<sub>R</sub>/N</span><span class="v" id="rgIRN">&mdash;</span></div>
+              <div class="readout"><span class="k">n you would report</span><span class="v" id="rgN2">&mdash;</span></div>
+              <div class="readout"><span class="k">% H<sub>2</sub>O<sub>2</sub> you would report</span><span class="v" id="rgPct">&mdash;</span></div>
+              <div class="readout"><span class="k">the truth</span><span class="v" id="rgTrue">&mdash;</span></div>
+            </div>
+            <div class="verdict flat" id="rgVerd">&mdash;</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="figs">
+        <div class="card">
+          <div class="card-h"><h2>Disk below, ring above</h2>
+            <span class="note">the two halves of one experiment, on one potential axis</span></div>
+          <div class="card-b stack" style="gap:12px">
+            <svg id="rgLsv" viewBox="0 0 520 300" style="width:100%;height:auto" role="img"
+                 aria-label="Two current traces against disk potential. The disk current is cathodic and falls to a plateau as the potential is lowered; the ring current is anodic and rises as peroxide begins to be produced, on a scale magnified several times."></svg>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h2>What you would report, against the truth</h2>
+            <span class="note">swept across every catalyst from four-electron to two</span></div>
+          <div class="card-b stack" style="gap:12px">
+            <svg id="rgBias" viewBox="0 0 520 300" style="width:100%;height:auto" role="img"
+                 aria-label="The reported percentage of peroxide and the reported electron number plotted against the true peroxide fraction. With nothing lost the reported line lies on the true one; with peroxide decomposing before the ring it falls below it, and the electron number is reported too high."></svg>
+            <div class="eqbig" id="rgEq" style="white-space:normal"></div>
+          </div>
+        </div>
+
+        <div class="card wideF">
+          <div class="card-h"><h2>What the ring cannot tell you</h2></div>
+          <div class="card-b stack" style="gap:14px">
+            <div class="notes2">
+              <p class="hint"><b class="cnc">N belongs to the electrode, not to the experiment.</b> It is
+                set by the disk radius and the two edges of the ring &mdash; the fraction of what leaves
+                the disk that passes under the ring before the flow throws it outward. <b>Nothing in the
+                chemistry enters</b>, which is why it can be calibrated once, on a couple whose product
+                cannot decompose: Fe(CN)<sub>6</sub><sup>3&minus;</sup>/Fe(CN)<sub>6</sub><sup>4&minus;</sup>,
+                as on slide 6. Re-polish the disk, or cover the gap with a thick film, and measure it again.</p>
+              <p class="hint"><b class="ohm">A sequence looks like the direct route.</b> O<sub>2</sub> &rarr;
+                H<sub>2</sub>O<sub>2</sub> &rarr; H<sub>2</sub>O on the disk and O<sub>2</sub> &rarr;
+                2H<sub>2</sub>O on the disk give the <i>same</i> small ring current, because the ring only
+                ever sees what escaped. <b>Separating them takes rotation rate, not potential:</b> plot
+                i<sub>D</sub>/i<sub>R</sub> against &omega;<sup>&minus;1/2</sup> and the intercept holds the
+                branching ratio while the slope holds the rate of the second reduction &mdash; Damjanovic's
+                analysis, and the reason an RRDE study quotes several rotation rates.</p>
+              <p class="hint"><b class="act">Peroxide that never arrives is never counted.</b> Decomposition
+                in the gap, or on the catalyst film itself, lowers i<sub>R</sub> without touching
+                i<sub>D</sub>. N calibrated on a stable couple is then too large for this species, so
+                <b>n is reported too high and %H<sub>2</sub>O<sub>2</sub> too low</b>. Put the loss slider
+                up and watch a two-electron catalyst be reported as nearly four. <b>An n of 3.9 is not by
+                itself proof of a four-electron catalyst.</b></p>
+              <p class="hint"><b class="pot">And the ring has to be oxidising peroxide, not water.</b> Hold
+                it on the plateau for H<sub>2</sub>O<sub>2</sub> oxidation &mdash; about 1.2 V vs RHE in
+                acid &mdash; and no higher: above that the ring makes O<sub>2</sub> from water or oxidises
+                itself, and every microamp of it is counted as peroxide. The last slider adds exactly that
+                current. <b>Run the blank under argon and subtract it.</b></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-quiz1" role="tabpanel" aria-labelledby="t-quiz1" hidden>
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h">
+        <h2>Concept check 1 &middot; transport, kinetics, and telling them apart</h2>
+        <span class="note">six questions &mdash; answer once per question; the reasoning appears immediately</span>
+        <span class="tally" style="margin-left:auto" id="tally1"></span>
+      </div>
+      <div class="card-b">
+        <div class="idgrid">
+          <div>
+            <label class="fld" for="sId1">Student ID</label>
+            <input type="text" id="sId1" inputmode="numeric" placeholder="e.g. 20261234">
+          </div>
+        </div>
+        <p class="hint" id="idHint1"></p>
+      </div>
+      <div class="scorebar" id="scorebar1" hidden>
+        <div>
+          <div class="scorenum" id="scoreNum1">&mdash;</div>
+          <div class="vcode" style="margin-top:4px" id="whoLine1">&mdash;</div>
+        </div>
+        <div style="flex:1 1 300px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="solid" id="sendBtn1" type="button" hidden>Submit to the course</button>
+            <button class="ghost" id="dlBtn1" type="button">Download my result</button>
+          </div>
+          <p class="hint" id="dlHint1" style="margin-top:8px">Download the file and hand it in as your instructor directs.</p>
+        </div>
+      </div>
+    </div>
+    <div class="quiz" id="quiz1"></div>
+  </section>
+
+
+  <section class="panel" id="p-quiz2" role="tabpanel" aria-labelledby="t-quiz2" hidden>
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h">
+        <h2>Concept check 2 &middot; what the ring does and does not see</h2>
+        <span class="note">six questions &mdash; answer once per question; the reasoning appears immediately</span>
+        <span class="tally" style="margin-left:auto" id="tally2"></span>
+      </div>
+      <div class="card-b">
+        <div class="idgrid">
+          <div>
+            <label class="fld" for="sId2">Student ID</label>
+            <input type="text" id="sId2" inputmode="numeric" placeholder="e.g. 20261234">
+          </div>
+        </div>
+        <p class="hint" id="idHint2"></p>
+      </div>
+      <div class="scorebar" id="scorebar2" hidden>
+        <div>
+          <div class="scorenum" id="scoreNum2">&mdash;</div>
+          <div class="vcode" style="margin-top:4px" id="whoLine2">&mdash;</div>
+        </div>
+        <div style="flex:1 1 300px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="solid" id="sendBtn2" type="button" hidden>Submit to the course</button>
+            <button class="ghost" id="dlBtn2" type="button">Download my result</button>
+          </div>
+          <p class="hint" id="dlHint2" style="margin-top:8px">Download the file and hand it in as your instructor directs.</p>
+        </div>
+      </div>
+    </div>
+    <div class="quiz" id="quiz2"></div>
+  </section>
+
+  <footer>
+    Everything is closed form. &delta; = 1.61 D<sup>1/3</sup>&nu;<sup>1/6</sup>&omega;<sup>&minus;1/2</sup> and
+    i<sub>L</sub> = 0.620 nFAD<sup>2/3</sup>&nu;<sup>&minus;1/6</sup>&omega;<sup>1/2</sup>C* as on slide 7 (the derivation gives
+    1.612 and 0.6205 from the near-wall von K&aacute;rm&aacute;n flow v<sub>y</sub> = &minus;0.510&omega;<sup>3/2</sup>&nu;<sup>&minus;1/2</sup>y<sup>2</sup>);
+    the profile under the disk is that same near-wall solution, g(u) = &int;<sub>0</sub><sup>u</sup>exp[&minus;(&Gamma;(4/3)t)<sup>3</sup>]dt;
+    &delta;<sub>h</sub> = 3.6(&nu;/&omega;)<sup>1/2</sup> is the usual estimate of the hydrodynamic layer &middot;
+    the voltammograms of the first tab are a Nernstian wave with equal D for O and R; those of the third tab are
+    1/i = 1/i<sub>k</sub> + 1/i<sub>L</sub> with a single Tafel line and no back reaction, which is the Koutecky&ndash;Levich
+    model taken at its word &middot; the &ldquo;drifts with E&rdquo; option lets n run from 2.5 to 4 across 0.75 V and is an
+    illustration, not a mechanism &middot; noise is Gaussian, relative, and the same draw for a given potential and rotation rate
+    until you press &ldquo;new noise&rdquo; &middot; ring&ndash;disk collection efficiency belongs to Lecture 18<br>
+    CH40051 Electroanalytical Chemistry &middot; Fall 2026 &mdash; companion to Lecture 16
+  </footer>
+</div>
+<script>
+(function(){
+"use strict";
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+/* ---------------- tabs ---------------- */
+var tabs=[].slice.call(document.querySelectorAll(".tab"));
+tabs.forEach(function(t){
+  t.addEventListener("click",function(){
+    tabs.forEach(function(o){
+      var on=(o===t);
+      o.setAttribute("aria-selected",on?"true":"false");
+      document.getElementById(o.getAttribute("aria-controls")).hidden=!on;
+    });
+  });
+});
+
+/* ================= SHARED CONSTANTS AND HELPERS =========================
+   Currents in A/cm2, potentials in V, lengths in cm unless a name says
+   otherwise. Everything on the page is derived from these.              */
+var QE = 1.602176634e-19, KB = 1.380649e-23, NA = 6.02214076e23;
+var FARADAY = QE * NA, RGAS = KB * NA, T25 = 298.15;
+var RTF = RGAS * T25 / FARADAY;            /* 0.025693 V                 */
+var DEC = RTF * Math.LN10;                 /* 0.059159 V per decade      */
+var MONO = 'font-family="IBM Plex Mono,monospace"';
+var SEC_YR = 3.15576e7;
+
+function pillGroup(id, cb){
+  var wrap = document.getElementById(id);
+  wrap.addEventListener("click", function(e){
+    var b = e.target.closest("button.pill");
+    if(!b) return;
+    [].slice.call(wrap.querySelectorAll("button.pill")).forEach(function(o){
+      o.setAttribute("aria-pressed", o === b ? "true" : "false");
+    });
+    cb(b.getAttribute("data-s"));
+  });
+}
+function pillSet(id, val){
+  [].slice.call(document.querySelectorAll("#" + id + " button.pill")).forEach(function(o){
+    o.setAttribute("aria-pressed", o.getAttribute("data-s") === val ? "true" : "false");
+  });
+}
+
+/* ---- one requestAnimationFrame loop; a picture only ticks while shown -- */
+var REDUCED = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+var ANIM = [], animLast = 0;
+function animLoop(ts){
+  if(ts - animLast > 32){
+    animLast = ts;
+    ANIM.forEach(function(a){ if(!document.getElementById(a.panel).hidden) a.tick(ts); });
+  }
+  window.requestAnimationFrame(animLoop);
+}
+
+/* x as "1.84 × 10<sup>7</sup>", and the same with a tspan for inside an SVG */
+function sciH(x, d){
+  if(x === 0) return "0";
+  var e = Math.floor(Math.log10(Math.abs(x))), m = x / Math.pow(10, e);
+  if(Math.abs(+m.toFixed(d - 1)) >= 10){ m /= 10; e++; }
+  return m.toFixed(d - 1) + " × 10<sup>" + e + "</sup>";
+}
+function sciSvg(x, d){
+  if(x === 0) return "0";
+  var e = Math.floor(Math.log10(Math.abs(x))), m = x / Math.pow(10, e);
+  if(Math.abs(+m.toFixed(d - 1)) >= 10){ m /= 10; e++; }
+  return m.toFixed(d - 1) + ' × 10<tspan baseline-shift="super" font-size="8">' + e + '</tspan>';
+}
+/* a current density, in whatever unit keeps it readable */
+function fmtJ(j){
+  var a = Math.abs(j);
+  if(a === 0) return "0";
+  if(a >= 1) return j.toFixed(2) + " A/cm²";
+  if(a >= 1e-3) return (j * 1e3).toFixed(2) + " mA/cm²";
+  if(a >= 1e-6) return (j * 1e6).toFixed(2) + " µA/cm²";
+  if(a >= 1e-9) return (j * 1e9).toFixed(2) + " nA/cm²";
+  return sciH(j, 2) + " A/cm²";
+}
+/* the same, for a current rather than a current density */
+function fmtA(i){
+  var a = Math.abs(i);
+  if(a === 0) return "0";
+  if(a >= 1) return i.toFixed(3) + " A";
+  if(a >= 1e-3) return (i * 1e3).toPrecision(3) + " mA";
+  if(a >= 1e-6) return (i * 1e6).toPrecision(3) + " µA";
+  if(a >= 1e-9) return (i * 1e9).toPrecision(3) + " nA";
+  return sciH(i, 2) + " A";
+}
+/* the same two, for an SVG <text>, where <sup> is not markup but a
+   mistake: everything from it to the end of the string disappears */
+function fmtJSvg(j){ var t = fmtJ(j); return t.indexOf("<sup>") < 0 ? t : sciSvg(j, 2) + " A/cm²"; }
+function fmtASvg(i){ var t = fmtA(i); return t.indexOf("<sup>") < 0 ? t : sciSvg(i, 2) + " A"; }
+function fmtV(v){
+  var a = Math.abs(v);
+  if(a < 1) return (v * 1000).toFixed(a < 0.01 ? 2 : 1) + " mV";
+  return v.toFixed(3) + " V";
+}
+function fmtR(r){
+  if(r >= 1e6) return (r / 1e6).toFixed(2) + " MΩ";
+  if(r >= 1e3) return (r / 1e3).toFixed(2) + " kΩ";
+  if(r >= 1) return r.toFixed(1) + " Ω";
+  return (r * 1000).toFixed(1) + " mΩ";
+}
+function clamp(v, a, b){ return v < a ? a : v > b ? b : v; }
+
+/* ---- the small SVG vocabulary every picture on this page is drawn in --- */
+function ln(x1, y1, x2, y2, col, w, dash, op){
+  return '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + x2.toFixed(1)
+       + '" y2="' + y2.toFixed(1) + '" stroke="' + col + '" stroke-width="' + (w || 1) + '"'
+       + (dash ? ' stroke-dasharray="' + dash + '"' : "")
+       + (op !== undefined ? ' opacity="' + op + '"' : "") + '/>';
+}
+function tx(x, y, s, col, size, anchor, weight){
+  return '<text x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" fill="' + col + '" ' + MONO
+       + ' font-size="' + (size || 10.5) + '"'
+       + (anchor ? ' text-anchor="' + anchor + '"' : "")
+       + (weight ? ' font-weight="' + weight + '"' : "") + '>' + s + '</text>';
+}
+/* an axis name that sits beside its axis rather than in a caption under
+   the frame: xName at the right end of the x axis, yName up the left */
+function xName(x0, x1, y, lab){ return tx((x0 + x1) / 2, y, lab, "var(--ink-2)", 11.5, "middle", 600); }
+function yName(x, y0, y1, lab){
+  var cy = (y0 + y1) / 2;
+  return tx(x, cy, lab, "var(--ink-2)", 11.5, "middle", 600)
+    .replace("<text", '<text transform="rotate(-90 ' + x.toFixed(1) + ' ' + cy.toFixed(1) + ')"');
+}
+function pth(d, col, w, fill, op){
+  return '<path d="' + d + '" fill="' + (fill || "none") + '" stroke="' + (col || "none")
+       + '" stroke-width="' + (w || 2) + '"'
+       + (op !== undefined ? ' opacity="' + op + '"' : "") + ' stroke-linejoin="round"/>';
+}
+function rc(x, y, w, h, col, op, rx){
+  if(w <= 0 || h <= 0) return "";
+  return '<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + w.toFixed(1)
+       + '" height="' + h.toFixed(1) + '" fill="' + col + '"'
+       + (rx ? ' rx="' + rx + '"' : "")
+       + (op !== undefined ? ' opacity="' + op + '"' : "") + '/>';
+}
+function cir(x, y, r, col, op){
+  return '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + r.toFixed(2)
+       + '" fill="' + col + '"' + (op !== undefined ? ' opacity="' + op + '"' : "") + '/>';
+}
+/* a two-headed measure, used for every "this much" on the page */
+function arrowV(x, y1, y2, col, lab, side){
+  var s = ln(x, y1, x, y2, col, 1.6);
+  var d = y2 > y1 ? 1 : -1;
+  s += '<polygon points="' + x + ',' + y2 + ' ' + (x - 3) + ',' + (y2 - 4 * d) + ' ' + (x + 3) + ',' + (y2 - 4 * d) + '" fill="' + col + '"/>';
+  s += '<polygon points="' + x + ',' + y1 + ' ' + (x - 3) + ',' + (y1 + 4 * d) + ' ' + (x + 3) + ',' + (y1 + 4 * d) + '" fill="' + col + '"/>';
+  if(lab) s += tx(x + (side === "l" ? -6 : 6), (y1 + y2) / 2 + 3.5, lab, col, 10, side === "l" ? "end" : "start", 600);
+  return s;
+}
+
+
+/* the shared fmtA stops at nanoamps; a microcoulomb integral does not */
+function fmtI(i){
+  var a = Math.abs(i);
+  if(a === 0) return "0";
+  if(a >= 1) return i.toPrecision(3) + " A";
+  if(a >= 1e-3) return (i * 1e3).toPrecision(3) + " mA";
+  if(a >= 1e-6) return (i * 1e6).toPrecision(3) + " µA";
+  if(a >= 1e-9) return (i * 1e9).toPrecision(3) + " nA";
+  if(a >= 1e-12) return (i * 1e12).toPrecision(3) + " pA";
+  if(a >= 1e-15) return (i * 1e15).toPrecision(3) + " fA";
+  return sciH(i, 2) + " A";
+}
+function fmtT(t){
+  if(!isFinite(t)) return "—";
+  if(t >= 60) return (t / 60).toPrecision(3) + " min";
+  if(t >= 1) return t.toPrecision(3) + " s";
+  if(t >= 1e-3) return (t * 1e3).toPrecision(3) + " ms";
+  if(t >= 1e-6) return (t * 1e6).toPrecision(3) + " µs";
+  return sciH(t, 2) + " s";
+}
+function fmtF(c){
+  if(c >= 1e-6) return (c * 1e6).toPrecision(3) + " µF";
+  if(c >= 1e-9) return (c * 1e9).toPrecision(3) + " nF";
+  return (c * 1e12).toPrecision(3) + " pF";
+}
+function fmtLen15(cm){
+  var um = cm * 1e4;
+  if(um >= 1e4) return (um / 1e4).toPrecision(3) + " cm";
+  if(um >= 1000) return (um / 1000).toPrecision(3) + " mm";
+  if(um >= 1) return um.toPrecision(3) + " µm";
+  return (um * 1000).toPrecision(3) + " nm";
+}
+function tickNum(v){
+  var a = Math.abs(v);
+  if(a < 1e-9) return "0";
+  return (+v.toFixed(a >= 100 ? 0 : a >= 10 ? 1 : a >= 1 ? 2 : 3)) + "";
+}
+function nice(v){
+  var e = Math.pow(10, Math.floor(Math.log10(v))), m = v / e;
+  return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 2.5 ? 2.5 : m <= 5 ? 5 : 10) * e;
+}
+function iUnit(maxA){
+  var a = Math.abs(maxA);
+  return a >= 1e-3 ? {k:1e-3, u:"mA"} : a >= 1e-6 ? {k:1e-6, u:"µA"}
+       : a >= 1e-9 ? {k:1e-9, u:"nA"} : {k:1e-12, u:"pA"};
+}
+function supr(e){
+  var m = {"-":"⁻", "0":"⁰", "1":"¹", "2":"²", "3":"³", "4":"⁴",
+           "5":"⁵", "6":"⁶", "7":"⁷", "8":"⁸", "9":"⁹"};
+  return String(Math.round(e)).split("").map(function(c){ return m[c] || c; }).join("");
+}
+
+/* ---- a frame, and a decade frame for the log-log pictures -------------- */
+function fr(X0, X1, Y0, Y1, xlo, xhi, ylo, yhi){
+  return {X0:X0, X1:X1, Y0:Y0, Y1:Y1, xlo:xlo, xhi:xhi, ylo:ylo, yhi:yhi,
+    px:function(v){ return X0 + (v - xlo) / (xhi - xlo) * (X1 - X0); },
+    py:function(v){ return Y1 - (v - ylo) / (yhi - ylo) * (Y1 - Y0); }};
+}
+function axLin(f, xlab, ylab, fx, fy){
+  var s = rc(f.X0, f.Y0, f.X1 - f.X0, f.Y1 - f.Y0, "var(--surface-2)", 0.5, 4), g;
+  var xs = nice((f.xhi - f.xlo) / 5), ys = nice((f.yhi - f.ylo) / 5);
+  for(g = Math.ceil(f.xlo / xs) * xs; g <= f.xhi + 1e-12; g += xs){
+    s += ln(f.px(g), f.Y0, f.px(g), f.Y1, "var(--line)", 1, "2 3", 0.75);
+    /* the first one would sit in the corner the y labels already use */
+    if(f.px(g) > f.X0 + 10)
+      s += tx(f.px(g), f.Y1 + 14, fx ? fx(g) : tickNum(g), "var(--muted)", 9.5, "middle");
+  }
+  for(g = Math.ceil(f.ylo / ys) * ys; g <= f.yhi + 1e-12; g += ys){
+    s += ln(f.X0, f.py(g), f.X1, f.py(g), "var(--line)", 1, "2 3", 0.75);
+    s += tx(f.X0 - 6, f.py(g) + 3.4, fy ? fy(g) : tickNum(g), "var(--muted)", 9.5, "end");
+  }
+  s += xName(f.X0, f.X1, f.Y1 + 30, xlab);
+  s += yName(14, f.Y0, f.Y1, ylab);
+  return s;
+}
+/* both axes in decades: the only honest way to show a current that runs
+   from microamps to picoamps over six orders of magnitude of time      */
+/* a decade label is about 15 units wide and 13 tall; when there are more
+   decades than that leaves room for, label every second or fifth     */
+function thin(decades, room, each){
+  var want = Math.ceil(decades * each / room);
+  return want <= 1 ? 1 : want <= 2 ? 2 : want <= 5 ? 5 : 10;
+}
+function axLog(f, xlab, ylab){
+  var s = rc(f.X0, f.Y0, f.X1 - f.X0, f.Y1 - f.Y0, "var(--surface-2)", 0.5, 4), g;
+  var sx = thin(f.xhi - f.xlo, f.X1 - f.X0, 30), sy = thin(f.yhi - f.ylo, f.Y1 - f.Y0, 15);
+  for(g = Math.ceil(f.xlo); g <= f.xhi + 1e-9; g++){
+    s += ln(f.px(g), f.Y0, f.px(g), f.Y1, "var(--line)", 1, "2 3", 0.75);
+    /* the leftmost one shares its corner with the lowest y label */
+    if(g % sx === 0 && f.px(g) > f.X0 + 12)
+      s += tx(f.px(g), f.Y1 + 14, "10" + supr(g), "var(--muted)", 9.5, "middle");
+  }
+  for(g = Math.ceil(f.ylo); g <= f.yhi + 1e-9; g++){
+    s += ln(f.X0, f.py(g), f.X1, f.py(g), "var(--line)", 1, "2 3", 0.75);
+    if(g % sy === 0) s += tx(f.X0 - 6, f.py(g) + 3.4, "10" + supr(g), "var(--muted)", 9.5, "end");
+  }
+  s += xName(f.X0, f.X1, f.Y1 + 30, xlab);
+  s += yName(14, f.Y0, f.Y1, ylab);
+  return s;
+}
+function curve(f, fn, lo, hi, npt){
+  var d = "", pen = false, N = npt || 200;
+  for(var i = 0; i <= N; i++){
+    var x = lo + (hi - lo) * i / N, y = fn(x);
+    if(!isFinite(y) || y < f.ylo || y > f.yhi || x < f.xlo || x > f.xhi){ pen = false; continue; }
+    d += (pen ? "L" : "M") + f.px(x).toFixed(1) + " " + f.py(y).toFixed(1) + " ";
+    pen = true;
+  }
+  return d;
+}
+var PEND = {};
+function later(key, fn){
+  if(PEND[key]) return;
+  PEND[key] = true;
+  window.requestAnimationFrame(function(){ PEND[key] = false; fn(); });
+}
+
+/* ======================== THE ROTATING DISK ============================
+   Everything below is closed form. The two constants are slide 7's:
+   delta = 1.61 D^1/3 nu^1/6 omega^-1/2 and the Levich 0.620, both the
+   rounded forms of 1.612 and 0.6205 from the near-wall flow
+   v_y = -0.510 omega^3/2 nu^-1/2 y^2. verify/lecture16_rde.py re-derives
+   them from the von Karman equations and checks every number here.    */
+
+var FRT = FARADAY / (RGAS * T25);          /* 38.92 V^-1                 */
+var LEV = 0.620, DEL = 1.61, DHC = 3.6, VK = 0.510;
+var G43 = 0.8929795115692492;              /* Gamma(4/3)                 */
+var RPMS = [400, 900, 1600, 2500];
+var ROOT_RPM = Math.sqrt(2 * Math.PI / 60);  /* omega^1/2 per rpm^1/2, 0.3236 */
+
+function el(id){ return document.getElementById(id); }
+function omega(rpm){ return 2 * Math.PI * rpm / 60; }
+function deltaOf(D, nu, w){ return DEL * Math.pow(D, 1 / 3) * Math.pow(nu, 1 / 6) * Math.pow(w, -0.5); }
+function deltaH(nu, w){ return DHC * Math.sqrt(nu / w); }
+function levB(n, A, D, nu, C){ return LEV * n * FARADAY * A * Math.pow(D, 2 / 3) * Math.pow(nu, -1 / 6) * C; }
+
+/* g(u): the near-wall profile in units of delta, tabulated once. Its
+   slope at u = 0 is 1, so the tangent meets the bulk at exactly u = 1,
+   and g(infinity) = Gamma(4/3)/G43 = 1.                                */
+var GTAB = (function(){
+  var N = 800, U = 4, t = [0], s = 0, h = U / N, f0 = 1;
+  for(var k = 1; k <= N; k++){
+    var f1 = Math.exp(-Math.pow(G43 * k * h, 3));
+    s += 0.5 * (f0 + f1) * h; t.push(s); f0 = f1;
+  }
+  return {N:N, U:U, t:t};
+})();
+function gProf(u){
+  if(u <= 0) return 0;
+  if(u >= GTAB.U) return GTAB.t[GTAB.N];
+  var x = u / GTAB.U * GTAB.N, k = Math.floor(x);
+  return GTAB.t[k] + (GTAB.t[k + 1] - GTAB.t[k]) * (x - k);
+}
+
+function sp(t){ return '<tspan baseline-shift="super" font-size="8">' + t + '</tspan>'; }
+function sb(t){ return '<tspan baseline-shift="sub" font-size="8">' + t + '</tspan>'; }
+function fmtD(D){ return sciH(D, 3) + " cm²/s"; }
+function fmtMt(m){ return sciH(m, 3) + " cm/s"; }
+function linfit(xs, ys){
+  var n = xs.length, mx = 0, my = 0, sxx = 0, sxy = 0, i;
+  for(i = 0; i < n; i++){ mx += xs[i] / n; my += ys[i] / n; }
+  for(i = 0; i < n; i++){ sxx += (xs[i] - mx) * (xs[i] - mx); sxy += (xs[i] - mx) * (ys[i] - my); }
+  var s = sxy / sxx;
+  return {s:s, c:my - s * mx};
+}
+function bind(id, fn){
+  var e = document.getElementById(id);
+  e.addEventListener("input", function(){ fn(+this.value); });
+}
+
+/* ======================== 1 · ROTATION AND LEVICH ===================== */
+var LV = {n:1, C:1.0, lD:-5, nu:0.010, dia:5, rpm:1600, ax:"rad"};
+
+function lvP(){
+  var A = Math.PI * Math.pow(LV.dia / 20, 2), D = Math.pow(10, LV.lD), C = LV.C * 1e-6;
+  return {n:LV.n, A:A, D:D, C:C, nu:LV.nu, B:levB(LV.n, A, D, LV.nu, C)};
+}
+function lvSync(){ later("lv", lvDraw); }
+
+function lvDraw(){
+  var p = lvP(), w = omega(LV.rpm), d = deltaOf(p.D, p.nu, w), iL = p.B * Math.sqrt(w);
+  el("lvCv").textContent = LV.C.toFixed(1) + " mM";
+  el("lvDv").innerHTML = sciH(p.D, 3) + " cm<sup>2</sup>/s";
+  el("lvNuv").textContent = LV.nu.toFixed(4) + " cm²/s";
+  el("lvDiav").textContent = LV.dia.toFixed(1) + " mm  ·  " + p.A.toFixed(3) + " cm²";
+  el("lvRpmv").textContent = LV.rpm + " rpm";
+
+  el("lvW").textContent = w.toFixed(1) + " rad/s";
+  el("lvDel").textContent = fmtLen15(d);
+  el("lvMt").innerHTML = fmtMt(p.D / d);
+  el("lvIL").textContent = fmtA(iL);
+  el("lvJL").textContent = fmtJ(iL / p.A);
+  var v = el("lvVerd");
+  {
+    el("lvB").innerHTML = sciH(p.B, 3) + " A s<sup>1/2</sup>";
+    var Db = Math.pow(p.B / (LEV * p.n * FARADAY * p.A * Math.pow(p.nu, -1 / 6) * p.C), 1.5);
+    el("lvDb").innerHTML = fmtD(Db);
+    v.className = "verdict go";
+    v.innerHTML = "Read against &omega;<sup>1/2</sup> in rad<sup>1/2</sup> s<sup>&minus;1/2</sup>, the slope goes back through "
+      + "D = [B/(0.620 nFA&nu;<sup>&minus;1/6</sup>C*)]<sup>3/2</sup> to the D you set. A 2 % error in the slope would be 3 % in D. "
+      + "Plotted against rpm<sup>1/2</sup> instead, the same slope is 0.3236 &times; B and would return a D 5.4 times too small.";
+  }
+  lvLsv(p);
+  lvPlot(p);
+  lvDer(p, w, d, iL);
+}
+
+function lvLsv(p){
+  var list = RPMS.slice();
+  if(list.indexOf(LV.rpm) < 0) list.push(LV.rpm);
+  var maxIL = 0;
+  list.forEach(function(r){ maxIL = Math.max(maxIL, p.B * Math.sqrt(omega(r))); });
+  var u = iUnit(maxIL), top = maxIL / u.k;
+  var f = fr(62, 500, 22, 250, -0.25, 0.25, -top * 1.12, top * 0.12);
+  var s = axLin(f, "E − E½ / V", "i / " + u.u);
+  s += ln(f.X0, f.py(0), f.X1, f.py(0), "var(--line-2)", 1);
+  RPMS.forEach(function(r){
+    if(r === LV.rpm) return;
+    var iL = p.B * Math.sqrt(omega(r)) / u.k;
+    s += pth(curve(f, function(E){ return -iL / (1 + Math.exp(p.n * FRT * E)); }, -0.25, 0.25, 160), "var(--red-)", 1.5, null, 0.45);
+    s += tx(f.px(-0.245), f.py(-iL) - 4, r + " rpm", "var(--muted)", 9.5);
+  });
+  var iL0 = p.B * Math.sqrt(omega(LV.rpm)) / u.k;
+  s += pth(curve(f, function(E){ return -iL0 / (1 + Math.exp(p.n * FRT * E)); }, -0.25, 0.25, 160), "var(--ox)", 2.6);
+  s += tx(f.px(0.02), f.py(-iL0) + 14, LV.rpm + " rpm · i" + sb("L") + " = " + fmtASvg(iL0 * u.k), "var(--ox)", 10.5, "start", 600);
+  el("lvLsv").innerHTML = s;
+  el("lvFigN").innerHTML = "n = " + p.n + " &middot; a Nernstian wave, i = &minus;i<sub>L</sub>/(1 + e<sup>nf(E&minus;E&frac12;)</sup>)";
+}
+
+function lvPlot(p){
+  var radAx = true;          /* the axis is rad/s; see the verdict */
+  var list = RPMS.slice();
+  if(list.indexOf(LV.rpm) < 0) list.push(LV.rpm);
+  var xOf = function(r){ return radAx ? Math.sqrt(omega(r)) : Math.sqrt(r); };
+  var slope = radAx ? p.B : p.B * ROOT_RPM;
+  var xmax = radAx ? Math.sqrt(omega(4000)) * 1.04 : Math.sqrt(4000) * 1.04;
+  var u = iUnit(slope * xmax), ytop = slope * xmax / u.k;
+  var f = fr(62, 500, 22, 250, 0, xmax, 0, ytop * 1.06);
+  var s = axLin(f, radAx ? "ω" + sp("1/2") + " / rad" + sp("1/2") + " s" + sp("−1/2") : "rpm" + sp("1/2"), "i" + sb("L") + " / " + u.u);
+  s += pth(curve(f, function(x){ return slope * x / u.k; }, 0, xmax, 4), radAx ? "var(--go)" : "var(--stop)", 2);
+  list.forEach(function(r){
+    var on = (r === LV.rpm);
+    s += cir(f.px(xOf(r)), f.py(slope * xOf(r) / u.k), on ? 6 : 4.5, on ? "var(--ox)" : "var(--red-)");
+    if(!on) s += tx(f.px(xOf(r)) + 7, f.py(slope * xOf(r) / u.k) + 13, r + "", "var(--muted)", 9.5);
+  });
+  s += tx(f.px(xmax * 0.04), f.Y0 + 16, "slope = " + sciSvg(slope, 3) + (radAx ? " A s" + sp("1/2") : " A rpm" + sp("−1/2")),
+          radAx ? "var(--go)" : "var(--stop)", 11, "start", 600);
+  s += tx(f.px(xmax * 0.04), f.Y0 + 31, "a line through the origin: transport control", "var(--muted)", 10);
+  el("lvPlot").innerHTML = s;
+}
+
+function lvDer(p, w, d, iL){
+  var h = "";
+  h += '<span class="pot">&omega; = 2&pi; &times; ' + LV.rpm + '/60 = ' + w.toFixed(1) + ' rad s<sup>&minus;1</sup></span>'
+     + ' &nbsp;<small>&omega;<sup>1/2</sup> = ' + Math.sqrt(w).toFixed(3) + ' s<sup>&minus;1/2</sup></small><br>';
+  h += '<span class="cnc">&delta; = 1.61 &times; (' + sciH(p.D, 3) + ')<sup>1/3</sup> &times; (' + p.nu.toFixed(4) + ')<sup>1/6</sup> &times; '
+     + w.toFixed(1) + '<sup>&minus;1/2</sup> = ' + sciH(d, 3) + ' cm = ' + fmtLen15(d) + '</span>'
+     + ' &nbsp;<small>D<sup>1/3</sup> = ' + sciH(Math.pow(p.D, 1 / 3), 4) + ', &nu;<sup>1/6</sup> = ' + Math.pow(p.nu, 1 / 6).toFixed(4) + '</small><br>';
+  h += '<span class="act">B = 0.620 &times; ' + p.n + ' &times; 96 485 &times; ' + p.A.toFixed(4) + ' &times; ('
+     + sciH(p.D, 3) + ')<sup>2/3</sup> &times; (' + p.nu.toFixed(4) + ')<sup>&minus;1/6</sup> &times; ' + sciH(p.C, 3)
+     + ' = ' + sciH(p.B, 3) + ' A s<sup>1/2</sup></span> &nbsp;<small>the Levich constant, in A per (rad/s)<sup>1/2</sup></small><br>';
+  h += '<span class="act">i<sub>L</sub> = B&omega;<sup>1/2</sup> = ' + fmtA(iL) + '</span>'
+     + ' &nbsp;<small>and nFADC*/&delta; = ' + fmtA(p.n * FARADAY * p.A * p.D * p.C / d)
+     + ' &middot; j<sub>L</sub> = ' + fmtJ(iL / p.A) + '</small>';
+  el("lvDer").innerHTML = h;
+}
+
+pillGroup("lvN", function(v){ LV.n = +v; lvSync(); });
+bind("lvC", function(v){ LV.C = v; lvSync(); });
+bind("lvD", function(v){ LV.lD = v; lvSync(); });
+bind("lvNu", function(v){ LV.nu = v; lvSync(); });
+bind("lvDia", function(v){ LV.dia = v; lvSync(); });
+bind("lvRpm", function(v){ LV.rpm = v; lvSync(); });
+
+
+/* ======================== 3 · KOUTECKY-LEVICH ========================= */
+/* transport fixed: round values often quoted for O2 in 0.1 M HClO4      */
+var KA = Math.PI * 0.25 * 0.25, KC = 1.2e-6, KD = 1.9e-5, KNU = 0.010, EREF = 0.90;
+var KB1 = levB(1, KA, KD, KNU, KC);          /* Levich constant per electron */
+var KL = {E:0.85, lj:0, b:0.060, n:"4", nz:0, seed:1};
+
+function klN(E){
+  if(KL.n === "4") return 4;
+  if(KL.n === "2") return 2;
+  return 2.5 + 1.5 / (1 + Math.exp(-(E - 0.75) / 0.03));
+}
+function klIk(E){ return Math.pow(10, KL.lj) * 1e-3 * KA * Math.pow(10, (EREF - E) / KL.b); }
+function klIL(E, rpm){ return klN(E) * KB1 * Math.sqrt(omega(rpm)); }
+function klTrue(E, rpm){ return 1 / (1 / klIk(E) + 1 / klIL(E, rpm)); }
+function hash01(a){
+  a |= 0; a = a + 0x6D2B79F5 | 0;
+  var t = Math.imul(a ^ a >>> 15, 1 | a);
+  t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+  return ((t ^ t >>> 14) >>> 0) / 4294967296;
+}
+function klZ(E, k){
+  var e = Math.round(E * 1000);
+  var u1 = Math.max(1e-12, hash01(e * 7919 + k * 104729 + KL.seed * 1299709));
+  var u2 = hash01(e * 15485863 + k * 32452843 + KL.seed * 49979687 + 17);
+  return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+}
+function klMeas(E, k){ return klTrue(E, RPMS[k]) * (1 + KL.nz / 100 * klZ(E, k)); }
+function klFit(E){
+  var xs = [], ys = [];
+  for(var k = 0; k < RPMS.length; k++){ xs.push(Math.pow(omega(RPMS[k]), -0.5)); ys.push(1 / klMeas(E, k)); }
+  var L = linfit(xs, ys);
+  return {xs:xs, ys:ys, s:L.s, c:L.c, ik:L.c > 0 ? 1 / L.c : NaN, n:1 / (L.s * KB1)};
+}
+function klFrac(E){ return klTrue(E, 1600) / klIL(E, 1600); }
+function klEdge(r){
+  /* the potential where i/iL at 1600 rpm equals r; frac falls as E rises */
+  var lo = 0.2, hi = 1.4;
+  for(var i = 0; i < 60; i++){ var m = 0.5 * (lo + hi); if(klFrac(m) > r) lo = m; else hi = m; }
+  return 0.5 * (lo + hi);
+}
+function klSync(){ later("kl", klDraw); }
+
+function klDraw(){
+  var E = KL.E;
+  el("klEv").textContent = E.toFixed(3) + " V";
+  el("klJv").textContent = fmtJ(Math.pow(10, KL.lj) * 1e-3);
+  el("klNzv").textContent = KL.nz.toFixed(1) + " %";
+  var fit = klFit(E), fr16 = klFrac(E), k16 = RPMS.indexOf(1600);
+  var iL16 = klIL(E, 1600), im16 = klMeas(E, k16);
+  el("klFr").textContent = fr16.toFixed(3);
+  el("klIkT").textContent = fmtA(klIk(E));
+  el("klIkF").textContent = isFinite(fit.ik) ? fmtA(fit.ik) + "  (" + ((fit.ik / klIk(E) - 1) * 100).toFixed(1) + " %)" : "intercept ≤ 0";
+  el("klIkC").textContent = im16 < iL16 ? fmtA(im16 * iL16 / (iL16 - im16)) : "i ≥ iL";
+  el("klNT").textContent = klN(E).toFixed(2);
+  el("klNF").textContent = fit.n.toFixed(2);
+  var v = el("klVerd"), amp = 1 / (1 - fr16);
+  if(fr16 < 0.1){
+    v.className = "verdict flat";
+    v.innerHTML = "Kinetic region: i/i<sub>L</sub> = " + fr16.toFixed(3) + ", so i &asymp; i<sub>k</sub> and the K-L lines are nearly flat. "
+      + "The correction is small, but so is the current &mdash; and the slope, which carries n, is hard to read.";
+  } else if(fr16 <= 0.8){
+    v.className = "verdict go";
+    v.innerHTML = "Inside slide 13&rsquo;s window. A 1 % error in i costs " + amp.toFixed(1) + " % in i<sub>k</sub> here"
+      + (fr16 <= 0.5 ? ", and below half of i<sub>L</sub> catalysts can be compared fairly." : ".");
+  } else {
+    v.className = "verdict stop";
+    v.innerHTML = "Near the plateau: i/i<sub>L</sub> = " + fr16.toFixed(3) + ". Every 1 % of error in i becomes "
+      + amp.toFixed(0) + " % in i<sub>k</sub> &mdash; you are subtracting two nearly equal numbers. Move to higher E.";
+  }
+  klLsv();
+  klPlot(fit);
+  klTafel();
+}
+
+function klLsv(){
+  var jmax = 0;
+  RPMS.forEach(function(r){ jmax = Math.max(jmax, klTrue(0.40, r) / KA * 1e3); });
+  var f = fr(62, 500, 22, 250, 0.40, 1.05, -jmax * 1.12, jmax * 0.1);
+  var s = axLin(f, "E / V vs RHE", "j / mA cm⁻²");
+  var e80 = klEdge(0.8), e10 = klEdge(0.1);
+  var x0 = f.px(clamp(e80, f.xlo, f.xhi)), x1 = f.px(clamp(e10, f.xlo, f.xhi));
+  s += rc(x0, f.Y0, x1 - x0, f.Y1 - f.Y0, "var(--go-soft)", 0.85);
+  s += tx((x0 + x1) / 2, f.Y0 + 12, "10–80 % of iL", "var(--go)", 9.5, "middle", 600);
+  s += ln(f.X0, f.py(0), f.X1, f.py(0), "var(--line-2)", 1);
+  RPMS.forEach(function(r, k){
+    var on = r === 1600;
+    s += pth(curve(f, function(E){ return -klTrue(E, r) / KA * 1e3; }, 0.40, 1.05, 200),
+             on ? "var(--red-)" : "var(--red-)", on ? 2.4 : 1.4, null, on ? 1 : 0.5);
+    s += tx(f.px(0.405), f.py(-klTrue(0.40, r) / KA * 1e3) - 4, r + " rpm", "var(--muted)", 9.5);
+  });
+  s += ln(f.px(KL.E), f.Y0, f.px(KL.E), f.Y1, "var(--ox)", 1.4, "4 3");
+  for(var k = 0; k < RPMS.length; k++) s += cir(f.px(KL.E), f.py(-klMeas(KL.E, k) / KA * 1e3), 4.2, "var(--ox)");
+  el("klLsv").innerHTML = s;
+}
+
+function klPlot(fit){
+  var E = KL.E, sets = [], ymax = 0;
+  [E - 0.03, E, E + 0.03].forEach(function(e, j){
+    var F = (j === 1) ? fit : klFit(e);
+    sets.push({E:e, F:F, main:j === 1});
+  });
+  var ymain = 0;
+  fit.ys.forEach(function(y){ ymain = Math.max(ymain, y * 1e-3); });
+  sets.forEach(function(S){ S.F.ys.forEach(function(y){ ymax = Math.max(ymax, y * 1e-3); }); });
+  ymax = Math.max(Math.min(ymax * 1.1, ymain * 5), 0.5);
+  var f = fr(62, 500, 22, 250, 0, 0.17, 0, ymax);
+  var s = axLin(f, "ω" + sp("−1/2") + " / rad" + sp("−1/2") + " s" + sp("1/2"), "1/i / mA⁻¹");
+  var nt = klN(E);
+  s += pth(curve(f, function(x){ return x / (nt * KB1) * 1e-3; }, 0, 0.17, 30), "var(--muted)", 1.2, null, 0.8)
+       .replace("<path", '<path stroke-dasharray="1 3"');
+  var lab = [];
+  sets.forEach(function(S){
+    var col = S.main ? "var(--ox)" : "var(--muted)";
+    s += pth(curve(f, function(x){ return (S.F.c + S.F.s * x) * 1e-3; }, 0, 0.17, 60), col, S.main ? 2 : 1.3, null, S.main ? 1 : 0.6)
+         .replace("<path", '<path stroke-dasharray="6 4"');
+    for(var k = 0; k < S.F.xs.length; k++){
+      var y = S.F.ys[k] * 1e-3;
+      if(y <= f.yhi) s += cir(f.px(S.F.xs[k]), f.py(y), S.main ? 5 : 3.6, S.main ? "var(--red-)" : "var(--muted)", S.main ? 1 : 0.7);
+    }
+    var yl = (S.F.c + S.F.s * 0.17) * 1e-3;
+    if(yl <= f.yhi * 0.97) lab.push({y:f.py(yl) - 6, t:S.E.toFixed(3) + " V", c:col, m:S.main});
+  });
+  /* three lines that nearly coincide carry three labels that do too:
+     sort them and keep twelve pixels between                        */
+  lab.sort(function(a, b){ return a.y - b.y; });
+  for(var q = 1; q < lab.length; q++)
+    if(lab[q].y < lab[q - 1].y + 12) lab[q].y = lab[q - 1].y + 12;
+  lab.forEach(function(L){
+    if(L.y < f.Y1) s += tx(f.X1 - 2, L.y, L.t, L.c, 9.5, "end", L.m ? 600 : 400);
+  });
+  if(isFinite(fit.ik) && fit.c * 1e-3 <= f.yhi){
+    s += cir(f.px(0), f.py(fit.c * 1e-3), 5.5, "var(--ox)");
+    /* the fan of lines leaves one half of the left edge free: whichever
+       half the intercept is not in                                   */
+    var hi = fit.c * 1e-3 > (f.ylo + f.yhi) / 2;
+    s += tx(f.X0 + 8, hi ? f.Y1 - 10 : f.Y0 + 15,
+            "intercept 1/i" + sb("k") + " = " + (fit.c * 1e-3).toPrecision(3) + " mA⁻¹",
+            "var(--ox)", 10.5, "start", 700);
+  }
+  /* above the dotted line when it runs low, below it when it runs high:
+     at the bottom of the frame the label would sit on the axis    */
+  var ytp = f.py(0.085 / (nt * KB1) * 1e-3);
+  s += tx(f.px(0.085), ytp > (f.Y0 + f.Y1) / 2 ? ytp - 8 : ytp + 16,
+          "pure transport", "var(--muted)", 9.5);
+  el("klPlot").innerHTML = s;
+}
+
+function klTafel(){
+  var jl16 = Math.log10(klIL(0.7, 1600) / KA * 1e3);
+  var top = Math.log10(Math.pow(10, KL.lj) * Math.pow(10, (EREF - 0.60) / KL.b));
+  var bot = Math.log10(Math.pow(10, KL.lj) * Math.pow(10, (EREF - 1.00) / KL.b));
+  var yhi = Math.min(top, jl16 + 2.2) + 0.3, ylo = bot - 0.3;
+  var f = fr(70, 1010, 22, 250, 0.60, 1.00, ylo, yhi);
+  var s = axLin(f, "E / V vs RHE", "j" + sb("k") + " / mA cm⁻²", null, function(){ return ""; });
+  /* one label per decade: axLin's own step can land on every second one */
+  for(var g = Math.ceil(ylo); g <= Math.floor(yhi); g++){
+    s += ln(f.X0, f.py(g), f.X1, f.py(g), "var(--line-2)", 1, "2 3", 0.9);
+    s += tx(f.X0 - 6, f.py(g) + 3.4, "10" + supr(g), "var(--muted)", 9.5, "end");
+  }
+  var e80 = klEdge(0.8), e10 = klEdge(0.1);
+  var x0 = f.px(clamp(e80, f.xlo, f.xhi)), x1 = f.px(clamp(e10, f.xlo, f.xhi));
+  s += rc(x0, f.Y0, x1 - x0, f.Y1 - f.Y0, "var(--go-soft)", 0.85);
+  if(jl16 >= ylo && jl16 <= yhi){
+    s += ln(f.X0, f.py(jl16), f.X1, f.py(jl16), "var(--stop)", 1.2, "5 4");
+    s += tx(f.X1 - 4, f.py(jl16) - 5, "j" + sb("L") + " at 1600 rpm (n at 0.70 V)", "var(--stop)", 10, "end", 600);
+  }
+  s += pth(curve(f, function(E){ return Math.log10(klIk(E) / KA * 1e3); }, 0.60, 1.00, 80), "var(--ink-2)", 1.6, null, 0.8);
+  var nin = 0, nout = 0, worstIn = 0, worstOut = 0, fail = 0;
+  for(var E = 0.60; E <= 1.0001; E += 0.02){
+    var F = klFit(E), fr16 = klFrac(E), inW = fr16 >= 0.1 && fr16 <= 0.8;
+    if(!isFinite(F.ik)){ fail++; s += tx(f.px(E), f.Y0 + 10, "×", "var(--stop)", 12, "middle", 700); continue; }
+    var dev = Math.abs(Math.log10(F.ik / klIk(E)));
+    if(inW){ nin++; worstIn = Math.max(worstIn, dev); } else { nout++; worstOut = Math.max(worstOut, dev); }
+    var y = Math.log10(F.ik / KA * 1e3);
+    if(y > f.yhi || y < f.ylo){ s += tx(f.px(E), y > f.yhi ? f.Y0 + 10 : f.Y1 - 4, y > f.yhi ? "↑" : "↓", "var(--stop)", 12, "middle", 700); continue; }
+    s += inW ? cir(f.px(E), f.py(y), 4.6, "var(--red-)")
+             : '<circle cx="' + f.px(E).toFixed(1) + '" cy="' + f.py(y).toFixed(1) + '" r="4.6" fill="var(--surface)" stroke="var(--red-)" stroke-width="1.6"/>';
+  }
+  s += tx(f.px(0.605), f.Y1 - 10, "true Tafel line, b = " + Math.round(KL.b * 1000) + " mV/dec", "var(--ink-2)", 10.5, "start", 600);
+  el("klTafel").innerHTML = s;
+  var pc = function(d){ var r = Math.pow(10, d); return r >= 2 ? "a factor of " + (r >= 10 ? r.toFixed(0) : r.toFixed(1)) : ((r - 1) * 100).toFixed(d < 0.02 ? 1 : 0) + " %"; };
+  el("klTafNote").innerHTML = KL.nz === 0
+    ? "With no noise every extracted point sits on the line, inside the window or not &mdash; the equation is exact for this model. Add 1 % of noise and watch the points below the window."
+    : "With " + KL.nz.toFixed(1) + " % noise on each current: inside the window the worst i<sub>k</sub> is off by " + pc(worstIn)
+      + " (" + nin + " points); outside it, by " + pc(worstOut) + " (" + nout + " points)"
+      + (fail ? ", and " + fail + " fit" + (fail > 1 ? "s" : "") + " gave a negative intercept (&times;)" : "") + ".";
+}
+
+bind("klE", function(v){ KL.E = v; klSync(); });
+bind("klJ", function(v){ KL.lj = v; klSync(); });
+bind("klNz", function(v){ KL.nz = v; klSync(); });
+pillGroup("klB", function(v){ KL.b = +v; klSync(); });
+pillGroup("klN", function(v){ KL.n = v; klSync(); });
+el("klReroll").addEventListener("click", function(){ KL.seed++; klSync(); });
+
+/* ---- panels drawn when first shown ------------------------------------ */
+var PANEL_SHOW = {}, SHOWN = {};
+[].slice.call(document.querySelectorAll(".tab")).forEach(function(t){
+  t.addEventListener("click", function(){
+    var id = t.getAttribute("aria-controls");
+    if(PANEL_SHOW[id] && !SHOWN[id]){ SHOWN[id] = 1; PANEL_SHOW[id](); }
+  });
+});
+PANEL_SHOW["p-kl"] = klSync;
+PANEL_SHOW["p-ring"] = rgSync;
+
+lvSync();
+
+
+
+/* ======================== 3 - THE RING ================================
+   Let x be the fraction of the arriving O2 that leaves the disk as
+   peroxide, and i4 the current the same flux would pass if every
+   molecule took four electrons. Then
+
+       i_disk   = i4 (1 - x/2)        two electrons for the fraction x
+       i_ring/N = i4 (x/2)            the peroxide current, un-collected
+
+   so i_disk + i_ring/N = i4 exactly, and the two reported numbers come
+   back as n = 4 - 2x and %H2O2 = 100x. Everything the bench shows is
+   what happens when that arithmetic is fed something it did not expect:
+   peroxide that decomposed on the way, or a ring current that was never
+   peroxide at all.                                                    */
+var RG = {x:0.30, N:0.25, rpm:1600, loss:0, bg:0};
+
+function rgI4(rpm){ return 4 * KB1 * Math.sqrt(omega(rpm)); }     /* A      */
+function rgWave(E){ return 1 / (1 + Math.pow(10, (E - 0.78) / 0.050)); }
+function rgAt(E){
+  var i4 = rgI4(RG.rpm) * rgWave(E);
+  var iD = i4 * (1 - RG.x / 2);
+  var iR = RG.N * i4 * RG.x / 2 * (1 - RG.loss) + RG.bg * 1e-6;
+  return {i4:i4, iD:iD, iR:iR, iRN:iR / RG.N};
+}
+function rgNof(p){ return 4 * p.iD / (p.iD + p.iRN); }
+function rgPctOf(p){ return 200 * p.iRN / (p.iD + p.iRN); }
+
+function rgLsvDraw(){
+  var lo = 0.20, hi = 1.00, s = "";
+  var pl = rgAt(lo), un = iUnit(pl.iD);
+  /* the ring carries a few per cent of the disk current: magnify it by a
+     round factor and say so, the way a paper does                     */
+  var mag = 1;
+  if(pl.iR > 0) mag = Math.max(1, Math.min(50, Math.round(0.45 * pl.iD / pl.iR)));
+  var top = pl.iR * mag / un.k * 1.35 + 0.02, bot = -pl.iD / un.k * 1.15;
+  var f = fr(64, 500, 22, 252, lo - 0.03, hi + 0.03, bot, Math.max(top, -bot * 0.25));
+  s += axLin(f, "E of the disk / V vs RHE", "i / " + un.u,
+             function(v){ return v.toFixed(1); }, function(v){ return v.toFixed(0); });
+  s += ln(f.X0, f.py(0), f.X1, f.py(0), "var(--line-2)", 1.2);
+  s += pth(curve(f, function(E){ return -rgAt(E).iD / un.k; }, lo, hi, 180), "var(--red-)", 2.2);
+  s += pth(curve(f, function(E){ return rgAt(E).iR * mag / un.k; }, lo, hi, 180), "var(--ox)", 2.2);
+  s += tx(f.px(0.24), f.py(-pl.iD / un.k) + 16, "disk \u2014 the reduction", "var(--red-)", 10.5, null, 700);
+  s += tx(f.px(0.24), f.py(pl.iR * mag / un.k) - 9,
+          "ring \u00d7 " + mag + " \u2014 the peroxide that got there", "var(--ox)", 10.5, null, 700);
+  s += ln(f.px(0.30), f.Y0, f.px(0.30), f.Y1, "var(--ink-2)", 1, "3 3", 0.45);
+  /* the ring's own label lives in the top left, so this one goes to the
+     right, where neither trace has anything to say                */
+  s += tx(f.X1 - 6, f.Y1 - 8, "the readings are taken at 0.30 V",
+          "var(--ink-2)", 9.5, "end", 600);
+  el("rgLsv").innerHTML = s;
+}
+
+function rgBiasDraw(){
+  var s = "", f = fr(70, 500, 22, 244, 0, 1, 0, 105);
+  s += axLin(f, "the peroxide the catalyst really makes, x", "% H\u2082O\u2082 reported",
+             function(v){ return (v * 100).toFixed(0) + " %"; }, function(v){ return v.toFixed(0); });
+  s += pth(curve(f, function(x){ return 100 * x; }, 0, 1, 20), "var(--muted)", 1.4, null, 0.8)
+       .replace("<path", '<path stroke-dasharray="5 4"');
+  s += tx(f.px(0.80), f.py(80) - 9, "if nothing were lost", "var(--muted)", 10, "middle", 600);
+  var keep = RG.x;
+  s += pth(curve(f, function(x){
+    RG.x = x; var p = rgAt(0.20); var v = rgPctOf(p); RG.x = keep; return clamp(v, 0, 105);
+  }, 0, 1, 120), "var(--ox)", 2.4);
+  var p0 = rgAt(0.20), here = clamp(rgPctOf(p0), 0, 105);
+  s += ln(f.px(RG.x), f.Y0, f.px(RG.x), f.Y1, "var(--ink-2)", 1, "3 3", 0.45);
+  s += cir(f.px(RG.x), f.py(here), 5, "var(--ox)");
+  /* both curves climb to the right, so the top left is always free: the
+     marker keeps the dashed line, the sentence keeps the corner   */
+  s += tx(f.X0 + 8, f.Y0 + 15,
+          "you report " + here.toFixed(0) + " %, the truth is " + (100 * RG.x).toFixed(0) + " %",
+          "var(--ox)", 10.5, null, 700);
+  el("rgBias").innerHTML = s;
+}
+
+function rgDraw(){
+  var p = rgAt(0.20), n = rgNof(p), pct = rgPctOf(p);
+  rgLsvDraw();
+  rgBiasDraw();
+  el("rgXv").textContent = (RG.x * 100).toFixed(0) + " % of the O\u2082";
+  el("rgNv").textContent = RG.N.toFixed(2);
+  el("rgRpmv").textContent = RG.rpm + " rpm";
+  el("rgLv").textContent = (RG.loss * 100).toFixed(0) + " %";
+  el("rgBv").textContent = RG.bg.toFixed(1) + " \u00b5A";
+  el("rgID").textContent = fmtA(p.iD);
+  el("rgIR").textContent = fmtA(p.iR);
+  el("rgIRN").textContent = fmtA(p.iRN);
+  el("rgN2").textContent = n.toFixed(2) + " electrons";
+  el("rgPct").textContent = pct.toFixed(0) + " %";
+  el("rgTrue").innerHTML = (4 - 2 * RG.x).toFixed(2) + " e<sup>&minus;</sup> &middot; "
+      + (100 * RG.x).toFixed(0) + " %";
+  el("rgEq").innerHTML =
+      '<span class="act">n = 4 &times; ' + fmtA(p.iD) + ' / (' + fmtA(p.iD) + ' + '
+      + fmtA(p.iRN) + ') = ' + n.toFixed(2) + '</span><br>'
+      + '<span class="pot">% H<sub>2</sub>O<sub>2</sub> = 200 &times; ' + fmtA(p.iRN) + ' / ('
+      + fmtA(p.iD) + ' + ' + fmtA(p.iRN) + ') = ' + pct.toFixed(0) + ' %</span>'
+      + '<small>i<sub>R</sub>/N = ' + fmtA(p.iR) + ' / ' + RG.N.toFixed(2) + ' = ' + fmtA(p.iRN)
+      + ' &mdash; the peroxide current as it left the disk</small>';
+  var v = el("rgVerd"), d = pct - 100 * RG.x;
+  if(RG.loss < 0.01 && RG.bg < 0.05){
+    v.className = "verdict go";
+    v.innerHTML = "<b>Nothing is lost and the ring is clean, so the arithmetic is exact:</b> "
+      + "i<sub>D</sub> + i<sub>R</sub>/N = " + fmtA(p.i4) + ", the four-electron current of this "
+      + "oxygen flux, and the two numbers come back as 4 &minus; 2x and 100x. <b>N cancels</b> "
+      + "&mdash; change it and both currents change, but n and %H<sub>2</sub>O<sub>2</sub> do not.";
+  }else if(d < -1){
+    v.className = "verdict stop";
+    v.innerHTML = "<b>Peroxide is decomposing before it reaches the ring.</b> i<sub>R</sub> is "
+      + (RG.loss * 100).toFixed(0) + " % short, so you report " + pct.toFixed(0) + " % instead of "
+      + (100 * RG.x).toFixed(0) + " %, and n = " + n.toFixed(2) + " instead of "
+      + (4 - 2 * RG.x).toFixed(2) + ". <b>N calibrated on a stable couple is too large for a "
+      + "species that does not survive the trip</b>, and the error always points the same way: "
+      + "the catalyst looks better than it is.";
+  }else{
+    v.className = "verdict stop";
+    v.innerHTML = "<b>Some of that ring current is not peroxide.</b> " + RG.bg.toFixed(1)
+      + " \u00b5A of water oxidation or ring corrosion is being divided by N and counted as "
+      + "product, so %H<sub>2</sub>O<sub>2</sub> reads " + pct.toFixed(0) + " % against a true "
+      + (100 * RG.x).toFixed(0) + " %. <b>Hold the ring on the peroxide plateau and subtract the "
+      + "argon blank.</b>";
+  }
+}
+function rgSync(){ later("rg", rgDraw); }
+
+bind("rgX", function(v){ RG.x = v; rgSync(); });
+bind("rgN", function(v){ RG.N = v; rgSync(); });
+bind("rgRpm", function(v){ RG.rpm = v; rgSync(); });
+bind("rgL", function(v){ RG.loss = v; rgSync(); });
+bind("rgB", function(v){ RG.bg = v; rgSync(); });
+[["rgP1", {x:0.02, loss:0, bg:0}],
+ ["rgP2", {x:0.30, loss:0, bg:0}],
+ ["rgP3", {x:0.60, loss:0.35, bg:0}]].forEach(function(q){
+  el(q[0]).addEventListener("click", function(){
+    var k; for(k in q[1]){ if(Object.prototype.hasOwnProperty.call(q[1], k)) RG[k] = q[1][k]; }
+    el("rgX").value = RG.x; el("rgL").value = RG.loss; el("rgB").value = RG.bg;
+    rgSync();
+  });
+});
+
+
+/* ================= CONCEPT CHECK QUESTIONS ============================
+   Every answer is something one of the three benches can be made to
+   show, not something to remember.                                     */
+
+var QZ1 = [
+ {q:"The rotation rate of an RDE is raised from 400 to 1600 rpm. What happens to the diffusion-layer thickness &delta; and the limiting current i<sub>L</sub>?",
+  o:["&delta; falls to a quarter and i<sub>L</sub> rises four times",
+     "&delta; halves and i<sub>L</sub> doubles",
+     "&delta; falls to a quarter and i<sub>L</sub> doubles",
+     "&delta; and i<sub>L</sub> both change by &radic;2"],
+  a:1,
+  w:"&delta; = 1.61 D<sup>1/3</sup>&nu;<sup>1/6</sup>&omega;<sup>&minus;1/2</sup>, so four times the rotation rate is half the layer; i<sub>L</sub> = nFADC*/&delta; is then twice as large, which is the &omega;<sup>1/2</sup> of the Levich equation. Four times in rpm is four times in &omega; &mdash; the factor 2&pi;/60 cancels in a ratio. On the <b>Rotation &amp; Levich</b> tab, 400 &rarr; 1600 rpm takes &delta; from 24.9 to 12.4 µm and i<sub>L</sub> from 76.0 to 152 µA at the default settings; the third option mixes the two exponents up."},
+
+ {q:"A Levich plot is drawn against rpm<sup>1/2</sup>, and its slope is put straight into i<sub>L</sub> = 0.620nFAD<sup>2/3</sup>&nu;<sup>&minus;1/6</sup>C*&omega;<sup>1/2</sup> as if it were per (rad/s)<sup>1/2</sup>. The D that comes out is:",
+  o:["Correct &mdash; the unit of the axis cancels in a slope",
+     "About 3.1 times too large",
+     "About 3.1 times too small",
+     "About 5.4 times too small"],
+  a:3,
+  w:"&omega;<sup>1/2</sup> = (2&pi;/60)<sup>1/2</sup> rpm<sup>1/2</sup> = 0.3236 rpm<sup>1/2</sup>, so the same current against a longer axis gives a slope 0.3236 times as steep. D goes as slope<sup>3/2</sup>, and 0.3236<sup>3/2</sup> = 0.184: D comes out 5.4 times too small. The 3.1 answers forget the 3/2 power. Switch the axis on the <b>Rotation &amp; Levich</b> tab and read &ldquo;D read back from it&rdquo;: a slope has to be per (rad/s)<sup>1/2</sup> before D can be read from it."},
+
+ {q:"A Levich plot is straight at low rotation rates but bends toward the &omega;<sup>1/2</sup> axis at high ones, falling below the line through the origin. What does that say?",
+  o:["The flow has turned turbulent",
+     "D increases with the rotation rate",
+     "Electron transfer can no longer keep up with the supply: the current is under mixed control",
+     "Natural convection is adding to the current"],
+  a:2,
+  w:"The faster the disk spins, the more O arrives, and once the electrode cannot use it all, i stops rising as &omega;<sup>1/2</sup>: 1/i = 1/i<sub>k</sub> + 1/(B&omega;<sup>1/2</sup>) levels off at i<sub>k</sub>. That is the cue to use the Koutecky&ndash;Levich plot instead. Turbulence and natural convection would both bring <i>more</i> solution to the surface and push the current above the Levich line, not below it; and D is a property of the solution, not of the disk."},
+
+ {q:"In a Koutecky&ndash;Levich plot of 1/i against &omega;<sup>&minus;1/2</sup>, what is the intercept on the 1/i axis?",
+  o:["1/i<sub>L</sub> at the slowest rotation rate",
+     "1/i<sub>k</sub>: the current the electrode would pass at infinite rotation, with no transport limit",
+     "1/B, the inverse Levich constant",
+     "Always zero for a straight line"],
+  a:1,
+  w:"&omega;<sup>&minus;1/2</sup> = 0 means &omega; &rarr; &infin;, where 1/i<sub>L</sub> = 1/(B&omega;<sup>1/2</sup>) vanishes and only 1/i<sub>k</sub> is left. That is why the intercept is called the apparent i<sub>k</sub> and used to compare catalysts. 1/B is the <i>slope</i>, and an intercept of zero is the special case of fast kinetics (HOR on Pt). On the <b>Koutecky&ndash;Levich</b> tab the intercept is marked on the axis and compared with the true i<sub>k</sub>."},
+
+ {q:"Two ORR catalysts give the same limiting current at 1600 rpm, but one reaches half of it at a higher potential. Which number should you use to compare their activity?",
+  o:["i<sub>k</sub> at one potential in the mixed region, from the K-L intercept or i&middot;i<sub>L</sub>/(i<sub>L</sub> &minus; i)",
+     "i<sub>L</sub> at 1600 rpm",
+     "The slope of the Koutecky&ndash;Levich line",
+     "The potential at which the current first reaches i<sub>L</sub>"],
+  a:0,
+  w:"i<sub>L</sub> is set by D, &nu;, C* and &omega; &mdash; by the solution and the rotator, not the catalyst &mdash; which is why it is a bad choice: every catalyst making H<sub>2</sub>O has the same one. The slope also belongs to transport (it gives n). The activity is in i<sub>k</sub>, and it should be taken at a fixed potential, ideally below half of i<sub>L</sub>. The potential where i reaches i<sub>L</sub> is never sharply defined, because the plateau is approached asymptotically."},
+
+ {q:"You extract i<sub>k</sub> from a current measured at 90 % of i<sub>L</sub>. If i<sub>L</sub> is uncertain by 1 %, how uncertain is i<sub>k</sub>?",
+  o:["1 %",
+     "0.1 %",
+     "About 9 %",
+     "About 90 %"],
+  a:2,
+  w:"i<sub>k</sub> = i&middot;i<sub>L</sub>/(i<sub>L</sub> &minus; i). Differentiating, a relative error in i<sub>L</sub> becomes i/(i<sub>L</sub> &minus; i) = 0.9/0.1 = 9 times larger in i<sub>k</sub> (and one in i becomes i<sub>L</sub>/(i<sub>L</sub> &minus; i) = 10 times larger). You are subtracting two numbers that differ by 10 %. That is the reason for the usual 10&ndash;80 % window: set 1 % of noise on the <b>Koutecky&ndash;Levich</b> tab and watch the Tafel points scatter once they leave it."}
+];
+
+var QZ2 = [
+ {q:"The collection efficiency N of a ring-disk electrode is 0.25. What does that number depend on?",
+  o:["The rotation rate: faster rotation sweeps more product past the ring",
+     "The diffusion coefficient of the product and its concentration",
+     "The three radii &mdash; the disk, and the inner and outer edge of the ring &mdash; and nothing else",
+     "The potential the ring is held at"],
+  a:2,
+  w:"N is the fraction of what leaves the disk that passes under the ring before the flow throws it outward, and that is a question about shape. <b>&omega; cancels</b>: faster rotation brings more product to the ring and sweeps it away faster in the same proportion. D and C* cancel for the same reason. The ring potential only has to be far enough onto the plateau that everything arriving is consumed &mdash; past that, it does not enter either. This is why N can be calibrated once, on a different couple entirely, and then used all day."},
+
+ {q:"On the same electrode you measure i<sub>D</sub> = 1.00 mA and i<sub>R</sub> = 0.100 mA, with N = 0.25. What fraction of the oxygen left the disk as H<sub>2</sub>O<sub>2</sub>?",
+  o:["10 %, the ratio of the two currents",
+     "57 %",
+     "40 %, the ratio divided by N",
+     "25 %, because that is what N allows through"],
+  a:1,
+  w:"Divide by N first: <code>i<sub>R</sub>/N = 0.100/0.25 = 0.400 mA</code> is the peroxide current <i>as it left the disk</i>. Then <code>%H<sub>2</sub>O<sub>2</sub> = 200 &times; 0.400/(1.00 + 0.400) = 57 %</code>, and <code>n = 4 &times; 1.00/1.40 = 2.9</code>. The 200 is there because peroxide takes two electrons of the four. <b>A ring current a tenth of the disk current is a catalyst sending more than half its oxygen to peroxide</b> &mdash; which is exactly what a collection efficiency of a quarter means, and why the raw ratio is so misleading."},
+
+ {q:"Why is N calibrated with Fe(CN)<sub>6</sub><sup>3&minus;</sup>/Fe(CN)<sub>6</sub><sup>4&minus;</sup> rather than with the oxygen reduction itself?",
+  o:["Because ferrocyanide is stable: it cannot decompose between the disk and the ring, so every molecule that gets there is counted",
+     "Because it is a one-electron couple and the arithmetic is simpler",
+     "Because it is reversible, so the ring potential does not matter",
+     "Because its diffusion coefficient is known more accurately than that of O<sub>2</sub>"],
+  a:0,
+  w:"N is defined for a product that survives the trip. Ferrocyanide does; H<sub>2</sub>O<sub>2</sub> may not, and in any case the ORR produces a mixture rather than one countable product, so there is nothing to measure N against. The one-electron stoichiometry and the reversibility are conveniences, not the reason &mdash; and D is irrelevant, since N does not contain it."},
+
+ {q:"Some of the H<sub>2</sub>O<sub>2</sub> decomposes on the catalyst film before it reaches the ring. Which way does that push the two reported numbers?",
+  o:["Both too low: less peroxide is detected and less is made",
+     "n too low and %H<sub>2</sub>O<sub>2</sub> too high",
+     "Neither: dividing by N corrects for it",
+     "n too high and %H<sub>2</sub>O<sub>2</sub> too low"],
+  a:3,
+  w:"i<sub>R</sub> falls while i<sub>D</sub> does not, so i<sub>R</sub>/N is an underestimate of the peroxide that was actually made: <code>n = 4i<sub>D</sub>/(i<sub>D</sub> + i<sub>R</sub>/N)</code> rises towards 4 and the percentage falls. <b>Dividing by N cannot correct it</b>, because N was measured on a species that did not decompose &mdash; it is too large for this one. The error always flatters the catalyst, which is why <b>an n of 3.9 is not by itself proof of a four-electron pathway</b>. Push the loss slider on the ring tab and watch a 60 % peroxide catalyst be reported at half that."},
+
+ {q:"At one rotation rate, can the ring distinguish O<sub>2</sub> &rarr; 2H<sub>2</sub>O at the disk from O<sub>2</sub> &rarr; H<sub>2</sub>O<sub>2</sub> &rarr; 2H<sub>2</sub>O at the disk?",
+  o:["Yes: the series route always gives a larger ring current",
+     "No &mdash; both give only the peroxide that escaped, and separating them needs the rotation-rate dependence",
+     "Yes, if the ring is held at a more positive potential",
+     "No, and nothing can: the two are indistinguishable in principle"],
+  a:1,
+  w:"The ring sees what escaped, not what happened. A catalyst that makes peroxide and then reduces it further keeps most of it on the surface, so the ring current looks much like the direct route's. <b>Time is the discriminator:</b> spinning faster gives the intermediate less time on the surface, so more escapes. Plotting i<sub>D</sub>/i<sub>R</sub> against &omega;<sup>&minus;1/2</sup> &mdash; Damjanovic's analysis &mdash; gives a straight line whose intercept holds the branching ratio and whose slope holds the rate of the second reduction. So it is not indistinguishable in principle; it is indistinguishable <i>at one rotation rate</i>."},
+
+ {q:"A student sets the ring 400 mV above the H<sub>2</sub>O<sub>2</sub> oxidation plateau to &ldquo;make sure everything is caught&rdquo;. What happens?",
+  o:["Nothing: once on the plateau, extra potential changes no current",
+     "The collection efficiency rises, so N must be re-measured",
+     "Water oxidation and ring corrosion add current that is counted as peroxide, so %H<sub>2</sub>O<sub>2</sub> reads high",
+     "The ring begins to reduce O<sub>2</sub> as well, so the ring current changes sign"],
+  a:2,
+  w:"The plateau is where every molecule arriving is already being oxidised; past it there is nothing more to collect, and the extra potential only opens other reactions &mdash; water oxidation on a Pt ring, or oxidation of the ring itself. That current is divided by N and reported as product. <b>Run the blank under argon at the same ring potential and subtract it</b>, and if the blank is not small, come back down to the plateau. N is geometry and does not move; and a ring held strongly positive cannot reduce anything."}
+];
+
+var LETTERS = "ABCD";
+var SUBMIT_URL = "https://script.google.com/macros/s/AKfycbxPm7WrbttFu6-gnTi__IcUPt-816GthK0eI8TPuwOZyYlcRW3RAWJlmsr791moxBc5GA/exec";
+
+function code(str){
+  var h=0x811c9dc5;
+  for(var i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=(h+((h<<1)+(h<<4)+(h<<7)+(h<<8)+(h<<24)))>>>0; }
+  return ("0000000"+h.toString(16).toUpperCase()).slice(-8);
+}
+
+/* n: 1 or 2, the suffix on every element id of that check's panel */
+function makeQuiz(n, QZ, label, STORE){
+  function E(id){ return document.getElementById(id + n); }
+  var picks=new Array(QZ.length).fill(-1);
+  var sId=E("sId"), elTally=E("tally"), elBar=E("scorebar"), elScore=E("scoreNum"),
+      elWho=E("whoLine"), elIdHint=E("idHint"), dlBtn=E("dlBtn"), dlHint=E("dlHint"),
+      sendBtn=E("sendBtn"), root=E("quiz");
+  var startedAt=null, finishedAt=null;
+
+  function save(){
+    try{ localStorage.setItem(STORE,JSON.stringify({i:sId.value,p:picks,s:startedAt,t:finishedAt})); }catch(e){}
+  }
+  function loadState(){
+    try{
+      var d=JSON.parse(localStorage.getItem(STORE)||"null");
+      if(d){ sId.value=d.i||""; if(Array.isArray(d.p)&&d.p.length===QZ.length) picks=d.p.slice();
+             startedAt=d.s||null; finishedAt=d.t||null; }
+    }catch(e){}
+  }
+  function started(){ return picks.some(function(p){return p>=0;}); }
+  function scoreOf(){ var s=0; for(var i=0;i<QZ.length;i++) if(picks[i]===QZ[i].a) s++; return s; }
+  function answered(){ return picks.filter(function(p){return p>=0;}).length; }
+
+  function receipt(){
+    var s=scoreOf(), pct=Math.round(s/QZ.length*100), id=(sId.value||"").trim();
+    var stamp=finishedAt||new Date().toISOString();
+    var vc=code(id+"|"+stamp+"|"+picks.join(""));
+    var head=["lecture","student_id","completed_utc","score","total","percent","verification"];
+    var row=[label,id,stamp,s,QZ.length,pct,vc];
+    for(var i=0;i<QZ.length;i++){ head.push("a"+(i+1)); row.push(picks[i]>=0?LETTERS[picks[i]]:"-"); }
+    for(var j=0;j<QZ.length;j++){ head.push("ok"+(j+1)); row.push(picks[j]===QZ[j].a?1:0); }
+    function cell(v){ v=String(v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
+    return {csv:head.join(",")+"\n"+row.map(cell).join(",")+"\n", vcode:vc, score:s, pct:pct, id:id};
+  }
+
+  function render(){
+    var done=answered(), all=(done===QZ.length);
+    elTally.textContent=done+" / "+QZ.length+" answered";
+    elBar.hidden=!all;
+    sId.readOnly=started();
+    elIdHint.innerHTML = all
+      ? "<strong>Attempt complete.</strong> Your answers are final. Every question now shows the correct answer and why — read them before you close this page."
+      : started() ? "<strong>Attempt in progress.</strong><span class=\"locked\">ID locked</span><br>Each answer is final."
+                  : "<strong>One attempt.</strong> Enter your student ID before you begin — it locks once you answer the first question.";
+    if(all){
+      if(!finishedAt){ finishedAt=new Date().toISOString(); save(); }
+      var r=receipt();
+      elScore.innerHTML=r.score+' <small>/ '+QZ.length+'  ·  '+r.pct+' %</small>';
+      elWho.innerHTML="Student ID <b>"+esc(r.id||"—")+"</b> &nbsp;·&nbsp; Verification <b>"+r.vcode+"</b>";
+    }
+    for(var i=0;i<QZ.length;i++){
+      var box=root.querySelector('.opts[data-q="'+i+'"]');
+      var kids=[].slice.call(box.children), why=box.parentNode.querySelector(".why");
+      if(picks[i]<0){ kids.forEach(function(o){o.disabled=false;o.className="opt";}); why.hidden=true; }
+      else{
+        (function(qi){ kids.forEach(function(o,j){
+          o.disabled=true;
+          o.className="opt"+(j===QZ[qi].a?" right":(j===picks[qi]?" wrong":""));
+        }); })(i);
+        var _note=(picks[i]!==QZ[i].a)
+          ? '<span class="misc">You chose <b>'+LETTERS[picks[i]]+'</b>. '
+            + 'The correct answer is <b>'+LETTERS[QZ[i].a]+'</b>.</span>'
+          : "";
+        why.innerHTML=_note+QZ[i].w; why.hidden=false;
+      }
+    }
+  }
+
+  root.innerHTML=QZ.map(function(item,i){
+    return '<div class="card q"><div class="card-b">'
+      +'<p class="stem"><b style="font-family:IBM Plex Mono,monospace;color:var(--muted);font-size:12px">Q'+(i+1)+'</b>  '+item.q+'</p>'
+      +'<div class="opts" data-q="'+i+'">'+item.o.map(function(o,j){
+          return '<button class="opt" data-i="'+j+'"><span class="ltr">'+LETTERS[j]+'</span><span>'+o+'</span></button>';
+        }).join("")+'</div><p class="why" hidden></p></div></div>';
+  }).join("");
+
+  [].slice.call(root.querySelectorAll(".opts")).forEach(function(box){
+    box.addEventListener("click",function(ev){
+      var b=ev.target.closest(".opt");
+      if(!b||b.disabled) return;
+      var qi=+box.getAttribute("data-q");
+      if(picks[qi]>=0) return;
+      if(!(sId.value||"").trim()){
+        elIdHint.innerHTML="<strong style=\"color:var(--stop)\">Enter your student ID first.</strong> It is written into the result file you submit.";
+        sId.focus(); return;
+      }
+      if(!startedAt) startedAt=new Date().toISOString();
+      picks[qi]=+b.getAttribute("data-i");
+      save(); render();
+    });
+  });
+  sId.addEventListener("input",save);
+
+  dlBtn.addEventListener("click",function(){
+    var id=(sId.value||"").trim();
+    if(!id){ dlHint.textContent="Enter your student ID first — it goes into the file."; return; }
+    var r=receipt();
+    try{
+      var blob=new Blob([r.csv],{type:"text/csv;charset=utf-8"});
+      var url=URL.createObjectURL(blob);
+      var a=document.createElement("a");
+      a.href=url; a.download="CH40051-"+label+"-check_"+id.replace(/[^A-Za-z0-9_-]/g,"")+".csv";
+      a.style.display="none";
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(function(){URL.revokeObjectURL(url);},1000);
+      dlHint.textContent="Saved. Hand it in as your instructor directs.";
+    }catch(e){
+      dlHint.textContent="Your browser blocked the download. Screenshot this panel and submit that instead.";
+    }
+  });
+
+  /* ---- submit straight to the course sheet -------------------------------- */
+  if(SUBMIT_URL){
+    sendBtn.hidden=false;
+    dlHint.textContent="Press Submit to send your result to the course. The download is a backup.";
+  }
+  sendBtn.addEventListener("click",function(){
+    var id=(sId.value||"").trim();
+    if(!id){ dlHint.textContent="Enter your student ID first."; return; }
+    var r=receipt();
+    var payload={
+      lecture:label, student_id:id, completed_utc:finishedAt||new Date().toISOString(),
+      score:r.score, total:QZ.length, percent:r.pct, verification:r.vcode,
+      answers:picks.map(function(p){ return p>=0?LETTERS[p]:"-"; }),
+      ok:picks.map(function(p,i){ return p===QZ[i].a?1:0; })
+    };
+    sendBtn.disabled=true;
+    dlHint.textContent="Sending...";
+    fetch(SUBMIT_URL,{
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(payload)
+    })
+    .then(function(res){ return res.json(); })
+    .then(function(j){
+      if(j && j.ok){
+        sendBtn.textContent="Submitted ✓";
+        dlHint.textContent="Recorded for student ID "+id+". You can close this page.";
+      }else{
+        sendBtn.disabled=false;
+        sendBtn.textContent="Submit to the course";
+        dlHint.textContent="Not recorded — "+((j && j.error) || "the course sheet refused it.")
+          + " Keep the downloaded file and tell your instructor if this looks wrong.";
+      }
+    })
+    .catch(function(){
+      fetch(SUBMIT_URL,{method:"POST",mode:"no-cors",
+        headers:{"Content-Type":"text/plain;charset=utf-8"},
+        body:JSON.stringify(payload)}).catch(function(){});
+      sendBtn.disabled=false;
+      sendBtn.textContent="Submit to the course";
+      dlHint.textContent="Sent, but the confirmation did not come back. "
+        + "Download the file as well and keep it - it is your proof of submission.";
+    });
+  });
+
+  loadState();
+  render();
+}makeQuiz(1, QZ1, "L16-RDE", "ch40051-l16rde-check-v1");
+makeQuiz(2, QZ2, "L16-RRDE", "ch40051-l16rrde-check2-v1");
+
+})();
+</script>
+</body>
+</html>
