@@ -818,7 +818,14 @@ var CALC = [pPeakSep, pPeakRatio, pRandles, pCottrell, pOhmic, pDPV];
 
 
 /* ---------- state ---------- */
-var STORE = "ch40051-ps4-v1";
+/* The set's own name, written once. Every other place that needs it -
+   the seed that decides which problems a student gets, the saved-state
+   key, the assignment field the course sheet files the result under,
+   and the name of the CSV the student keeps - is derived from this
+   line. These files are made by copying the previous set, and a name
+   repeated in four places is a name that gets renamed in three. */
+var PSET  = "PS4";
+var STORE = "ch40051-" + PSET.toLowerCase() + "-v1";
 var probs = [], state = [], sid = "";
 var sId       = document.getElementById("sId"),
     genBtn    = document.getElementById("genBtn"),
@@ -914,7 +921,7 @@ var CONCEPTS = {
 
 function build(id){
   sid = id;
-  var r = mulberry32(hash32("CH40051-PS4-" + id));
+  var r = mulberry32(hash32("CH40051-" + PSET + "-" + id));
   probs = CALC.map(function(fn){ return fn(r); });
 
   /* one concept question from each lecture, and a second from one of them */
@@ -1119,7 +1126,7 @@ sId.addEventListener("keydown", function(e){ if (e.key === "Enter") genBtn.click
 function result(){
   var solved = state.filter(function(s){ return s.solved; }).length;
   var r = {
-    assignment:"PS3", student_id:sid, completed_utc:new Date().toISOString(),
+    assignment:PSET, student_id:sid, completed_utc:new Date().toISOString(),
     solved:solved, total:probs.length, verification:vcode(),
     kinds:[], topics:[], expected:[], given:[], tries:[], ok:[]
   };
@@ -1154,7 +1161,7 @@ document.getElementById("dlBtn").addEventListener("click", function(){
     var blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
     var url = URL.createObjectURL(blob);
     var a = document.createElement("a");
-    a.href = url; a.download = "CH40051-PS3_" + sid.replace(/[^A-Za-z0-9_-]/g, "") + ".csv";
+    a.href = url; a.download = "CH40051-" + PSET + "_" + sid.replace(/[^A-Za-z0-9_-]/g, "") + ".csv";
     a.style.display = "none";
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
