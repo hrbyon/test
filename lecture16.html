@@ -271,11 +271,28 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
 .bench>.ctl .readout .v{font-size:15px;text-align:right;min-width:0;overflow-wrap:anywhere}
 .bench>.ctl .slider-row .fld{line-height:1.4}
 .bench .wideF{grid-column:1 / -1}
+/* Two pictures stacked in one column beside a third that is taller than
+   both. The column is stretched to the tall card by the grid's own
+   align-items, and the lower card of the pair is the one that takes the
+   slack - so its foot lands level with the foot of the tall card
+   whatever the sliders do to either of them. */
+.bench>.figs>.lcol{display:flex;flex-direction:column;gap:16px;min-width:0}
+.bench>.figs>.lcol>.card{display:flex;flex-direction:column}
+.bench>.figs>.lcol>.card:last-child{flex:1 1 auto}
+.bench>.figs>.lcol>.card:last-child>.card-b:last-child{flex:1 1 auto}
 @media(max-width:1200px){.bench{grid-template-columns:minmax(236px,282px) minmax(0,1fr)}}
 @media(max-width:980px){.bench{grid-template-columns:minmax(0,1fr)}}
-@media(max-width:700px){.bench>.figs{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:700px){
+  .bench>.figs{grid-template-columns:minmax(0,1fr)}
+  /* in one column there is no column to stack, and the stacking order is
+     the wrong reading order: the Tafel plot is made FROM the K-L
+     intercepts, so it has to come after them. display:contents lets the
+     two stacked cards rejoin the grid and the lower one take last place */
+  .bench>.figs>.lcol{display:contents}
+  .bench>.figs>.lcol>.card:last-child{order:3}
+}
 
-/* the mechanism tab: the line of slide 5 that holds at this eta */
+/* the mechanism tab: the line of the Tafel analysis that holds at this eta */
 .eqbig .lit{background:var(--stop-soft);border-radius:5px;padding:1px 5px}
 .eqbig .dim{opacity:.55}
 /* a reading list: four groups, two to a row */
@@ -313,14 +330,14 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
   <section class="panel" id="p-lev" role="tabpanel" aria-labelledby="t-lev">
 
     <div class="card" style="margin-bottom:16px">
-      <div class="card-h"><h2>Slide 7 in two lines</h2>
+      <div class="card-h"><h2>The Levich equation in two lines</h2>
         <span class="note">a reversible reduction O + ne<sup>&minus;</sup> &rarr; R, only O in the bulk, 25 &deg;C</span></div>
       <div class="card-b stack" style="gap:12px">
         <div class="eqbig" style="white-space:normal">
           <span class="cnc">&delta; = 1.61 D<sup>1/3</sup> &nu;<sup>1/6</sup> &omega;<sup>&minus;1/2</sup></span>
           <small>the Nernst diffusion layer: thinner as the disk spins faster, and fixed in time</small><br>
           <span class="act">i<sub>L</sub> = nFAD C*/&delta; = 0.620 nFA D<sup>2/3</sup> &nu;<sup>&minus;1/6</sup> &omega;<sup>1/2</sup> C* = B &omega;<sup>1/2</sup></span>
-          <small>B is the Levich constant (slide 7&rsquo;s &Gamma;n): the slope of the Levich plot</small><br>
+          <small>B is the Levich constant: the slope of the Levich plot</small><br>
           <span class="pot">&omega; = 2&pi; &times; rpm / 60</span>
           <small>in rad s<sup>&minus;1</sup> &mdash; the only unit the 0.620 is right for</small>
         </div>
@@ -364,35 +381,9 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
           </div>
         </div>
 
-
-      </div>
-
-      <div class="figs">
         <div class="card">
-          <div class="card-h"><h2>Voltammograms: four rotation rates, and yours</h2>
-            <span class="note" id="lvFigN">&mdash;</span></div>
-          <div class="card-b">
-            <svg id="lvLsv" viewBox="0 0 520 300" style="width:100%;height:auto" role="img"
-                 aria-label="Current against potential for a reversible reduction at four standard rotation rates and the one chosen. Each is a sigmoidal wave that levels off at a limiting current; the plateau is deeper the faster the disk spins."></svg>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-h"><h2>The Levich plot they make</h2>
-            <span class="note">plateau current against &radic;&omega;, with slide 7 evaluated underneath</span></div>
-          <div class="card-b stack" style="gap:12px">
-            <svg id="lvPlot" viewBox="0 0 520 300" style="width:100%;height:auto" role="img"
-                 aria-label="Limiting current against the square root of the rotation rate. The points lie on a straight line through the origin whose slope is the Levich constant; the chosen rotation rate is highlighted."></svg>
-
-            <div class="eqbig" id="lvDer" style="white-space:normal"></div>
-            <p class="hint" style="margin:0">Two routes to the same current differ in the third figure: nFADC*/&delta; uses 1/1.61 = 0.621 where Levich&rsquo;s equation has 0.620. Both are the rounded form of one constant, 1/1.612 = 0.6205, from the derivation in the supplementary slides (S2); the page uses 1.61 for &delta; and 0.620 for i<sub>L</sub>, as slide 7 does.</p>
-          </div>
-        </div>
-
-
-        <div class="card wideF">
           <div class="card-h"><h2>At this rotation rate</h2>
-            <span class="note">everything the two figures above are drawn from</span></div>
+            <span class="note">everything the three figures are drawn from</span></div>
           <div class="card-b stack" style="gap:12px">
             <div class="readouts">
               <div class="readout"><span class="k">&omega;</span><span class="v" id="lvW">&mdash;</span></div>
@@ -407,6 +398,60 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
           </div>
         </div>
       </div>
+
+      <div class="figs">
+        <div class="card wideF">
+          <div class="card-h"><h2>The disk, spinning &mdash; and the layer it holds against its face</h2>
+            <span class="note" id="lvSpinN">&mdash;</span></div>
+          <div class="card-b stack" style="gap:12px">
+            <svg id="lvSpin" viewBox="0 0 1040 392" style="width:100%;height:auto" role="img"
+                 aria-label="On the left, a rotating disk electrode in cross-section: solution is drawn up along the axis towards the face and flung outward across it, and a shaded band against the face is the diffusion layer, drawn to a micron scale. On the right, the same layer as a concentration profile against distance from the surface, with four other rotation rates ghosted behind the one chosen. Spinning the disk faster thins the band and steepens the profile."></svg>
+            <div class="btnrow">
+              <button class="ghost" id="lvSpinBtn" type="button">Spin</button>
+              <button class="ghost" id="lvSweepBtn" type="button">Sweep 100 &rarr; 4000 rpm</button>
+            </div>
+            <p class="hint" style="margin:0"><b>Read the two halves together.</b> The spinning does not
+              push the reactant into the electrode &mdash; it drags solution up the axis and throws it
+              outward across the face, and what that buys you is a <b>thinner stagnant layer</b>. The
+              micron scale on the left does not move when the rate changes, so the band genuinely thins:
+              &delta; &prop; &omega;<sup>&minus;1/2</sup>, four times the rate for half the thickness.
+              On the right the same layer is the distance over which the concentration climbs back to
+              C*, and the slope at the wall &mdash; which is the flux, and so the current &mdash; is
+              C*/&delta;. <b>Press Sweep and watch all three figures move together:</b> the band thins,
+              the wave deepens, the Levich point climbs the line.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h2>Voltammograms: four rotation rates, and yours</h2>
+            <span class="note" id="lvFigN">&mdash;</span></div>
+          <div class="card-b">
+            <svg id="lvLsv" viewBox="0 0 520 300" style="width:100%;height:auto" role="img"
+                 aria-label="Current against potential for a reversible reduction at four standard rotation rates and the one chosen. Each is a sigmoidal wave that levels off at a limiting current; the plateau is deeper the faster the disk spins."></svg>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h2>The Levich plot they make</h2>
+            <span class="note">plateau current against &radic;&omega;, with the equation evaluated underneath</span></div>
+          <div class="card-b">
+            <svg id="lvPlot" viewBox="0 0 520 300" style="width:100%;height:auto" role="img"
+                 aria-label="Limiting current against the square root of the rotation rate. The points lie on a straight line through the origin whose slope is the Levich constant; the chosen rotation rate is highlighted."></svg>
+
+          </div>
+        </div>
+
+        <div class="card wideF">
+          <div class="card-h"><h2>The Levich equation, evaluated at this rotation rate</h2>
+            <span class="note">the two routes to the same current, with the numbers in them</span></div>
+          <div class="card-b stack" style="gap:12px">
+            <div class="eqbig" id="lvDer" style="white-space:normal"></div>
+            <p class="hint" style="margin:0">Two routes to the same current differ in the third figure: nFADC*/&delta; uses 1/1.61 = 0.621 where Levich&rsquo;s equation has 0.620. Both are the rounded form of one constant, 1/1.612 = 0.6205, from the derivation in the supplementary material; the page uses 1.61 for &delta; and 0.620 for i<sub>L</sub>, as the lecture does.</p>
+          </div>
+        </div>
+
+
+      </div>
     </div>
   </section>
 
@@ -414,7 +459,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
 
     <div class="card" style="margin-bottom:16px">
       <div class="card-h"><h2>Two resistances in series</h2>
-        <span class="note">slides 10&ndash;13 &middot; an ORR-like reduction on a 5.0 mm disk</span></div>
+        <span class="note">an ORR-like reduction on a 5.0 mm disk</span></div>
       <div class="card-b stack" style="gap:12px">
         <p class="hint" style="margin:0">The transport numbers are fixed at C* = 1.2 mM, D = 1.9 &times; 10<sup>&minus;5</sup> cm<sup>2</sup> s<sup>&minus;1</sup> and &nu; = 0.010 cm<sup>2</sup> s<sup>&minus;1</sup> &mdash; round versions of values often quoted for O<sub>2</sub> in 0.1 M HClO<sub>4</sub> at 25 &deg;C, used here as an illustration rather than as data. The kinetics are yours to set.</p>
       </div>
@@ -475,12 +520,24 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
       </div>
 
       <div class="figs">
-        <div class="card">
-          <div class="card-h"><h2>Linear sweeps at four rotation rates</h2>
-            <span class="note">the band is 10&ndash;80 % of i<sub>L</sub> at 1600 rpm (slide 13)</span></div>
-          <div class="card-b">
-            <svg id="klLsv" viewBox="0 0 520 300" style="width:100%;height:auto" role="img"
-                 aria-label="Cathodic current density against potential at 400, 900, 1600 and 2500 rpm. At high potential the current is kinetic and the same at every rotation rate; at low potential it levels off at a plateau that deepens with rotation. A shaded band marks where the current is between ten and eighty per cent of the plateau at 1600 rpm, and a vertical line marks the chosen potential."></svg>
+        <div class="lcol">
+          <div class="card">
+            <div class="card-h"><h2>Linear sweeps at four rotation rates</h2>
+              <span class="note">the band is 10&ndash;80 % of i<sub>L</sub> at 1600 rpm</span></div>
+            <div class="card-b">
+              <svg id="klLsv" viewBox="0 0 520 300" style="width:100%;height:auto" role="img"
+                   aria-label="Cathodic current density against potential at 400, 900, 1600 and 2500 rpm. At high potential the current is kinetic and the same at every rotation rate; at low potential it levels off at a plateau that deepens with rotation. A shaded band marks where the current is between ten and eighty per cent of the plateau at 1600 rpm, and a vertical line marks the chosen potential."></svg>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-h"><h2>The Tafel plot, made from the intercepts</h2>
+              <span class="note">i<sub>k</sub> extracted by K-L at every 20 mV, with the noise you set &middot; open circles are outside the 10&ndash;80 % window</span></div>
+            <div class="card-b stack" style="gap:12px">
+              <svg id="klTafel" viewBox="0 0 520 392" style="width:100%;height:auto" role="img"
+                   aria-label="Logarithm of the kinetic current density against potential. The true Tafel line is straight; the points extracted from Koutecky-Levich fits follow it inside the ten-to-eighty per cent window and scatter widely near the plateau at low potential."></svg>
+              <p class="hint" style="margin:0" id="klTafNote">&mdash;</p>
+            </div>
           </div>
         </div>
 
@@ -500,17 +557,8 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
         </div>
           </div>
         </div>
-
-        <div class="card wideF">
-          <div class="card-h"><h2>Slide 12&rsquo;s Tafel plot, made from the intercepts</h2>
-            <span class="note">i<sub>k</sub> extracted by K-L at every 20 mV, with the noise you set &middot; open circles are outside the 10&ndash;80 % window</span></div>
-          <div class="card-b stack" style="gap:12px">
-            <svg id="klTafel" viewBox="0 0 1040 300" style="width:100%;height:auto" role="img"
-                 aria-label="Logarithm of the kinetic current density against potential. The true Tafel line is straight; the points extracted from Koutecky-Levich fits follow it inside the ten-to-eighty per cent window and scatter widely near the plateau at low potential."></svg>
-            <p class="hint" style="margin:0" id="klTafNote">&mdash;</p>
-          </div>
-        </div>
       </div>
+
     </div>
   </section>
 
@@ -520,18 +568,22 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
 
     <div class="card" style="margin-bottom:16px">
       <div class="card-h"><h2>The disk makes it; the ring counts what escapes</h2>
-        <span class="note">RRDE slides 6&ndash;8 &middot; an ORR-like reduction, ring held where H<sub>2</sub>O<sub>2</sub> is oxidised</span></div>
+        <span class="note">an ORR-like reduction, ring held where H<sub>2</sub>O<sub>2</sub> is oxidised</span></div>
       <div class="card-b stack" style="gap:12px">
         <div class="eqbig" style="white-space:normal">
           <span class="cnc">N = |i<sub>R</sub>| / |i<sub>D</sub>|</span>
           <small>for a product that cannot decompose on the way &mdash; three radii and nothing else: not &omega;, not D, not C*</small><br>
-          <span class="act">n = 4 i<sub>D</sub> / (i<sub>D</sub> + i<sub>R</sub>/N)</span>&nbsp;&nbsp;&middot;&nbsp;&nbsp;
-          <span class="pot">% H<sub>2</sub>O<sub>2</sub> = 200 (i<sub>R</sub>/N) / (i<sub>D</sub> + i<sub>R</sub>/N)</span>
-          <small>i<sub>R</sub>/N is the peroxide current <i>as it left the disk</i>, before the flow took its share away</small>
+          <span class="act">n = 4 |i<sub>D</sub>| / (|i<sub>D</sub>| + |i<sub>R</sub>|/N)</span>&nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="pot">% H<sub>2</sub>O<sub>2</sub> = 200 (|i<sub>R</sub>|/N) / (|i<sub>D</sub>| + |i<sub>R</sub>|/N)</span>
+          <small>|i<sub>R</sub>|/N is the peroxide current <i>as it left the disk</i>, before the flow took its share away</small><br>
+          <span class="cnc" style="font-size:12px">all three take magnitudes</span>
+          <small>on the plot below the disk current is <b>negative</b> (a reduction) and the ring current
+            <b>positive</b> (an oxidation). The signs say which way each electrode is running; they are
+            dropped before the arithmetic, or n comes out greater than four</small>
         </div>
         <p class="hint" style="margin:0">Set what the catalyst really does with the slider, and the bench
           reports what the two currents would tell you. With nothing lost on the way and a clean ring, the
-          two agree exactly: <b>i<sub>D</sub> + i<sub>R</sub>/N is the four-electron current of the same
+          two agree exactly: <b>|i<sub>D</sub>| + |i<sub>R</sub>|/N is the four-electron current of the same
           oxygen flux</b>, so n comes back as 4 &minus; 2x and %H<sub>2</sub>O<sub>2</sub> as 100x. Then
           add the two things that go wrong.</p>
       </div>
@@ -577,7 +629,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
             <div class="readouts">
               <div class="readout"><span class="k">i<sub>D</sub>, disk</span><span class="v" id="rgID">&mdash;</span></div>
               <div class="readout"><span class="k">i<sub>R</sub>, ring</span><span class="v" id="rgIR">&mdash;</span></div>
-              <div class="readout"><span class="k">i<sub>R</sub>/N</span><span class="v" id="rgIRN">&mdash;</span></div>
+              <div class="readout"><span class="k">|i<sub>R</sub>|/N</span><span class="v" id="rgIRN">&mdash;</span></div>
               <div class="readout"><span class="k">n you would report</span><span class="v" id="rgN2">&mdash;</span></div>
               <div class="readout"><span class="k">% H<sub>2</sub>O<sub>2</sub> you would report</span><span class="v" id="rgPct">&mdash;</span></div>
               <div class="readout"><span class="k">the truth</span><span class="v" id="rgTrue">&mdash;</span></div>
@@ -594,6 +646,13 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
           <div class="card-b stack" style="gap:12px">
             <svg id="rgLsv" viewBox="0 0 520 300" style="width:100%;height:auto" role="img"
                  aria-label="Two current traces against disk potential. The disk current is cathodic and falls to a plateau as the potential is lowered; the ring current is anodic and rises as peroxide begins to be produced, on a scale magnified several times."></svg>
+            <p class="hint" style="margin:0"><b>Mind the signs when you read values off this plot.</b>
+              The disk is reducing, so its current is drawn <b class="ohm">negative</b>; the ring is
+              oxidising what arrives, so its current is <b class="act">positive</b>. That is the IUPAC
+              convention and it is telling you the direction of each reaction &mdash; but
+              <b>N, n and %H<sub>2</sub>O<sub>2</sub> are all defined on the magnitudes</b>. Substitute
+              &minus;1.00 mA for the disk and you will get n &gt; 4, which is the arithmetic telling you
+              a sign was carried where it does not belong.</p>
           </div>
         </div>
 
@@ -616,7 +675,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
                 the disk that passes under the ring before the flow throws it outward. <b>Nothing in the
                 chemistry enters</b>, which is why it can be calibrated once, on a couple whose product
                 cannot decompose: Fe(CN)<sub>6</sub><sup>3&minus;</sup>/Fe(CN)<sub>6</sub><sup>4&minus;</sup>,
-                as on slide 6. Re-polish the disk, or cover the gap with a thick film, and measure it again.</p>
+                as in the lecture. Re-polish the disk, or cover the gap with a thick film, and measure it again.</p>
               <p class="hint"><b class="ohm">A sequence looks like the direct route.</b> O<sub>2</sub> &rarr;
                 H<sub>2</sub>O<sub>2</sub> &rarr; H<sub>2</sub>O on the disk and O<sub>2</sub> &rarr;
                 2H<sub>2</sub>O on the disk give the <i>same</i> small ring current, because the ring only
@@ -711,7 +770,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
 
   <footer>
     Everything is closed form. &delta; = 1.61 D<sup>1/3</sup>&nu;<sup>1/6</sup>&omega;<sup>&minus;1/2</sup> and
-    i<sub>L</sub> = 0.620 nFAD<sup>2/3</sup>&nu;<sup>&minus;1/6</sup>&omega;<sup>1/2</sup>C* as on slide 7 (the derivation gives
+    i<sub>L</sub> = 0.620 nFAD<sup>2/3</sup>&nu;<sup>&minus;1/6</sup>&omega;<sup>1/2</sup>C* as in the lecture (the derivation gives
     1.612 and 0.6205 from the near-wall von K&aacute;rm&aacute;n flow v<sub>y</sub> = &minus;0.510&omega;<sup>3/2</sup>&nu;<sup>&minus;1/2</sup>y<sup>2</sup>);
     the profile under the disk is that same near-wall solution, g(u) = &int;<sub>0</sub><sup>u</sup>exp[&minus;(&Gamma;(4/3)t)<sup>3</sup>]dt;
     &delta;<sub>h</sub> = 3.6(&nu;/&omega;)<sup>1/2</sup> is the usual estimate of the hydrodynamic layer &middot;
@@ -948,7 +1007,7 @@ function axLin(f, xlab, ylab, fx, fy){
     s += tx(f.X0 - 6, f.py(g) + 3.4, fy ? fy(g) : tickNum(g), "var(--muted)", 9.5, "end");
   }
   s += xName(f.X0, f.X1, f.Y1 + 30, xlab);
-  s += yName(14, f.Y0, f.Y1, ylab);
+  s += yName(f.X0 - 48, f.Y0, f.Y1, ylab);
   return s;
 }
 /* both axes in decades: the only honest way to show a current that runs
@@ -973,7 +1032,7 @@ function axLog(f, xlab, ylab){
     if(g % sy === 0) s += tx(f.X0 - 6, f.py(g) + 3.4, "10" + supr(g), "var(--muted)", 9.5, "end");
   }
   s += xName(f.X0, f.X1, f.Y1 + 30, xlab);
-  s += yName(14, f.Y0, f.Y1, ylab);
+  s += yName(f.X0 - 48, f.Y0, f.Y1, ylab);
   return s;
 }
 function curve(f, fn, lo, hi, npt){
@@ -994,7 +1053,7 @@ function later(key, fn){
 }
 
 /* ======================== THE ROTATING DISK ============================
-   Everything below is closed form. The two constants are slide 7's:
+   Everything below is closed form. The two constants are the lecture's:
    delta = 1.61 D^1/3 nu^1/6 omega^-1/2 and the Levich 0.620, both the
    rounded forms of 1.612 and 0.6205 from the near-wall flow
    v_y = -0.510 omega^3/2 nu^-1/2 y^2. verify/lecture16_rde.py re-derives
@@ -1078,10 +1137,178 @@ function lvDraw(){
       + "D = [B/(0.620 nFA&nu;<sup>&minus;1/6</sup>C*)]<sup>3/2</sup> to the D you set. A 2 % error in the slope would be 3 % in D. "
       + "Plotted against rpm<sup>1/2</sup> instead, the same slope is 0.3236 &times; B and would return a D 5.4 times too small.";
   }
+  lvSpin(p, w, d);
   lvLsv(p);
   lvPlot(p);
   lvDer(p, w, d, iL);
 }
+
+/* ---- the electrode, spinning, and the layer it holds ------------------
+   The micron scale is fixed by delta at the SLOWEST rate this solution
+   can give, so it moves when D or nu moves and never when the rotation
+   rate does: that is what makes the thinning visible rather than merely
+   stated.                                                            */
+var LVS = {on:false, sweep:false, ph:0, last:0, dir:1, rpm:100, iv:null};
+var LVS_X0 = 24, LVS_XA = 262, LVS_YS = 186, LVS_H = 150;
+
+function lvSpinScale(p){
+  return deltaOf(p.D, p.nu, omega(100)) * 1e4 * 1.06;     /* um, full scale */
+}
+function lvSpinPath(side, v){
+  /* up the axis, then out across the face */
+  if(v < 0.52) return {x:LVS_XA + side * 7, y:340 - (340 - 224) * (v / 0.52)};
+  var u = (v - 0.52) / 0.48;
+  return {x:LVS_XA + side * (7 + 214 * u * u), y:224 - 34 * (2 * u - u * u)};
+}
+function lvSpin(p, w, d){
+  var FS = lvSpinScale(p), s = "", i, k;
+  var um = function(v){ return LVS_YS + Math.min(1, v / FS) * LVS_H; };
+  var dum = d * 1e4;
+
+  /* ---------------- left: the electrode in cross-section ------------- */
+  s += tx(LVS_XA, 16, "the electrode in cross-section", "var(--ink-2)", 11, "middle", 600);
+  s += rc(LVS_X0, 24, 490, 358, "var(--surface-2)", 0.4, 6);
+  /* the solution it turns in */
+  s += rc(LVS_X0 + 6, LVS_YS, 478, 196, "var(--red-soft)", 0.5);
+  /* the body and the metal face */
+  s += rc(LVS_XA - 112, 32, 224, 154, "var(--line-2)", 1, 4);
+  s += tx(LVS_XA, 66, "insulating body", "var(--muted)", 10, "middle", 600);
+  s += rc(LVS_XA - 92, 172, 184, 14, "var(--ink-2)", 1, 2);
+  s += tx(LVS_XA, 164, "the disk", "var(--ink-2)", 10, "middle", 700);
+
+  /* it is turning: a marker going round the face, seen in perspective */
+  var th = LVS.ph * 2 * Math.PI;
+  s += '<ellipse cx="' + LVS_XA + '" cy="179" rx="92" ry="11" fill="none" '
+     + 'stroke="var(--ox)" stroke-width="1.1" stroke-dasharray="3 3" opacity="0.65"/>';
+  s += cir(LVS_XA + 92 * Math.cos(th), 179 + 11 * Math.sin(th), 5, "var(--ox)");
+  s += cir(LVS_XA + 92 * Math.cos(th + 2.094), 179 + 11 * Math.sin(th + 2.094), 3.4, "var(--ox)", 0.5);
+  s += cir(LVS_XA + 92 * Math.cos(th + 4.189), 179 + 11 * Math.sin(th + 4.189), 3.4, "var(--ox)", 0.5);
+  s += tx(LVS_XA, 46, LV.rpm + " rpm  ·  \u03c9 = " + w.toFixed(0) + " rad/s",
+          "var(--ox)", 11, "middle", 700);
+
+  /* the flow it drives: up the axis, out across the face */
+  [-1, 1].forEach(function(side){
+    var dd = "", j;
+    for(j = 0; j <= 40; j++){
+      var q = lvSpinPath(side, j / 40);
+      dd += (j ? "L" : "M") + q.x.toFixed(1) + " " + q.y.toFixed(1) + " ";
+    }
+    s += pth(dd, "var(--red-)", 1.1, null, 0.30);
+    for(j = 0; j < 4; j++){
+      var v = (LVS.ph * 1.0 + j / 4) % 1;
+      var q2 = lvSpinPath(side, v);
+      s += cir(q2.x, q2.y, 3.6, "var(--red-)", 0.3 + 0.6 * (1 - v));
+    }
+  });
+  s += tx(LVS_X0 + 100, 352, "solution is drawn up the axis, and flung out across the face",
+          "var(--red-)", 10, null, 600);
+
+  /* the layer the spinning holds, on a scale that does not move with it */
+  s += rc(LVS_XA - 92, LVS_YS, 184, um(dum) - LVS_YS, "var(--ox)", 0.22);
+  s += ln(LVS_XA - 92, um(dum), LVS_XA + 92, um(dum), "var(--ox)", 1.6, "4 3");
+  s += tx(LVS_XA + 98, um(dum) + 4, "\u03b4 = " + dum.toPrecision(3) + " \u00b5m"
+          + (dum > FS ? " \u2014 off this scale" : ""), "var(--ox)", 10.5, null, 700);
+  /* and the micron scale itself */
+  s += ln(LVS_X0 + 96, LVS_YS, LVS_X0 + 96, LVS_YS + LVS_H, "var(--muted)", 1.1);
+  for(i = 0; i <= 4; i++){
+    var vv = FS * i / 4;
+    s += ln(LVS_X0 + 91, um(vv), LVS_X0 + 96, um(vv), "var(--muted)", 1.1);
+    s += tx(LVS_X0 + 87, um(vv) + 3.4, vv.toFixed(0), "var(--muted)", 9, "end");
+  }
+  s += tx(LVS_X0 + 50, LVS_YS - 8, "\u00b5m from the face", "var(--muted)", 9.5, "middle", 600);
+  s += tx(LVS_X0 + 100, 370,
+          /* toPrecision prints 1.57e+3 um for a slow, viscous case; the
+             page's own formatter switches to mm instead            */
+          "\u03b4\u029c = " + fmtLen15(deltaH(p.nu, w))
+          + ", the hydrodynamic layer \u2014 (\u03bd/D)\u2153 \u2248 "
+          + Math.pow(p.nu / p.D, 1 / 3).toFixed(0) + "\u00d7 thicker, far off this scale",
+          "var(--muted)", 9.5, null, 600);
+
+  /* ---------------- right: the same layer as a profile --------------- */
+  var f = fr(600, 1016, 46, 320, 0, FS, 0, 1.1);
+  s += axLin(f, "distance from the surface / \u00b5m", "C / C*",
+             function(v){ return v.toFixed(0); }, function(v){ return v.toFixed(1); });
+  s += tx(808, 16, "the same layer, as a concentration profile",
+          "var(--ink-2)", 11, "middle", 600);
+  /* the other rotation rates, behind */
+  RPMS.forEach(function(r, ri){
+    if(r === LV.rpm) return;
+    var dr = deltaOf(p.D, p.nu, omega(r)) * 1e4;
+    s += pth(curve(f, function(x){ return gProf(x / dr); }, 0, FS, 120),
+             "var(--muted)", 1.3, null, 0.45);
+    /* delta goes as omega^-1/2, so the fastest two are always the closest
+       together on this axis and their labels always touch. Neighbours in
+       the list take turns on two rows; the ones that share a row are two
+       apart in rotation rate and far apart here. */
+    s += tx(f.px(Math.min(FS * 0.97, dr * 1.25)), f.py(0.86) + (ri % 2 ? 13 : 0),
+            r + "", "var(--muted)", 9, "middle", 600);
+  });
+  /* the tangent at the wall is the Nernst layer, and it meets C* at delta */
+  if(dum < FS){
+    s += ln(f.px(0), f.py(0), f.px(dum), f.py(1), "var(--cnc)", 1.5, "5 3");
+    s += ln(f.px(dum), f.Y1, f.px(dum), f.py(1), "var(--ox)", 1.3, "4 3");
+    s += tx(f.px(dum) + 5, f.Y1 - 8, "\u03b4", "var(--ox)", 11.5, null, 700);
+  }
+  s += pth(curve(f, function(x){ return gProf(x / dum); }, 0, FS, 220), "var(--ox)", 2.5);
+  s += ln(f.X0, f.py(1), f.X1, f.py(1), "var(--line-2)", 1.1, "3 3");
+  s += tx(f.X1 - 4, f.py(1) - 6, "C*", "var(--muted)", 10, "end", 600);
+  s += tx(f.px(FS * 0.06), f.py(0.26),
+          "slope at the wall = C*/\u03b4", "var(--cnc)", 10, null, 700);
+  s += tx(f.px(FS * 0.06), f.py(0.14),
+          "\u2192 m\u1d1b = D/\u03b4, and i\u029f = nFA\u00b7m\u1d1b\u00b7C*", "var(--cnc)", 10, null, 700);
+
+  el("lvSpin").innerHTML = s;
+  el("lvSpinN").innerHTML = "\u03b4 \u221d \u03c9<sup>&minus;1/2</sup> &mdash; four times the rate "
+    + "for half the layer &middot; the \u00b5m scale is fixed by \u03b4 at 100 rpm, so it does not "
+    + "move when the rate does";
+}
+
+/* ---- and the clock that turns it ------------------------------------- */
+function lvSpinStep(dt){
+  var w = omega(LV.rpm);
+  LVS.ph = (LVS.ph + dt * (0.22 + w / 420)) % 1;
+  if(LVS.sweep){
+    /* a slow ramp out and back, so the thinning is seen as motion */
+    LVS.rpm += LVS.dir * dt * 780;
+    if(LVS.rpm >= 4000){ LVS.rpm = 4000; LVS.dir = -1; }
+    if(LVS.rpm <= 100){ LVS.rpm = 100; LVS.dir = 1; }
+    var r = Math.round(LVS.rpm / 50) * 50;
+    if(r !== LV.rpm){ LV.rpm = r; el("lvRpm").value = r; lvSync(); }
+  }
+}
+function lvSpinFrame(ts){
+  if(!LVS.on && !LVS.sweep) return;
+  if(el("p-lev").hidden){ LVS.last = 0; window.requestAnimationFrame(lvSpinFrame); return; }
+  var dt = LVS.last ? Math.min(0.1, (ts - LVS.last) / 1000) : 0;
+  LVS.last = ts;
+  lvSpinStep(dt);
+  lvSpin(lvP(), omega(LV.rpm), deltaOf(Math.pow(10, LV.lD), LV.nu, omega(LV.rpm)));
+  window.requestAnimationFrame(lvSpinFrame);
+}
+function lvSpinLabels(){
+  el("lvSpinBtn").textContent = LVS.on ? "Stop" : "Spin";
+  el("lvSweepBtn").textContent = LVS.sweep ? "Stop the sweep" : "Sweep 100 \u2192 4000 rpm";
+}
+function lvSpinGo(){
+  if(LVS.iv){ window.clearInterval(LVS.iv); LVS.iv = null; }
+  lvSpinLabels();
+  if(!LVS.on && !LVS.sweep) return;
+  LVS.last = 0;
+  if(REDUCED){
+    /* no smooth motion: step the picture instead */
+    LVS.iv = window.setInterval(function(){
+      if(el("p-lev").hidden) return;
+      lvSpinStep(0.45);
+      lvSpin(lvP(), omega(LV.rpm), deltaOf(Math.pow(10, LV.lD), LV.nu, omega(LV.rpm)));
+    }, 450);
+  }else window.requestAnimationFrame(lvSpinFrame);
+}
+el("lvSpinBtn").addEventListener("click", function(){ LVS.on = !LVS.on; lvSpinGo(); });
+el("lvSweepBtn").addEventListener("click", function(){
+  LVS.sweep = !LVS.sweep;
+  if(LVS.sweep){ LVS.rpm = LV.rpm; LVS.dir = LV.rpm < 2000 ? 1 : -1; }
+  lvSpinGo();
+});
 
 function lvLsv(p){
   var list = RPMS.slice();
@@ -1213,7 +1440,7 @@ function klDraw(){
       + "The correction is small, but so is the current &mdash; and the slope, which carries n, is hard to read.";
   } else if(fr16 <= 0.8){
     v.className = "verdict go";
-    v.innerHTML = "Inside slide 13&rsquo;s window. A 1 % error in i costs " + amp.toFixed(1) + " % in i<sub>k</sub> here"
+    v.innerHTML = "Inside the 10&ndash;80 % window. A 1 % error in i costs " + amp.toFixed(1) + " % in i<sub>k</sub> here"
       + (fr16 <= 0.5 ? ", and below half of i<sub>L</sub> catalysts can be compared fairly." : ".");
   } else {
     v.className = "verdict stop";
@@ -1303,7 +1530,7 @@ function klTafel(){
   var top = Math.log10(Math.pow(10, KL.lj) * Math.pow(10, (EREF - 0.60) / KL.b));
   var bot = Math.log10(Math.pow(10, KL.lj) * Math.pow(10, (EREF - 1.00) / KL.b));
   var yhi = Math.min(top, jl16 + 2.2) + 0.3, ylo = bot - 0.3;
-  var f = fr(70, 1010, 22, 250, 0.60, 1.00, ylo, yhi);
+  var f = fr(70, 490, 22, 342, 0.60, 1.00, ylo, yhi);
   var s = axLin(f, "E / V vs RHE", "j" + sb("k") + " / mA cm⁻²", null, function(){ return ""; });
   /* one label per decade: axLin's own step can land on every second one */
   for(var g = Math.ceil(ylo); g <= Math.floor(yhi); g++){
@@ -1451,17 +1678,18 @@ function rgDraw(){
   el("rgTrue").innerHTML = (4 - 2 * RG.x).toFixed(2) + " e<sup>&minus;</sup> &middot; "
       + (100 * RG.x).toFixed(0) + " %";
   el("rgEq").innerHTML =
-      '<span class="act">n = 4 &times; ' + fmtA(p.iD) + ' / (' + fmtA(p.iD) + ' + '
+      '<span class="act">n = 4 &times; |' + fmtA(p.iD) + '| / (|' + fmtA(p.iD) + '| + '
       + fmtA(p.iRN) + ') = ' + n.toFixed(2) + '</span><br>'
-      + '<span class="pot">% H<sub>2</sub>O<sub>2</sub> = 200 &times; ' + fmtA(p.iRN) + ' / ('
-      + fmtA(p.iD) + ' + ' + fmtA(p.iRN) + ') = ' + pct.toFixed(0) + ' %</span>'
-      + '<small>i<sub>R</sub>/N = ' + fmtA(p.iR) + ' / ' + RG.N.toFixed(2) + ' = ' + fmtA(p.iRN)
-      + ' &mdash; the peroxide current as it left the disk</small>';
+      + '<span class="pot">% H<sub>2</sub>O<sub>2</sub> = 200 &times; ' + fmtA(p.iRN) + ' / (|'
+      + fmtA(p.iD) + '| + ' + fmtA(p.iRN) + ') = ' + pct.toFixed(0) + ' %</span>'
+      + '<small>|i<sub>R</sub>|/N = |' + fmtA(p.iR) + '| / ' + RG.N.toFixed(2) + ' = ' + fmtA(p.iRN)
+      + ' &mdash; the peroxide current as it left the disk. Both currents enter as magnitudes: '
+      + 'the disk reads negative on the plot, the ring positive.</small>';
   var v = el("rgVerd"), d = pct - 100 * RG.x;
   if(RG.loss < 0.01 && RG.bg < 0.05){
     v.className = "verdict go";
     v.innerHTML = "<b>Nothing is lost and the ring is clean, so the arithmetic is exact:</b> "
-      + "i<sub>D</sub> + i<sub>R</sub>/N = " + fmtA(p.i4) + ", the four-electron current of this "
+      + "|i<sub>D</sub>| + |i<sub>R</sub>|/N = " + fmtA(p.i4) + ", the four-electron current of this "
       + "oxygen flux, and the two numbers come back as 4 &minus; 2x and 100x. <b>N cancels</b> "
       + "&mdash; change it and both currents change, but n and %H<sub>2</sub>O<sub>2</sub> do not.";
   }else if(d < -1){
@@ -1568,7 +1796,7 @@ var QZ2 = [
      "40 %, the ratio divided by N",
      "25 %, because that is what N allows through"],
   a:1,
-  w:"Divide by N first: <code>i<sub>R</sub>/N = 0.100/0.25 = 0.400 mA</code> is the peroxide current <i>as it left the disk</i>. Then <code>%H<sub>2</sub>O<sub>2</sub> = 200 &times; 0.400/(1.00 + 0.400) = 57 %</code>, and <code>n = 4 &times; 1.00/1.40 = 2.9</code>. The 200 is there because peroxide takes two electrons of the four. <b>A ring current a tenth of the disk current is a catalyst sending more than half its oxygen to peroxide</b> &mdash; which is exactly what a collection efficiency of a quarter means, and why the raw ratio is so misleading."},
+  w:"Both currents enter as magnitudes &mdash; on a real plot the disk current is negative. Divide by N first: <code>|i<sub>R</sub>|/N = 0.100/0.25 = 0.400 mA</code> is the peroxide current <i>as it left the disk</i>. Then <code>%H<sub>2</sub>O<sub>2</sub> = 200 &times; 0.400/(1.00 + 0.400) = 57 %</code>, and <code>n = 4 &times; 1.00/1.40 = 2.9</code>. The 200 is there because peroxide takes two electrons of the four. <b>A ring current a tenth of the disk current is a catalyst sending more than half its oxygen to peroxide</b> &mdash; which is exactly what a collection efficiency of a quarter means, and why the raw ratio is so misleading."},
 
  {q:"Why is N calibrated with Fe(CN)<sub>6</sub><sup>3&minus;</sup>/Fe(CN)<sub>6</sub><sup>4&minus;</sup> rather than with the oxygen reduction itself?",
   o:["Because ferrocyanide is stable: it cannot decompose between the disk and the ring, so every molecule that gets there is counted",
@@ -1584,7 +1812,7 @@ var QZ2 = [
      "Neither: dividing by N corrects for it",
      "n too high and %H<sub>2</sub>O<sub>2</sub> too low"],
   a:3,
-  w:"i<sub>R</sub> falls while i<sub>D</sub> does not, so i<sub>R</sub>/N is an underestimate of the peroxide that was actually made: <code>n = 4i<sub>D</sub>/(i<sub>D</sub> + i<sub>R</sub>/N)</code> rises towards 4 and the percentage falls. <b>Dividing by N cannot correct it</b>, because N was measured on a species that did not decompose &mdash; it is too large for this one. The error always flatters the catalyst, which is why <b>an n of 3.9 is not by itself proof of a four-electron pathway</b>. Push the loss slider on the ring tab and watch a 60 % peroxide catalyst be reported at half that."},
+  w:"i<sub>R</sub> falls while i<sub>D</sub> does not, so i<sub>R</sub>/N is an underestimate of the peroxide that was actually made: <code>n = 4|i<sub>D</sub>|/(|i<sub>D</sub>| + |i<sub>R</sub>|/N)</code> rises towards 4 and the percentage falls. <b>Dividing by N cannot correct it</b>, because N was measured on a species that did not decompose &mdash; it is too large for this one. The error always flatters the catalyst, which is why <b>an n of 3.9 is not by itself proof of a four-electron pathway</b>. Push the loss slider on the ring tab and watch a 60 % peroxide catalyst be reported at half that."},
 
  {q:"At one rotation rate, can the ring distinguish O<sub>2</sub> &rarr; 2H<sub>2</sub>O at the disk from O<sub>2</sub> &rarr; H<sub>2</sub>O<sub>2</sub> &rarr; 2H<sub>2</sub>O at the disk?",
   o:["Yes: the series route always gives a larger ring current",
