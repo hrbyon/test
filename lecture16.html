@@ -699,6 +699,81 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
         </div>
       </div>
     </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-h"><h2>Measuring N: the experiment, step by step</h2>
+        <span class="note">a couple that cannot decompose, two potentials, and one ratio</span></div>
+      <div class="card-b stack" style="gap:12px">
+        <div class="eqbig" style="white-space:normal">
+          <span class="cnc">disk: Fe(CN)<sub>6</sub><sup>3&minus;</sup> + e<sup>&minus;</sup> &rarr; Fe(CN)<sub>6</sub><sup>4&minus;</sup></span>&nbsp;&nbsp;&middot;&nbsp;&nbsp;
+          <span class="act">ring: Fe(CN)<sub>6</sub><sup>4&minus;</sup> &rarr; Fe(CN)<sub>6</sub><sup>3&minus;</sup> + e<sup>&minus;</sup></span>
+          <small>one electron each way, and the product is stable &mdash; every molecule that reaches the ring is counted</small><br>
+          <span class="pot">N = |i<sub>R</sub>| / |i<sub>D</sub>|</span>
+          <small>measured once, on this electrode, and then carried to the catalyst above</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="bench level">
+      <div class="ctl">
+        <div class="card">
+          <div class="card-h"><h2>Run the calibration</h2></div>
+          <div class="card-b stack" style="gap:13px">
+            <div class="btnrow">
+              <button class="ghost" id="nxPlay" type="button">Play</button>
+              <button class="ghost" id="nxBack" type="button">&larr; back</button>
+              <button class="ghost" id="nxNext" type="button">next &rarr;</button>
+            </div>
+            <div>
+              <div class="slider-row"><span class="fld" style="margin:0">rotation rate</span><span class="val" id="nxRpmv"></span></div>
+              <input type="range" id="nxRpm" min="400" max="2500" step="100" value="1600">
+            </div>
+            <div class="steps" id="nxSteps"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h2>What the bipotentiostat reads</h2></div>
+          <div class="card-b stack" style="gap:12px">
+            <div class="readouts">
+              <div class="readout"><span class="k">i<sub>D</sub>, the disk plateau</span><span class="v" id="nxID">&mdash;</span></div>
+              <div class="readout"><span class="k">i<sub>R</sub>, the ring plateau</span><span class="v" id="nxIR">&mdash;</span></div>
+              <div class="readout"><span class="k">transit time disk &rarr; ring</span><span class="v" id="nxTau">&mdash;</span></div>
+              <div class="readout"><span class="k">the ratio</span><span class="v" id="nxRat">&mdash;</span></div>
+              <div class="readout"><span class="k">N for this electrode</span><span class="v" id="nxN">&mdash;</span></div>
+            </div>
+            <p class="hint" style="margin:0" id="nxSay">&mdash;</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="figs">
+        <div class="card">
+          <div class="card-h"><h2>The step goes in, and the ring answers</h2>
+            <span class="note">both currents against time, on one fixed scale</span></div>
+          <div class="card-b">
+            <svg id="nxTime" viewBox="0 0 520 300" style="width:100%;height:auto" role="img"
+                 aria-label="Disk and ring current against time after the disk is stepped onto its plateau. The disk current rises at once; the ring current follows after the transit time and settles at a fixed fraction of it."></svg>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h2>The ratio, against everything you can change</h2>
+            <span class="note">four rotation rates, three concentrations, one N</span></div>
+          <div class="card-b stack" style="gap:12px">
+            <svg id="nxFlat" viewBox="0 0 520 300" style="width:100%;height:auto" role="img"
+                 aria-label="The measured collection efficiency plotted against rotation rate for three concentrations. Every point lies on the same horizontal line, while the disk currents printed above them rise with the square root of the rotation rate."></svg>
+            <div class="eqbig" id="nxEq" style="white-space:normal"></div>
+          </div>
+        </div>
+
+        <div class="card wideF">
+          <div class="card-h"><h2 id="nxStepH">Step 1</h2>
+            <span class="note" id="nxStepN">&mdash;</span></div>
+          <div class="card-b"><p class="hint" style="margin:0" id="nxBody">&mdash;</p></div>
+        </div>
+      </div>
+    </div>
   </section>
 
   <section class="panel" id="p-quiz1" role="tabpanel" aria-labelledby="t-quiz1" hidden>
@@ -778,7 +853,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
     1/i = 1/i<sub>k</sub> + 1/i<sub>L</sub> with a single Tafel line and no back reaction, which is the Koutecky&ndash;Levich
     model taken at its word &middot; the &ldquo;drifts with E&rdquo; option lets n run from 2.5 to 4 across 0.75 V and is an
     illustration, not a mechanism &middot; noise is Gaussian, relative, and the same draw for a given potential and rotation rate
-    until you press &ldquo;new noise&rdquo; &middot; ring&ndash;disk collection efficiency belongs to Lecture 18<br>
+    until you press &ldquo;new noise&rdquo; &middot; on the ring tab the collection efficiency is the electrode's own geometry, taken as N = 0.25, and the calibration is ferricyanide in 0.1 M NaOH with D = 7.6 &times; 10<sup>&minus;6</sup> cm<sup>2</sup> s<sup>&minus;1</sup>; the transit time is Albery's 43.1(r&#8322;&#179; &minus; r&#8321;&#179;)<sup>2/3</sup>/&nu;<sup>1/3</sup>&omega; for a 5.0 mm disk and a 0.25 mm gap, and the peroxide model is i<sub>D</sub> = i&#8324;(1 &minus; x/2) with i<sub>R</sub>/N = i&#8324;x/2, so n and %H<sub>2</sub>O<sub>2</sub> come back as 4 &minus; 2x and 100x<br>
     CH40051 Electroanalytical Chemistry &middot; Fall 2026 &mdash; companion to Lecture 16
   </footer>
 </div>
@@ -1582,7 +1657,7 @@ var PANEL_SHOW = {}, SHOWN = {};
   });
 });
 PANEL_SHOW["p-kl"] = klSync;
-PANEL_SHOW["p-ring"] = rgSync;
+PANEL_SHOW["p-ring"] = function(){ rgSync(); nxList(); nxSync(); };
 
 lvSync();
 
@@ -1614,23 +1689,34 @@ function rgAt(E){
 function rgNof(p){ return 4 * p.iD / (p.iD + p.iRN); }
 function rgPctOf(p){ return 200 * p.iRN / (p.iD + p.iRN); }
 
+/* The scales are fixed, so that moving a slider moves the traces and
+   not the numbers. The disk can reach the four-electron current at the
+   fastest rotation this bench allows; the ring, at its largest N and a
+   wholly two-electron catalyst, reaches a quarter of that, and is drawn
+   at one fixed magnification rather than a different one each draw. */
+var RG_IMAX = 4 * KB1 * Math.sqrt(omega(2500));          /* A, disk      */
+var RG_MAG = 3;        /* at 4 the fixed frame carries only three ticks */
 function rgLsvDraw(){
   var lo = 0.20, hi = 1.00, s = "";
-  var pl = rgAt(lo), un = iUnit(pl.iD);
-  /* the ring carries a few per cent of the disk current: magnify it by a
-     round factor and say so, the way a paper does                     */
-  var mag = 1;
-  if(pl.iR > 0) mag = Math.max(1, Math.min(50, Math.round(0.45 * pl.iD / pl.iR)));
-  var top = pl.iR * mag / un.k * 1.35 + 0.02, bot = -pl.iD / un.k * 1.15;
-  var f = fr(64, 500, 22, 252, lo - 0.03, hi + 0.03, bot, Math.max(top, -bot * 0.25));
+  /* microamps, not milliamps: the fixed range would otherwise carry
+     three tick labels for two decades of current               */
+  var pl = rgAt(lo), un = {k:1e-6, u:"µA"};
+  var mag = RG_MAG;
+  var top = (0.45 * RG_IMAX / 2 * mag + 20e-6 * mag) / un.k;
+  var bot = -RG_IMAX / un.k * 1.06;
+  var f = fr(64, 500, 22, 252, lo - 0.03, hi + 0.03, bot, top);
   s += axLin(f, "E of the disk / V vs RHE", "i / " + un.u,
              function(v){ return v.toFixed(1); }, function(v){ return v.toFixed(0); });
   s += ln(f.X0, f.py(0), f.X1, f.py(0), "var(--line-2)", 1.2);
   s += pth(curve(f, function(E){ return -rgAt(E).iD / un.k; }, lo, hi, 180), "var(--red-)", 2.2);
   s += pth(curve(f, function(E){ return rgAt(E).iR * mag / un.k; }, lo, hi, 180), "var(--ox)", 2.2);
-  s += tx(f.px(0.24), f.py(-pl.iD / un.k) + 16, "disk \u2014 the reduction", "var(--red-)", 10.5, null, 700);
-  s += tx(f.px(0.24), f.py(pl.iR * mag / un.k) - 9,
+  s += tx(f.px(0.24), f.Y1 - 10, "disk \u2014 the reduction", "var(--red-)", 10.5, null, 700);
+  s += tx(f.px(0.24), f.Y0 + 15,
           "ring \u00d7 " + mag + " \u2014 the peroxide that got there", "var(--ox)", 10.5, null, 700);
+  /* and say where each trace has got to, since the scale no longer moves */
+  s += tx(f.X1 - 6, f.py(-pl.iD / un.k) - 7, fmtA(pl.iD), "var(--red-)", 10, "end", 600);
+  if(pl.iR > 0) s += tx(f.X1 - 6, f.py(pl.iR * mag / un.k) - 7, fmtA(pl.iR),
+                        "var(--ox)", 10, "end", 600);
   s += ln(f.px(0.30), f.Y0, f.px(0.30), f.Y1, "var(--ink-2)", 1, "3 3", 0.45);
   /* the ring's own label lives in the top left, so this one goes to the
      right, where neither trace has anything to say                */
@@ -1710,6 +1796,199 @@ function rgDraw(){
   }
 }
 function rgSync(){ later("rg", rgDraw); }
+
+/* ---- measuring N, played out -----------------------------------------
+   Ferricyanide in 0.1 M NaOH: one electron each way and a product that
+   cannot decompose, so every molecule that reaches the ring is counted
+   and the ratio of the plateaux is the collection efficiency itself.
+   The transit time is Albery's, 43.1 (r2^3 - r1^3)^(2/3)/(nu^1/3 omega),
+   which is what puts the ring's answer a few tens of milliseconds late. */
+var NX_N = 0.25;                 /* what this electrode's geometry gives */
+var NX_D = 7.6e-6, NX_NU = 0.010, NX_R1 = 0.25, NX_R2 = 0.275;
+var NX_CS = [5, 10, 20], NX_RPMS = [400, 900, 1600, 2500];
+var NX = {k:0, u:1, t:null, rpm:1600};
+
+function nxID(rpm, C){ return levB(1, KA, NX_D, NX_NU, C * 1e-6) * Math.sqrt(omega(rpm)); }
+function nxTau(rpm){
+  return 43.1 * Math.pow(NX_R2 * NX_R2 * NX_R2 - NX_R1 * NX_R1 * NX_R1, 2 / 3)
+       / (Math.pow(NX_NU, 1 / 3) * omega(rpm));
+}
+/* the two currents at time t (s) after the step */
+function nxDiskAt(t, rpm){ return t <= 0 ? 0 : nxID(rpm, 10) * (1 - Math.exp(-t / 0.004)); }
+function nxRingAt(t, rpm){
+  var tau = nxTau(rpm);
+  if(t <= tau) return 0;
+  return NX_N * nxID(rpm, 10) * (1 - Math.exp(-(t - tau) / (0.45 * tau)));
+}
+
+var NX_S = [
+ {h:"Put in a couple that cannot decompose", n:"10 mM K\u2083Fe(CN)\u2086 in 0.1 M NaOH, deaerated",
+  b:"N is defined for a product that survives the trip from the disk to the ring, so the "
+   + "calibration is done with one that does. <b>Ferricyanide takes one electron and gives "
+   + "ferrocyanide, which is stable</b>; nothing decomposes in the gap, so whatever fails to "
+   + "reach the ring failed for one reason only \u2014 the flow carried it past. That is exactly "
+   + "the quantity we are after."},
+ {h:"Set the two potentials", n:"disk on the reduction plateau, ring on the oxidation plateau",
+  b:"The disk is held where every ferricyanide arriving is reduced, so <b>i<sub>D</sub> is "
+   + "transport-limited and Levich's</b>. The ring is held where every ferrocyanide arriving is "
+   + "oxidised, about 1.55 V against the reference used there. <b>Both have to be on a "
+   + "plateau</b>: if either "
+   + "is only part-way up its wave, the ratio is not N but a mixture of N and kinetics."},
+ {h:"Step the disk, and wait for the ring", n:"the answer comes one transit time late",
+  b:"The disk current appears at once. The ring's does not: what it oxidises has to be carried "
+   + "there first, and that takes <b>t = 43.1 (r\u2082\u00b3 \u2212 r\u2081\u00b3)^(2/3) / "
+   + "(\u03bd^(1/3) \u03c9)</b> \u2014 a few tens of milliseconds here. <b>Spin faster and the "
+   + "answer comes sooner</b>, which is the clearest demonstration that the gap is a flow problem "
+   + "and not an electrical one."},
+ {h:"Read the ratio of the two plateaux", n:"and that is N",
+  b:"Once both have settled, <b>N = |i<sub>R</sub>|/|i<sub>D</sub>|</b>. A quarter of what leaves "
+   + "the disk passes under the ring; the rest is thrown outward by the same flow that brought the "
+   + "reactant in. <b>Nothing about the chemistry entered that number</b> \u2014 which is what "
+   + "makes it transferable to the oxygen experiment."},
+ {h:"Change everything you can, and watch it not move", n:"four rotation rates, three concentrations",
+  b:"Both currents rise as \u221a\u03c9 and both rise in proportion to C*, so <b>every ratio lands "
+   + "on the same line</b>. The figure beside this one is that experiment: the disk currents "
+   + "printed along the top differ by a factor of four, and N does not move. <b>If it does move, "
+   + "something is wrong with the measurement</b> \u2014 a ring off its plateau, a leak between "
+   + "the electrodes, or a film that has changed the gap."},
+ {h:"Carry it to the catalyst", n:"the same number, used on the bench above",
+  b:"With N in hand, the ring current of an oxygen experiment becomes a peroxide flux: "
+   + "<b>i<sub>R</sub>/N is the peroxide current as it left the disk</b>, and n and "
+   + "%H<sub>2</sub>O<sub>2</sub> follow. <b>N belongs to this electrode</b>: re-polish the disk, "
+   + "or deposit a film thick enough to reach over the gap, and it has to be measured again."}
+];
+
+function nxTimeDraw(){
+  var s = "", rpm = NX.rpm, k = NX.k, u = NX.u;
+  /* fixed scales: the fastest rotation this bench allows sets them, so
+     moving the slider moves the traces and not the numbers         */
+  var imax = nxID(2500, 10), un = iUnit(imax);
+  var f = fr(70, 502, 22, 244, 0, 0.26, -imax / un.k * 1.12, imax / un.k * 0.45);
+  s += axLin(f, "time after the step / s", "i / " + un.u,
+             function(v){ return (v * 1000).toFixed(0) + " ms"; },
+             function(v){ return v.toFixed(1); });
+  s += ln(f.X0, f.py(0), f.X1, f.py(0), "var(--line-2)", 1.2);
+  var tau = nxTau(rpm);
+  /* how far the trace has been drawn: steps 2 onwards sweep it in */
+  var frac = k < 2 ? 0 : (k === 2 ? clamp(u, 0, 1) : 1);
+  var tend = 0.26 * frac;
+  if(frac > 0){
+    s += pth(curve(f, function(t){ return -nxDiskAt(t, rpm) / un.k; }, 0, tend, 200),
+             "var(--red-)", 2.2);
+    s += pth(curve(f, function(t){ return nxRingAt(t, rpm) / un.k; }, 0, tend, 200),
+             "var(--ox)", 2.2);
+    s += ln(f.px(tau), f.Y0, f.px(tau), f.Y1, "var(--ink-2)", 1.1, "4 3", 0.55);
+    s += tx(f.px(tau) + 6, f.Y0 + 15, "transit " + (tau * 1000).toFixed(0) + " ms",
+            "var(--ink-2)", 10, null, 700);
+  }
+  s += tx(f.X0 + 8, f.Y1 - 10, "disk", "var(--red-)", 10.5, null, 700);
+  s += tx(f.X0 + 8, f.Y0 + 15, "ring", "var(--ox)", 10.5, null, 700);
+  if(k >= 3){
+    var iD = nxID(rpm, 10), iR = NX_N * iD;
+    s += ln(f.X0, f.py(-iD / un.k), f.X1, f.py(-iD / un.k), "var(--red-)", 1, "2 3", 0.5);
+    s += ln(f.X0, f.py(iR / un.k), f.X1, f.py(iR / un.k), "var(--ox)", 1, "2 3", 0.5);
+    s += tx(f.X1 - 6, f.py(-iD / un.k) - 7, fmtA(iD), "var(--red-)", 10, "end", 600);
+    s += tx(f.X1 - 6, f.py(iR / un.k) - 7, fmtA(iR), "var(--ox)", 10, "end", 600);
+  }
+  el("nxTime").innerHTML = s;
+}
+
+function nxFlatDraw(){
+  var s = "", f = fr(70, 502, 46, 244, 0, 2700, 0, 0.5), i, j;
+  s += axLin(f, "rotation rate / rpm", "|i\u0280| / |i\u1d05|",
+             function(v){ return v.toFixed(0); }, function(v){ return v.toFixed(2); });
+  var show = NX.k >= 4 ? (NX.k === 4 ? clamp(NX.u, 0, 1) : 1) : 0;
+  s += ln(f.X0, f.py(NX_N), f.X1, f.py(NX_N), "var(--go)", 2, "6 4", show ? 1 : 0.25);
+  for(i = 0; i < NX_RPMS.length; i++){
+    if((i + 1) / NX_RPMS.length > show + 1e-9) continue;
+    for(j = 0; j < NX_CS.length; j++){
+      s += cir(f.px(NX_RPMS[i]) + (j - 1) * 7, f.py(NX_N), 4.4,
+               ["var(--red-)", "var(--ox)", "var(--ink-2)"][j]);
+    }
+    s += tx(f.px(NX_RPMS[i]), f.Y0 - 10, fmtA(nxID(NX_RPMS[i], 10)), "var(--muted)", 9.5, "middle", 600);
+  }
+  s += tx(f.X0 + 8, f.Y0 - 26, "the disk currents, which do move:", "var(--muted)", 9.5, null, 600);
+  if(show > 0.99){
+    s += tx(f.px(1350), f.py(NX_N) - 12, "5, 10 and 20 mM all land on the same line",
+            "var(--go)", 10.5, "middle", 700);
+    s += tx(f.px(1350), f.py(NX_N) + 20, "N = " + NX_N.toFixed(2) + ", and nothing you can turn moves it",
+            "var(--go)", 10, "middle", 600);
+  }
+  s += cir(f.px(NX.rpm), f.py(NX_N), 7.5, "var(--ink)", 0.18);
+  el("nxFlat").innerHTML = s;
+}
+
+function nxDraw(){
+  var c = NX_S[NX.k], iD = nxID(NX.rpm, 10), iR = NX_N * iD;
+  nxTimeDraw();
+  nxFlatDraw();
+  el("nxRpmv").textContent = NX.rpm + " rpm";
+  el("nxID").textContent = NX.k >= 2 ? fmtA(iD) : "\u2014";
+  el("nxIR").textContent = NX.k >= 2 ? fmtA(iR) : "\u2014";
+  el("nxTau").textContent = NX.k >= 2 ? (nxTau(NX.rpm) * 1000).toFixed(0) + " ms" : "\u2014";
+  el("nxRat").textContent = NX.k >= 3 ? (iR / iD).toFixed(3) : "\u2014";
+  el("nxN").textContent = NX.k >= 3 ? NX_N.toFixed(2) : "\u2014";
+  el("nxStepH").textContent = "Step " + (NX.k + 1) + " of " + NX_S.length + " \u00b7 " + c.h;
+  el("nxStepN").innerHTML = c.n;
+  el("nxBody").innerHTML = c.b;
+  el("nxSay").innerHTML = NX.k >= 3
+    ? "<b>" + fmtA(iR) + " / " + fmtA(iD) + " = " + (iR / iD).toFixed(3) + ".</b> Both currents "
+      + "scale as \u221a\u03c9, so the ratio does not: that is why N can be measured once and used "
+      + "all day."
+    : "The ratio appears once both currents have settled.";
+  el("nxEq").innerHTML = NX.k >= 3
+    ? '<span class="pot">N = ' + fmtA(iR) + ' / ' + fmtA(iD) + ' = ' + (iR / iD).toFixed(3)
+      + '</span><small>i\u1d05 = 0.620 F A D<sup>2/3</sup>\u03bd<sup>\u22121/6</sup>C*\u03c9<sup>1/2</sup> '
+      + 'at ' + NX.rpm + ' rpm; the ring sees the same flux less what the flow carried past</small>'
+    : '<span class="act">step the disk, wait a transit time, then divide</span>'
+      + '<small>the two plateaux are all this measurement needs</small>';
+  var bs = el("nxSteps").querySelectorAll("button"), q;
+  for(q = 0; q < bs.length; q++){
+    if(q === NX.k) bs[q].setAttribute("aria-current", "true");
+    else bs[q].removeAttribute("aria-current");
+  }
+  el("nxPlay").textContent = NX.t ? "Pause"
+      : (NX.k === NX_S.length - 1 && NX.u >= 1 ? "Play again" : "Play");
+}
+function nxSync(){ later("nx", nxDraw); }
+function nxList(){
+  var h = "", i;
+  for(i = 0; i < NX_S.length; i++)
+    h += '<button type="button" data-k="' + i + '"' + (i === NX.k ? ' aria-current="true"' : "")
+       + '><span class="n">' + (i + 1) + '</span>' + NX_S[i].h + '</button>';
+  el("nxSteps").innerHTML = h;
+  [].slice.call(el("nxSteps").querySelectorAll("button")).forEach(function(b){
+    b.addEventListener("click", function(){
+      nxStop(); NX.k = +b.getAttribute("data-k"); NX.u = 1; nxSync();
+    });
+  });
+}
+function nxStop(){ if(NX.t){ window.clearInterval(NX.t); NX.t = null; } }
+function nxTick(){
+  NX.u += REDUCED ? 1 : 0.0126;
+  if(NX.u >= 1){
+    if(NX.k < NX_S.length - 1){ NX.k++; NX.u = 0; }
+    else { NX.u = 1; nxStop(); }
+  }
+  nxDraw();
+}
+function nxToggle(){
+  if(NX.t){ nxStop(); nxDraw(); return; }
+  if(NX.k === NX_S.length - 1 && NX.u >= 1) NX.k = 0;
+  NX.u = 0;
+  NX.t = window.setInterval(nxTick, REDUCED ? 2600 : 42);
+  nxDraw();
+}
+el("nxPlay").addEventListener("click", nxToggle);
+el("nxBack").addEventListener("click", function(){
+  nxStop(); NX.k = clamp(NX.k - 1, 0, NX_S.length - 1); NX.u = 1; nxSync();
+});
+el("nxNext").addEventListener("click", function(){
+  nxStop(); NX.k = clamp(NX.k + 1, 0, NX_S.length - 1); NX.u = 1; nxSync();
+});
+bind("nxRpm", function(v){ NX.rpm = v; nxSync(); });
+
+
 
 bind("rgX", function(v){ RG.x = v; rgSync(); });
 bind("rgN", function(v){ RG.N = v; rgSync(); });
