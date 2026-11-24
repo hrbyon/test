@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script src="exam-lock.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Problem Set 5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+:root{
+  --ground:#F1F3F2; --surface:#FFFFFF; --surface-2:#E9EDEB;
+  --ink:#14191B; --ink-2:#3E4A4D; --muted:#68767A; --line:#D6DDDA; --line-2:#C3CCC8;
+  --ox:#A85B33; --ox-soft:#F3E4DA;
+  --red-:#15618E; --red-soft:#DDE9F2;
+  --go:#2C7355; --go-soft:#DCEBE3;
+  --stop:#8A5F0C; --stop-soft:#F3E9D3;
+  --shadow:0 1px 2px rgba(20,25,27,.05),0 8px 24px -12px rgba(20,25,27,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+    --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+    --ox:#D08551; --ox-soft:#33231A;
+    --red-:#5AA6D4; --red-soft:#152833;
+    --go:#5DBB8D; --go-soft:#152A21;
+    --stop:#D6A33F; --stop-soft:#2B2415;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0F1315; --surface:#171C1E; --surface-2:#1F2528;
+  --ink:#E7EDEB; --ink-2:#BDC8C6; --muted:#8B999C; --line:#2A3235; --line-2:#3A4448;
+  --ox:#D08551; --ox-soft:#33231A;
+  --red-:#5AA6D4; --red-soft:#152833;
+  --go:#5DBB8D; --go-soft:#152A21;
+  --stop:#D6A33F; --stop-soft:#2B2415;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:880px;margin:0 auto;padding:32px 20px 80px}
+
+.masthead{padding-bottom:20px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.eyebrow a{color:inherit}
+h1{font-family:"IBM Plex Serif",Georgia,serif;font-weight:600;font-size:clamp(28px,4.2vw,40px);line-height:1.12;margin:0;letter-spacing:-.015em}
+.sub{margin:10px 0 0;color:var(--ink-2);font-size:15px;max-width:62ch}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);margin-top:16px}
+.card-h{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.card-h h2{font-size:15px;font-weight:600;margin:0}
+.card-h .note{font-size:12.5px;color:var(--muted)}
+.card-b{padding:18px}
+
+label.fld{display:block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+input[type=text]{width:100%;font-family:inherit;font-size:14px;color:var(--ink);background:var(--surface-2);
+  border:1px solid var(--line-2);border-radius:7px;padding:9px 10px}
+input:read-only{background:var(--surface);color:var(--muted);cursor:not-allowed}
+input:focus-visible,button:focus-visible{outline:2px solid var(--red-);outline-offset:1px}
+.startrow{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:end}
+@media(max-width:560px){.startrow{grid-template-columns:1fr}}
+
+.solid{appearance:none;background:var(--ox);border:1px solid var(--ox);color:#fff;font-family:inherit;
+  font-size:13.5px;font-weight:500;padding:10px 18px;border-radius:7px;cursor:pointer;white-space:nowrap}
+.solid:hover{filter:brightness(1.08)}
+.solid:disabled{background:var(--line-2);border-color:var(--line-2);color:var(--muted);cursor:not-allowed;filter:none}
+.ghost{appearance:none;background:var(--surface-2);border:1px solid var(--line-2);color:var(--ink-2);
+  font-family:inherit;font-size:12.5px;padding:8px 13px;border-radius:7px;cursor:pointer}
+.ghost:hover{border-color:var(--ox);color:var(--ox)}
+
+.pnum{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);letter-spacing:.1em}
+.ptopic{font-size:14px;font-weight:600;flex:1 1 auto}
+.stem{font-size:15px;line-height:1.7;margin:0 0 16px}
+.stem b{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--ox);font-size:14.5px}
+.answer{display:grid;grid-template-columns:minmax(120px,190px) auto auto;gap:10px;align-items:center}
+@media(max-width:560px){.answer{grid-template-columns:1fr}}
+.unit{font-family:"IBM Plex Mono",monospace;font-size:13.5px;color:var(--muted)}
+.verdict{margin:14px 0 0;padding:11px 14px;border-radius:8px;font-size:13.5px;line-height:1.6}
+.verdict[hidden]{display:none}
+.verdict.ok{background:var(--go-soft);color:var(--go)}
+.verdict.no{background:var(--stop-soft);color:var(--stop)}
+.sol{margin:14px 0 0;border-left:2px solid var(--line-2);padding-left:14px}
+.sol[hidden]{display:none}
+.sol h3{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 10px;font-weight:500}
+.sol ol{margin:0;padding-left:20px}
+.sol li{font-size:13.5px;line-height:1.8;color:var(--ink-2);margin-bottom:6px}
+.sol code{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--ink)}
+.sol .final{color:var(--ox);font-weight:600}
+.done .card-h{background:var(--go-soft)}
+
+.scorebar{display:flex;flex-wrap:wrap;align-items:center;gap:14px 22px;padding:16px 18px}
+.scorenum{font-family:"IBM Plex Mono",monospace;font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+.scorenum small{font-size:14px;font-weight:400;color:var(--muted)}
+.vcode{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted)}
+.vcode b{color:var(--ink);font-weight:600;letter-spacing:.08em}
+.hint{font-size:12.5px;color:var(--muted);line-height:1.65;margin:10px 0 0}
+footer{margin-top:44px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;line-height:1.8}
+
+/* --- section rules between Part A and Part B --- */
+.sect{margin:34px 0 0;padding:0 0 8px;border-bottom:1px solid var(--line-2);
+  display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.sect h2{font-family:"IBM Plex Serif",Georgia,serif;font-size:19px;font-weight:600;margin:0;letter-spacing:-.01em}
+.sect p{margin:0;font-size:12.5px;color:var(--muted)}
+
+/* --- multiple-choice items --- */
+.lect{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--muted);border:1px solid var(--line-2);border-radius:99px;padding:2px 8px}
+.opts{display:grid;gap:8px;margin:0}
+.opt{display:flex;gap:11px;align-items:flex-start;width:100%;text-align:left;
+  background:var(--surface-2);border:1px solid var(--line-2);border-radius:8px;
+  padding:11px 13px;font-family:inherit;font-size:13.5px;line-height:1.6;color:var(--ink);cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--ox)}
+.opt:disabled{cursor:default}
+.opt .k{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);flex:0 0 auto;padding-top:1px}
+.opt.picked{border-color:var(--ink-2)}
+.opt.right{background:var(--go-soft);border-color:var(--go);color:var(--go)}
+.opt.right .k{color:var(--go)}
+.opt.wrong{background:var(--stop-soft);border-color:var(--stop);color:var(--stop)}
+.opt.wrong .k{color:var(--stop)}
+.why{margin:14px 0 0;border-left:2px solid var(--line-2);padding-left:14px;
+  font-size:13.5px;line-height:1.75;color:var(--ink-2)}
+.why[hidden]{display:none}
+.why b{color:var(--ox)}
+
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow"><a href="index.html" style="color:inherit">CH40051 Electroanalytical Chemistry</a> · Problem Set 5</p>
+    <h1>Your own problem set</h1>
+    <p class="sub">Twelve problems on Lectures 15 and 16: the electrochemically active
+      surface area, the Tafel slope and the step it names, the rotating disk and the ring around it.
+      <b>Eight of them are figures.</b> Part A asks you to read a number off a plot &mdash; a
+      capacitance slope, the area of a stripping peak, a Tafel slope, the gap an uncompensated
+      resistance opens, a Levich slope, a Kouteck&yacute;&ndash;Levich intercept, a disk plateau and
+      the ring current beside it &mdash; and then use it. Part B shows you a result and asks what it
+      is allowed to mean. Every figure is generated from your student ID, so no two sets are the
+      same: a number copied from anyone else will simply be wrong. This is what the final
+      examination is going to ask you to do.</p>
+  </header>
+
+  <div class="card" id="startCard">
+    <div class="card-h"><h2>Generate your set</h2><span class="note">same ID always gives the same problems</span></div>
+    <div class="card-b">
+      <div class="startrow">
+        <div>
+          <label class="fld" for="sId">Student ID</label>
+          <input type="text" id="sId" inputmode="numeric" placeholder="e.g. 20261234" autocomplete="off">
+        </div>
+        <button class="solid" id="genBtn" type="button">Generate my problems</button>
+      </div>
+      <p class="hint" id="startHint">You can close this page and come back &mdash; your work is saved in this
+        browser, and the same ID regenerates the same set.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h2>How this is marked</h2><span class="note">read once before you start</span></div>
+    <div class="card-b">
+      <p class="hint" style="margin-top:0">
+        <b style="color:var(--ink)">Calculations</b> allow two attempts. A wrong first attempt earns one diagnostic
+        hint; the worked solution opens after the second. <b style="color:var(--ink)">Concept questions</b> allow
+        one attempt, then the reasoning is shown &mdash; guessing costs you the mark, so think before you click.
+        Give calculations to three significant figures in the unit printed beside the box; anything within 2 % counts.
+      </p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h2>What you may need</h2><span class="note">nothing else is required</span></div>
+    <div class="card-b">
+      <p class="hint" style="margin-top:0">
+        F = 96 485 C mol⁻¹ &nbsp;·&nbsp; R = 8.314 J mol⁻¹ K⁻¹ &nbsp;·&nbsp; RT/F = 25.69 mV at 25 °C &nbsp;·&nbsp; 2.303RT/F = 59.16 mV per decade<br>
+        <b>Area.</b> H<sub>upd</sub>: 210 µC cm<sup>&minus;2</sup> (197 as the three-face average) &nbsp;·&nbsp;
+        CO stripping: 420 µC cm<sup>&minus;2</sup> &nbsp;·&nbsp; double layer: ECSA = C<sub>dl</sub>/C<sub>s</sub>,
+        C<sub>s</sub> = 20&ndash;60 µF cm<sup>&minus;2</sup> &nbsp;·&nbsp; i = υC<sub>dl</sub> &nbsp;·&nbsp;
+        roughness = ECSA/A<sub>geo</sub><br>
+        <b>Kinetics.</b> η = a + b log j &nbsp;·&nbsp; b = 2.303RT/αF &nbsp;·&nbsp;
+        118 · 39 · 30 mV/dec for Volmer, Heyrovsky, Tafel rate-determining at α = 0.5 &nbsp;·&nbsp;
+        η<sub>applied</sub> = η<sub>true</sub> + iR<sub>u</sub> &nbsp;·&nbsp;
+        FE<sub>i</sub> = n<sub>i</sub>FN<sub>i</sub>/Q<sub>total</sub> &nbsp;·&nbsp; j<sub>i</sub> = FE<sub>i</sub> × j<sub>total</sub><br>
+        <b>Rotation.</b> ω = 2π(rpm)/60 &nbsp;·&nbsp;
+        δ = 1.61 D<sup>1/3</sup>ν<sup>1/6</sup>ω<sup>&minus;1/2</sup> &nbsp;·&nbsp;
+        i<sub>L</sub> = nFADC*/δ = 0.620 nFAD<sup>2/3</sup>ν<sup>&minus;1/6</sup>ω<sup>1/2</sup>C* = Bω<sup>1/2</sup> &nbsp;·&nbsp;
+        1/i = 1/i<sub>k</sub> + 1/(Bω<sup>1/2</sup>)<br>
+        <b>The ring.</b> N = |i<sub>R</sub>|/|i<sub>D</sub>| for a stable couple &nbsp;·&nbsp;
+        n = 4|i<sub>D</sub>|/(|i<sub>D</sub>| + |i<sub>R</sub>|/N) &nbsp;·&nbsp;
+        % H<sub>2</sub>O<sub>2</sub> = 200(|i<sub>R</sub>|/N)/(|i<sub>D</sub>| + |i<sub>R</sub>|/N)
+      </p>
+    </div>
+  </div>
+
+  <div id="sheet" hidden></div>
+
+  <div class="card" id="summary" hidden>
+    <div class="card-h"><h2>Submission</h2><span class="note">one button &mdash; the file is only a backup</span></div>
+    <div class="scorebar">
+      <div>
+        <div class="scorenum" id="scoreNum">&mdash;</div>
+        <div class="vcode" style="margin-top:5px" id="whoLine">&mdash;</div>
+      </div>
+      <div style="flex:1 1 300px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="solid" id="sendBtn" type="button" hidden>Submit to the course</button>
+          <button class="ghost" id="dlBtn" type="button">Download my result</button>
+        </div>
+        <p class="hint" id="dlHint" style="margin-top:8px">Answer every problem first &mdash; unanswered ones are recorded as incomplete.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Charge densities and the C<sub>s</sub> range from the Lecture 15 ECSA table · the three Tafel slopes from the
+    Volmer–Heyrovsky–Tafel tab · D, C* and ν for oxygen from the Lecture 16 bench, where the transport numbers are
+    fixed at C* = 1.2 mM and ν = 0.010 cm² s⁻¹ · every constant above is the one the lectures use<br>
+    CH40051 Electroanalytical Chemistry · Fall 2026
+  </footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+var F = 96485.33;             /* C/mol                                   */
+var RG = 8.314462;            /* J/(mol K)                               */
+var E0 = 8.8541878e-12;       /* F/m                                     */
+var QE = 1.602176634e-19;     /* C                                       */
+var KB = 1.380649e-23;        /* J/K                                     */
+var NA = 6.02214076e23;       /* /mol                                    */
+var T25 = 298.15;             /* K                                       */
+var RT_F = RG * T25 / F;      /* 0.025693 V                              */
+var DEC_V = RT_F * Math.LN10; /* 0.059159 V per decade                   */
+var ER_W = 78.39;             /* water at 25 C                           */
+var ETA_W = 0.890e-3;         /* Pa s                                    */
+
+/* ---------- deterministic RNG: same student ID -> same problem set ---------- */
+function hash32(s){
+  var h = 0x811c9dc5;
+  for (var i = 0; i < s.length; i++){
+    h ^= s.charCodeAt(i);
+    h = (h + ((h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24))) >>> 0;
+  }
+  return h >>> 0;
+}
+function mulberry32(a){
+  return function(){
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    var t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function ri(r, a, b){ return a + Math.floor(r() * (b - a + 1)); }
+function rf(r, a, b, d){ var v = a + r() * (b - a); return +v.toFixed(d); }
+function pick(r, arr){ return arr[Math.floor(r() * arr.length)]; }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function gcd(a,b){ while(b){ var t=b; b=a%b; a=t; } return a; }
+function lcm(a,b){ return a*b/gcd(a,b); }
+var SUPD = {"-":"⁻","0":"⁰","1":"¹","2":"²","3":"³","4":"⁴",
+            "5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹"};
+function supn(e){ return String(e).split("").map(function(c){ return SUPD[c]; }).join(""); }
+/* three figures, and a power of ten written the way it is read aloud */
+function sig(x, d){
+  if (x === 0) return "0";
+  var e = Math.floor(Math.log10(Math.abs(x)));
+  if (e >= 4 || e <= -3)
+    return (+(x / Math.pow(10, e)).toPrecision(d)) + " × 10" + supn(e);
+  return (+x.toPrecision(d)).toString();
+}
+/* Fisher-Yates on a copy, reporting where a tracked index landed. */
+function shuffle(r, arr, track){
+  var a = arr.slice(), pos = track;
+  for (var i = a.length - 1; i > 0; i--){
+    var j = Math.floor(r() * (i + 1));
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+    if (pos === i) pos = j; else if (pos === j) pos = i;
+  }
+  return { list: a, at: pos };
+}
+
+/* ---------- chemistry data, Lectures 9-12 ----------
+   Transference numbers from the Lecture 8/9 tables; diffusion coefficients
+   and exchange currents from the Lecture 10 and 11 tables; metal data from
+   the Lecture 12 Evans presets. Every number a problem uses is one the
+   lectures already put on screen.                                        */
+var SALT_T = [
+ {nm:"HCl",  tp:0.821, ions:"H⁺ and Cl⁻"},
+ {nm:"KCl",  tp:0.491, ions:"K⁺ and Cl⁻"},
+ {nm:"NaCl", tp:0.396, ions:"Na⁺ and Cl⁻"},
+ {nm:"LiCl", tp:0.336, ions:"Li⁺ and Cl⁻"}
+];
+var METALS = [
+ {nm:"Fe", E0:-0.440, i0:1e-7, ba:0.060, M:55.845, z:2, rho:7.87},
+ {nm:"Zn", E0:-0.762, i0:1e-7, ba:0.040, M:65.38,  z:2, rho:7.14},
+ {nm:"Ni", E0:-0.257, i0:1e-6, ba:0.060, M:58.693, z:2, rho:8.90},
+ {nm:"Cd", E0:-0.403, i0:1e-6, ba:0.060, M:112.41, z:2, rho:8.65}
+];
+var SEC_YR = 3.15576e7;
+
+var SUP = {"-":"⁻","0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹"};
+function p10(x){            /* 1.0e-5 -> 10⁻⁵, 2.5e-5 -> 2.5 × 10⁻⁵ */
+  var e = Math.floor(Math.log10(Math.abs(x))), m = x / Math.pow(10, e);
+  var ex = String(e).split("").map(function(ch){ return SUP[ch]; }).join("");
+  return (Math.abs(m - 1) < 1e-9 ? "" : (+m.toFixed(2)) + " × ") + "10" + ex;
+}
+function mM(c){             /* a concentration in mol/L, printed where it reads best */
+  return c >= 0.01 ? (+c.toFixed(4)) + " M" : sig(c * 1000, 3) + " mM";
+}
+
+/* =====================================================================
+   DRAWING - small and local. Every figure is a schematic: the shape is a
+   recognisable voltammogram or decay, and the peak positions, peak
+   heights and slopes are placed at exactly the values the question is
+   about, so what you read off the plot is what the arithmetic wants.
+   ================================================================== */
+function FR(X0, X1, Y0, Y1, xlo, xhi, ylo, yhi){
+  return {X0:X0, X1:X1, Y0:Y0, Y1:Y1, xlo:xlo, xhi:xhi, ylo:ylo, yhi:yhi,
+    px:function(v){ return X0 + (v - xlo) / (xhi - xlo) * (X1 - X0); },
+    py:function(v){ return Y1 - (v - ylo) / (yhi - ylo) * (Y1 - Y0); }};
+}
+function LN(x1, y1, x2, y2, c, w, d){
+  return '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + x2.toFixed(1)
+       + '" y2="' + y2.toFixed(1) + '" stroke="' + c + '" stroke-width="' + (w || 1) + '"'
+       + (d ? ' stroke-dasharray="' + d + '"' : "") + "/>";
+}
+function TX(x, y, t, c, sz, an, wt){
+  return '<text x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" fill="' + (c || "var(--ink-2)")
+       + '" font-size="' + (sz || 10) + '"'
+       + (an ? ' text-anchor="' + an + '"' : "")
+       + (wt ? ' font-weight="' + wt + '"' : "")
+       + ' font-family="IBM Plex Mono,monospace">' + t + "</text>";
+}
+function PA(d, c, w, dash){
+  return '<path d="' + d + '" fill="none" stroke="' + c + '" stroke-width="' + (w || 2) + '"'
+       + (dash ? ' stroke-dasharray="' + dash + '"' : "") + ' stroke-linejoin="round"/>';
+}
+function CIR(x, y, r, c){
+  return '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + r
+       + '" fill="' + c + '"/>';
+}
+function AX(f, xlab, ylab, nx, ny, fx, fy){
+  var s = '<rect x="' + f.X0 + '" y="' + f.Y0 + '" width="' + (f.X1 - f.X0) + '" height="'
+        + (f.Y1 - f.Y0) + '" fill="var(--surface-2)" opacity="0.5" rx="4"/>', i, v;
+  for(i = 0; i <= nx; i++){
+    v = f.xlo + (f.xhi - f.xlo) * i / nx;
+    s += LN(f.px(v), f.Y0, f.px(v), f.Y1, "var(--line)", 1, "2 3");
+    /* the leftmost label, centred, would sit on top of the lowest y label
+       in the corner they share: start it at the corner instead      */
+    s += f.px(v) > f.X0 + 12
+       ? TX(f.px(v), f.Y1 + 14, fx(v), "var(--muted)", 9.5, "middle")
+       : TX(f.X0, f.Y1 + 14, fx(v), "var(--muted)", 9.5, null);
+  }
+  for(i = 0; i <= ny; i++){
+    v = f.ylo + (f.yhi - f.ylo) * i / ny;
+    s += LN(f.X0, f.py(v), f.X1, f.py(v), "var(--line)", 1, "2 3");
+    s += TX(f.X0 - 6, f.py(v) + 3.4, fy(v), "var(--muted)", 9.5, "end");
+  }
+  s += TX((f.X0 + f.X1) / 2, f.Y1 + 32, xlab, "var(--ink-2)", 11, "middle", 600);
+  s += '<text x="15" y="' + ((f.Y0 + f.Y1) / 2).toFixed(1) + '" fill="var(--ink-2)" font-size="11"'
+     + ' text-anchor="middle" font-weight="600" font-family="IBM Plex Mono,monospace"'
+     + ' transform="rotate(-90 15 ' + ((f.Y0 + f.Y1) / 2).toFixed(1) + ')">' + ylab + "</text>";
+  return s;
+}
+function SVG(w, h, inner, lab){
+  return '<svg viewBox="0 0 ' + w + " " + h + '" style="width:100%;height:auto;max-width:620px;'
+       + 'display:block;margin:10px 0 2px" role="img" aria-label="' + lab + '">' + inner + "</svg>";
+}
+/* a peak that rises like a wave and falls like a diffusion tail */
+function PKSHAPE(u, wid){
+  return u <= 0 ? Math.exp(-0.5 * (u / wid) * (u / wid))
+                : 1 / Math.sqrt(1 + u / (0.55 * wid));
+}
+/* one full cycle, cathodic first. E runs Ehi -> Elo -> Ehi */
+function CVPATH(f, Ehi, Elo, Epc, ipc, Epa, ipa, wid, base){
+  var d = "", i, E, y, N = 260;
+  for(i = 0; i <= N; i++){
+    E = Ehi - (Ehi - Elo) * i / N;
+    y = -ipc * PKSHAPE(Epc - E, wid) - base;
+    d += (i ? "L" : "M") + f.px(E).toFixed(1) + " " + f.py(y).toFixed(1) + " ";
+  }
+  for(i = 0; i <= N; i++){
+    E = Elo + (Ehi - Elo) * i / N;
+    y = ipa * PKSHAPE(E - Epa, wid) + base;
+    d += "L" + f.px(E).toFixed(1) + " " + f.py(y).toFixed(1) + " ";
+  }
+  return d;
+}
+
+/* =====================================================================
+   PART A - eight figures, each one a measurement you make on the plot
+   and then use. Four from Lecture 15 (the area, and what it was for)
+   and four from Lecture 16 (the rotating disk and its ring).
+
+   Every one of these is built backwards. The number the student has to
+   read is chosen first, as a round value that lands exactly on a
+   labelled gridline, and the chemistry is then derived from it - the
+   diffusion coefficient from the plateau rather than the plateau from
+   the diffusion coefficient. A figure you can only read to 20 % makes a
+   question about eyesight instead of electrochemistry.
+   ================================================================== */
+
+var NU_W = 0.010;             /* kinematic viscosity, cm2/s              */
+var LEVC = 0.620;             /* Levich constant, omega in rad/s         */
+var DELC = 1.61;              /* the same constant, as a thickness       */
+function omg(rpm){ return 2 * Math.PI * rpm / 60; }
+/* B of i_L = B sqrt(omega), in A per (rad/s)^1/2 */
+function levB(n, A, D, C){
+  return LEVC * n * F * A * Math.pow(D, 2 / 3) * Math.pow(NU_W, -1 / 6) * C;
+}
+/* and the inverse: the D that puts the plateau exactly where it is drawn */
+function levD(n, A, C, B){
+  return Math.pow(B / (LEVC * n * F * A * Math.pow(NU_W, -1 / 6) * C), 1.5);
+}
+/* a tick label with as many decimals as it needs and no more */
+function tk(v, step){
+  var d = step >= 10 ? 0 : step >= 1 ? (Math.abs(v - Math.round(v)) < 1e-9 ? 0 : 1)
+        : step >= 0.1 ? 2 : 3;
+  return (+v.toFixed(d)).toFixed(d);
+}
+
+/* ---- 1. Lecture 15: the double layer, and the platinum it hides ---- */
+function pCdl(r){
+  var rough = pick(r, [2.5, 4.0, 6.0, 8.0]);        /* what is asked for */
+  var Cs    = pick(r, [20, 40, 60]);                /* µF per real cm2   */
+  var Cgeo  = rough * Cs;                           /* µF per geo cm2    */
+  var nus   = [20, 40, 60, 80, 100], i;             /* mV/s              */
+  var jm    = Cgeo * 0.100;                         /* µA/cm2 at 100mV/s */
+  var ystep = jm / 4;                               /* the point is 4 up */
+  var f = FR(76, 500, 20, 230, 0, 120, 0, jm * 1.25);
+  var g = AX(f, "scan rate υ / mV s⁻¹", "Δj / 2 at 0.45 V   (µA cm⁻²)", 6, 5,
+             function(v){ return v.toFixed(0); },
+             function(v){ return tk(v, ystep); });
+  g += PA("M" + f.px(0).toFixed(1) + " " + f.py(0).toFixed(1)
+        + " L" + f.px(115).toFixed(1) + " " + f.py(Cgeo * 0.115).toFixed(1), "var(--red-)", 2);
+  for (i = 0; i < nus.length; i++)
+    g += CIR(f.px(nus[i]), f.py(Cgeo * nus[i] / 1000), 3.6, "var(--ink)");
+  g += LN(f.px(100), f.py(jm), f.px(100), f.Y1, "var(--ink-2)", 1.1, "4 3");
+  g += LN(f.X0, f.py(jm), f.px(100), f.py(jm), "var(--ink-2)", 1.1, "4 3");
+  g += CIR(f.px(100), f.py(jm), 4.6, "var(--ox)");
+  g += TX(f.X0 + 10, f.Y0 + 15, "glassy carbon · no adsorbing species", "var(--muted)", 10, null, 600);
+  return {
+    kind:"calc", lec:"Lecture 15", topic:"Double layer → roughness factor", unit:"roughness factor",
+    answer:rough, abstol:rough * 0.09,
+    stem:"A material with nothing to adsorb &mdash; so neither H<sub>upd</sub> nor CO stripping is "
+        + "available, and the double layer is all you have. Half the anodic&ndash;cathodic current "
+        + "separation is measured at 0.45 V, where no faradaic current flows, and plotted against "
+        + "scan rate. <b>Currents are per geometric cm<sup>2</sup></b>, and the specific capacitance "
+        + "of this material is taken as <b>C<sub>s</sub> = " + Cs + " µF cm<sup>&minus;2</sup></b>.<br>"
+        + SVG(520, 272, g, "Half the anodic minus cathodic current density at a fixed potential "
+            + "against scan rate: five points on a straight line through the origin, the last of "
+            + "them dropped onto both axes.")
+        + "<b>Read the marked point off the figure</b> and report the <b>roughness factor</b>.",
+    solution:[
+      "The non-faradaic current in a sweep is <code>i = υ C<sub>dl</sub></code>, so the slope of "
+        + "this line <i>is</i> the capacitance &mdash; per geometric cm<sup>2</sup>, because that is "
+        + "what the current was divided by.",
+      "The marked point: <code>Δj/2 = " + sig(jm, 3) + " µA cm<sup>&minus;2</sup> at υ = 100 mV s"
+        + "<sup>&minus;1</sup></code>, so <code>C<sub>dl</sub> = " + sig(jm, 3)
+        + " µA cm<sup>&minus;2</sup> / 0.100 V s<sup>&minus;1</sup> = " + sig(Cgeo, 3)
+        + " µF cm<sup>&minus;2</sup></code>.",
+      "<code>roughness = C<sub>dl</sub> / C<sub>s</sub> = " + sig(Cgeo, 3) + " / " + Cs + "</code>",
+      "<span class='final'>roughness factor = " + rough.toFixed(1) + "</span>",
+      "<b>And now the weakness of the method.</b> C<sub>s</sub> is not a constant of nature: the "
+        + "literature spans 20 to 60 µF cm<sup>&minus;2</sup> for the same kind of material, <b>a "
+        + "factor of three</b>, and it is a number you took from a paper about something that is not "
+        + "quite your sample. H<sub>upd</sub> divides by a site density you can count; this divides "
+        + "by a guess. It is the route you use when the other two are unavailable &mdash; and the "
+        + "C<sub>s</sub> you used has to be stated with the answer."
+    ]
+  };
+}
+
+/* ---- 2. Lecture 15: CO stripping, integrated off the plot ---------- */
+function pCO(r){
+  var ip   = pick(r, [100, 150, 200, 250]);         /* µA, on a gridline */
+  var wid  = pick(r, [0.10, 0.20]);                 /* V, feet on ticks  */
+  var Ep   = pick(r, [0.75, 0.80]);                 /* V vs RHE          */
+  var Q    = 0.5 * wid * ip / 0.020;                /* µC                */
+  var ecsa = Q / 420;                               /* cm2               */
+  var E1 = Ep - wid / 2, E2 = Ep + wid / 2;
+  var f = FR(76, 500, 20, 230, 0.55, 1.05, -ip * 0.25, ip * 1.25);
+  var g = AX(f, "E / V vs RHE", "i / µA", 10, 6,
+             function(v){ return v.toFixed(2); }, function(v){ return tk(v, ip / 4); });
+  g += LN(f.X0, f.py(0), f.X1, f.py(0), "var(--line-2)", 1.2);
+  g += PA("M" + f.px(0.55).toFixed(1) + " " + f.py(0).toFixed(1)
+        + " L" + f.px(1.05).toFixed(1) + " " + f.py(0).toFixed(1), "var(--muted)", 1.6, "5 4");
+  g += PA("M" + f.px(0.55).toFixed(1) + " " + f.py(0).toFixed(1)
+        + " L" + f.px(E1).toFixed(1) + " " + f.py(0).toFixed(1)
+        + " L" + f.px(Ep).toFixed(1) + " " + f.py(ip).toFixed(1)
+        + " L" + f.px(E2).toFixed(1) + " " + f.py(0).toFixed(1)
+        + " L" + f.px(1.05).toFixed(1) + " " + f.py(0).toFixed(1), "var(--red-)", 2);
+  g += LN(f.px(Ep), f.py(ip), f.px(Ep), f.py(0), "var(--ink-2)", 1.1, "4 3");
+  g += LN(f.X0, f.py(ip), f.px(Ep), f.py(ip), "var(--ink-2)", 1.1, "4 3");
+  g += CIR(f.px(E1), f.py(0), 3.6, "var(--ink)");
+  g += CIR(f.px(E2), f.py(0), 3.6, "var(--ink)");
+  g += CIR(f.px(Ep), f.py(ip), 4.6, "var(--ox)");
+  g += TX(f.X0 + 10, f.Y0 + 15, "first cycle (CO) · second cycle dashed", "var(--muted)", 10, null, 600);
+  return {
+    kind:"calc", lec:"Lecture 15", topic:"CO stripping → ECSA", unit:"cm² of real Pt",
+    answer:ecsa, abstol:ecsa * 0.08,
+    stem:"A monolayer of CO is dosed onto a platinum electrode and burnt off at <b>20 mV s"
+        + "<sup>&minus;1</sup></b>; the dashed trace is the second cycle, with the CO gone, and it "
+        + "is the baseline. <b>Treat the stripping peak as the triangle it is drawn as</b> &mdash; "
+        + "the two feet and the apex are marked.<br>"
+        + SVG(520, 272, g, "A carbon monoxide stripping peak above a flat second-cycle baseline, "
+            + "with its two feet on the baseline and its apex both marked.")
+        + "Report the <b>ECSA in cm<sup>2</sup></b>, taking a full monolayer as 420 µC cm"
+        + "<sup>&minus;2</sup>.",
+    solution:[
+      "Read the triangle: feet at <code>" + E1.toFixed(2) + " V</code> and <code>" + E2.toFixed(2)
+        + " V</code>, apex <code>i<sub>p</sub> = " + ip + " µA</code>, so base = <code>"
+        + wid.toFixed(2) + " V</code> and area = <code>½ × " + wid.toFixed(2) + " × " + ip + " = "
+        + (0.5 * wid * ip).toFixed(0) + " µA V</code>.",
+      "An area on an i&ndash;E plot is a charge only after you divide by the scan rate: <code>Q = "
+        + (0.5 * wid * ip).toFixed(0) + " µA V / 0.020 V s<sup>&minus;1</sup> = " + sig(Q, 3)
+        + " µC</code>.",
+      "<code>ECSA = Q / 420 µC cm<sup>&minus;2</sup> = " + sig(Q, 3) + " / 420</code>",
+      "<span class='final'>ECSA = " + sig(ecsa, 3) + " cm<sup>2</sup></span>",
+      "<b>Why 420 and not 210.</b> One CO sits on one Pt atom and gives up <i>two</i> electrons when "
+        + "it is oxidised to CO<sub>2</sub>, so a full layer is twice the H<sub>upd</sub> charge. "
+        + "<b>The assumption is the geometry, not the baseline:</b> a CO bridged across two atoms is "
+        + "one molecule where you counted one site, so a bridged fraction x reports 420(1 &minus; x/2) "
+        + "and the area comes out <i>low</i>. CO stripping underestimates; it never overestimates. "
+        + "H<sub>upd</sub> fails the other way, which is why both are worth the afternoon."
+    ]
+  };
+}
+
+/* ---- 3. Lecture 15: the Tafel slope, and the step it names --------- */
+function pTafel(r){
+  var cs = pick(r, [[120, "the Volmer step", "b = 2.303RT/αF with α = 0.5, which is 118 mV exactly"],
+                    [40,  "the Heyrovsky step", "b = 2.303RT/(1+α)F with α = 0.5, 39 mV exactly"],
+                    [30,  "the Tafel step", "b = 2.303RT/2F, 30 mV, with no α in it at all"]]);
+  var b = cs[0], lj0 = -1.9;                         /* log (j0/mA cm-2) */
+  var xA = -0.9, xB = 0.6;                           /* both on ticks    */
+  var eA = b * (xA - lj0), eB = b * (xB - lj0);      /* = b and 2.5b     */
+  var f = FR(76, 500, 20, 230, -1.2, 1.2, 0, 3 * b);
+  var g = AX(f, "log ( j / mA cm⁻² )", "η / mV", 8, 6,
+             function(v){ return v.toFixed(1); }, function(v){ return v.toFixed(0); });
+  g += PA("M" + f.px(-1.2).toFixed(1) + " " + f.py(b * (-1.2 - lj0)).toFixed(1)
+        + " L" + f.px(1.2).toFixed(1) + " " + f.py(b * (1.2 - lj0)).toFixed(1), "var(--red-)", 2);
+  [[xA, eA], [xB, eB]].forEach(function(q){
+    g += LN(f.px(q[0]), f.py(q[1]), f.px(q[0]), f.Y1, "var(--ink-2)", 1.1, "4 3");
+    g += LN(f.X0, f.py(q[1]), f.px(q[0]), f.py(q[1]), "var(--ink-2)", 1.1, "4 3");
+    g += CIR(f.px(q[0]), f.py(q[1]), 4.4, "var(--ox)");
+  });
+  g += TX(f.X0 + 10, f.Y0 + 15, "iR corrected · per real cm²", "var(--muted)", 10, null, 600);
+  return {
+    kind:"calc", lec:"Lecture 15", topic:"Tafel slope from two marked points", unit:"mV per decade",
+    answer:b, abstol:b * 0.09,
+    stem:"Hydrogen evolution on a metal in acid, 25 &deg;C. The overpotential has been corrected for "
+        + "uncompensated resistance and the current is per <b>real</b> cm<sup>2</sup>, so the slope "
+        + "means what it says. Two points on the straight part are marked and dropped onto both "
+        + "axes.<br>"
+        + SVG(520, 272, g, "Overpotential against the logarithm of current density: a straight Tafel "
+            + "line with two points marked, each dropped onto both axes.")
+        + "<b>Read both points off the figure</b> and report the <b>Tafel slope in mV per decade</b>.",
+    solution:[
+      "The marked points are <code>(log j = " + xA.toFixed(1) + ", η = " + eA.toFixed(0)
+        + " mV)</code> and <code>(log j = " + xB.toFixed(1) + ", η = " + eB.toFixed(0)
+        + " mV)</code> &mdash; one and a half decades apart.",
+      "<code>b = Δη / Δlog j = (" + eB.toFixed(0) + " &minus; " + eA.toFixed(0) + ") / ("
+        + xB.toFixed(1) + " &minus; " + xA.toFixed(1) + ") = " + (eB - eA).toFixed(0)
+        + " / 1.5</code>",
+      "<span class='final'>b = " + b.toFixed(0) + " mV per decade</span>",
+      "Which names the slow step: <b>" + cs[1] + "</b> &mdash; " + cs[2] + ". The three values to "
+        + "know at 25 &deg;C are <b>120, 40 and 30 mV/dec</b> for Volmer, Heyrovsky and Tafel "
+        + "rate-determining, and reading one off a plot is how a mechanism is argued for "
+        + "experimentally.",
+      "The intercept is the other half of the plot: extrapolating to η = 0 gives <code>j<sub>0</sub> "
+        + "= " + sig(Math.pow(10, lj0), 2) + " mA cm<sup>&minus;2</sup></code>. <b>Neither number is "
+        + "an activity on its own.</b> Two Tafel lines of different slope cross, and which one is "
+        + "above the other depends entirely on the current density you compare them at &mdash; which "
+        + "is why activity is quoted as η at 10 mA cm<sup>&minus;2</sup>."
+    ]
+  };
+}
+
+/* ---- 4. Lecture 15: the bend that is not a mechanism --------------- */
+function pIR(r){
+  var Ru = pick(r, [4, 8, 12]);                      /* ohms             */
+  var b  = 120, i0 = 1.0;                            /* mV/dec, mA       */
+  var etaT = function(i){ return b * (Math.log(i / i0) / Math.LN10); };
+  var dEta = Ru * 10;                                /* mV at 10 mA      */
+  var step = 40;                                     /* the grid, in mV  */
+  var nd = Math.ceil((etaT(Math.pow(10, 1.2)) + Ru * Math.pow(10, 1.2)) * 1.04 / step);
+  var f = FR(76, 500, 20, 230, 0, 1.2, 0, nd * step);
+  var g = AX(f, "log ( i / mA )", "η (applied) / mV", 6, nd,
+             function(v){ return v.toFixed(1); }, function(v){ return v.toFixed(0); });
+  var d1 = "", d2 = "", k, x, ii;
+  for (k = 0; k <= 120; k++){
+    x = 1.2 * k / 120; ii = Math.pow(10, x);
+    d1 += (k ? "L" : "M") + f.px(x).toFixed(1) + " " + f.py(etaT(ii)).toFixed(1) + " ";
+    d2 += (k ? "L" : "M") + f.px(x).toFixed(1) + " " + f.py(etaT(ii) + Ru * ii).toFixed(1) + " ";
+  }
+  g += PA(d1, "var(--muted)", 1.6, "5 4");
+  g += PA(d2, "var(--red-)", 2.2);
+  g += LN(f.px(1), f.py(etaT(10)), f.px(1), f.py(etaT(10) + dEta), "var(--ox)", 2.4);
+  g += LN(f.X0, f.py(etaT(10)), f.px(1), f.py(etaT(10)), "var(--ink-2)", 1.1, "4 3");
+  g += LN(f.X0, f.py(etaT(10) + dEta), f.px(1), f.py(etaT(10) + dEta), "var(--ink-2)", 1.1, "4 3");
+  g += CIR(f.px(1), f.py(etaT(10)), 4.2, "var(--ink)");
+  g += CIR(f.px(1), f.py(etaT(10) + dEta), 4.6, "var(--ox)");
+  g += TX(f.X0 + 10, f.Y0 + 15, "measured —   the 120 mV/dec line extrapolated ---",
+          "var(--muted)", 10, null, 600);
+  return {
+    kind:"calc", lec:"Lecture 15", topic:"The upward bend → R(u)", unit:"Ω",
+    answer:Ru, abstol:Ru * 0.10,
+    stem:"The same experiment without the iR correction. The measured curve follows a straight "
+        + "120 mV/decade line while the current is small and then bends away from it; the dashed "
+        + "line is that line extrapolated. Both the measured point and the extrapolated one are "
+        + "marked at <b>log i = 1.0, that is i = 10 mA</b>.<br>"
+        + SVG(520, 272, g, "A Tafel plot that is straight at low current and bends upward at high "
+            + "current, with the straight part extrapolated as a dashed line and the gap between "
+            + "the two marked at ten milliamps.")
+        + "<b>Read the gap between the two marked points</b> and report <b>R<sub>u</sub></b> in Ω.",
+    solution:[
+      "At i = 10 mA the measured overpotential is <code>" + (etaT(10) + dEta).toFixed(0)
+        + " mV</code> and the extrapolated kinetic line is at <code>" + etaT(10).toFixed(0)
+        + " mV</code>.",
+      "<code>Δη = " + dEta.toFixed(0) + " mV</code>, and every millivolt of it is potential that "
+        + "never reached the electrode: <code>η<sub>applied</sub> = η<sub>true</sub> + iR"
+        + "<sub>u</sub></code>.",
+      "<code>R<sub>u</sub> = Δη / i = " + dEta.toFixed(0) + " mV / 10 mA</code>",
+      "<span class='final'>R<sub>u</sub> = " + Ru + " Ω</span>",
+      "<b>A Tafel plot that bends upward at high current is almost always R<sub>u</sub>, not a "
+        + "change of mechanism.</b> It is the same uncompensated resistance that set the R"
+        + "<sub>u</sub>C<sub>dl</sub> time constant in Lecture 14, and the test is free: switch the "
+        + "current off and the ohmic part of the overpotential vanishes instantly, while the kinetic "
+        + "and concentration parts do not. Measure it, subtract it, and say that you did."
+    ]
+  };
+}
+
+/* ---- 5. Lecture 16: the Levich slope, and D out of it -------------- */
+function pLevich(r){
+  var dia = pick(r, [4.0, 5.0]);                     /* mm               */
+  var i16 = dia === 5.0 ? pick(r, [0.80, 1.00, 1.20]) /* mA at 1600 rpm  */
+                        : pick(r, [0.60, 0.70, 0.80]);
+  var A = Math.PI * Math.pow(dia / 20, 2), C = 1.2e-6, n = 4, i;
+  var B = i16 * 1e-3 / Math.sqrt(omg(1600));         /* A/(rad/s)^1/2    */
+  var D = levD(n, A, C, B);                          /* the answer       */
+  var rpms = [400, 900, 1600, 2500];
+  var f = FR(80, 500, 20, 230, 0, 18, 0, i16 * 1.5);
+  var g = AX(f, "ω^½ / (rad s⁻¹)^½", "i(L) / mA", 6, 6,
+             function(v){ return v.toFixed(0); }, function(v){ return tk(v, i16 / 4); });
+  g += PA("M" + f.px(0).toFixed(1) + " " + f.py(0).toFixed(1)
+        + " L" + f.px(18).toFixed(1) + " " + f.py(B * 18 * 1000).toFixed(1), "var(--red-)", 2);
+  for (i = 0; i < rpms.length; i++)
+    g += CIR(f.px(Math.sqrt(omg(rpms[i]))), f.py(B * Math.sqrt(omg(rpms[i])) * 1000),
+             rpms[i] === 1600 ? 4.6 : 3.6, rpms[i] === 1600 ? "var(--ox)" : "var(--ink)");
+  g += LN(f.X0, f.py(i16), f.px(Math.sqrt(omg(1600))), f.py(i16), "var(--ink-2)", 1.1, "4 3");
+  g += LN(f.px(Math.sqrt(omg(1600))), f.py(i16), f.px(Math.sqrt(omg(1600))), f.Y1,
+          "var(--ink-2)", 1.1, "4 3");
+  g += TX(f.X0 + 10, f.Y0 + 15, "400 · 900 · 1600 · 2500 rpm — the marked point is 1600",
+          "var(--muted)", 10, null, 600);
+  return {
+    kind:"calc", lec:"Lecture 16", topic:"Levich slope → D", unit:"×10⁻⁵ cm² s⁻¹",
+    answer:D * 1e5, abstol:D * 1e5 * 0.12,
+    stem:"Oxygen reduction on a <b>" + dia.toFixed(1) + " mm</b> rotating disk, four rotation rates, "
+        + "every point taken on the plateau. <b>n = 4</b>, <b>C* = 1.2 mM</b> and <b>ν = 0.010 cm"
+        + "<sup>2</sup> s<sup>&minus;1</sup></b>. The marked point is the one at <b>1600 rpm</b> "
+        + "&mdash; you will have to turn that into ω yourself.<br>"
+        + SVG(520, 272, g, "Limiting current against the square root of angular velocity: four "
+            + "points on a straight line through the origin, the 1600 rpm one marked and dropped "
+            + "onto both axes.")
+        + "<b>Read the marked current</b> and report <b>D</b> in units of 10<sup>&minus;5</sup> "
+        + "cm<sup>2</sup> s<sup>&minus;1</sup>.",
+    solution:[
+      "<code>ω = 2π × 1600/60 = " + omg(1600).toFixed(1) + " rad s<sup>&minus;1</sup></code>, so "
+        + "<code>ω<sup>½</sup> = " + Math.sqrt(omg(1600)).toFixed(2) + "</code>, and the figure "
+        + "gives <code>i<sub>L</sub> = " + i16.toFixed(2) + " mA</code>.",
+      "<code>B = i<sub>L</sub>/ω<sup>½</sup> = " + sig(B, 3) + " A s<sup>½</sup></code>",
+      "<code>B = 0.620 nFA D<sup>2/3</sup> ν<sup>&minus;1/6</sup> C*</code>, and with <code>A = π("
+        + (dia / 20).toFixed(2) + ")<sup>2</sup> = " + A.toFixed(4) + " cm<sup>2</sup></code> only D "
+        + "is unknown:",
+      "<code>D<sup>2/3</sup> = " + sig(B, 3) + " / (0.620 × 4 × 96485 × " + A.toFixed(4)
+        + " × 0.010<sup>&minus;1/6</sup> × 1.2 × 10<sup>&minus;6</sup>) = "
+        + sig(Math.pow(D, 2 / 3), 3) + "</code>",
+      "<span class='final'>D = " + sig(D * 1e5, 3) + " × 10<sup>&minus;5</sup> cm<sup>2</sup> s"
+        + "<sup>&minus;1</sup></span>",
+      "<b>The unit of ω is not optional.</b> The 0.620 is right only for rad s<sup>&minus;1</sup>. "
+        + "Plot the same points against (rpm)<sup>½</sup> and the slope shrinks by √(2π/60) = 0.324, "
+        + "so D comes out low by 0.324<sup>3/2</sup> &mdash; <b>a factor of 5.4</b>. Two other "
+        + "things to check before claiming a new D: the area must be the real one, and C* must be "
+        + "in mol cm<sup>&minus;3</sup>, not mol L<sup>&minus;1</sup> &mdash; that one is a factor "
+        + "of a thousand."
+    ]
+  };
+}
+
+/* ---- 6. Lecture 16: Koutecky-Levich, and the intercept ------------- */
+function pKL(r){
+  var inter = pick(r, [500, 800, 1000]);             /* A-1, the read    */
+  /* i_k/(i_k + i_L) must stay under 80 % at the slowest rotation, which
+     is the rule this problem's own solution gives: that caps i_k at
+     about 2.2 mA for a 5 mm disk turning at 400 rpm              */
+  var ik = 1 / inter;                                /* A                */
+  var D = 1.9e-5, C = 1.2e-6, n = 4;
+  var A = Math.PI * Math.pow(5.0 / 20, 2);
+  var B = levB(n, A, D, C);
+  var rpms = [400, 900, 1600, 2500], i, x, y;
+  var xmax = 0.20;
+  var worst = inter + 1 / (B * Math.sqrt(omg(400)));
+  var nd = Math.min(10, Math.ceil(worst * 1.04 / inter));
+  var f = FR(84, 500, 20, 230, 0, xmax, 0, nd * inter);
+  var g = AX(f, "ω^−½ / (rad s⁻¹)^−½", "1 / i   (A⁻¹)", 8, nd,
+             function(v){ return v.toFixed(3); }, function(v){ return v.toFixed(0); });
+  g += PA("M" + f.px(0).toFixed(1) + " " + f.py(inter).toFixed(1)
+        + " L" + f.px(xmax).toFixed(1) + " " + f.py(inter + xmax / B).toFixed(1), "var(--red-)", 2);
+  for (i = 0; i < rpms.length; i++){
+    x = 1 / Math.sqrt(omg(rpms[i])); y = inter + x / B;
+    g += CIR(f.px(x), f.py(y), 3.6, "var(--ink)");
+  }
+  g += LN(f.X0, f.py(inter), f.px(xmax * 0.34), f.py(inter), "var(--ox)", 1.4, "4 3");
+  g += CIR(f.px(0), f.py(inter), 4.8, "var(--ox)");
+  g += TX(f.px(xmax * 0.36), f.py(inter) + 3.6, "intercept, at infinite rotation",
+          "var(--ox)", 10, null, 700);
+  g += TX(f.X0 + 10, f.Y0 + 15, "2500 · 1600 · 900 · 400 rpm, left to right",
+          "var(--muted)", 10, null, 600);
+  return {
+    kind:"calc", lec:"Lecture 16", topic:"Koutecký–Levich intercept → i(k)", unit:"mA",
+    answer:ik * 1000, abstol:ik * 1000 * 0.10,
+    stem:"The same reaction at a potential where the electrode is <b>no longer at its plateau</b>: "
+        + "the current is set partly by transport and partly by the kinetics. The reciprocal current "
+        + "at four rotation rates, plotted against ω<sup>&minus;½</sup> and extrapolated to infinite "
+        + "rotation.<br>"
+        + SVG(520, 272, g, "Reciprocal current against the inverse square root of angular velocity: "
+            + "four points on a straight line with a clear positive intercept, which is marked on "
+            + "the current axis.")
+        + "<b>Read the intercept</b> and report the <b>kinetic current i<sub>k</sub></b> in mA.",
+    solution:[
+      "<code>1/i = 1/i<sub>k</sub> + 1/(Bω<sup>½</sup>)</code>. Infinite rotation is <code>ω"
+        + "<sup>&minus;½</sup> = 0</code>, where transport costs nothing at all and only the "
+        + "kinetics are left &mdash; so the intercept is <code>1/i<sub>k</sub></code>.",
+      "The marked intercept is <code>" + inter + " A<sup>&minus;1</sup></code>.",
+      "<code>i<sub>k</sub> = 1 / " + inter + " A<sup>&minus;1</sup></code>",
+      "<span class='final'>i<sub>k</sub> = " + sig(ik * 1000, 3) + " mA</span>",
+      "The slope is the other half: <code>1/B</code>, so with D, ν and C* known it returns <b>n</b> "
+        + "&mdash; which is how a four-electron pathway is told from a two-electron one without a "
+        + "ring. <b>Keep the points between about 10 and 80 % of i<sub>L</sub>.</b> Too close to the "
+        + "plateau and the intercept is a small difference between two large reciprocals, so a 2 % "
+        + "error in a current becomes a huge error in i<sub>k</sub>; too far below it and the back "
+        + "reaction and the double-layer current start to matter."
+    ]
+  };
+}
+
+/* ---- 7. Lecture 16: the ring, and what it says the disk made ------- */
+function pRRDE(r){
+  var iD = pick(r, [0.80, 1.00, 1.20]);              /* mA, on a tick    */
+  var iR = pick(r, [40, 60, 80, 100]);               /* µA, on a tick    */
+  var N  = pick(r, [0.20, 0.25]);
+  var irn = iR / N / 1000;                           /* mA, as it left   */
+  var pct = 200 * irn / (iD + irn);
+  var nel = 4 * iD / (iD + irn);
+  var wv = function(E){ return 1 / (1 + Math.pow(10, (E - 0.78) / 0.050)); };
+  /* two panels, because a ring current is tens of µA and a disk current
+     is milliamps: one axis cannot show both, and the figure a paper
+     prints puts the ring above the disk for exactly this reason    */
+  var fR = FR(80, 500, 22, 128, 0.10, 1.00, 0, 120);
+  var fD = FR(80, 500, 196, 302, 0.10, 1.00, -1.4, 0);
+  var g = AX(fR, "", "i (ring) / µA", 9, 6,
+             function(){ return ""; }, function(v){ return v.toFixed(0); });
+  g += AX(fD, "E (disk) / V vs RHE", "i (disk) / mA", 9, 7,
+          function(v){ return v.toFixed(2); }, function(v){ return v.toFixed(1); });
+  var d1 = "", d2 = "", k, E;
+  for (k = 0; k <= 160; k++){
+    E = 0.10 + 0.90 * k / 160;
+    d1 += (k ? "L" : "M") + fR.px(E).toFixed(1) + " " + fR.py(iR * wv(E)).toFixed(1) + " ";
+    d2 += (k ? "L" : "M") + fD.px(E).toFixed(1) + " " + fD.py(-iD * wv(E)).toFixed(1) + " ";
+  }
+  g += PA(d1, "var(--go)", 2.2);
+  g += PA(d2, "var(--red-)", 2.2);
+  g += LN(fR.X0, fR.py(iR), fR.px(0.30), fR.py(iR), "var(--ink-2)", 1.1, "4 3");
+  g += CIR(fR.px(0.30), fR.py(iR), 4.6, "var(--ox)");
+  g += LN(fD.X0, fD.py(-iD), fD.px(0.30), fD.py(-iD), "var(--ink-2)", 1.1, "4 3");
+  g += CIR(fD.px(0.30), fD.py(-iD), 4.6, "var(--ox)");
+  g += TX(fR.X1 - 8, fR.Y0 + 15, "ring, held at 1.2 V", "var(--go)", 10.5, "end", 700);
+  g += TX(fD.X1 - 8, fD.Y1 - 10, "disk", "var(--red-)", 10.5, "end", 700);
+  return {
+    kind:"calc", lec:"Lecture 16", topic:"Two currents and N → % H₂O₂", unit:"% H₂O₂",
+    answer:pct, abstol:Math.max(2.5, pct * 0.08),
+    stem:"Oxygen reduction on the disk of a rotating ring-disk electrode; the ring is held at 1.2 V, "
+        + "on the plateau for H<sub>2</sub>O<sub>2</sub> oxidation. <b>The two panels share a "
+        + "potential axis but not a current axis</b> &mdash; the ring is in µA and the disk in mA. "
+        + "Both plateaux are marked at 0.30 V. The collection efficiency of this electrode is "
+        + "<b>N = " + N.toFixed(2) + "</b>.<br>"
+        + SVG(520, 344, g, "Two stacked panels sharing a potential axis: above, a small anodic ring "
+            + "wave in microamps; below, a large cathodic disk wave in milliamps. Both plateaux are "
+            + "marked at 0.30 volts.")
+        + "Report the <b>percentage of the oxygen that went to peroxide</b>.",
+    solution:[
+      "Read the two plateaux: <code>|i<sub>D</sub>| = " + iD.toFixed(2) + " mA</code> and "
+        + "<code>|i<sub>R</sub>| = " + iR + " µA</code>.",
+      "The ring only catches a fixed fraction of what the disk makes, so undo the geometry first: "
+        + "<code>|i<sub>R</sub>|/N = " + iR + " / " + N.toFixed(2) + " = " + (iR / N).toFixed(0)
+        + " µA = " + irn.toFixed(2) + " mA</code> &mdash; the peroxide current as it left the disk.",
+      "<code>% H<sub>2</sub>O<sub>2</sub> = 200 (|i<sub>R</sub>|/N) / (|i<sub>D</sub>| + "
+        + "|i<sub>R</sub>|/N) = 200 × " + irn.toFixed(2) + " / " + (iD + irn).toFixed(2) + "</code>",
+      "<span class='final'>% H<sub>2</sub>O<sub>2</sub> = " + pct.toFixed(1) + " %</span>",
+      "The electron count comes from the same two numbers: <code>n = 4|i<sub>D</sub>|/(|i"
+        + "<sub>D</sub>| + |i<sub>R</sub>|/N) = " + nel.toFixed(2) + "</code>, and the two always "
+        + "satisfy <code>n = 4 &minus; 2x</code> with x the peroxide fraction. <b>Notice what N does "
+        + "not do:</b> it scales i<sub>R</sub> and is divided straight back out, so <b>both reported "
+        + "numbers are independent of N</b> &mdash; N has to be right, not large. What does bias "
+        + "them is peroxide that decomposes before it arrives: i<sub>R</sub> falls, i<sub>D</sub> "
+        + "does not, and the catalyst is flattered."
+    ]
+  };
+}
+
+/* ---- 8. Lecture 16: the plateau, read as a thickness --------------- */
+function pDelta(r){
+  /* the four rates are 400, 900, 1600 and 2500 rpm, whose square roots
+     are 20, 30, 40 and 50 - so one base current puts all four plateaux
+     on gridlines at once                                           */
+  var base = pick(r, [0.20, 0.25, 0.30]);            /* mA per 100 rpm^½ */
+  var rpm  = pick(r, [400, 900, 1600, 2500]);
+  var rates = [400, 900, 1600, 2500], i, k, E, d;
+  var A = Math.PI * Math.pow(5.0 / 20, 2), C = 1.2e-6, n = 4;
+  var iL = base * Math.sqrt(rpm) / 10;               /* mA, exact ticks  */
+  var B  = iL * 1e-3 / Math.sqrt(omg(rpm));
+  var D  = levD(n, A, C, B);                         /* so Levich holds  */
+  var del = n * F * A * D * C / (iL * 1e-3);         /* cm               */
+  var wv = function(E){ return 1 / (1 + Math.pow(10, (E - 0.78) / 0.050)); };
+  var f = FR(80, 500, 20, 236, 0.10, 1.00, -base * 6, 0);
+  var g = AX(f, "E / V vs RHE", "i / mA", 9, 6,
+             function(v){ return v.toFixed(2); }, function(v){ return tk(v, base); });
+  for (i = 0; i < rates.length; i++){
+    d = "";
+    for (k = 0; k <= 140; k++){
+      E = 0.10 + 0.90 * k / 140;
+      d += (k ? "L" : "M") + f.px(E).toFixed(1) + " "
+         + f.py(-base * Math.sqrt(rates[i]) / 10 * wv(E)).toFixed(1) + " ";
+    }
+    g += PA(d, rates[i] === rpm ? "var(--red-)" : "var(--line-2)", rates[i] === rpm ? 2.4 : 1.4);
+  }
+  g += LN(f.X0, f.py(-iL), f.px(0.30), f.py(-iL), "var(--ink-2)", 1.1, "4 3");
+  g += CIR(f.px(0.30), f.py(-iL), 4.6, "var(--ox)");
+  g += TX(f.px(0.33), f.py(-iL) - 9, rpm + " rpm", "var(--red-)", 10.5, null, 700);
+  g += TX(f.X0 + 10, f.Y0 + 15, "400 · 900 · 1600 · 2500 rpm", "var(--muted)", 10, null, 600);
+  return {
+    kind:"calc", lec:"Lecture 16", topic:"A plateau, read as a thickness", unit:"µm",
+    answer:del * 1e4, abstol:del * 1e4 * 0.10,
+    stem:"The same family of waves, one for each rotation rate. The marked plateau is the one at "
+        + "<b>" + rpm + " rpm</b>. The disk is <b>5.0 mm</b> across, <b>n = 4</b>, <b>C* = 1.2 mM</b> "
+        + "and <b>D = " + sig(D * 1e5, 3) + " × 10<sup>&minus;5</sup> cm<sup>2</sup> s"
+        + "<sup>&minus;1</sup></b>.<br>"
+        + SVG(520, 278, g, "Four voltammetric waves of increasing plateau height, one for each "
+            + "rotation rate, with one plateau marked and dropped onto the current axis.")
+        + "<b>Read the marked plateau</b> and report the <b>diffusion-layer thickness δ in µm</b>.",
+    solution:[
+      "<code>|i<sub>L</sub>| = " + iL.toFixed(2) + " mA</code> from the figure, and <code>A = "
+        + "π(0.25)<sup>2</sup> = " + A.toFixed(4) + " cm<sup>2</sup></code>.",
+      "The rotating disk holds the layer at one thickness, so the plateau is a plain Fick's-law "
+        + "current across it: <code>i<sub>L</sub> = nFADC*/δ</code>.",
+      "<code>δ = nFADC*/i<sub>L</sub> = (4 × 96485 × " + A.toFixed(4) + " × " + sig(D, 3)
+        + " × 1.2 × 10<sup>&minus;6</sup>) / " + sig(iL * 1e-3, 3) + " A = " + sig(del, 3)
+        + " cm</code>",
+      "<span class='final'>δ = " + sig(del * 1e4, 3) + " µm</span>",
+      "The check that costs nothing: <code>δ = 1.61 D<sup>1/3</sup>ν<sup>1/6</sup>ω<sup>&minus;½</sup> "
+        + "= " + sig(DELC * Math.pow(D, 1 / 3) * Math.pow(NU_W, 1 / 6) / Math.sqrt(omg(rpm)) * 1e4, 3)
+        + " µm</code> &mdash; the same answer to the rounding in the constant, because the two "
+        + "equations are one equation. <b>δ is tens of µm and it is held there</b>, which is the "
+        + "whole point of spinning the electrode: an unstirred diffusion layer passes through this "
+        + "thickness in about a second and keeps growing. Four times the rotation rate halves it, "
+        + "which is a slow way to buy transport, and the reason an RDE study covers about one order "
+        + "of magnitude in ω."
+    ]
+  };
+}
+
+var CALC = [pCdl, pCO, pTafel, pIR, pLevich, pKL, pRRDE, pDelta];
+
+
+
+/* ---------- state ---------- */
+/* The set's own name, written once. Every other place that needs it -
+   the seed that decides which problems a student gets, the saved-state
+   key, the assignment field the course sheet files the result under,
+   and the name of the CSV the student keeps - is derived from this
+   line. These files are made by copying the previous set, and a name
+   repeated in four places is a name that gets renamed in three. */
+var PSET  = "PS5";
+var STORE = "ch40051-" + PSET.toLowerCase() + "-v1";
+var probs = [], state = [], sid = "";
+var sId       = document.getElementById("sId"),
+    genBtn    = document.getElementById("genBtn"),
+    sheet     = document.getElementById("sheet"),
+    summary   = document.getElementById("summary"),
+    startHint = document.getElementById("startHint");
+
+function save(){
+  try { localStorage.setItem(STORE, JSON.stringify({id:sid, st:state})); } catch(e){}
+}
+function load(){
+  try {
+    var d = JSON.parse(localStorage.getItem(STORE) || "null");
+    if (d && d.id){ sId.value = d.id; return d; }
+  } catch(e){}
+  return null;
+}
+
+/* ---------- Part B: concepts ----------
+   Three per lecture, aimed at the misconceptions the concept checks
+   probe, so revising the checks is the right preparation and
+   memorising their answers is not enough. Two are drawn from each
+   lecture and the options are shuffled per student.                  */
+
+/* a platinum voltammogram with the two integration windows shaded */
+function FIG_PTCV(){
+  var f = FR(66, 500, 18, 170, 0, 1.45, -60, 60);
+  var g = AX(f, "E / V vs RHE", "i / µA", 5, 4,
+             function(v){ return v.toFixed(2); }, function(v){ return v.toFixed(0); });
+  var d = "", k, E, y;
+  g += LN(f.X0, f.py(0), f.X1, f.py(0), "var(--line-2)", 1.2);
+  for (k = 0; k <= 200; k++){
+    E = 1.45 * k / 200;
+    y = 8 + 34 * Math.exp(-Math.pow((E - 0.12) / 0.055, 2))
+          + 28 * Math.exp(-Math.pow((E - 0.24) / 0.060, 2))
+          + 26 * Math.exp(-Math.pow((E - 1.05) / 0.16, 2));
+    d += (k ? "L" : "M") + f.px(E).toFixed(1) + " " + f.py(y).toFixed(1) + " ";
+  }
+  for (k = 200; k >= 0; k--){
+    E = 1.45 * k / 200;
+    y = -8 - 34 * Math.exp(-Math.pow((E - 0.12) / 0.055, 2))
+           - 28 * Math.exp(-Math.pow((E - 0.24) / 0.060, 2))
+           - 30 * Math.exp(-Math.pow((E - 0.76) / 0.075, 2));
+    d += "L" + f.px(E).toFixed(1) + " " + f.py(y).toFixed(1) + " ";
+  }
+  g += PA(d, "var(--red-)", 1.8);
+  g += '<rect x="' + f.px(0.05).toFixed(1) + '" y="' + f.py(46).toFixed(1) + '" width="'
+     + (f.px(0.40) - f.px(0.05)).toFixed(1) + '" height="' + (f.py(8) - f.py(46)).toFixed(1)
+     + '" fill="var(--go)" opacity="0.16"/>';
+  g += TX(f.px(0.225), f.py(52), "H(upd)", "var(--go)", 10, "middle", 700);
+  g += TX(f.px(0.60), f.py(10), "double layer", "var(--muted)", 9.5, "middle", 600);
+  return SVG(520, 212, g, "A platinum voltammogram with the hydrogen underpotential region shaded "
+           + "and the flat double-layer region labelled.");
+}
+
+/* the volcano, as the lecture draws it */
+function FIG_VOLC(){
+  var f = FR(66, 500, 18, 170, -0.9, 0.9, -8, -2);
+  var g = AX(f, "ΔG(H) / eV", "log ( j₀ / A cm⁻² )", 6, 3,
+             function(v){ return v.toFixed(1); }, function(v){ return v.toFixed(0); });
+  var d = "", k, x;
+  for (k = 0; k <= 160; k++){
+    x = -0.9 + 1.8 * k / 160;
+    d += (k ? "L" : "M") + f.px(x).toFixed(1) + " " + f.py(-2.6 - 5.2 * Math.abs(x)).toFixed(1) + " ";
+  }
+  g += PA(d, "var(--red-)", 2);
+  [[0.0, "Pt"], [-0.55, "W"], [0.45, "Au"], [0.62, "Ag"], [-0.35, "Mo"]].forEach(function(q){
+    g += CIR(f.px(q[0]), f.py(-2.6 - 5.2 * Math.abs(q[0])), 3.6, "var(--ink)");
+    g += TX(f.px(q[0]) + 6, f.py(-2.6 - 5.2 * Math.abs(q[0])) + 3, q[1], "var(--ink-2)", 10, null, 700);
+  });
+  g += TX(f.px(-0.78), f.Y0 + 16, "binds H too strongly", "var(--muted)", 9.5, null, 600);
+  g += TX(f.px(0.86), f.Y0 + 16, "too weakly", "var(--muted)", 9.5, "end", 600);
+  return SVG(520, 212, g, "A volcano plot of exchange current against hydrogen binding free energy, "
+           + "peaking near zero where platinum sits.");
+}
+
+/* faradaic efficiency against potential, with the total current on it */
+function FIG_FE(){
+  var f = FR(66, 500, 18, 170, -1.25, -0.55, 0, 100);
+  var g = AX(f, "E / V vs RHE", "faradaic efficiency / %", 7, 4,
+             function(v){ return v.toFixed(2); }, function(v){ return v.toFixed(0); });
+  var Es = [-0.65, -0.75, -0.85, -0.95, -1.05, -1.15];
+  var CO = [18, 42, 63, 70, 58, 34], w = (f.px(-0.55) - f.px(-1.25)) / 16, i;
+  for (i = 0; i < Es.length; i++){
+    g += '<rect x="' + (f.px(Es[i]) - w / 2).toFixed(1) + '" y="' + f.py(CO[i]).toFixed(1)
+       + '" width="' + w.toFixed(1) + '" height="' + (f.py(0) - f.py(CO[i])).toFixed(1)
+       + '" fill="var(--red-)" opacity="0.75"/>';
+    g += '<rect x="' + (f.px(Es[i]) - w / 2).toFixed(1) + '" y="' + f.py(100).toFixed(1)
+       + '" width="' + w.toFixed(1) + '" height="' + (f.py(CO[i]) - f.py(100)).toFixed(1)
+       + '" fill="var(--muted)" opacity="0.22"/>';
+  }
+  g += TX(f.px(-0.95), f.py(36), "CO", "var(--surface)", 11, "middle", 700);
+  g += TX(f.px(-0.65), f.py(92), "H₂ and the rest", "var(--muted)", 9.5, "middle", 600);
+  g += TX(f.X0 + 8, f.Y0 + 14, "j(total): 2.1 → 4.0 → 7.5 → 14 → 22 → 31 mA cm⁻²",
+          "var(--ink-2)", 9.5, null, 600);
+  return SVG(520, 212, g, "Faradaic efficiency for carbon monoxide against potential, as stacked "
+           + "bars, with the total current density written above them.");
+}
+
+/* a Levich line that stops being straight */
+function FIG_BEND(){
+  var f = FR(66, 500, 18, 170, 0, 18, 0, 1.6);
+  var g = AX(f, "ω^½ / (rad s⁻¹)^½", "i / mA", 6, 4,
+             function(v){ return v.toFixed(0); }, function(v){ return v.toFixed(1); });
+  var B = 0.086, ik = 1.25, d = "", k, s;
+  g += PA("M" + f.px(0).toFixed(1) + " " + f.py(0).toFixed(1)
+        + " L" + f.px(18).toFixed(1) + " " + f.py(B * 18).toFixed(1), "var(--muted)", 1.5, "5 4");
+  for (k = 0; k <= 140; k++){
+    s = 18 * k / 140;
+    d += (k ? "L" : "M") + f.px(s).toFixed(1) + " "
+       + f.py(s === 0 ? 0 : 1 / (1 / ik + 1 / (B * s))).toFixed(1) + " ";
+  }
+  g += PA(d, "var(--red-)", 2.2);
+  g += TX(f.px(4.0), f.py(1.42), "Levich, extrapolated", "var(--muted)", 10, null, 600);
+  g += TX(f.X1 - 8, f.py(0.72), "measured", "var(--red-)", 10.5, "end", 700);
+  return SVG(520, 212, g, "Limiting current against the square root of angular velocity: the "
+           + "measured curve follows the Levich line at low rotation and falls away from it at high "
+           + "rotation, flattening towards a ceiling.");
+}
+
+/* the same disk, two rings of different collection efficiency */
+function FIG_NTWO(){
+  var f = FR(66, 500, 18, 170, 0.10, 1.00, -1.0, 0.36);
+  var g = AX(f, "E (disk) / V vs RHE", "i / mA", 5, 4,
+             function(v){ return v.toFixed(2); }, function(v){ return v.toFixed(1); });
+  g += LN(f.X0, f.py(0), f.X1, f.py(0), "var(--line-2)", 1.2);
+  var mk = function(amp, col, wd){
+    var d = "", k, E, w;
+    for (k = 0; k <= 140; k++){
+      E = 0.10 + 0.90 * k / 140;
+      w = 1 / (1 + Math.pow(10, (E - 0.78) / 0.050));
+      d += (k ? "L" : "M") + f.px(E).toFixed(1) + " " + f.py(amp * w).toFixed(1) + " ";
+    }
+    return PA(d, col, wd);
+  };
+  g += mk(-0.88, "var(--red-)", 2.2);
+  g += mk(0.060, "var(--go)", 2.2);
+  g += mk(0.111, "var(--ox)", 2.2);
+  g += TX(f.X1 - 8, f.py(-0.52), "one disk", "var(--red-)", 10.5, "end", 700);
+  /* the two ring plateaux are only 0.05 mA apart, so their labels have to
+     sit above and below their own traces rather than beside them   */
+  g += TX(f.X1 - 8, f.py(0.111) - 7, "ring B, N = 0.37", "var(--ox)", 10, "end", 700);
+  g += TX(f.X1 - 8, f.py(0.060) + 15, "ring A, N = 0.20", "var(--go)", 10, "end", 700);
+  return SVG(520, 212, g, "One disk wave with two different ring waves, one nearly twice the height "
+           + "of the other, from two electrodes of different collection efficiency.");
+}
+
+/* the same data on the wrong x axis */
+function FIG_RPM(){
+  var f = FR(66, 500, 18, 170, 0, 52, 0, 1.6);
+  var g = AX(f, "x-axis as plotted", "i(L) / mA", 4, 4,
+             function(v){ return v.toFixed(0); }, function(v){ return v.toFixed(1); });
+  var i, rp = [400, 900, 1600, 2500], B = 0.086;
+  g += PA("M" + f.px(0).toFixed(1) + " " + f.py(0).toFixed(1)
+        + " L" + f.px(16.2).toFixed(1) + " " + f.py(B * 16.2).toFixed(1), "var(--red-)", 2.2);
+  g += PA("M" + f.px(0).toFixed(1) + " " + f.py(0).toFixed(1)
+        + " L" + f.px(50).toFixed(1) + " " + f.py(B * 16.2).toFixed(1), "var(--go)", 2.2);
+  for (i = 0; i < rp.length; i++){
+    g += CIR(f.px(Math.sqrt(2 * Math.PI * rp[i] / 60)), f.py(B * Math.sqrt(2 * Math.PI * rp[i] / 60)), 3.4, "var(--ink)");
+    g += CIR(f.px(Math.sqrt(rp[i])), f.py(B * Math.sqrt(2 * Math.PI * rp[i] / 60)), 3.4, "var(--ink)");
+  }
+  g += TX(f.px(9), f.py(1.35), "ω^½ in (rad s⁻¹)^½", "var(--red-)", 10, "middle", 700);
+  g += TX(f.px(40), f.py(0.52), "the same points against (rpm)^½", "var(--go)", 10, "middle", 700);
+  return SVG(520, 212, g, "The same four limiting currents plotted twice: against the square root "
+           + "of angular velocity in radians per second, and against the square root of rpm, giving "
+           + "two lines of very different slope.");
+}
+
+var CONCEPTS = {
+"Lecture 15": [
+ {q:"Two routes to the area of one platinum electrode. The H<sub>upd</sub> charge gives 2.4 cm<sup>2</sup>; a CO-stripping monolayer on the same electrode, divided by 420 µC cm<sup>&minus;2</sup>, gives 1.9 cm<sup>2</sup>.<br>" + FIG_PTCV() + "Which reading of this is sound?",
+  o:["The CO layer is partly bridged, so it carried fewer than two electrons per site and the CO area is an underestimate",
+     "The H<sub>upd</sub> integration included hydrogen evolution, so the H area must be the wrong one",
+     "The two numbers should agree exactly; one of the measurements failed and both should be discarded",
+     "CO adsorbs on sites hydrogen cannot reach, so the CO area should be the larger of the two"],
+  a:0,
+  why:"CO stripping assumes one molecule per Pt atom and two electrons each. A molecule <b>bridged across two atoms</b> is one molecule where you counted one site, so a bridged fraction x reports 420(1 &minus; x/2) worth of charge and the area comes out <b>low &mdash; by up to half if the whole layer were bridged</b>. It is an underestimate, never an overestimate, which is why CO &lt; H<sub>upd</sub> is the expected direction and not a failure. H<sub>upd</sub> has its own bias in the other direction: it assumes a baseline you drew by hand, and it misses the weakly bound tail running below 0.05 V that the window cannot reach without hydrogen evolution coming up to meet it. <b>Two methods that fail in opposite directions bracket the truth</b>, which is the whole reason for doing both."},
+
+ {q:"Two HER catalysts on one Tafel plot. A has j<sub>0</sub> = 10<sup>&minus;3</sup> A cm<sup>&minus;2</sup> and b = 120 mV/dec; B has j<sub>0</sub> = 10<sup>&minus;5</sup> A cm<sup>&minus;2</sup> and b = 40 mV/dec. Both are per real area.<br>" + FIG_VOLC() + "Which is the better catalyst?",
+  o:["A, because its exchange current is a hundred times larger",
+     "B, because a smaller Tafel slope always means faster kinetics",
+     "Neither statement is complete: the lines cross, so it depends entirely on the current density you compare them at",
+     "They are equivalent, since the products of j<sub>0</sub> and b are similar"],
+  a:2,
+  why:"Two straight lines of different slope cross exactly once. Here η<sub>A</sub> = 120 log(j/10<sup>&minus;3</sup>) and η<sub>B</sub> = 40 log(j/10<sup>&minus;5</sup>), which are equal at about <b>j = 10<sup>&minus;2</sup> A cm<sup>&minus;2</sup></b>: below it A wins, above it B wins and keeps winning. <b>Neither j<sub>0</sub> nor b is an activity on its own</b> &mdash; that is precisely why the field quotes <b>η at 10 mA cm<sup>&minus;2</sup></b>, one number at one agreed rate. And the comparison is only honest if both are per <i>real</i> area, since a j<sub>0</sub> quoted on geometric area is partly a roughness measurement."},
+
+ {q:"A CO<sub>2</sub> reduction paper reports 92 % faradaic efficiency for CO at &minus;0.65 V in an H-cell, and compares it with a catalyst reported at 61 % in a gas-diffusion electrode.<br>" + FIG_FE() + "What is wrong with the comparison?",
+  o:["Nothing, as long as both were measured at the same potential",
+     "Faradaic efficiency is a selectivity, not a rate, and the two cells cap the current at completely different levels — the partial current densities are what must be compared",
+     "An H-cell always gives the more reliable number, so the 92 % should be preferred",
+     "The 61 % must be wrong, because a better cell should give a higher efficiency"],
+  a:1,
+  why:"FE<sub>i</sub> = n<sub>i</sub>FN<sub>i</sub>/Q<sub>total</sub> is a <b>share of the charge</b>, and it says nothing at all about how much charge there was. <b>100 % FE at 1 mA cm<sup>&minus;2</sup> is not a catalyst.</b> The number that compares two catalysts is the partial current density, j<sub>i</sub> = FE<sub>i</sub> × j<sub>total</sub>, per real area. And the cell sets the ceiling: in an H-cell the reactant is <b>dissolved</b> CO<sub>2</sub>, about 34 mM, so transport caps j at tens of mA cm<sup>&minus;2</sup> whatever the catalyst does, while a gas-diffusion electrode delivers CO<sub>2</sub> as a gas to a three-phase boundary and reaches hundreds. 61 % of 300 mA cm<sup>&minus;2</sup> is thirty times the rate of 92 % of 6."}
+],
+"Lecture 16": [
+ {q:"Limiting current against ω<sup>½</sup> for a reaction on a rotating disk. The points lie on the Levich line at low rotation and fall below it at high rotation, flattening towards a ceiling.<br>" + FIG_BEND() + "What does the bend mean?",
+  o:["The electrode is roughening, so its area changes with rotation rate",
+     "The flow has gone turbulent and the Levich equation no longer applies",
+     "Transport has stopped being the slow step: at high rotation the kinetics set the current, and 1/i against ω^−½ will have a positive intercept",
+     "The bulk concentration is falling as the experiment proceeds"],
+  a:2,
+  why:"Spinning faster only delivers reactant faster. Once delivery is quicker than the electrode can consume, <b>the reaction itself becomes the bottleneck</b> and the current stops caring about ω &mdash; it approaches i<sub>k</sub> from below. That is exactly the situation Koutecký&ndash;Levich is for: <code>1/i = 1/i<sub>k</sub> + 1/(Bω<sup>½</sup>)</code>, whose intercept at ω<sup>&minus;½</sup> = 0 is 1/i<sub>k</sub>. Turbulence is real but arrives far above the rates an RDE is used at (Re ≈ 2 × 10<sup>5</sup>), and it would make the current <i>larger</i> than Levich, not smaller. A bend <b>below</b> the line at high ω is kinetics; a bend <b>above</b> it is usually a leak, a convection artefact or a second reaction."},
+
+ {q:"Two ring-disk electrodes measure the same catalyst in the same solution. Their disk currents are identical; ring A gives 60 µA and ring B gives 111 µA, because their collection efficiencies are N = 0.20 and N = 0.37.<br>" + FIG_NTWO() + "What should the two experiments report?",
+  o:["The same n and the same % H₂O₂, because N divides straight back out of both",
+     "Ring B reports nearly twice the peroxide, since it collects nearly twice the current",
+     "Ring A is more accurate, because a small N disturbs the disk less",
+     "Neither can report % H₂O₂ without first calibrating against a known peroxide standard"],
+  a:0,
+  why:"Both reported numbers are built from <code>|i<sub>R</sub>|/N</code>, never from i<sub>R</sub> itself: <code>n = 4|i<sub>D</sub>|/(|i<sub>D</sub>| + |i<sub>R</sub>|/N)</code> and <code>%H<sub>2</sub>O<sub>2</sub> = 200(|i<sub>R</sub>|/N)/(|i<sub>D</sub>| + |i<sub>R</sub>|/N)</code>. Here 60/0.20 = 300 µA and 111/0.37 = 300 µA &mdash; the same peroxide current as it left the disk, so the same answer. <b>N has to be right, not large</b>; it is a property of the electrode's geometry and nothing else, which is why it is measured once with a stable couple like ferricyanide and then used for every experiment on that electrode. A larger N is still worth having, for signal, not for accuracy."},
+
+ {q:"A student measures four limiting currents at 400, 900, 1600 and 2500 rpm, plots them against the square root of the rotation rate <b>in rpm</b>, takes the slope and puts it into the Levich equation.<br>" + FIG_RPM() + "What happens to the diffusion coefficient?",
+  o:["Nothing — the square root is taken of both, so the units cancel",
+     "It comes out too large, by a factor of about 5",
+     "It comes out too small, by a factor of about 5",
+     "It comes out negative, which is how the mistake is usually caught"],
+  a:2,
+  why:"The 0.620 in Levich's equation is right for ω in <b>rad s<sup>&minus;1</sup></b> only, and ω = 2π(rpm)/60 = 0.1047 × rpm. Plotting against (rpm)<sup>½</sup> therefore shrinks the slope by √0.1047 = 0.324. Since <code>B ∝ D<sup>2/3</sup></code>, the error in D is 0.324<sup>3/2</sup> = <b>0.185, a factor of 5.4 too small</b>. The lesson is not arithmetic but habit: <b>a D that comes out one order of magnitude from the literature is almost never new chemistry.</b> Check the ω units, then the area, then the concentration unit (mol cm<sup>&minus;3</sup>, not mol L<sup>&minus;1</sup> &mdash; that one is a factor of 1000)."}
+]
+};
+
+function build(id){
+  sid = id;
+  var r = mulberry32(hash32("CH40051-" + PSET + "-" + id));
+  probs = CALC.map(function(fn){ return fn(r); });
+
+  /* two concepts from each lecture, drawn by the seed and shuffled, so
+     Part A is eight problems and Part B is four - two thirds of the set
+     is a measurement made on a figure                               */
+  var LECS = ["Lecture 15", "Lecture 16"];
+  LECS.forEach(function(L){
+    var pool = CONCEPTS[L].map(function(c, i){ return {c:c, i:i}; });
+    for (var k = 0; k < 2; k++){
+      var take = pool.splice(Math.floor(r() * pool.length), 1)[0];
+      var sh = shuffle(r, take.c.o, take.c.a);
+      probs.push({
+        kind:"mcq", lec:L, topic:"Diagnose — " + L + " #" + (take.i + 1),
+        stem:take.c.q, opts:sh.list, answer:sh.at, why:take.c.why
+      });
+    }
+  });
+}
+
+
+/* ---------- rendering ---------- */
+var LETTER = ["A", "B", "C", "D", "E"];
+
+function section(title, note){
+  return '<div class="sect"><h2>' + title + '</h2><p>' + note + '</p></div>';
+}
+
+function render(){
+  sheet.hidden = false;
+  summary.hidden = false;
+  sId.readOnly = true;
+
+  var h = "";
+  probs.forEach(function(p, i){
+    if (i === 0) h += section("Part A &mdash; read it off the plot", "eight figures to read and use &middot; four from Lecture 15, four from Lecture 16 &middot; two attempts each &middot; the tolerance is as wide as reading a line off a grid, about 10 %");
+    if (i === 8) h += section("Part B &mdash; what is this result allowed to mean?", "four results to judge &middot; two per lecture &middot; one attempt each &middot; the answer is in what the method assumes");
+
+    var st = state[i];
+    h += '<div class="card' + (st.solved ? " done" : "") + '">'
+       +   '<div class="card-h">'
+       +     '<span class="pnum">' + (i < 9 ? "0" : "") + (i + 1) + '</span>'
+       +     '<span class="ptopic">' + esc(p.topic) + '</span>'
+       +     '<span class="lect">' + esc(p.lec) + '</span>'
+       +   '</div>'
+       +   '<div class="card-b">'
+       +     '<p class="stem">' + p.stem + '</p>';
+
+    if (p.kind === "calc"){
+      h += '<div class="answer">'
+         +   '<input type="text" id="in' + i + '" inputmode="decimal" autocomplete="off"'
+         +     ' placeholder="your answer" value="' + esc(st.given) + '"'
+         +     (st.solved ? " readonly" : "") + '>'
+         +   '<span class="unit">' + esc(p.unit) + '</span>'
+         +   '<button class="ghost" type="button" data-check="' + i + '"'
+         +     (st.solved ? " disabled" : "") + '>Check</button>'
+         + '</div>';
+      if (st.msg) h += '<p class="verdict ' + st.msgKind + '">' + st.msg + '</p>';
+      if (st.showSol){
+        h += '<div class="sol"><h3>Worked solution</h3><ol>';
+        p.solution.forEach(function(s){ h += "<li>" + s + "</li>"; });
+        h += '</ol></div>';
+      }
+    } else {
+      h += '<div class="opts">';
+      p.opts.forEach(function(o, j){
+        var cls = "opt";
+        if (st.showSol){
+          if (j === p.answer) cls += " right";
+          else if (String(j) === String(st.given)) cls += " wrong";
+        }
+        h += '<button type="button" class="' + cls + '" data-mcq="' + i + '" data-opt="' + j + '"'
+           +   (st.showSol ? " disabled" : "") + '>'
+           +   '<span class="k">' + LETTER[j] + '</span><span>' + o + '</span></button>';
+      });
+      h += '</div>';
+      if (st.msg) h += '<p class="verdict ' + st.msgKind + '">' + st.msg + '</p>';
+      if (st.showSol) h += '<div class="why"><b>Why.</b> ' + p.why + '</div>';
+    }
+    h += '</div></div>';
+  });
+  sheet.innerHTML = h;
+
+  var solved = state.filter(function(s){ return s.solved; }).length;
+  document.getElementById("scoreNum").innerHTML = solved + ' <small>/ ' + probs.length + ' correct</small>';
+  document.getElementById("whoLine").innerHTML = esc(sid) + " &middot; verification <b>" + vcode() + "</b>";
+}
+
+/* A short code over the student ID and the exact answers this set expects, so a
+   marker can confirm a submitted file was produced by this page and not edited. */
+function vcode(){
+  var s = sid + "|";
+  probs.forEach(function(p){ s += sig(p.answer, 6) + "|"; });
+  var v = hash32(s).toString(36).toUpperCase();
+  while (v.length < 7) v = "0" + v;
+  return v.slice(0, 4) + "-" + v.slice(4);
+}
+
+/* ---------- checking ---------- */
+function check(i){
+  var el = document.getElementById("in" + i);
+  var raw = (el.value || "").trim().replace(/,/g, "").replace(/\s+/g, "");
+  var v = parseFloat(raw);
+  var st = state[i], p = probs[i];
+  if (!raw || !isFinite(v)){
+    st.msg = "Type a number. Use a decimal point, and scientific notation like <code>1.7e-2</code> if you need it.";
+    st.msgKind = "no";
+    render(); return;
+  }
+  st.tries++;
+  st.given = raw;
+  var tol = Math.max(Math.abs(p.answer) * 0.02, p.abstol || 1e-9);
+  if (Math.abs(v - p.answer) <= tol){
+    st.solved = true; st.showSol = true;
+    st.msg = "Correct. The exact value is <b>" + sig(p.answer, 4) + " " + esc(p.unit) + "</b>.";
+    st.msgKind = "ok";
+  } else if (st.tries >= 2){
+    st.showSol = true;
+    st.msg = "Not correct, and that was your second attempt &mdash; the worked solution is below. "
+           + "Read it, then try the number again.";
+    st.msgKind = "no";
+  } else {
+    var ratio = v / p.answer, nudge = "";
+    function near(x, f){ return Math.abs(ratio - x) < x * f; }
+    /* the mistakes these eight problems actually produce, in the order
+       they are worth naming                                        */
+    if (ratio < 0)
+      nudge = " Check the sign — every answer here is a positive magnitude.";
+    else if (ratio > 0.9 && ratio < 1.1)
+      nudge = " You are very close — check your rounding or significant figures.";
+    else if (near(5.43, 0.06) || near(0.184, 0.06))
+      nudge = " Out by about 5.4 — that is the rotation unit. The 0.620 in Levich’s "
+            + "equation is right only for ω in rad s⁻¹, and ω = 2π(rpm)/60.";
+    else if (near(9.55, 0.06) || near(0.1047, 0.06))
+      nudge = " Out by 2π/60 — you used rpm where the equation wants rad s⁻¹.";
+    else if (near(1000, 0.08) || near(0.001, 0.08))
+      nudge = " Out by a factor of 1000 — look for a milli- prefix: mM against M, mA against A, "
+            + "or mol L⁻¹ against mol cm⁻³, which is the one this topic punishes.";
+    else if (near(1e4, 0.08) || near(1e-4, 0.08))
+      nudge = " Out by 10⁴ — that is cm² against m², or cm against µm. Decide "
+            + "once which length unit you are in and convert everything.";
+    else if (near(100, 0.08) || near(0.01, 0.08))
+      nudge = " Out by 100 — check µF cm⁻² against F m⁻² "
+            + "(1 F m⁻² = 100 µF cm⁻²), or a percentage against a fraction.";
+    else if (near(10, 0.08) || near(0.1, 0.08))
+      nudge = " Out by 10 — check a prefix, or whether a decade in a logarithm has gone astray.";
+    else if (near(2, 0.06) || near(0.5, 0.06))
+      nudge = " Out by a factor of 2 — look for n, for the two electrons that make CO stripping "
+            + "420 rather than 210 µC cm⁻², or for the 2 in 200(iᴿ/N)/(iᴰ + iᴿ/N).";
+    else if (near(1.5, 0.05) || near(1 / 1.5, 0.05))
+      nudge = " Out by 1.5 — that is Δlog j. A Tafel slope is a rise divided by the number of "
+            + "decades, and the two marked points are one and a half decades apart, not one.";
+    else if (near(4, 0.05) || near(0.25, 0.05))
+      nudge = " Out by 4 — check n, or whether the collection efficiency has been divided in "
+            + "rather than out.";
+    else if (near(Math.PI, 0.05) || near(1 / Math.PI, 0.05))
+      nudge = " Out by π — the area of a disk is πr², and the figure gives you "
+            + "the diameter.";
+    st.msg = "Not correct." + nudge + " One more attempt before the solution appears.";
+    st.msgKind = "no";
+  }
+  save(); render();
+}
+
+function choose(i, j){
+  var st = state[i], p = probs[i];
+  if (st.showSol) return;
+  st.tries = 1;
+  st.given = String(j);
+  st.showSol = true;
+  st.solved = (j === p.answer);
+  st.msg = st.solved
+    ? "Correct."
+    : "Not correct &mdash; the right option is <b>" + LETTER[p.answer] + "</b>. Concept questions get one attempt.";
+  st.msgKind = st.solved ? "ok" : "no";
+  save(); render();
+}
+
+sheet.addEventListener("click", function(ev){
+  var b = ev.target.closest("[data-check]");
+  if (b){ check(+b.getAttribute("data-check")); return; }
+  var m = ev.target.closest("[data-mcq]");
+  if (m) choose(+m.getAttribute("data-mcq"), +m.getAttribute("data-opt"));
+});
+sheet.addEventListener("keydown", function(ev){
+  if (ev.key !== "Enter") return;
+  var m = (ev.target.id || "").match(/^in(\d+)$/);
+  if (m){ ev.preventDefault(); check(+m[1]); }
+});
+
+function start(id){
+  build(id);
+  if (!state.length || state.length !== probs.length){
+    state = probs.map(function(){
+      return {solved:false, tries:0, given:"", msg:"", msgKind:"", showSol:false};
+    });
+  }
+  save(); render();
+}
+
+genBtn.addEventListener("click", function(){
+  var id = (sId.value || "").trim();
+  if (!id){
+    startHint.innerHTML = "<b style='color:var(--stop)'>Enter your student ID first.</b> "
+                        + "It is what generates your particular problems.";
+    sId.focus(); return;
+  }
+  state = []; start(id);
+});
+sId.addEventListener("keydown", function(e){ if (e.key === "Enter") genBtn.click(); });
+
+/* ---------- the result, in one shape ----------
+   The download and the course submission carry exactly the same columns, so a
+   sheet export and a handed-in file can be marked by the same tool. */
+function result(){
+  var solved = state.filter(function(s){ return s.solved; }).length;
+  var r = {
+    assignment:PSET, student_id:sid, completed_utc:new Date().toISOString(),
+    solved:solved, total:probs.length, verification:vcode(),
+    kinds:[], topics:[], expected:[], given:[], tries:[], ok:[]
+  };
+  probs.forEach(function(p, i){
+    var g = state[i].given;
+    r.kinds.push(p.kind);
+    r.topics.push(p.topic);
+    r.expected.push(p.kind === "calc" ? sig(p.answer, 5) : LETTER[p.answer]);
+    r.given.push(p.kind === "calc" ? g : (g === "" ? "" : LETTER[+g]));
+    r.tries.push(state[i].tries);
+    r.ok.push(state[i].solved ? 1 : 0);
+  });
+  return r;
+}
+
+/* ---------- submission file ---------- */
+document.getElementById("dlBtn").addEventListener("click", function(){
+  var res = result();
+  var head = ["assignment", "student_id", "completed_utc", "solved", "total", "verification"];
+  var row  = [res.assignment, res.student_id, res.completed_utc, res.solved, res.total, res.verification];
+  probs.forEach(function(p, i){
+    head.push("q" + (i+1) + "_kind");     row.push(res.kinds[i]);
+    head.push("q" + (i+1) + "_topic");    row.push(res.topics[i]);
+    head.push("q" + (i+1) + "_expected"); row.push(res.expected[i]);
+    head.push("q" + (i+1) + "_given");    row.push(res.given[i]);
+    head.push("q" + (i+1) + "_tries");    row.push(res.tries[i]);
+    head.push("q" + (i+1) + "_solved");   row.push(res.ok[i]);
+  });
+  function cell(v){ v = String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+  var csv = head.join(",") + "\n" + row.map(cell).join(",") + "\n";
+  try {
+    var blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = "CH40051-" + PSET + "_" + sid.replace(/[^A-Za-z0-9_-]/g, "") + ".csv";
+    a.style.display = "none";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+    document.getElementById("dlHint").textContent =
+      "Saved. Keep it as your backup — the submission itself is the button beside this one.";
+  } catch(e){
+    document.getElementById("dlHint").textContent =
+      "Your browser blocked the download. Screenshot this page and submit that instead.";
+  }
+});
+
+/* ---- submit straight to the course sheet ----------------------------------
+   The same endpoint the concept checks use; the assignment field is what
+   routes this row to the "Problem set" tab of the submissions sheet. Left
+   empty, the button stays hidden and only the download exists.             */
+var SUBMIT_URL = "https://script.google.com/macros/s/AKfycbxPm7WrbttFu6-gnTi__IcUPt-816GthK0eI8TPuwOZyYlcRW3RAWJlmsr791moxBc5GA/exec";
+
+var sendBtn = document.getElementById("sendBtn"),
+    dlHint  = document.getElementById("dlHint");
+if (SUBMIT_URL){
+  sendBtn.hidden = false;
+  dlHint.textContent = "Press Submit to send your result to the course. The download is a backup.";
+}
+
+sendBtn.addEventListener("click", function(){
+  if (!sid){ dlHint.textContent = "Generate your set first."; return; }
+  var payload = result();
+  sendBtn.disabled = true;
+  dlHint.textContent = "Sending\u2026";
+
+  /* text/plain keeps this a simple request, so the browser sends it without
+     a preflight the Apps Script endpoint cannot answer */
+  fetch(SUBMIT_URL, {
+    method:"POST",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify(payload)
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(j){
+    if (j && j.ok){
+      sendBtn.textContent = "Submitted \u2713";
+      dlHint.textContent = "Recorded for student ID " + payload.student_id + " \u2014 "
+        + payload.solved + " of " + payload.total + " correct. You can close this page.";
+    } else {
+      var e = new Error((j && j.error) || "rejected"); e.fromServer = !!(j && j.error); throw e;
+    }
+  })
+  .catch(function(err){
+    /* a refusal the endpoint gave us is the student's to act on and resending
+       would not help; a reply we could not read is ours, so resend blind and
+       let the downloaded file stand as proof */
+    if (err && err.fromServer){
+      sendBtn.disabled = false;
+      sendBtn.textContent = "Submit to the course";
+      dlHint.textContent = err.message;
+      return;
+    }
+    fetch(SUBMIT_URL, {method:"POST", mode:"no-cors",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(payload)}).catch(function(){});
+    sendBtn.disabled = false;
+    sendBtn.textContent = "Submit to the course";
+    dlHint.textContent = "Sent, but the confirmation did not come back. "
+      + "Download the file as well and keep it \u2014 it is your proof of submission.";
+  });
+});
+
+/* resume a set from a previous visit */
+var prev = load();
+if (prev){ state = prev.st || []; start(prev.id); }
+
+})();
+</script>
+</body>
+</html>
