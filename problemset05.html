@@ -370,6 +370,14 @@ function AX(f, xlab, ylab, nx, ny, fx, fy){
      + ' transform="rotate(-90 15 ' + ((f.Y0 + f.Y1) / 2).toFixed(1) + ')">' + ylab + "</text>";
   return s;
 }
+/* a rotated y-axis title anywhere, for a figure with two frames side by
+   side - AX always puts its own at x = 15, which only suits the left */
+function YLAB(x, f, lab){
+  var cy = ((f.Y0 + f.Y1) / 2).toFixed(1);
+  return '<text x="' + x + '" y="' + cy + '" fill="var(--ink-2)" font-size="11"'
+       + ' text-anchor="middle" font-weight="600" font-family="IBM Plex Mono,monospace"'
+       + ' transform="rotate(-90 ' + x + ' ' + cy + ')">' + lab + "</text>";
+}
 function SVG(w, h, inner, lab){
   return '<svg viewBox="0 0 ' + w + " " + h + '" style="width:100%;height:auto;max-width:620px;'
        + 'display:block;margin:10px 0 2px" role="img" aria-label="' + lab + '">' + inner + "</svg>";
@@ -968,27 +976,47 @@ function FIG_VOLC(){
            + "peaking near zero where platinum sits.");
 }
 
-/* faradaic efficiency against potential, with the total current on it */
+/* the two cells the question compares, side by side: selectivity on the
+   left and rate on the right, because one figure with both on the same
+   axis is exactly the confusion the question is about                */
 function FIG_FE(){
-  var f = FR(66, 500, 18, 170, -1.25, -0.55, 0, 100);
-  var g = AX(f, "E / V vs RHE", "faradaic efficiency / %", 7, 4,
-             function(v){ return v.toFixed(2); }, function(v){ return v.toFixed(0); });
-  var Es = [-0.65, -0.75, -0.85, -0.95, -1.05, -1.15];
-  var CO = [18, 42, 63, 70, 58, 34], w = (f.px(-0.55) - f.px(-1.25)) / 16, i;
-  for (i = 0; i < Es.length; i++){
-    g += '<rect x="' + (f.px(Es[i]) - w / 2).toFixed(1) + '" y="' + f.py(CO[i]).toFixed(1)
-       + '" width="' + w.toFixed(1) + '" height="' + (f.py(0) - f.py(CO[i])).toFixed(1)
-       + '" fill="var(--red-)" opacity="0.75"/>';
-    g += '<rect x="' + (f.px(Es[i]) - w / 2).toFixed(1) + '" y="' + f.py(100).toFixed(1)
-       + '" width="' + w.toFixed(1) + '" height="' + (f.py(CO[i]) - f.py(100)).toFixed(1)
-       + '" fill="var(--muted)" opacity="0.22"/>';
+  var A = FR(62, 258, 20, 150, 0, 2, 0, 100);
+  var B = FR(330, 500, 20, 150, 0, 2, 0, 3);       /* log10 mA cm-2    */
+  var g = AX(A, "", "FE for CO / %", 2, 5,
+             function(){ return ""; }, function(v){ return v.toFixed(0); });
+  g += AX(B, "", "", 2, 3,
+          function(){ return ""; }, function(v){ return "10" + supn(Math.round(v)); });
+  g += YLAB(292, B, "j(CO) / mA cm⁻²");
+  var cells = [[0.5, 92, 6.5, 5.98, "H-cell", "var(--red-)"],
+               [1.5, 61, 310, 189, "gas-diffusion", "var(--go)"]], i, c, w;
+  for (i = 0; i < cells.length; i++){
+    c = cells[i];
+    w = (A.px(1) - A.px(0)) * 0.44;
+    g += '<rect x="' + (A.px(c[0]) - w / 2).toFixed(1) + '" y="' + A.py(c[1]).toFixed(1)
+       + '" width="' + (2 * w / 2).toFixed(1) + '" height="' + (A.py(0) - A.py(c[1])).toFixed(1)
+       + '" fill="' + c[5] + '" opacity="0.78"/>';
+    g += TX(A.px(c[0]), A.py(c[1]) - 6, c[1] + " %", c[5], 11, "middle", 700);
+    g += TX(A.px(c[0]), A.Y1 + 15, c[4], "var(--ink-2)", 9.5, "middle", 600);
+
+    var lj = Math.log(c[3]) / Math.LN10;
+    w = (B.px(1) - B.px(0)) * 0.44;
+    g += '<rect x="' + (B.px(c[0]) - w / 2).toFixed(1) + '" y="' + B.py(lj).toFixed(1)
+       + '" width="' + w.toFixed(1) + '" height="' + (B.py(0) - B.py(lj)).toFixed(1)
+       + '" fill="' + c[5] + '" opacity="0.78"/>';
+    /* the partial current and the total it was taken from, together, so
+       the one number cannot be read without the other              */
+    g += TX(B.px(c[0]), B.py(lj) - 6, (c[3] < 10 ? c[3].toFixed(1) : c[3].toFixed(0))
+            + " of " + (c[2] < 10 ? c[2].toFixed(1) : c[2].toFixed(0)), c[5], 10.5, "middle", 700);
+    g += TX(B.px(c[0]), B.Y1 + 15, c[4], "var(--ink-2)", 9.5, "middle", 600);
+
   }
-  g += TX(f.px(-0.95), f.py(36), "CO", "var(--surface)", 11, "middle", 700);
-  g += TX(f.px(-0.65), f.py(92), "H₂ and the rest", "var(--muted)", 9.5, "middle", 600);
-  g += TX(f.X0 + 8, f.Y0 + 14, "j(total): 2.1 → 4.0 → 7.5 → 14 → 22 → 31 mA cm⁻²",
-          "var(--ink-2)", 9.5, null, 600);
-  return SVG(520, 212, g, "Faradaic efficiency for carbon monoxide against potential, as stacked "
-           + "bars, with the total current density written above them.");
+  g += TX(A.px(1), A.Y1 + 44, "selectivity", "var(--ink-2)", 10.5, "middle", 700);
+  g += TX(B.px(1), B.Y1 + 44, "rate: j(CO) of j(total), mA cm⁻²", "var(--ink-2)", 10, "middle", 700);
+  return SVG(520, 212, g, "Two panels. On the left, faradaic efficiency for carbon monoxide: "
+           + "92 per cent in an H-cell against 61 per cent in a gas-diffusion electrode. On the "
+           + "right, the partial current density for carbon monoxide on a logarithmic scale: 6.0 "
+           + "out of a total 6.5 against 189 out of 310 milliamps per square centimetre, the "
+           + "ranking the other way round.");
 }
 
 /* a Levich line that stops being straight */
@@ -1078,7 +1106,7 @@ var CONCEPTS = {
   a:2,
   why:"Two straight lines of different slope cross exactly once. Here η<sub>A</sub> = 120 log(j/10<sup>&minus;3</sup>) and η<sub>B</sub> = 40 log(j/10<sup>&minus;5</sup>), which are equal at about <b>j = 10<sup>&minus;2</sup> A cm<sup>&minus;2</sup></b>: below it A wins, above it B wins and keeps winning. <b>Neither j<sub>0</sub> nor b is an activity on its own</b> &mdash; that is precisely why the field quotes <b>η at 10 mA cm<sup>&minus;2</sup></b>, one number at one agreed rate. And the comparison is only honest if both are per <i>real</i> area, since a j<sub>0</sub> quoted on geometric area is partly a roughness measurement."},
 
- {q:"A CO<sub>2</sub> reduction paper reports 92 % faradaic efficiency for CO at &minus;0.65 V in an H-cell, and compares it with a catalyst reported at 61 % in a gas-diffusion electrode.<br>" + FIG_FE() + "What is wrong with the comparison?",
+ {q:"A CO<sub>2</sub> reduction paper reports <b>92 % faradaic efficiency for CO</b> in an H-cell and compares it with a catalyst reported at <b>61 %</b> in a gas-diffusion electrode. The figure gives both, and beside each the total current density it was measured at.<br>" + FIG_FE() + "What is wrong with the comparison?",
   o:["Nothing, as long as both were measured at the same potential",
      "Faradaic efficiency is a selectivity, not a rate, and the two cells cap the current at completely different levels — the partial current densities are what must be compared",
      "An H-cell always gives the more reliable number, so the 92 % should be preferred",
