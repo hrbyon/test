@@ -608,7 +608,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
             </div>
             <div>
               <div class="slider-row"><span class="fld" style="margin:0">peroxide lost before the ring</span><span class="val" id="rgLv"></span></div>
-              <input type="range" id="rgL" min="0" max="0.5" step="0.01" value="0">
+              <input type="range" id="rgL" min="0" max="1" step="0.01" value="0">
             </div>
             <div>
               <div class="slider-row"><span class="fld" style="margin:0">ring current that is not peroxide</span><span class="val" id="rgBv"></span></div>
@@ -617,7 +617,8 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
             <div class="btnrow">
               <button class="ghost" id="rgP1" type="button">clean 4e&minus;</button>
               <button class="ghost" id="rgP2" type="button">a real catalyst</button>
-              <button class="ghost" id="rgP3" type="button">peroxide decomposing</button>
+              <button class="ghost" id="rgP3" type="button">60 % peroxide, read as 30 %</button>
+              <button class="ghost" id="rgP4" type="button">a 2e&minus; catalyst read as 4e&minus;</button>
             </div>
           </div>
         </div>
@@ -642,7 +643,7 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
       <div class="figs">
         <div class="card">
           <div class="card-h"><h2>Disk below, ring above</h2>
-            <span class="note">the two halves of one experiment, on one potential axis</span></div>
+            <span class="note">the two halves of one experiment, on one potential axis &middot; read at 0.30 V, marked</span></div>
           <div class="card-b stack" style="gap:12px">
             <svg id="rgLsv" viewBox="0 0 520 300" style="width:100%;height:auto" role="img"
                  aria-label="Two current traces against disk potential. The disk current is cathodic and falls to a plateau as the potential is lowered; the ring current is anodic and rises as peroxide begins to be produced, on a scale magnified several times."></svg>
@@ -687,8 +688,10 @@ footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:v
                 in the gap, or on the catalyst film itself, lowers i<sub>R</sub> without touching
                 i<sub>D</sub>. N calibrated on a stable couple is then too large for this species, so
                 <b>n is reported too high and %H<sub>2</sub>O<sub>2</sub> too low</b>. Put the loss slider
-                up and watch a two-electron catalyst be reported as nearly four. <b>An n of 3.9 is not by
-                itself proof of a four-electron catalyst.</b></p>
+                up and watch a two-electron catalyst be reported as nearly four &mdash; the preset
+                <i>a 2e&minus; catalyst read as 4e&minus;</i> sets it to 98 % lost, where n reads 3.92
+                against a truth of 2.00. At 100 % the ring sees nothing at all and the answer is a
+                flawless 4.00. <b>An n of 3.9 is not by itself proof of a four-electron catalyst.</b></p>
               <p class="hint"><b class="pot">And the ring has to be oxidising peroxide, not water.</b> Hold
                 it on the plateau for H<sub>2</sub>O<sub>2</sub> oxidation &mdash; about 1.2 V vs RHE in
                 acid &mdash; and no higher: above that the ring makes O<sub>2</sub> from water or oxidises
@@ -1718,10 +1721,6 @@ function rgLsvDraw(){
   if(pl.iR > 0) s += tx(f.X1 - 6, f.py(pl.iR * mag / un.k) - 7, fmtA(pl.iR),
                         "var(--ox)", 10, "end", 600);
   s += ln(f.px(0.30), f.Y0, f.px(0.30), f.Y1, "var(--ink-2)", 1, "3 3", 0.45);
-  /* the ring's own label lives in the top left, so this one goes to the
-     right, where neither trace has anything to say                */
-  s += tx(f.X1 - 6, f.Y1 - 8, "the readings are taken at 0.30 V",
-          "var(--ink-2)", 9.5, "end", 600);
   el("rgLsv").innerHTML = s;
 }
 
@@ -1997,7 +1996,10 @@ bind("rgL", function(v){ RG.loss = v; rgSync(); });
 bind("rgB", function(v){ RG.bg = v; rgSync(); });
 [["rgP1", {x:0.02, loss:0, bg:0}],
  ["rgP2", {x:0.30, loss:0, bg:0}],
- ["rgP3", {x:0.60, loss:0.35, bg:0}]].forEach(function(q){
+ /* the case check 2 question 4 quotes: 60 % peroxide reported at half */
+ ["rgP3", {x:0.60, loss:0.59, bg:0}],
+ /* and the one the notes describe: a 2-electron catalyst read as 3.9 */
+ ["rgP4", {x:1.00, loss:0.98, bg:0}]].forEach(function(q){
   el(q[0]).addEventListener("click", function(){
     var k; for(k in q[1]){ if(Object.prototype.hasOwnProperty.call(q[1], k)) RG[k] = q[1][k]; }
     el("rgX").value = RG.x; el("rgL").value = RG.loss; el("rgB").value = RG.bg;
@@ -2091,7 +2093,7 @@ var QZ2 = [
      "Neither: dividing by N corrects for it",
      "n too high and %H<sub>2</sub>O<sub>2</sub> too low"],
   a:3,
-  w:"i<sub>R</sub> falls while i<sub>D</sub> does not, so i<sub>R</sub>/N is an underestimate of the peroxide that was actually made: <code>n = 4|i<sub>D</sub>|/(|i<sub>D</sub>| + |i<sub>R</sub>|/N)</code> rises towards 4 and the percentage falls. <b>Dividing by N cannot correct it</b>, because N was measured on a species that did not decompose &mdash; it is too large for this one. The error always flatters the catalyst, which is why <b>an n of 3.9 is not by itself proof of a four-electron pathway</b>. Push the loss slider on the ring tab and watch a 60 % peroxide catalyst be reported at half that."},
+  w:"i<sub>R</sub> falls while i<sub>D</sub> does not, so i<sub>R</sub>/N is an underestimate of the peroxide that was actually made: <code>n = 4|i<sub>D</sub>|/(|i<sub>D</sub>| + |i<sub>R</sub>|/N)</code> rises towards 4 and the percentage falls. <b>Dividing by N cannot correct it</b>, because N was measured on a species that did not decompose &mdash; it is too large for this one. The error always flatters the catalyst, which is why <b>an n of 3.9 is not by itself proof of a four-electron pathway</b>. Push the loss slider on the ring tab — or press <i>60 % peroxide, read as 30 %</i> — and watch exactly that: at 59 % lost, a catalyst sending 60 % of its oxygen to peroxide is reported at 30 %, with n = 3.40 instead of 2.80."},
 
  {q:"At one rotation rate, can the ring distinguish O<sub>2</sub> &rarr; 2H<sub>2</sub>O at the disk from O<sub>2</sub> &rarr; H<sub>2</sub>O<sub>2</sub> &rarr; 2H<sub>2</sub>O at the disk?",
   o:["Yes: the series route always gives a larger ring current",
